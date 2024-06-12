@@ -283,14 +283,10 @@ export class Step3Component implements OnInit {
 
 	filteredCountries: any;
 
-	reviewerIsValid = false;
-
-	reviewerSelected: any;
-
 	constructor(private router: Router, public presenter: InscriptionPresenter) {}
 
 	ngOnInit(): void {
-		this.watchEstudent();
+		this.presenter.watchReviewer();
 	}
 
 	nextStep() {
@@ -311,18 +307,5 @@ export class Step3Component implements OnInit {
 			}
 		}
 		this.filteredCountries = filtered;
-	}
-
-	watchEstudent() {
-		this.presenter.reviewer.valueChanges.pipe().subscribe((data: any) => {
-			if (data.code) {
-				this.reviewerIsValid = true;
-				this.reviewerSelected = data.code
-				console.log(data.code);
-			} else {
-				this.reviewerIsValid = false;
-				this.reviewerSelected = {};
-			}
-		})
 	}
 }

@@ -283,26 +283,11 @@ export class Step2Component implements OnInit {
 
 	filteredCountries: any[];
 
-	
-
-	studentTwoRequired = false;
-
-	studentOneIsValid = false;
-	studentTwoIsValid = false;
-
-	dataStudentOneSelected: any;
-	dataStudentTwoSelected: any;
-
-	
-
-	constructor(private router: Router, public presenter: InscriptionPresenter) {
-		
-	}
+	constructor(private router: Router, public presenter: InscriptionPresenter) { }
 
 	ngOnInit(): void {
-		this.watchEstudent();
-		this.watchEstudentTwo();
-		this.presenter.prueba();
+		this.presenter.watchEstudent();
+		this.presenter.watchEstudentTwo();
 	}
 
 	nextStep() {
@@ -324,47 +309,4 @@ export class Step2Component implements OnInit {
 		}
 		this.filteredCountries = filtered;
 	}
-
-	watchEstudent() {
-		this.presenter.student.valueChanges.pipe().subscribe((data: any) => {
-			if (data.code) {
-				this.studentOneIsValid = true;
-				this.dataStudentOneSelected = data.code
-				console.log(data.code);
-			} else {
-				this.studentOneIsValid = false;
-				this.dataStudentOneSelected = {};
-			}
-		})
-	}
-
-	watchEstudentTwo() {
-		this.presenter.studentTwo.valueChanges.pipe().subscribe((data: any) => {
-			if (data.code) {
-				this.studentTwoIsValid = true;
-				this.dataStudentTwoSelected = data.code;
-				console.log(data.code);
-			} else {
-				this.studentTwoIsValid = false;
-				this.dataStudentTwoSelected = {}
-			}
-		})
-	}
-
-	showStudentTwo() {
-		this.studentTwoRequired = true;
-		this.presenter.formStep2.addControl('studentTwo', this.presenter.studentTwo);
-	}
-
-	hideStudentTwo(){
-		this.studentTwoRequired = false;
-		this.studentTwoIsValid = false;
-		this.presenter.formStep2.removeControl('studentTwo');
-		this.presenter.studentTwo.reset();
-	}
-
-	validatonForStudentTwo(): boolean {
-		return this.studentTwoRequired ? !this.studentTwoIsValid : false;
-	}
-
 }

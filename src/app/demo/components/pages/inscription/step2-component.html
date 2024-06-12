@@ -9,7 +9,7 @@
                 <span class="p-float-label">
                     <p-autoComplete 
                     id="inputtext"
-            (formControlName)="presenter.student"
+            formControlName="student"
             [suggestions]="filteredCountries" 
             (completeMethod)="filterCountry($event)" 
             field="name" />
@@ -17,16 +17,16 @@
                         estudiante</label>
                 </span>
             </div>
-            <div *ngIf="!studentTwoRequired" class="col-12 md:col-1">
+            <div *ngIf="!presenter.studentTwoRequired" class="col-12 md:col-1">
                 <p-button icon="pi pi-user-plus" [rounded]="true" [outlined]="true"
                 pTooltip="Agregar un segundo estudiante" tooltipPosition="bottom" 
-                (click)="showStudentTwo()" />
+                (click)="presenter.showStudentTwo()" />
             </div>
-            <div *ngIf="studentTwoRequired" class="col-12 md:col-5">
+            <div *ngIf="presenter.studentTwoRequired" class="col-12 md:col-5">
                 <span class="p-float-label">
                     <p-autoComplete 
                     id="inputtext"
-            (formControlName)="presenter.studentTwo"
+            formControlName="studentTwo"
             [suggestions]="filteredCountries" 
             (completeMethod)="filterCountry($event)" 
             field="name" />
@@ -34,29 +34,29 @@
                         segundo estudiante</label>
                 </span>
             </div>
-            <div *ngIf="studentTwoRequired" class="col-12 md:col-1">
+            <div *ngIf="presenter.studentTwoRequired" class="col-12 md:col-1">
                 <p-button icon="pi pi-times" [rounded]="true" severity="danger" [outlined]="true" 
                 pTooltip="Eliminar el segundo estudiante" tooltipPosition="bottom" 
-                (click)="hideStudentTwo()" />
+                (click)="presenter.hideStudentTwo()" />
             </div>
         </div>
         <div class="grid p-fluid">
             <div class="col-12 md:col-6">
-                <div *ngIf="studentOneIsValid" style="border: 1px dashed #d1d5db;">
+                <div *ngIf="presenter.studentOneIsValid" style="border: 1px dashed #d1d5db;">
                     <div class="py-3">
                         <h5>Datos del estudiante</h5>
-                        <p>{{dataStudentOneSelected.email}}</p>
-                        <p>{{dataStudentOneSelected.celular}}</p>
+                        <p>{{presenter.dataStudentOneSelected.email}}</p>
+                        <p>{{presenter.dataStudentOneSelected.celular}}</p>
                     </div>
                     
                 </div>
             </div>
-            <div *ngIf="studentTwoIsValid" class="col-12 md:col-6">
+            <div *ngIf="presenter.studentTwoIsValid" class="col-12 md:col-6">
                 <div style="border: 1px dashed #d1d5db;">
                     <div class="py-3">
                         <h5>Datos del estudiante</h5>
-                        <p>{{dataStudentTwoSelected.email}}</p>
-                        <p>{{dataStudentTwoSelected.celular}}</p>
+                        <p>{{presenter.dataStudentTwoSelected.email}}</p>
+                        <p>{{presenter.dataStudentTwoSelected.celular}}</p>
                     </div>
                     
                 </div>
@@ -66,7 +66,7 @@
             <p-button (click)="backStep()" label="Regresar" [outlined]="true"
                 icon="pi pi-angle-left" iconPos="left" />
             <p-button (click)="nextStep()" label="Siguiente"
-                icon="pi pi-angle-right" iconPos="right" [disabled]="!studentOneIsValid || validatonForStudentTwo()" />
+                icon="pi pi-angle-right" iconPos="right" [disabled]="!presenter.studentOneIsValid || presenter.validatonForStudentTwo()" />
         </div>
     </form>
 </div>

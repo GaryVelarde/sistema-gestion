@@ -9,7 +9,7 @@
                 <span class="p-float-label">
                     <p-autoComplete 
                     id="inputtext"
-            (formControlName)="presenter.reviewer"
+            formControlName="reviewer"
             [suggestions]="filteredCountries" 
             (completeMethod)="filterCountry($event)" 
             field="name" />
@@ -20,11 +20,11 @@
         </div>
         <div class="grid p-fluid">
             <div class="col-12 md:col-12">
-                <div *ngIf="reviewerIsValid" style="border: 1px dashed #d1d5db;">
+                <div *ngIf="presenter.reviewerIsValid" style="border: 1px dashed #d1d5db;">
                     <div class="py-3">
                         <h5>Datos del estudiante</h5>
-                        <p>{{reviewerSelected.email}}</p>
-                        <p>{{reviewerSelected.celular}}</p>
+                        <p>{{presenter.reviewerSelected.email}}</p>
+                        <p>{{presenter.reviewerSelected.celular}}</p>
                     </div>
                     
                 </div>
@@ -35,7 +35,7 @@
                 icon="pi pi-angle-left" iconPos="left" />
             <p-button (click)="nextStep()" label="Siguiente"
                 icon="pi pi-angle-right" iconPos="right" [disabled]="false"
-                [disabled]="!reviewerIsValid" />
+                [disabled]="!presenter.reviewerIsValid" />
         </div>
     </form>
 </div>

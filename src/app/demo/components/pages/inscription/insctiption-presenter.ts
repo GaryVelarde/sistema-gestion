@@ -6,9 +6,6 @@ import { BehaviorSubject } from 'rxjs';
     providedIn: 'root'
 })
 export class InscriptionPresenter {
-    private dataSubject = new BehaviorSubject<string>('Initial Data');
-    data$ = this.dataSubject.asObservable();
-
     formStep1: FormGroup;
     formStep2: FormGroup;
     formStep3: FormGroup;
@@ -19,6 +16,14 @@ export class InscriptionPresenter {
     private _reviewer: FormControl = new FormControl('', Validators.required);
     private _student: FormControl = new FormControl('', Validators.required);
 	private _studentTwo: FormControl = new FormControl('', Validators.required);
+
+    studentTwoRequired = false;
+	studentOneIsValid = false;
+	studentTwoIsValid = false;
+	dataStudentOneSelected: any;
+	dataStudentTwoSelected: any;
+    reviewerIsValid = false;
+	reviewerSelected: any;
 
     get receptionDate(){
         return this._receptionDate;
@@ -55,11 +60,59 @@ export class InscriptionPresenter {
 		})
     }
 
-    updateData(newData: string) {
-        this.dataSubject.next(newData);
-    }
+    watchEstudent() {
+		this.student.valueChanges.pipe().subscribe((data: any) => {
+			if (data.code) {
+				this.studentOneIsValid = true;
+				this.dataStudentOneSelected = data.code;
+                console.log('this.dataStudentOneSelected', this.dataStudentOneSelected)
+				console.log(data.code);
+			} else {
+				this.studentOneIsValid = false;
+				this.dataStudentOneSelected = {};
+			}
+		})
+	}
 
-    prueba() {
-        console.log('prueba');
-    }
+	watchEstudentTwo() {
+		this.studentTwo.valueChanges.pipe().subscribe((data: any) => {
+			if (data.code) {
+				this.studentTwoIsValid = true;
+				this.dataStudentTwoSelected = data.code;
+				console.log(data.code);
+			} else {
+				this.studentTwoIsValid = false;
+				this.dataStudentTwoSelected = {}
+			}
+		})
+	}
+
+	showStudentTwo() {
+		this.studentTwoRequired = true;
+		this.formStep2.addControl('studentTwo', this.studentTwo);
+	}
+
+	hideStudentTwo(){
+		this.studentTwoRequired = false;
+		this.studentTwoIsValid = false;
+		this.formStep2.removeControl('studentTwo');
+		this.studentTwo.reset();
+	}
+
+	validatonForStudentTwo(): boolean {
+		return this.studentTwoRequired ? !this.studentTwoIsValid : false;
+	}
+
+    watchReviewer() {
+		this.reviewer.valueChanges.pipe().subscribe((data: any) => {
+			if (data.code) {
+				this.reviewerIsValid = true;
+				this.reviewerSelected = data.code
+				console.log(data.code);
+			} else {
+				this.reviewerIsValid = false;
+				this.reviewerSelected = {};
+			}
+		})
+	}
 }

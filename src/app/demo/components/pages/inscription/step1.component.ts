@@ -16,7 +16,7 @@ export class Step1Component {
 
 	nextStep(): void{
 		console.log(this.presenter.formStep1)
-		//void this.router.navigate(['pages/new-titulation-proces/step2']);
+		void this.router.navigate(['pages/new-titulation-proces/step2']);
 	}
 	
 }
