@@ -1,0 +1,506 @@
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button
+                            pButton
+                            pRipple
+                            label="New"
+                            icon="pi pi-plus"
+                            class="p-button-success mr-2"
+                            (click)="openNew()"></button>
+                        <button
+                            pButton
+                            pRipple
+                            label="Delete"
+                            icon="pi pi-trash"
+                            class="p-button-danger"
+                            (click)="deleteSelectedProducts()"
+                            [disabled]="
+                                !selectedProducts || !selectedProducts.length
+                            "></button>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="right">
+                    <p-fileupload
+                        mode="basic"
+                        accept="image/*"
+                        [maxFileSize]="1000000"
+                        label="Import"
+                        chooseLabel="Import"
+                        class="mr-2 inline-block"></p-fileupload>
+                    <button
+                        pButton
+                        pRipple
+                        label="Export"
+                        icon="pi pi-upload"
+                        class="p-button-help"
+                        (click)="dt.exportCSV()"></button>
+                </ng-template>
+            </p-toolbar>
+
+            <p-table
+                #dt
+                [value]="products"
+                [columns]="cols"
+                responsiveLayout="scroll"
+                [rows]="10"
+                [globalFilterFields]="[
+                    'name',
+                    'country.name',
+                    'representative.name',
+                    'status'
+                ]"
+                [paginator]="true"
+                [rowsPerPageOptions]="[10, 20, 30]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [(selection)]="selectedProducts"
+                selectionMode="multiple"
+                [rowHover]="true"
+                dataKey="id">
+                <ng-template pTemplate="caption">
+                    <div
+                        class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">Manage Products</h5>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input
+                                pInputText
+                                type="text"
+                                (input)="onGlobalFilter(dt, $event)"
+                                placeholder="Search..."
+                                class="w-full sm:w-auto" />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem">
+                            <p-tableheadercheckbox></p-tableheadercheckbox>
+                        </th>
+                        <th pSortableColumn="code">
+                            Code <p-sorticon field="code"></p-sorticon>
+                        </th>
+                        <th pSortableColumn="name">
+                            Name <p-sorticon field="name"></p-sorticon>
+                        </th>
+                        <th>Image</th>
+                        <th pSortableColumn="price">
+                            Price <p-sorticon field="price"></p-sorticon>
+                        </th>
+                        <th pSortableColumn="category">
+                            Category <p-sorticon field="category"></p-sorticon>
+                        </th>
+                        <th pSortableColumn="rating">
+                            Reviews <p-sorticon field="rating"></p-sorticon>
+                        </th>
+                        <th pSortableColumn="inventoryStatus">
+                            Status
+                            <p-sorticon field="inventoryStatus"></p-sorticon>
+                        </th>
+                        <th></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-product>
+                    <tr>
+                        <td>
+                            <p-tablecheckbox
+                                [value]="product"></p-tablecheckbox>
+                        </td>
+                        <td style="width: 14%; min-width: 10rem">
+                            <span class="p-column-title">Code</span>
+                            {{ product.code || product.id }}
+                        </td>
+                        <td style="width: 14%; min-width: 10rem">
+                            <span class="p-column-title">Name</span>
+                            {{ product.name }}
+                        </td>
+                        <td style="width: 14%; min-width: 10rem">
+                            <span class="p-column-title">Image</span>
+                            <img
+                                [src]="
+                                    'assets/demo/images/product/' +
+                                    product.image
+                                "
+                                [alt]="product.name"
+                                width="100"
+                                class="shadow-4" />
+                        </td>
+                        <td style="width: 14%; min-width: 8rem">
+                            <span class="p-column-title">Price</span>
+                            {{ product.price | currency : "USD" }}
+                        </td>
+                        <td style="width: 14%; min-width: 10rem">
+                            <span class="p-column-title">Category</span>
+                            {{ product.category }}
+                        </td>
+                        <td style="width: 14%; min-width: 10rem">
+                            <span class="p-column-title">Reviews</span>
+                            <p-rating
+                                [ngModel]="product.rating"
+                                [readonly]="true"
+                                [cancel]="false"></p-rating>
+                        </td>
+                        <td style="width: 14%; min-width: 10rem">
+                            <span class="p-column-title">Status</span>
+                            <span
+                                [class]="
+                                    'product-badge status-' +
+                                    (product.inventoryStatus
+                                        ? product.inventoryStatus.toLowerCase()
+                                        : '')
+                                ">{{ product.inventoryStatus }}</span>
+                        </td>
+                        <td>
+                            <div class="flex">
+                                <button
+                                    pButton
+                                    pRipple
+                                    icon="pi pi-pencil"
+                                    class="p-button-rounded p-button-success mr-2"
+                                    (click)="editProduct(product)"></button>
+                                <button
+                                    pButton
+                                    pRipple
+                                    icon="pi pi-trash"
+                                    class="p-button-rounded p-button-warning"
+                                    (click)="deleteProduct(product)"></button>
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <p-dialog
+            [(visible)]="modalNewUser"
+            [style]="{ width: '60rem' }"
+            header="Product Details"
+            [modal]="true"
+            class="p-fluid">
+            <div class="content">
+                <form [formGroup]="userForm">
+                    <div class="field mt-4">
+                        <span class="p-float-label">
+                            <p-dropdown
+                                formControlName="role"
+                                inputId="role"
+                                [autoDisplayFirst]="false"
+                                [options]="roles"
+                                optionLabel="name"></p-dropdown>
+                            <label for="role">Seleccione un rol</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="role.dirty && role.errors">El nombre es
+                            requerido.</small>
+                    </div>
+                    <div *ngIf="role.value.code === 'Estudiante'">
+                        <div class="formgrid grid mt-5">
+                            <div class="field col">
+                                <span class="p-float-label">
+                                    <input
+                                        type="text"
+                                        id="career"
+                                        pInputText
+                                        formControlName="career" />
+                                    <label for="career">Carrera</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="career.dirty && career.errors">La
+                                    carrera es requerida.</small>
+                            </div>
+                            <div class="field col">
+                                <span class="p-float-label">
+                                    <p-dropdown
+                                        formControlName="cycle"
+                                        inputId="cycle"
+                                        [autoDisplayFirst]="false"
+                                        [options]="cycles"
+                                        optionLabel="name"></p-dropdown>
+                                    <label for="cycle">Seleccione el
+                                        ciclo</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="cycle.dirty && cycle.errors">El ciclo
+                                    es requerido.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="role.value.code === 'Egresado'">
+                        <div class="formgrid grid mt-5">
+                            <div class="field col">
+                                <span class="p-float-label">
+                                    <input
+                                        type="text"
+                                        id="career"
+                                        pInputText
+                                        formControlName="career" />
+                                    <label for="career">Carrera</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="career.dirty && career.errors">La
+                                    carrera es requerida.</small>
+                            </div>
+                            <div class="field col">
+                                <span class="p-float-label">
+                                    <p-calendar
+                                        inputId="egressDate"
+                                        formControlName="egressDate"></p-calendar>
+                                    <label for="egressDate">Fecha de
+                                        egreso</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="
+                                        egressDate.dirty && egressDate.errors
+                                    ">La fecha de egreso es requerida.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field mt-4">
+                        <span class="p-float-label">
+                            <input
+                                type="text"
+                                id="name"
+                                pInputText
+                                formControlName="name" />
+                            <label for="name">Nombres completos</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="name.dirty && name.errors">El nombre es
+                            requerido.</small>
+                    </div>
+                    <div class="field mt-4">
+                        <span class="p-float-label">
+                            <input
+                                type="text"
+                                id="lastName"
+                                pInputText
+                                formControlName="lastName" />
+                            <label for="lastName">Apellidos completos</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="lastName.dirty && lastName.errors">El
+                            apellido es requerido.</small>
+                    </div>
+
+                    <div class="formgrid grid mt-4">
+                        <div class="field col">
+                            <span class="p-float-label">
+                                <input
+                                    type="text"
+                                    id="code"
+                                    pInputText
+                                    formControlName="code" />
+                                <label for="code">Código</label>
+                            </span>
+                            <small
+                                class="pl-2 text-error"
+                                *ngIf="code.dirty && code.errors">El código es
+                                requerido.</small>
+                        </div>
+
+                        <div class="field col">
+                            <span class="p-float-label">
+                                <input
+                                    type="text"
+                                    id="number"
+                                    pInputText
+                                    formControlName="number" />
+                                <label for="number">Celular</label>
+                            </span>
+                            <small
+                                class="pl-2 text-error"
+                                *ngIf="number.dirty && number.errors">El celular
+                                es requerido.</small>
+                        </div>
+                    </div>
+                    <div class="formgrid grid mt-4">
+                        <div class="field col">
+                            <span class="p-float-label">
+                                <input
+                                    type="email"
+                                    id="email"
+                                    pInputText
+                                    formControlName="email" />
+                                <label for="email">Correo</label>
+                            </span>
+                            <small
+                                class="pl-2 text-error"
+                                *ngIf="email.dirty && email.errors">El nombre es
+                                requerido.</small>
+                        </div>
+                    </div>
+                    <div *ngIf="role.value.code === 'Docente'">
+                        <div class="grid formgrid mt-4 pl-1">
+                            <div class="col-12 md:col-4">
+                                <div class="field-checkbox">
+                                    <p-checkbox
+                                        name="group1"
+                                        value="Revisor"
+                                        formControlName="reviewer"
+                                        id="Revisor"></p-checkbox>
+                                    <label for="ny">Revisor</label>
+                                </div>
+                            </div>
+                            <div class="col-12 md:col-4">
+                                <div class="field-checkbox">
+                                    <p-checkbox
+                                        name="group1"
+                                        value="Asesor"
+                                        formControlName="adviser"
+                                        id="adviser"></p-checkbox>
+                                    <label for="sf">Asesor</label>
+                                </div>
+                            </div>
+                            <div class="col-12 md:col-4">
+                                <div class="field-checkbox">
+                                    <p-checkbox
+                                        name="group1"
+                                        value="Jurado"
+                                        formControlName="jury"
+                                        id="jury"></p-checkbox>
+                                    <label for="la">Jurado</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="formgrid grid mt-5">
+                            <div class="field col">
+                                <span class="p-float-label">
+                                    <input
+                                        type="text"
+                                        id="career"
+                                        pInputText
+                                        formControlName="career" />
+                                    <label for="career">Carrera</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="career.dirty && career.errors">La
+                                    carrera es requerida.</small>
+                            </div>
+                            <div class="field col">
+                                <span class="p-float-label">
+                                    <input
+                                        type="text"
+                                        id="line"
+                                        pInputText
+                                        formControlName="line" />
+                                    <label for="line">Línea</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="line.dirty && line.errors">la línea
+                                    es requerida.</small>
+                            </div>
+                        </div>
+                        <div class="field mt-4">
+                            <span class="p-float-label">
+                                <textarea
+                                    inputId="subLine"
+                                    rows="3"
+                                    cols="30"
+                                    formControlName="subLine"
+                                    pInputTextarea></textarea>
+                                <label for="subLine">Sub línea</label>
+                            </span>
+                            <small
+                                class="pl-2 text-error"
+                                *ngIf="subLine.dirty && subLine.errors">Las sub
+                                líneas son requeridas.</small>
+                        </div>
+                    </div>
+
+                    <div class="footer mt-5">
+                        <button
+                            pButton
+                            pRipple
+                            label="Cancel"
+                            icon="pi pi-times"
+                            class="p-button-text"
+                            iconPos="right"
+                            (click)="hideDialog()"></button>
+                        <button
+                            pButton
+                            pRipple
+                            label="Guardar"
+                            icon="pi pi-check"
+                            iconPos="right"
+                            [disabled]="!userForm.valid"
+                            (click)="saveProduct()"></button>
+                    </div>
+                </form>
+            </div>
+        </p-dialog>
+
+        <p-dialog
+            [(visible)]="deleteProductDialog"
+            header="Confirm"
+            [modal]="true"
+            [style]="{ width: '450px' }">
+            <div class="flex align-items-center justify-content-center">
+                <i
+                    class="pi pi-exclamation-triangle mr-3"
+                    style="font-size: 2rem"></i>
+                <span *ngIf="product">Are you sure you want to delete <b>{{
+                        product.name }}</b>?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button
+                    pButton
+                    pRipple
+                    icon="pi pi-times"
+                    class="p-button-text"
+                    label="No"
+                    (click)="deleteProductDialog = false"></button>
+                <button
+                    pButton
+                    pRipple
+                    icon="pi pi-check"
+                    class="p-button-text"
+                    label="Yes"
+                    (click)="confirmDelete()"></button>
+            </ng-template>
+        </p-dialog>
+
+        <p-dialog
+            [(visible)]="deleteProductsDialog"
+            header="Confirm"
+            [modal]="true"
+            [style]="{ width: '450px' }">
+            <div class="flex align-items-center justify-content-center">
+                <i
+                    class="pi pi-exclamation-triangle mr-3"
+                    style="font-size: 2rem"></i>
+                <span>Are you sure you want to delete selected products?</span>
+            </div>
+            <ng-template pTemplate="footer">
+                <button
+                    pButton
+                    pRipple
+                    icon="pi pi-times"
+                    class="p-button-text"
+                    label="No"
+                    (click)="deleteProductsDialog = false"></button>
+                <button
+                    pButton
+                    pRipple
+                    icon="pi pi-check"
+                    class="p-button-text"
+                    label="Yes"
+                    (click)="confirmDeleteSelected()"></button>
+            </ng-template>
+        </p-dialog>
+    </div>
+</div>

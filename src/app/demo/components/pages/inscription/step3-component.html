@@ -1,0 +1,41 @@
+<div class="card">
+    <h5>Asignación de estudiantes</h5>
+    <p>
+        Complete todos los campos para continuar.
+    </p>
+    <form [formGroup]="presenter.formStep3">
+        <div class="grid p-fluid mt-3">
+            <div class="field col-12 md:col-12">
+                <span class="p-float-label">
+                    <p-autoComplete 
+                    id="inputtext"
+            (formControlName)="presenter.reviewer"
+            [suggestions]="filteredCountries" 
+            (completeMethod)="filterCountry($event)" 
+            field="name" />
+                    <label for="inputtext">Ingrese el nombre del
+                        revisor</label>
+                </span>
+            </div>
+        </div>
+        <div class="grid p-fluid">
+            <div class="col-12 md:col-12">
+                <div *ngIf="reviewerIsValid" style="border: 1px dashed #d1d5db;">
+                    <div class="py-3">
+                        <h5>Datos del estudiante</h5>
+                        <p>{{reviewerSelected.email}}</p>
+                        <p>{{reviewerSelected.celular}}</p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-3 mt-1">
+            <p-button (click)="backStep()" label="Regresar" [outlined]="true"
+                icon="pi pi-angle-left" iconPos="left" />
+            <p-button (click)="nextStep()" label="Siguiente"
+                icon="pi pi-angle-right" iconPos="right" [disabled]="false"
+                [disabled]="!reviewerIsValid" />
+        </div>
+    </form>
+</div>

@@ -1,0 +1,70 @@
+<div class="card">
+    <h5>Float Label</h5>
+    <p>
+        All input text components support floating labels by adding
+        (<mark>.p-float-label</mark>) to wrapper class.
+    </p>
+    <div class="grid p-fluid mt-3">
+        <div class="field col-12 md:col-12">
+            <span class="p-float-label">
+                <textarea
+                    inputId="textarea"
+                    rows="4"
+                    cols="30"
+                    pInputTextarea
+                ></textarea>
+                <label for="textarea">Título del proyecto de tesis</label>
+            </span>
+        </div>
+    </div>
+    <div class="grid p-fluid">
+        <div class="field col-12 md:col-4">
+            <span class="p-float-label">
+                <p-calendar
+                    inputId="approvalDate"
+                    formControlName="approvalDate"></p-calendar>
+                <label for="approvalDate">Fecha de
+                    aprobación UDI</label>
+            </span>
+        </div>
+        <div class="field col-12 md:col-4">
+            <span class="p-float-label">
+                <input
+                type="text"
+                id="jobNumber"
+                pInputText
+            />
+                <label for="jobNumber">Número de oficio</label>
+            </span>
+        </div>
+        <div class="field col-12 md:col-4">
+            <span class="p-float-label">
+                <input
+                type="text"
+                id="resolutionNumber"
+                pInputText
+            />
+                <label for="resolutionNumber">Número de resolución</label>
+            </span>
+        </div>
+    </div>
+    <div class="grid p-fluid">
+        <div class="field col-12 md:col-12">
+            <span class="p-float-label">
+                <textarea
+                    inputId="textarea"
+                    rows="4"
+                    cols="30"
+                    pInputTextarea
+                ></textarea>
+                <label for="textarea">Comentarios u observaciones de la inscripción</label>
+            </span>
+        </div>
+    </div>
+    <div class="flex gap-3 mt-1">
+        <p-button (click)="backStep()" label="Regresar" [outlined]="true"
+        icon="pi pi-angle-left" iconPos="left" />
+    <p-button (click)="finalize()" label="Finalizar" icon="pi pi-check"
+        iconPos="right" />
+    </div>
+</div>
