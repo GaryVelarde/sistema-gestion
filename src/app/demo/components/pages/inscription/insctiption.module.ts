@@ -20,6 +20,12 @@ import { DropdownModule } from 'primeng/dropdown';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InsctiptionComponent } from './insctiption.component';
 import { InscriptionPresenter } from './insctiption-presenter';
+import { ToastModule } from 'primeng/toast';
+import { FileUploadModule } from 'primeng/fileupload';
+import { BadgeModule } from 'primeng/badge';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { HttpClientModule } from '@angular/common/http';
+
 @NgModule({
 	imports: [
 		CommonModule,
@@ -37,6 +43,9 @@ import { InscriptionPresenter } from './insctiption-presenter';
 		CalendarModule,
 		DropdownModule,
 		InputTextareaModule,
+		ToastModule,
+		FileUploadModule,
+		BadgeModule, ProgressBarModule, HttpClientModule,
 		RouterModule.forChild([
 			{
 				path: '', component: InsctiptionComponent, children: [

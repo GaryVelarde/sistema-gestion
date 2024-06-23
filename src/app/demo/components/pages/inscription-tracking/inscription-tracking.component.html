@@ -1,0 +1,153 @@
+<div *ngIf="!inscriptionSelected" class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <p-toast></p-toast>
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button
+                            pButton
+                            pRipple
+                            label="Nuevo usuario"
+                            icon="pi pi-plus"
+                            class="p-button-success mr-2"
+                            (click)="openNew()"></button>
+                        <button
+                            pButton
+                            pRipple
+                            label="Eliminar"
+                            icon="pi pi-trash"
+                            class="p-button-danger"
+                            (click)="deleteSelectedProducts()"
+                            [disabled]="
+                                !selectedProducts || !selectedProducts.length
+                            "></button>
+                    </div>
+                </ng-template>
+
+                <ng-template pTemplate="right">
+                    <p-fileupload
+                        mode="basic"
+                        accept="image/*"
+                        [maxFileSize]="1000000"
+                        label="Import"
+                        chooseLabel="Import"
+                        class="mr-2 inline-block"></p-fileupload>
+                    <button
+                        pButton
+                        pRipple
+                        label="Export"
+                        icon="pi pi-upload"
+                        class="p-button-help"
+                        (click)="dt.exportCSV()"></button>
+                </ng-template>
+            </p-toolbar>
+
+            <p-table #dt [value]="registros" responsiveLayout="scroll"
+                [rows]="10"
+                [globalFilterFields]="['titulo_proyecto_tesis','nombre']"
+                [paginator]="true" [rowsPerPageOptions]="[10,20,30]"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [(selection)]="selectedProducts" selectionMode="multiple"
+                [rowHover]="true" dataKey="id">
+                <ng-template pTemplate="caption">
+                    <div
+                        class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">Seguimiento de inscripciones</h5>
+                        <span class="block mt-2 md:mt-0 p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text"
+                                (input)="onGlobalFilter(dt, $event)"
+                                placeholder="Search..."
+                                class="w-full sm:w-auto" />
+                        </span>
+                    </div>
+                </ng-template>
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 3rem">
+                            <p-tableheadercheckbox></p-tableheadercheckbox>
+                        </th>
+                        <th pSortableColumn="titulo_proyecto_tesis" style="width:60%">Título de
+                            tesis <p-sorticon
+                                field="titulo_proyecto_tesis"></p-sorticon></th>
+                        <th pSortableColumn="nombre" style="width:20%">Asesor <p-sorticon
+                                field="nombre"></p-sorticon></th>
+                        <th style="width:10%">Estado</th>
+                        <th style="width:10%"></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-data>
+                    <tr>
+                        <td>
+                            <p-tablecheckbox [value]="data"></p-tablecheckbox>
+                        </td>
+                        <td style="width:14%; min-width:10rem;"><span
+                                class="p-column-title">Título de tesis</span>
+                            {{data.titulo_proyecto_tesis}}
+                        </td>
+                        <td style="width:14%; min-width:8rem;">
+                            <span class="p-column-title">Asesor</span>
+                            {{data.inscripciones[0].docente[0].nombre + ' ' +
+                            data.inscripciones[0].docente[0].apellidos}}
+                        </td>
+                        <td style="width:14%; min-width: 10rem;"><span
+                                class="p-column-title">estado</span>
+                            <span
+                                [class]="'product-badge status-' + (data.estado ? data.estado.toLowerCase() : '')">{{data.inscripciones[0].estado}}</span>
+                        </td>
+                        <td>
+                            <div class="flex">
+                                <p-button label="Ver detalle" [outlined]="true"
+                                    severity="contrast"
+                                    (click)="viewDetailsInscription(data)" />
+
+                                <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteProduct(product)"></button> -->
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+    </div>
+</div>
+
+<div *ngIf="inscriptionSelected" class="grid">
+    <div class="col-12">
+        <div class="card flex justify-content-center col-12">
+           
+               <h4 class="font-bold">{{inscriptionSelected.titulo_proyecto_tesis}}</h4>
+         
+           
+        </div>
+
+
+        <div class="card ">
+            <div class="row col-12">
+                <div class="col-4"><p>Nro de expediente: {{inscriptionSelected.expediente}}</p></div>
+                <div class="col-4"><p>Escuala profesional: {{inscriptionSelected.escuela_profesional}}</p></div>
+                <div class="col-4"><p>Nro de oficio: {{inscriptionSelected.numero_oficio}}</p></div>
+                <div class="col-4"><p>Nro de resolución: {{inscriptionSelected.numero_resolucion}}</p></div>
+                <div class="col-6">.col-6 .col-md-4</div>
+              </div>
+              
+                <p class="m-0">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                    Inventore sed consequuntur error repudiandae numquam
+                    deserunt quisquam repellat libero asperiores earum nam
+                    nobis, culpa ratione quam perferendis esse, cupiditate neque
+                    quas!
+                </p>
+          
+                <div class=" col-1flex gap-3 mt-1">
+                    <p-button (click)="backList()" label="Regresar"
+                        [outlined]="true"
+                        icon="pi pi-angle-left" iconPos="left" />
+                </div>
+        </div>
+       
+    </div>
+</div>

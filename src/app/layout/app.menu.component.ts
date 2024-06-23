@@ -23,8 +23,8 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Proceso de titulación',
                 items: [
-                    { label: 'Inscripción', icon: 'pi pi-fw pi-id-card', routerLink: ['/pages/new-titulation-proces'] },
-                    { label: 'Seguimiento', icon: 'pi pi-fw pi-list', routerLink: ['/pages/new-titulation-proces'] }
+                    { label: 'Inscripción', icon: 'pi pi-fw pi-id-card', routerLink: ['/pages/new-titulation-process'] },
+                    { label: 'Seguimiento', icon: 'pi pi-fw pi-list', routerLink: ['/pages/inscription-tracking'] }
                 ]
             },
             {

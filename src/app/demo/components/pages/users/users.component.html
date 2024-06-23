@@ -8,14 +8,14 @@
                         <button
                             pButton
                             pRipple
-                            label="New"
+                            label="Nuevo usuario"
                             icon="pi pi-plus"
                             class="p-button-success mr-2"
                             (click)="openNew()"></button>
                         <button
                             pButton
                             pRipple
-                            label="Delete"
+                            label="Eliminar"
                             icon="pi pi-trash"
                             class="p-button-danger"
                             (click)="deleteSelectedProducts()"
@@ -43,133 +43,57 @@
                 </ng-template>
             </p-toolbar>
 
-            <p-table
-                #dt
-                [value]="products"
-                [columns]="cols"
-                responsiveLayout="scroll"
-                [rows]="10"
-                [globalFilterFields]="[
-                    'name',
-                    'country.name',
-                    'representative.name',
-                    'status'
-                ]"
-                [paginator]="true"
-                [rowsPerPageOptions]="[10, 20, 30]"
-                [showCurrentPageReport]="true"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                [(selection)]="selectedProducts"
-                selectionMode="multiple"
-                [rowHover]="true"
-                dataKey="id">
+            <p-table #dt [value]="userData" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['codigo','nombre','email','celular']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(selection)]="selectedProducts" selectionMode="multiple" [rowHover]="true" dataKey="id">
                 <ng-template pTemplate="caption">
-                    <div
-                        class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                        <h5 class="m-0">Manage Products</h5>
+                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                        <h5 class="m-0">Administración de usuarios</h5>
                         <span class="block mt-2 md:mt-0 p-input-icon-left">
                             <i class="pi pi-search"></i>
-                            <input
-                                pInputText
-                                type="text"
-                                (input)="onGlobalFilter(dt, $event)"
-                                placeholder="Search..."
-                                class="w-full sm:w-auto" />
+                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."  class="w-full sm:w-auto"/>
                         </span>
                     </div>
                 </ng-template>
                 <ng-template pTemplate="header">
                     <tr>
                         <th style="width: 3rem">
-                            <p-tableheadercheckbox></p-tableheadercheckbox>
+                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
                         </th>
-                        <th pSortableColumn="code">
-                            Code <p-sorticon field="code"></p-sorticon>
-                        </th>
-                        <th pSortableColumn="name">
-                            Name <p-sorticon field="name"></p-sorticon>
-                        </th>
-                        <th>Image</th>
-                        <th pSortableColumn="price">
-                            Price <p-sorticon field="price"></p-sorticon>
-                        </th>
-                        <th pSortableColumn="category">
-                            Category <p-sorticon field="category"></p-sorticon>
-                        </th>
-                        <th pSortableColumn="rating">
-                            Reviews <p-sorticon field="rating"></p-sorticon>
-                        </th>
-                        <th pSortableColumn="inventoryStatus">
-                            Status
-                            <p-sorticon field="inventoryStatus"></p-sorticon>
-                        </th>
+                        <th pSortableColumn="codigo">Código <p-sortIcon field="codigo"></p-sortIcon></th>
+                        <th pSortableColumn="nombre">Nombres completos <p-sortIcon field="nombre"></p-sortIcon></th>
+                        <th pSortableColumn="email">Correo <p-sortIcon field="email"></p-sortIcon></th>
+                        <th pSortableColumn="celular">Celular <p-sortIcon field="celular"></p-sortIcon></th>
+                        <th>Estado</th>
                         <th></th>
                     </tr>
                 </ng-template>
-                <ng-template pTemplate="body" let-product>
+                <ng-template pTemplate="body" let-data>
                     <tr>
                         <td>
-                            <p-tablecheckbox
-                                [value]="product"></p-tablecheckbox>
+                            <p-tableCheckbox [value]="data"></p-tableCheckbox>
                         </td>
-                        <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">Code</span>
-                            {{ product.code || product.id }}
+                        <td style="width:14%; min-width:10rem;"><span class="p-column-title">codigo</span>
+                            {{data.codigo}}
                         </td>
-                        <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">Name</span>
-                            {{ product.name }}
+                        <td style="width:14%; min-width:10rem;">
+                            <span class="p-column-title">nombre</span>
+                            {{data.nombre + ' ' + data.apellidos}}
                         </td>
-                        <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">Image</span>
-                            <img
-                                [src]="
-                                    'assets/demo/images/product/' +
-                                    product.image
-                                "
-                                [alt]="product.name"
-                                width="100"
-                                class="shadow-4" />
+                        <td style="width:14%; min-width:10rem;"><span class="p-column-title">email</span>
+                            {{data.email}}
                         </td>
-                        <td style="width: 14%; min-width: 8rem">
-                            <span class="p-column-title">Price</span>
-                            {{ product.price | currency : "USD" }}
+                        <td style="width:14%; min-width:8rem;">
+                            <span class="p-column-title">ceular</span>
+                            {{data.celular}}
                         </td>
-                        <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">Category</span>
-                            {{ product.category }}
-                        </td>
-                        <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">Reviews</span>
-                            <p-rating
-                                [ngModel]="product.rating"
-                                [readonly]="true"
-                                [cancel]="false"></p-rating>
-                        </td>
-                        <td style="width: 14%; min-width: 10rem">
-                            <span class="p-column-title">Status</span>
-                            <span
-                                [class]="
-                                    'product-badge status-' +
-                                    (product.inventoryStatus
-                                        ? product.inventoryStatus.toLowerCase()
-                                        : '')
-                                ">{{ product.inventoryStatus }}</span>
+                        <td style="width:14%; min-width: 10rem;"><span class="p-column-title">estado</span>
+                            <span [class]="'product-badge status-' + (data.estado ? data.estado.toLowerCase() : '')">{{data.estado}}</span>
                         </td>
                         <td>
                             <div class="flex">
-                                <button
-                                    pButton
-                                    pRipple
-                                    icon="pi pi-pencil"
-                                    class="p-button-rounded p-button-success mr-2"
-                                    (click)="editProduct(product)"></button>
-                                <button
-                                    pButton
-                                    pRipple
-                                    icon="pi pi-trash"
-                                    class="p-button-rounded p-button-warning"
-                                    (click)="deleteProduct(product)"></button>
+                                <p-button label="Ver detalle" [outlined]="true" severity="contrast" (click)="openModalUserDetail(data)" />
+
+                                <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteProduct(product)"></button> -->
                             </div>
                         </td>
                     </tr>
@@ -182,7 +106,8 @@
             [style]="{ width: '60rem' }"
             header="Product Details"
             [modal]="true"
-            class="p-fluid">
+            class="p-fluid"
+            [maximizable]="true">
             <div class="content">
                 <form [formGroup]="userForm">
                     <div class="field mt-4">
@@ -426,7 +351,7 @@
                         <button
                             pButton
                             pRipple
-                            label="Cancel"
+                            label="Cancelar"
                             icon="pi pi-times"
                             class="p-button-text"
                             iconPos="right"
@@ -441,6 +366,18 @@
                             (click)="saveProduct()"></button>
                     </div>
                 </form>
+            </div>
+        </p-dialog>
+
+        <p-dialog
+            [(visible)]="modalUserDetail"
+            [style]="{ width: '60rem' }"
+            [header]="titleModalDetailIserSelected"
+            [modal]="true"
+            class="p-fluid"
+            [maximizable]="true">
+            <div *ngIf="modalUserDetail" class="content">
+                {{ userDetailSelected.nombre }}
             </div>
         </p-dialog>
 

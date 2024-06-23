@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { UsersComponent } from './users.component';
 import { TableModule } from 'primeng/table';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ButtonModule } from 'primeng/button';
@@ -15,14 +14,16 @@ import { DropdownModule } from 'primeng/dropdown';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DialogModule } from 'primeng/dialog';
-import { UsersRoutingModule } from './users-routing.module';
 import { CheckboxModule } from 'primeng/checkbox';
 import { CalendarModule } from 'primeng/calendar';
+import { InscriptionTrackingComponent } from './inscription-tracking.component';
+import { InscriptionTrackingRoutingModule } from './inscription-tracking-routing.module';
+import { CardModule } from 'primeng/card';
 
 @NgModule({
     imports: [
         CommonModule,
-        UsersRoutingModule,
+        InscriptionTrackingRoutingModule,
         TableModule,
         FileUploadModule,
         ReactiveFormsModule,
@@ -40,7 +41,8 @@ import { CalendarModule } from 'primeng/calendar';
         DialogModule,
         CheckboxModule,
         CalendarModule,
+        CardModule
     ],
-    declarations: [UsersComponent]
+    declarations: [InscriptionTrackingComponent]
 })
-export class UsersModule { }
+export class InscriptionTrackingModule { }
