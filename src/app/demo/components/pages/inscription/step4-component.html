@@ -74,8 +74,10 @@
                 </ng-template>
             </p-fileUpload> -->
             <p-toast />
+            <input type="file" name="files[]" multiple>
+
                 <p-fileUpload 
-                    name="demo[]" 
+                    name="files[]" 
                     url="https://www.primefaces.org/cdn/api/upload.php" 
                     (onUpload)="upload($event)" 
                     (onSelect)="onSelectedFiles($event)"

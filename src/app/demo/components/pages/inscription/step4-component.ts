@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { InscriptionPresenter } from './insctiption-presenter';
 import { MessageService } from 'primeng/api';
+import { AuthService } from 'src/app/services/auth.service';
 
 interface UploadEvent {
   originalEvent: Event;
@@ -18,7 +19,7 @@ export class Step4Component implements OnInit {
   approvalDate: FormControl = new FormControl('');
   jobNumber: FormControl = new FormControl('');
 
-  constructor(private router: Router, public presenter: InscriptionPresenter, private service: MessageService) { }
+  constructor(private router: Router, public presenter: InscriptionPresenter, private service: MessageService, private authService: AuthService) { }
 
   ngOnInit(): void {
     setTimeout(() => {
@@ -27,12 +28,13 @@ export class Step4Component implements OnInit {
   }
 
   finalize() {
-    this.presenter.callExecute();
+    this.authService.postInscription(this.presenter.callExecute()).subscribe((res) => console.log(res));
+
     this.showSuccessViaToast();
   }
 
   backStep() {
-    void this.router.navigate(['pages/new-titulation-proces/step3']);
+    void this.router.navigate(['pages/new-titulation-process/step3']);
   }
 
   showSuccessViaToast() {
@@ -76,7 +78,7 @@ export class Step4Component implements OnInit {
             image = 'excel-icon.png';
             break
         }
-        firstChildDiv.style.backgroundImage = "url('/assets/img/" + image +"')";
+        firstChildDiv.style.backgroundImage = "url('/assets/img/" + image + "')";
         firstChildDiv.style.backgroundSize = '59px 50px';
         firstChildDiv.style.backgroundPosition = 'center';
         firstChildDiv.style.backgroundRepeat = 'no-repeat';

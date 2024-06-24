@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Product } from 'src/app/demo/api/product';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ProductService } from 'src/app/demo/service/product.service';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { IUsuario } from 'src/app/demo/api/user';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
     templateUrl: './inscription-tracking.component.html',
     styleUrls: ['./inscription-tracking.component.scss'],
-    providers: [MessageService]
+    providers: [MessageService, ConfirmationService]
 })
 export class InscriptionTrackingComponent implements OnInit {
 
@@ -257,18 +258,12 @@ export class InscriptionTrackingComponent implements OnInit {
                     "email": "miguel@test.com",
                     "celular": 123456789
                 },
-                {
-                    "id": 10,
-                    "nombre": "Laura",
-                    "apellidos": "López",
-                    "email": "laura@test.com",
-                    "celular": 123456789
-                }
             ]
         },
     ];
 
     modalUserDetail = false;
+    inscriptionState = '';
 
     roles: any[] = [
         { name: 'UDI', code: 'UDI' },
@@ -353,7 +348,9 @@ export class InscriptionTrackingComponent implements OnInit {
         return this._jury;
     }
 
-    constructor(private productService: ProductService, private messageService: MessageService, private fb: FormBuilder) {
+    constructor(private productService: ProductService, private messageService: MessageService, private fb: FormBuilder,
+        private confirmationService: ConfirmationService, private service: AuthService
+    ) {
         this.userForm = this.fb.group({
             role: this.role,
             name: this.name,
@@ -365,6 +362,8 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.service.postCount().subscribe();
+        //this.inscriptionSelected = this.registros[0];
         this.productService.getProducts().then(data => this.products = data);
 
         this.statuses = [
@@ -465,13 +464,78 @@ export class InscriptionTrackingComponent implements OnInit {
         this.modalUserDetail = true;
     }
 
-    viewDetailsInscription(data: any){
-        if(data){
+    viewDetailsInscription(data: any) {
+        if (data) {
             this.inscriptionSelected = data;
+            this.inscriptionState = data.inscripciones[0].estado;
         }
     }
 
-    backList(){
+    backList() {
         this.inscriptionSelected = null;
+    }
+
+    get severity(): string {
+        let severity = '';
+        switch (this.inscriptionSelected.inscripciones[0].estado) {
+            case 'inscrito':
+                severity = 'success';
+                break;
+            case 'observado':
+                severity = 'warning';
+                break;
+            case 'cancelado':
+                severity = 'danger';
+                break;
+        }
+        return severity;
+    }
+
+    showEdition() {
+
+    }
+
+    goToReview() {
+        this.inscriptionState = 'En revisión';
+    }
+
+    goToObserved() {
+        this.inscriptionState = 'Observado';
+    }
+
+    goToCancelation() {
+        this.confirmationService.confirm({
+            header: 'Confirmación',
+            message: 'Estás a punto de cancelar esta inscripción, ¿estás seguro(a)?.',
+            acceptIcon: 'pi pi-check mr-2',
+            rejectIcon: 'pi pi-times mr-2',
+            rejectButtonStyleClass: 'p-button-sm',
+            acceptButtonStyleClass: 'p-button-outlined p-button-sm',
+            accept: () => {
+                this.inscriptionState = 'Cancelado';
+                this.messageService.add({ key: 'tst', severity: 'info', summary: 'Confirmado', detail: 'Se ha realizado la cencelación de la inscripción.', life: 3000 });
+            },
+            reject: () => {
+            }
+        });
+
+    }
+
+    goToApprove() {
+        this.confirmationService.confirm({
+            header: 'Confirmación',
+            message: 'Estás a punto de aprobar esta inscripción, ¿estás seguro(a)?.',
+            acceptIcon: 'pi pi-check mr-2',
+            rejectIcon: 'pi pi-times mr-2',
+            rejectButtonStyleClass: 'p-button-sm',
+            acceptButtonStyleClass: 'p-button-outlined p-button-sm',
+            accept: () => {
+                this.inscriptionState = 'Aprobado';
+                this.messageService.add({ key: 'tst', severity: 'info', summary: 'Confirmado', detail: 'Se ha realizado la aprobación de la inscripción.', life: 3000 });
+            },
+            reject: () => {
+            }
+        });
+
     }
 }

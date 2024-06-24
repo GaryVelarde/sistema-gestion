@@ -19,6 +19,9 @@ import { CalendarModule } from 'primeng/calendar';
 import { InscriptionTrackingComponent } from './inscription-tracking.component';
 import { InscriptionTrackingRoutingModule } from './inscription-tracking-routing.module';
 import { CardModule } from 'primeng/card';
+import { TagModule } from 'primeng/tag';
+import { FieldsetModule } from 'primeng/fieldset';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @NgModule({
     imports: [
@@ -41,7 +44,10 @@ import { CardModule } from 'primeng/card';
         DialogModule,
         CheckboxModule,
         CalendarModule,
-        CardModule
+        CardModule,
+        TagModule,
+        FieldsetModule,
+        ConfirmDialogModule
     ],
     declarations: [InscriptionTrackingComponent]
 })

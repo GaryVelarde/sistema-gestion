@@ -320,11 +320,11 @@ export class Step3Component implements OnInit {
 	}
 
 	nextStep() {
-		void this.router.navigate(['pages/new-titulation-proces/step4'])
+		void this.router.navigate(['pages/new-titulation-process/step4'])
 	}
 
 	backStep() {
-		void this.router.navigate(['pages/new-titulation-proces/step2']);
+		void this.router.navigate(['pages/new-titulation-process/step2']);
 	}
 
 	filterCountry(event: any) {

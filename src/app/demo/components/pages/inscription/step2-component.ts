@@ -321,11 +321,11 @@ export class Step2Component implements OnInit {
 	}
 
 	nextStep() {
-		void this.router.navigate(['pages/new-titulation-proces/step3']);
+		void this.router.navigate(['pages/new-titulation-process/step3']);
 	}
 
 	backStep() {
-		void this.router.navigate(['pages/new-titulation-proces/step1']);
+		void this.router.navigate(['pages/new-titulation-process/step1']);
 	}
 
 	filterCountry(event: any) {
