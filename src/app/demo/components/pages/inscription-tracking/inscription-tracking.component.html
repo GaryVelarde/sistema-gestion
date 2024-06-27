@@ -2,7 +2,6 @@
 <div *ngIf="!inscriptionSelected" class="grid">
     <div class="col-12">
         <div class="card px-6 py-6">
-            
             <p-table #dt [value]="registros" responsiveLayout="scroll"
                 [rows]="10"
                 [globalFilterFields]="['titulo_proyecto_tesis','nombre']"
@@ -78,7 +77,8 @@
 </div>
 <p-confirmDialog>
     <ng-template pTemplate="message" let-message>
-        <div class="flex flex-column align-items-center w-full gap-3 border-bottom-1 surface-border">
+        <div
+            class="flex flex-column align-items-center w-full gap-3 border-bottom-1 surface-border">
             <i class="pi pi-exclamation-circle text-6xl text-primary-500"></i>
             <p>{{ message.message }}</p>
         </div>
@@ -86,7 +86,7 @@
 </p-confirmDialog>
 <div *ngIf="inscriptionSelected" class="grid">
     <div class="col-12">
-       
+
         <div class="card">
             <div class="grid d-flex col-12">
                 <div class="mr-auto p-2">
@@ -98,7 +98,8 @@
                         icon="pi pi-pencil" iconPos="left" />
                 </div>
                 <div class="p-2">
-                    <p-button *ngIf="inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'"
+                    <p-button
+                        *ngIf="inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'"
                         label="Cancelar inscripción"
                         [outlined]="true"
                         class="mr-3"
@@ -126,7 +127,7 @@
                 <h4
                     class="font-bold">Título:
                     {{inscriptionSelected.titulo_proyecto_tesis}}</h4>
-    
+
             </div>
             <div class="grid col-12">
                 <div class="col-3"><p class="font-bold">Nro de
@@ -208,84 +209,99 @@
                     </p-table>
                 </div>
             </div>
+
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
-                <div class="grid col-12">
-                    <div class=" col-12">
-                        <h5>Observaciones</h5>
+                <div class=" col-12">
+                    <h5>Lista de tareas</h5>
+                </div>
+                <div class="col-4">
+                    <p-card>
+                        <h5>Incompletas</h5>
+                    </p-card>
+                </div>
+                <div class="col-4">
+                    <p-card>
+                        <h5>Terminadas</h5>
+                    </p-card>
+                </div>
+                <div class="col-4">
+                    <p-card>
+                        <h5>Total</h5>
+                    </p-card>
+                </div>
+                <div class="col-11">
+                    <form [formGroup]="tasksForm">
+                        <span class="p-float-label">
+                            <input
+                                type="text"
+                                style="width: 100%;"
+                                id="taskDescription"
+                                pInputText
+                                formControlName="taskDescription" />
+                            <label for="taskDescription">Escribe la tarea
+                                aquí...</label>
+                        </span>
+                    </form>
+                </div>
+                <div class="col-1">
+                    <p-button label="Enviar" [rounded]="true" (click)="addTask()" />
+                </div>
+
+                <div class=" col-12">
+                    <div *ngFor="let task of tasks" class="grid d-flex ml-1">
+                        <div class="mr-auto p-2 col-11"
+                            style="align-content: center;">
+                            <p-checkbox
+                                [inputId]="task.id"
+                                [(ngModel)]="task.checked"
+                                [binary]="true"
+                                #checkbox
+                                (onChange)="taskDone(task.id, checkbox)"></p-checkbox>
+                            <label class="ml-3" [for]="task.id"
+                                [ngClass]="isTaskDone(task)">{{ task.description
+                                }}</label>
+                        </div>
+                        <div class="p-2 col-1">
+                            <p-button icon="pi pi-trash" [rounded]="true"
+                                [text]="true" severity="danger"
+                                [disabled]="task.checked" (click)="removeTask(task.id)" />
+                        </div>
+                        <p-divider class="col-12 divider-aditional-class"></p-divider>
                     </div>
-                    <div class="col-11">
+
+                </div>
+                <div class="ml-2 mr-2 separator"></div>
+
+                <div class=" col-12">
+                    <h5>Observaciones</h5>
+                </div>
+                <div class="col-11">
+                    <form [formGroup]="commentsForm">
                         <span class="p-float-label">
                             <textarea
                                 inputId="textarea"
                                 rows="4"
                                 style="width: 100%;"
+                                formControlName="comment"
                                 pInputTextarea></textarea>
                             <label for="textarea">Escribe tu observación
                                 aquí...</label>
                         </span>
-                    </div>
-                    <div class="col-1">
-                        <p-button label="Enviar" [rounded]="true" />
-                    </div>
+                    </form>
+                </div>
+                <div class="col-1">
+                    <p-button label="Enviar" [rounded]="true"
+                        (click)="addComment()" />
+                </div>
 
-                    <div class=" col-12">
-                        <div class="mb-3">
-                            <p-fieldset legend="Gary Velarde"
-                                [toggleable]="true">
-                                <p>
-                                    Lorem ipsum dolor sit amet...Lorem ipsum
-                                    dolor sit amet...Lorem ipsum dolor sit
-                                    amet...Lorem ipsum dolor sit amet...Lorem
-                                    ipsum dolor sit amet...Lorem ipsum dolor sit
-                                    amet...Lorem ipsum dolor sit amet...Lorem
-                                    ipsum dolor sit amet...Lorem ipsum dolor sit
-                                    amet...Lorem ipsum dolor sit amet...Lorem
-                                    ipsum dolor sit amet...Lorem ipsum dolor sit
-                                    amet...Lorem ipsum dolor sit amet...Lorem
-                                    ipsum dolor sit amet...
-                                </p>
-                            </p-fieldset>
-                        </div>
-                        <div class="mb-3">
-                            <p-fieldset legend="Cesar Jauregui"
-                                [toggleable]="true">
-                                <p>
-                                    Lorem ipsum dolor sit amet...Lorem ipsum
-                                    dolor sit amet...Lorem ipsum dolor sit
-                                    amet...Lorem ipsum dolor sit amet...Lorem
-                                    ipsum dolor sit amet...Lorem ipsum dolor sit
-                                    amet...Lorem ipsum dolor sit amet...Lorem
-                                    ipsum dolor sit amet...Lorem ipsum dolor sit
-                                    amet...Lorem ipsum dolor sit amet...Lorem
-                                    ipsum dolor sit amet...Lorem ipsum dolor sit
-                                    amet...Lorem ipsum dolor sit amet...Lorem
-                                    ipsum dolor sit amet...
-                                </p>
-                            </p-fieldset>
-                        </div>
-                        <div class="mb-3">
-                            <p-fieldset legend="Gary Velarde"
-                                [toggleable]="true">
-                                <p>
-                                    Lorem ipsum dolor sit amet...Lorem ipsum
-                                    dolor sit amet...Lorem ipsum dolor sit
-                                    amet...Lorem ipsum dolor sit amet...Lorem
-                                    ipsum dolor sit amet...Lorem ipsum dolor sit
-                                    amet...Lorem ipsum dolor sit amet...Lorem
-                                    ipsum dolor sit amet...Lorem ipsum dolor sit
-                                    amet...Lorem ipsum dolor sit amet...Lorem
-                                    ipsum dolor sit amet...Lorem ipsum dolor sit
-                                    amet...Lorem ipsum dolor sit amet...Lorem
-                                    ipsum dolor sit amet...
-                                </p>
-                            </p-fieldset>
-                        </div>
+                <div class=" col-12">
+                    <div *ngFor="let comment of comments" class="mb-3">
+                        <p-fieldset [legend]="comment.name" [toggleable]="true">
+                            <p [innerHTML]="formatText(comment.content)"></p>
+                        </p-fieldset>
                     </div>
                 </div>
+
             </div>
-
         </div>
-
-    </div>
-</div>

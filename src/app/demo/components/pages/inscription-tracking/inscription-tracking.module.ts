@@ -22,6 +22,7 @@ import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { FieldsetModule } from 'primeng/fieldset';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DividerModule } from 'primeng/divider';
 
 @NgModule({
     imports: [
@@ -47,7 +48,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
         CardModule,
         TagModule,
         FieldsetModule,
-        ConfirmDialogModule
+        ConfirmDialogModule,
+        DividerModule
     ],
     declarations: [InscriptionTrackingComponent]
 })
