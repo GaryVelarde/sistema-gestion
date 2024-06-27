@@ -10,7 +10,11 @@ import { UserRegister } from '../models/user-register.model';
 })
 export class AuthService {
   private readonly API_URL = environment.apiURL;
-
+  header = {
+    headers: {
+      'ngrok-skip-browser-warning': 'true'
+    }
+  }
   constructor(private http: HttpClient) { }
 
   login(credentials: AuthCredentials): Observable<any> {
@@ -40,4 +44,21 @@ export class AuthService {
       }
     });
   }
+
+  postCreateNewUser(rq: any): Observable<any> {
+    return this.http.post(`${this.API_URL}/users`, rq, this.header);
+  }
+
+  getUserList(): Observable<any> {
+    return this.http.get(`${this.API_URL}/users`, this.header);
+  }
+
+  getTeachersList(): Observable<any> {
+    return this.http.get(`${this.API_URL}/teachers`, this.header);
+  }
+
+  getStudentsList(): Observable<any> {
+    return this.http.get(`${this.API_URL}/graduates-students`, this.header);
+  }
+
 }

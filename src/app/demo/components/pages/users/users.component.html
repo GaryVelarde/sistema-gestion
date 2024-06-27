@@ -43,7 +43,7 @@
                 </ng-template>
             </p-toolbar>
 
-            <p-table #dt [value]="userData" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['codigo','nombre','email','celular']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(selection)]="selectedProducts" selectionMode="multiple" [rowHover]="true" dataKey="id">
+            <p-table #dt [value]="userData" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['code','name','email','phone']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(selection)]="selectedProducts" selectionMode="multiple" [rowHover]="true" dataKey="id">
                 <ng-template pTemplate="caption">
                     <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                         <h5 class="m-0">Administración de usuarios</h5>
@@ -58,10 +58,10 @@
                         <th style="width: 3rem">
                             <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
                         </th>
-                        <th pSortableColumn="codigo">Código <p-sortIcon field="codigo"></p-sortIcon></th>
-                        <th pSortableColumn="nombre">Nombres completos <p-sortIcon field="nombre"></p-sortIcon></th>
+                        <th pSortableColumn="code">Código <p-sortIcon field="code"></p-sortIcon></th>
+                        <th pSortableColumn="name">Nombres completos <p-sortIcon field="name"></p-sortIcon></th>
                         <th pSortableColumn="email">Correo <p-sortIcon field="email"></p-sortIcon></th>
-                        <th pSortableColumn="celular">Celular <p-sortIcon field="celular"></p-sortIcon></th>
+                        <th pSortableColumn="phone">Celular <p-sortIcon field="phone"></p-sortIcon></th>
                         <th>Estado</th>
                         <th></th>
                     </tr>
@@ -72,21 +72,21 @@
                             <p-tableCheckbox [value]="data"></p-tableCheckbox>
                         </td>
                         <td style="width:14%; min-width:10rem;"><span class="p-column-title">codigo</span>
-                            {{data.codigo}}
+                            {{data.code}}
                         </td>
                         <td style="width:14%; min-width:10rem;">
                             <span class="p-column-title">nombre</span>
-                            {{data.nombre + ' ' + data.apellidos}}
+                            {{data.name + ' ' + data.surnames}}
                         </td>
                         <td style="width:14%; min-width:10rem;"><span class="p-column-title">email</span>
                             {{data.email}}
                         </td>
                         <td style="width:14%; min-width:8rem;">
                             <span class="p-column-title">ceular</span>
-                            {{data.celular}}
+                            {{data.phone}}
                         </td>
                         <td style="width:14%; min-width: 10rem;"><span class="p-column-title">estado</span>
-                            <span [class]="'product-badge status-' + (data.estado ? data.estado.toLowerCase() : '')">{{data.estado}}</span>
+                            <span [class]="'product-badge status-' + (data.status ? data.status.toLowerCase() : '')">{{data.status}}</span>
                         </td>
                         <td>
                             <div class="flex">
@@ -363,7 +363,7 @@
                             icon="pi pi-check"
                             iconPos="right"
                             [disabled]="!userForm.valid"
-                            (click)="saveProduct()"></button>
+                            (click)="callPostNewUser()"></button>
                     </div>
                 </form>
             </div>
@@ -377,7 +377,7 @@
             class="p-fluid"
             [maximizable]="true">
             <div *ngIf="modalUserDetail" class="content">
-                {{ userDetailSelected.nombre }}
+                {{ userDetailSelected.name }}
             </div>
         </p-dialog>
 

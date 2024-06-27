@@ -1,5 +1,5 @@
 <div class="card">
-    <h5>Asignación de estudiantes</h5>
+    <h5>Asignación de revisor</h5>
     <p>
         Complete todos los campos para continuar.
     </p>
@@ -20,14 +20,12 @@
         </div>
         <div class="grid p-fluid">
             <div class="col-12 md:col-12">
-                <div *ngIf="presenter.reviewerIsValid" style="border: 1px dashed #d1d5db;">
-                    <div class="py-3">
-                        <h5>Datos del estudiante</h5>
-                        <p>{{presenter.reviewerSelected.email}}</p>
-                        <p>{{presenter.reviewerSelected.celular}}</p>
-                    </div>
-                    
-                </div>
+                <p-card *ngIf="presenter.reviewerIsValid" header="Datos del revisor">
+                    <p>Código: {{presenter.reviewerSelected.code}}</p>
+                    <p>Nombres: {{presenter.reviewerSelected.name + ' ' + presenter.reviewerSelected.surnames}}</p>
+                    <p>Correo: {{presenter.reviewerSelected.email}}</p>
+                    <p>Celular: {{presenter.reviewerSelected.phone}}</p>
+                </p-card>
             </div>
         </div>
         <div class="flex gap-3 mt-1">

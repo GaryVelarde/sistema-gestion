@@ -42,24 +42,20 @@
         </div>
         <div class="grid p-fluid">
             <div class="col-12 md:col-6">
-                <div *ngIf="presenter.studentOneIsValid" style="border: 1px dashed #d1d5db;">
-                    <div class="py-3">
-                        <h5>Datos del estudiante</h5>
-                        <p>{{presenter.dataStudentOneSelected.email}}</p>
-                        <p>{{presenter.dataStudentOneSelected.celular}}</p>
-                    </div>
-                    
-                </div>
+                <p-card *ngIf="presenter.studentOneIsValid" header="Datos del estudiante">
+                    <p>Código: {{presenter.dataStudentOneSelected.code}}</p>
+                    <p>Nombres: {{presenter.dataStudentOneSelected.name + ' ' + presenter.dataStudentOneSelected.surnames}}</p>
+                    <p>Correo: {{presenter.dataStudentOneSelected.email}}</p>
+                    <p>Celular: {{presenter.dataStudentOneSelected.phone}}</p>
+                </p-card>
             </div>
-            <div *ngIf="presenter.studentTwoIsValid" class="col-12 md:col-6">
-                <div style="border: 1px dashed #d1d5db;">
-                    <div class="py-3">
-                        <h5>Datos del estudiante</h5>
-                        <p>{{presenter.dataStudentTwoSelected.email}}</p>
-                        <p>{{presenter.dataStudentTwoSelected.celular}}</p>
-                    </div>
-                    
-                </div>
+            <div class="col-12 md:col-6">
+                <p-card *ngIf="presenter.studentTwoIsValid" header="Datos del estudiante">
+                    <p>Código: {{presenter.dataStudentTwoSelected.code}}</p>
+                    <p>Nombres: {{presenter.dataStudentTwoSelected.name + ' ' + presenter.dataStudentOneSelected.surnames}}</p>
+                    <p>Correo: {{presenter.dataStudentTwoSelected.email}}</p>
+                    <p>Celular: {{presenter.dataStudentTwoSelected.phone}}</p>
+                </p-card>
             </div>
         </div>
         <div class="flex gap-3 mt-1">

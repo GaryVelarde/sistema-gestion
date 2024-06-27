@@ -92,11 +92,11 @@ export class InscriptionPresenter {
 
 	watchEstudent() {
 		this.student.valueChanges.pipe().subscribe((data: any) => {
+			console.log('data',data)
 			if (data.code) {
 				this.studentOneIsValid = true;
-				this.dataStudentOneSelected = data.code;
+				this.dataStudentOneSelected = data;
 				console.log('this.dataStudentOneSelected', this.dataStudentOneSelected)
-				console.log(data.code);
 			} else {
 				this.studentOneIsValid = false;
 				this.dataStudentOneSelected = {};
@@ -108,7 +108,7 @@ export class InscriptionPresenter {
 		this.studentTwo.valueChanges.pipe().subscribe((data: any) => {
 			if (data.code) {
 				this.studentTwoIsValid = true;
-				this.dataStudentTwoSelected = data.code;
+				this.dataStudentTwoSelected = data;
 				console.log(data.code);
 			} else {
 				this.studentTwoIsValid = false;
@@ -137,8 +137,8 @@ export class InscriptionPresenter {
 		this.reviewer.valueChanges.pipe().subscribe((data: any) => {
 			if (data.code) {
 				this.reviewerIsValid = true;
-				this.reviewerSelected = data.code
-				console.log(data.code);
+				this.reviewerSelected = data;
+				console.log(data);
 			} else {
 				this.reviewerIsValid = false;
 				this.reviewerSelected = {};

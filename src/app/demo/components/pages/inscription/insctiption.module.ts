@@ -25,6 +25,7 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { BadgeModule } from 'primeng/badge';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { HttpClientModule } from '@angular/common/http';
+import { CardModule } from 'primeng/card';
 
 @NgModule({
 	imports: [
@@ -45,6 +46,7 @@ import { HttpClientModule } from '@angular/common/http';
 		InputTextareaModule,
 		ToastModule,
 		FileUploadModule,
+		CardModule,
 		BadgeModule, ProgressBarModule, HttpClientModule,
 		RouterModule.forChild([
 			{
