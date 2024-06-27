@@ -42,63 +42,110 @@
                         (click)="dt.exportCSV()"></button>
                 </ng-template>
             </p-toolbar>
+            <div *ngIf="!userData.length" class="card">
+                <p-table [value]="skeletonRows" responsiveLayout="scroll">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombres completos</th>
+                            <th>Correo</th>
+                            <th>Celular</th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-product>
+                        <tr>
+                            <td><p-skeleton /></td>
+                            <td><p-skeleton /></td>
+                            <td><p-skeleton /></td>
+                            <td><p-skeleton /></td>
+                            <td><p-skeleton /></td>
+                            <td><p-skeleton /></td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            <div *ngIf="userData.length" class="card">
+                <p-table #dt [value]="userData" responsiveLayout="scroll"
+                    [rows]="10"
+                    [globalFilterFields]="['code','name','email','phone']"
+                    [paginator]="true" [rowsPerPageOptions]="[10,20,30]"
+                    [showCurrentPageReport]="true"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [(selection)]="selectedProducts" selectionMode="multiple"
+                    [rowHover]="true" dataKey="id">
+                    <ng-template pTemplate="caption">
+                        <div
+                            class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                            <h5 class="m-0">Administración de usuarios</h5>
+                            <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                <i class="pi pi-search"></i>
+                                <input pInputText type="text"
+                                    (input)="onGlobalFilter(dt, $event)"
+                                    placeholder="Buscar por nombre..."
+                                    class="w-full sm:w-auto" />
+                            </span>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 3rem">
+                                <p-tableheadercheckbox></p-tableheadercheckbox>
+                            </th>
+                            <th pSortableColumn="code">Código <p-sortIcon
+                                    field="code"></p-sortIcon></th>
+                            <th pSortableColumn="name">Nombres completos
+                                <p-sortIcon field="name"></p-sortIcon></th>
+                            <th pSortableColumn="email">Correo <p-sortIcon
+                                    field="email"></p-sortIcon></th>
+                            <th pSortableColumn="phone">Celular <p-sortIcon
+                                    field="phone"></p-sortIcon></th>
+                            <th>Estado</th>
+                            <th></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-data>
+                        <tr>
+                            <td>
+                                <p-tableCheckbox
+                                    [value]="data"></p-tableCheckbox>
+                            </td>
+                            <td style="width:14%; min-width:10rem;"><span
+                                    class="p-column-title">codigo</span>
+                                {{data.code}}
+                            </td>
+                            <td style="width:14%; min-width:10rem;">
+                                <span class="p-column-title">nombre</span>
+                                {{data.name + ' ' + data.surnames}}
+                            </td>
+                            <td style="width:14%; min-width:10rem;"><span
+                                    class="p-column-title">email</span>
+                                {{data.email}}
+                            </td>
+                            <td style="width:14%; min-width:8rem;">
+                                <span class="p-column-title">ceular</span>
+                                {{data.phone}}
+                            </td>
+                            <td style="width:14%; min-width: 10rem;"><span
+                                    class="p-column-title">estado</span>
+                                <span
+                                    [class]="'product-badge status-' + (data.status ? data.status.toLowerCase() : '')">{{data.status}}</span>
+                            </td>
+                            <td>
+                                <div class="flex">
+                                    <p-button label="Ver detalle"
+                                        [outlined]="true" severity="contrast"
+                                        (click)="openModalUserDetail(data)" />
 
-            <p-table #dt [value]="userData" responsiveLayout="scroll" [rows]="10" [globalFilterFields]="['code','name','email','phone']" [paginator]="true" [rowsPerPageOptions]="[10,20,30]" [showCurrentPageReport]="true" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries" [(selection)]="selectedProducts" selectionMode="multiple" [rowHover]="true" dataKey="id">
-                <ng-template pTemplate="caption">
-                    <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                        <h5 class="m-0">Administración de usuarios</h5>
-                        <span class="block mt-2 md:mt-0 p-input-icon-left">
-                            <i class="pi pi-search"></i>
-                            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..."  class="w-full sm:w-auto"/>
-                        </span>
-                    </div>
-                </ng-template>
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th style="width: 3rem">
-                            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                        </th>
-                        <th pSortableColumn="code">Código <p-sortIcon field="code"></p-sortIcon></th>
-                        <th pSortableColumn="name">Nombres completos <p-sortIcon field="name"></p-sortIcon></th>
-                        <th pSortableColumn="email">Correo <p-sortIcon field="email"></p-sortIcon></th>
-                        <th pSortableColumn="phone">Celular <p-sortIcon field="phone"></p-sortIcon></th>
-                        <th>Estado</th>
-                        <th></th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-data>
-                    <tr>
-                        <td>
-                            <p-tableCheckbox [value]="data"></p-tableCheckbox>
-                        </td>
-                        <td style="width:14%; min-width:10rem;"><span class="p-column-title">codigo</span>
-                            {{data.code}}
-                        </td>
-                        <td style="width:14%; min-width:10rem;">
-                            <span class="p-column-title">nombre</span>
-                            {{data.name + ' ' + data.surnames}}
-                        </td>
-                        <td style="width:14%; min-width:10rem;"><span class="p-column-title">email</span>
-                            {{data.email}}
-                        </td>
-                        <td style="width:14%; min-width:8rem;">
-                            <span class="p-column-title">ceular</span>
-                            {{data.phone}}
-                        </td>
-                        <td style="width:14%; min-width: 10rem;"><span class="p-column-title">estado</span>
-                            <span [class]="'product-badge status-' + (data.status ? data.status.toLowerCase() : '')">{{data.status}}</span>
-                        </td>
-                        <td>
-                            <div class="flex">
-                                <p-button label="Ver detalle" [outlined]="true" severity="contrast" (click)="openModalUserDetail(data)" />
-
-                                <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
+                                    <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
                                 <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteProduct(product)"></button> -->
-                            </div>
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
         </div>
 
         <p-dialog

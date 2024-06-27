@@ -18,6 +18,7 @@ import { DialogModule } from 'primeng/dialog';
 import { UsersRoutingModule } from './users-routing.module';
 import { CheckboxModule } from 'primeng/checkbox';
 import { CalendarModule } from 'primeng/calendar';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @NgModule({
     imports: [
@@ -40,6 +41,7 @@ import { CalendarModule } from 'primeng/calendar';
         DialogModule,
         CheckboxModule,
         CalendarModule,
+        SkeletonModule,
     ],
     declarations: [UsersComponent]
 })

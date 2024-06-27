@@ -64,6 +64,7 @@ export class UsersComponent implements OnInit {
         { name: 'X', code: 'X' }
     ];
 
+    skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     userDetailSelected: IUsuario;
     titleModalDetailIserSelected: string = '';
     public userForm: FormGroup;
