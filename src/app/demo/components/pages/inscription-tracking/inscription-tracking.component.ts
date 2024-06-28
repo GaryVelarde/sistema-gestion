@@ -285,8 +285,7 @@ export class InscriptionTrackingComponent implements OnInit {
     ];
 
     inscriptionSelected: any;
-
-    userDetailSelected: IUsuario;
+    showEdit = false;
     titleModalDetailIserSelected: string = '';
     public commentsForm: FormGroup;
     public tasksForm: FormGroup;
@@ -333,16 +332,6 @@ export class InscriptionTrackingComponent implements OnInit {
         return index;
     }
 
-    createId(): string {
-        let id = '';
-        const chars =
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-    }
-
     onGlobalFilter(table: Table, event: Event) {
         table.filterGlobal(
             (event.target as HTMLInputElement).value,
@@ -350,11 +339,6 @@ export class InscriptionTrackingComponent implements OnInit {
         );
     }
 
-    openModalUserDetail(user: IUsuario) {
-        this.titleModalDetailIserSelected = 'Detalle de ' + user.nombre;
-        this.userDetailSelected = user;
-        this.modalUserDetail = true;
-    }
 
     viewDetailsInscription(data: any) {
         if (data) {
@@ -383,7 +367,9 @@ export class InscriptionTrackingComponent implements OnInit {
         return severity;
     }
 
-    showEdition() {}
+    showEdition() {
+        this.showEdit = true;
+    }
 
     goToReview() {
         this.inscriptionState = 'En revisión';

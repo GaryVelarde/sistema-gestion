@@ -23,6 +23,7 @@ import { TagModule } from 'primeng/tag';
 import { FieldsetModule } from 'primeng/fieldset';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DividerModule } from 'primeng/divider';
+import { BadgeModule } from 'primeng/badge';
 
 @NgModule({
     imports: [
@@ -49,8 +50,9 @@ import { DividerModule } from 'primeng/divider';
         TagModule,
         FieldsetModule,
         ConfirmDialogModule,
-        DividerModule
+        DividerModule,
+        BadgeModule,
     ],
-    declarations: [InscriptionTrackingComponent]
+    declarations: [InscriptionTrackingComponent],
 })
-export class InscriptionTrackingModule { }
+export class InscriptionTrackingModule {}

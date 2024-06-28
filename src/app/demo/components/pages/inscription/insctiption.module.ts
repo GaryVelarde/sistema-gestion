@@ -26,6 +26,8 @@ import { BadgeModule } from 'primeng/badge';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { HttpClientModule } from '@angular/common/http';
 import { CardModule } from 'primeng/card';
+import { SkeletonModule } from 'primeng/skeleton';
+import { MessagesModule } from 'primeng/messages';
 
 @NgModule({
 	imports: [
@@ -47,6 +49,8 @@ import { CardModule } from 'primeng/card';
 		ToastModule,
 		FileUploadModule,
 		CardModule,
+		SkeletonModule,
+		MessagesModule,
 		BadgeModule, ProgressBarModule, HttpClientModule,
 		RouterModule.forChild([
 			{

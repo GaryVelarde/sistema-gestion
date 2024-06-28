@@ -129,7 +129,7 @@
                     {{inscriptionSelected.titulo_proyecto_tesis}}</h4>
 
             </div>
-            <div class="grid col-12">
+            <div *ngIf="!showEdit" class="grid col-12">
                 <div class="col-3"><p class="font-bold">Nro de
                         expediente:</p><p>{{inscriptionSelected.expediente}}</p></div>
                 <div class="col-3"><p class="font-bold">Escuala
@@ -138,6 +138,20 @@
                         oficio:</p><p>{{inscriptionSelected.numero_oficio}}</p></div>
                 <div class="col-3"><p class="font-bold">Nro de
                         resolución:</p><p>{{inscriptionSelected.numero_resolucion}}</p></div>
+            </div>
+            <div *ngIf="showEdit" class="grid col-12">
+                <div class="col-3"><p class="font-bold">Nro de
+                        expediente:</p><input type="text" pInputText [value]="inscriptionSelected.expediente" />
+                    </div>
+                <div class="col-3"><p class="font-bold">Escuala
+                        profesional:</p><input type="text" pInputText [value]="inscriptionSelected.escuela_profesional" />
+                    </div>
+                <div class="col-3"><p class="font-bold">Nro de
+                        oficio:</p><input type="text" pInputText [value]="inscriptionSelected.numero_oficio" />
+                    </div>
+                <div class="col-3"><p class="font-bold">Nro de
+                        resolución:</p><input type="text" pInputText [value]="inscriptionSelected.numero_resolucion"  />
+                    </div>
             </div>
             <div class="grid col-12">
                 <div class="col-3"><p class="font-bold">Fecha de recepción a
@@ -216,18 +230,24 @@
                     <h5>Lista de tareas</h5>
                 </div>
                 <div class="col-4">
-                    <p-card>
-                        <h5>Incompletas</h5>
+                    <p-card style="text-align: center;">
+                        <p>Tareas incompletas <p-badge [value]="2"
+                                severity="warning" />
+                        </p>
                     </p-card>
                 </div>
                 <div class="col-4">
-                    <p-card>
-                        <h5>Terminadas</h5>
+                    <p-card style="text-align: center;">
+                        <p>Tareas terminadas <p-badge [value]="2"
+                                severity="success" />
+                        </p>
                     </p-card>
                 </div>
                 <div class="col-4">
-                    <p-card>
-                        <h5>Total</h5>
+                    <p-card style="text-align: center;">
+                        <p>Total de tareas <p-badge [value]="2"
+                                severity="info" />
+                        </p>
                     </p-card>
                 </div>
                 <div class="col-11">
@@ -245,7 +265,9 @@
                     </form>
                 </div>
                 <div class="col-1">
-                    <p-button label="Enviar" [rounded]="true" (click)="addTask()" />
+                    <p-button label="Enviar" [rounded]="true"
+                        (click)="addTask()"
+                        [disabled]="!taskDescription.value.length" />
                 </div>
 
                 <div class=" col-12">
@@ -265,9 +287,11 @@
                         <div class="p-2 col-1">
                             <p-button icon="pi pi-trash" [rounded]="true"
                                 [text]="true" severity="danger"
-                                [disabled]="task.checked" (click)="removeTask(task.id)" />
+                                [disabled]="task.checked"
+                                (click)="removeTask(task.id)" />
                         </div>
-                        <p-divider class="col-12 divider-aditional-class"></p-divider>
+                        <p-divider
+                            class="col-12 divider-aditional-class"></p-divider>
                     </div>
 
                 </div>
@@ -292,7 +316,8 @@
                 </div>
                 <div class="col-1">
                     <p-button label="Enviar" [rounded]="true"
-                        (click)="addComment()" />
+                        (click)="addComment()"
+                        [disabled]="!comment.value.length" />
                 </div>
 
                 <div class=" col-12">
