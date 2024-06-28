@@ -111,10 +111,8 @@ export class InscriptionPresenter {
 
     watchEstudent() {
         this.student.valueChanges.pipe().subscribe((data: any) => {
-            console.log('data', data);
             if (data.code) {
 				if(data === this.dataStudentTwoSelected){
-					console.log('USUARIOS IGUALES');
 					this.messages = [
 						{ severity: 'warn', detail: 'Se está seleccionando el mismo estudiante para ambos campos. Por favor seleccione otro.' },
 					];
@@ -134,7 +132,6 @@ export class InscriptionPresenter {
         this.studentTwo.valueChanges.pipe().subscribe((data: any) => {
             if (data.code) {
 				if(data === this.dataStudentOneSelected){
-					console.log('USUARIOS IGUALES');
 					this.messages = [
 						{ severity: 'warn', detail: 'Se está seleccionando el mismo estudiante para ambos campos. Por favor seleccione otro.' },
 					];

@@ -3,17 +3,21 @@ import { Product } from 'src/app/demo/api/product';
 import { MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ProductService } from 'src/app/demo/service/product.service';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import {
+    FormBuilder,
+    FormControl,
+    FormGroup,
+    Validators,
+} from '@angular/forms';
 import { IUsuario } from 'src/app/demo/api/user';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
     templateUrl: './users.component.html',
     styleUrls: ['./users.component.scss'],
-    providers: [MessageService]
+    providers: [MessageService],
 })
 export class UsersComponent implements OnInit {
-
     modalNewUser: boolean = false;
 
     deleteProductDialog: boolean = false;
@@ -61,12 +65,13 @@ export class UsersComponent implements OnInit {
         { name: 'VII', code: 'VII' },
         { name: 'VIII', code: 'VIII' },
         { name: 'IX', code: 'IX' },
-        { name: 'X', code: 'X' }
+        { name: 'X', code: 'X' },
     ];
 
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     userDetailSelected: IUsuario;
     titleModalDetailIserSelected: string = '';
+    getUserProcess = '';
     public userForm: FormGroup;
     private _role: FormControl = new FormControl('', [Validators.required]);
     private _name: FormControl = new FormControl('', [Validators.required]);
@@ -74,7 +79,9 @@ export class UsersComponent implements OnInit {
     private _email: FormControl = new FormControl('', [Validators.required]);
     private _number: FormControl = new FormControl('', [Validators.required]);
     private _code: FormControl = new FormControl('', [Validators.required]);
-    private _egressDate: FormControl = new FormControl('', [Validators.required]);
+    private _egressDate: FormControl = new FormControl('', [
+        Validators.required,
+    ]);
     private _cycle: FormControl = new FormControl('', [Validators.required]);
     private _career: FormControl = new FormControl('', [Validators.required]);
     private _line: FormControl = new FormControl('', [Validators.required]);
@@ -126,7 +133,10 @@ export class UsersComponent implements OnInit {
         return this._jury;
     }
 
-    constructor(private productService: ProductService, private messageService: MessageService, private fb: FormBuilder,
+    constructor(
+        private productService: ProductService,
+        private messageService: MessageService,
+        private fb: FormBuilder,
         private service: AuthService
     ) {
         this.userForm = this.fb.group({
@@ -142,12 +152,14 @@ export class UsersComponent implements OnInit {
     ngOnInit() {
         this.callGetUserList();
         this.watchRoleSelected();
-        this.productService.getProducts().then(data => this.products = data);
+        this.productService
+            .getProducts()
+            .then((data) => (this.products = data));
 
         this.statuses = [
             { label: 'INSTOCK', value: 'instock' },
             { label: 'LOWSTOCK', value: 'lowstock' },
-            { label: 'OUTOFSTOCK', value: 'outofstock' }
+            { label: 'OUTOFSTOCK', value: 'outofstock' },
         ];
     }
 
@@ -184,7 +196,7 @@ export class UsersComponent implements OnInit {
                 }
                 console.log(role);
             }
-        })
+        });
     }
 
     addControlForDocente() {
@@ -205,7 +217,6 @@ export class UsersComponent implements OnInit {
         this.userForm.addControl('career', this.career);
         this.userForm.addControl('egressDate', this.egressDate);
     }
-
 
     removeControlForDocente() {
         this.userForm.removeControl('line');
@@ -249,15 +260,29 @@ export class UsersComponent implements OnInit {
 
     confirmDeleteSelected() {
         this.deleteProductsDialog = false;
-        this.products = this.products.filter(val => !this.selectedProducts.includes(val));
-        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
+        this.products = this.products.filter(
+            (val) => !this.selectedProducts.includes(val)
+        );
+        this.messageService.add({
+            severity: 'success',
+            summary: 'Successful',
+            detail: 'Products Deleted',
+            life: 3000,
+        });
         this.selectedProducts = [];
     }
 
     confirmDelete() {
         this.deleteProductDialog = false;
-        this.products = this.products.filter(val => val.id !== this.product.id);
-        this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
+        this.products = this.products.filter(
+            (val) => val.id !== this.product.id
+        );
+        this.messageService.add({
+            severity: 'success',
+            summary: 'Successful',
+            detail: 'Product Deleted',
+            life: 3000,
+        });
         this.product = {};
     }
 
@@ -272,17 +297,33 @@ export class UsersComponent implements OnInit {
         if (this.product.name?.trim()) {
             if (this.product.id) {
                 // @ts-ignore
-                this.product.inventoryStatus = this.product.inventoryStatus.value ? this.product.inventoryStatus.value : this.product.inventoryStatus;
-                this.products[this.findIndexById(this.product.id)] = this.product;
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
+                this.product.inventoryStatus = this.product.inventoryStatus
+                    .value
+                    ? this.product.inventoryStatus.value
+                    : this.product.inventoryStatus;
+                this.products[this.findIndexById(this.product.id)] =
+                    this.product;
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'Product Updated',
+                    life: 3000,
+                });
             } else {
                 this.product.id = this.createId();
                 this.product.code = this.createId();
                 this.product.image = 'product-placeholder.svg';
                 // @ts-ignore
-                this.product.inventoryStatus = this.product.inventoryStatus ? this.product.inventoryStatus.value : 'INSTOCK';
+                this.product.inventoryStatus = this.product.inventoryStatus
+                    ? this.product.inventoryStatus.value
+                    : 'INSTOCK';
                 this.products.push(this.product);
-                this.messageService.add({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Successful',
+                    detail: 'Product Created',
+                    life: 3000,
+                });
             }
 
             this.products = [...this.products];
@@ -305,7 +346,8 @@ export class UsersComponent implements OnInit {
 
     createId(): string {
         let id = '';
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const chars =
+            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         for (let i = 0; i < 5; i++) {
             id += chars.charAt(Math.floor(Math.random() * chars.length));
         }
@@ -313,7 +355,10 @@ export class UsersComponent implements OnInit {
     }
 
     onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+        table.filterGlobal(
+            (event.target as HTMLInputElement).value,
+            'contains'
+        );
     }
 
     openModalUserDetail(user: IUsuario) {
@@ -322,11 +367,20 @@ export class UsersComponent implements OnInit {
         this.modalUserDetail = true;
     }
 
-    callGetUserList(){
-        this.service.getUserList().subscribe((res) => {
-            this.userData = res.data;
-            console.log(res);
-        })
+    callGetUserList() {
+        this.getUserProcess = 'charging';
+        this.service.getUserList().subscribe(
+            (res) => {
+                this.getUserProcess = 'complete';
+                this.userData = res.data;
+                console.log(res);
+            },
+            (error) => {
+                // Handle the error in the subscription if necessary
+                this.getUserProcess = 'error';
+                console.log('Error in subscription:', error);
+            }
+        );
     }
 
     callPostNewUser() {
@@ -334,74 +388,79 @@ export class UsersComponent implements OnInit {
         switch (this.role.value.code) {
             case 'Docente':
                 rq = {
-                    "role": this.role.value.code,
-                    "name": this.name.value,
-                    "surnames": this.lastName.value,
-                    "email": this.email.value,
-                    "phone": this.number.value,
-                    "code": this.code.value,
-                    "career": this.career.value,
-                    "line": this.line.value,
-                    "sublines": this.subLine.value,
-                    "is_reviewer": this.reviewer.value ? true : false,
-                    "is_advisor": this.adviser.value ? true : false,
-                    "is_jury": this.jury.value ? true : false
+                    role: this.role.value.code,
+                    name: this.name.value,
+                    surnames: this.lastName.value,
+                    email: this.email.value,
+                    phone: this.number.value,
+                    code: this.code.value,
+                    career: this.career.value,
+                    line: this.line.value,
+                    sublines: this.subLine.value,
+                    is_reviewer: this.reviewer.value ? true : false,
+                    is_advisor: this.adviser.value ? true : false,
+                    is_jury: this.jury.value ? true : false,
                 };
                 break;
             case 'UDI':
-                console.log('entra')
+                console.log('entra');
                 rq = {
-                    "role": this.role.value.code,
-                    "name": this.name.value,
-                    "surnames": this.lastName.value,
-                    "email": this.email.value,
-                    "phone": this.number.value,
-                    "code": this.code.value,
-                    "career": this.career.value,
+                    role: this.role.value.code,
+                    name: this.name.value,
+                    surnames: this.lastName.value,
+                    email: this.email.value,
+                    phone: this.number.value,
+                    code: this.code.value,
+                    career: this.career.value,
                 };
                 break;
             case 'Egresado':
                 rq = {
-                    "role": this.role.value.code,
-                    "name": this.name.value,
-                    "surnames": this.lastName.value,
-                    "email": this.email.value,
-                    "phone": this.number.value,
-                    "code": this.code.value,
-                    "discharge_date": this.egressDate.value,
-                    "career": this.career.value
-                }
+                    role: this.role.value.code,
+                    name: this.name.value,
+                    surnames: this.lastName.value,
+                    email: this.email.value,
+                    phone: this.number.value,
+                    code: this.code.value,
+                    discharge_date: this.egressDate.value,
+                    career: this.career.value,
+                };
                 break;
             case 'Semillero':
                 rq = {
-                    "role": this.role.value.code,
-                    "name": this.name.value,
-                    "surnames": this.lastName.value,
-                    "email": this.email.value,
-                    "phone": this.number.value,
-                    "code": this.code.value,
-                    "cycle": this.cycle.value
-                }
+                    role: this.role.value.code,
+                    name: this.name.value,
+                    surnames: this.lastName.value,
+                    email: this.email.value,
+                    phone: this.number.value,
+                    code: this.code.value,
+                    cycle: this.cycle.value,
+                };
                 break;
             case 'Estudiante':
                 rq = {
-                    "role": this.role.value.code,
-                    "name": this.name.value,
-                    "surnames": this.lastName.value,
-                    "email": this.email.value,
-                    "phone": this.number.value,
-                    "code": this.code.value,
-                    "cycle": this.cycle.value,
-                    "career": this.career.value
-                }
+                    role: this.role.value.code,
+                    name: this.name.value,
+                    surnames: this.lastName.value,
+                    email: this.email.value,
+                    phone: this.number.value,
+                    code: this.code.value,
+                    cycle: this.cycle.value,
+                    career: this.career.value,
+                };
                 break;
         }
         console.log(rq);
         this.service.postCreateNewUser(rq).subscribe((res) => {
             if (res.status) {
-                this.messageService.add({ severity: 'success', summary: 'Mensaje', detail: 'El usuario se ha creado!', life: 3000 });
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Mensaje',
+                    detail: 'El usuario se ha creado!',
+                    life: 3000,
+                });
             }
-            console.log(res)
-        })
+            console.log(res);
+        });
     }
 }

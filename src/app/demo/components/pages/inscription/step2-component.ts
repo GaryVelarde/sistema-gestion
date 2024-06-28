@@ -11,7 +11,7 @@ export class Step2Component implements OnInit {
 
     filteredStudents: any[];
     filteredSecondStudents: any[];
-
+    getStudentListProcess = '';
     constructor(
         private router: Router,
         public presenter: InscriptionPresenter,
@@ -65,9 +65,12 @@ export class Step2Component implements OnInit {
     }
 
     callGetStudentList() {
+        this.getStudentListProcess = 'charging';
         this.service.getStudentsList().subscribe((res) => {
-            console.log(res);
+            this.getStudentListProcess = 'complete';
             this.studentsList = res.graduates_students;
+        }, (error) => {
+            this.getStudentListProcess = 'error';
         });
     }
 }

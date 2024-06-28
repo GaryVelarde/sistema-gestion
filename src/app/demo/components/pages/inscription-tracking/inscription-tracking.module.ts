@@ -24,6 +24,7 @@ import { FieldsetModule } from 'primeng/fieldset';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DividerModule } from 'primeng/divider';
 import { BadgeModule } from 'primeng/badge';
+import { SkeletonModule } from 'primeng/skeleton';
 
 @NgModule({
     imports: [
@@ -52,6 +53,7 @@ import { BadgeModule } from 'primeng/badge';
         ConfirmDialogModule,
         DividerModule,
         BadgeModule,
+        SkeletonModule
     ],
     declarations: [InscriptionTrackingComponent],
 })

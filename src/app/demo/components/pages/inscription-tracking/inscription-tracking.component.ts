@@ -287,7 +287,7 @@ export class InscriptionTrackingComponent implements OnInit {
             checked: false,
         },
     ];
-
+    skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     inscriptionSelected: any;
     showEdit = false;
     titleModalDetailIserSelected: string = '';
