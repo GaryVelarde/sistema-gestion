@@ -7,10 +7,9 @@
         <div class="grid p-fluid mt-3">
             <div class="field col-12 md:col-4">
                 <span class="p-float-label">
-                    <p-calendar 
+                    <p-calendar
                         formControlName="receptionDate"
-                        inputId="egressDate"
-                        ></p-calendar>
+                        inputId="egressDate"></p-calendar>
                     <label for="egressDate">Fecha de
                         recepción a facultad</label>
                 </span>
@@ -38,9 +37,11 @@
             </div>
         </div>
         <div class="flex gap-3 mt-1">
+            <p-button (click)="goToList()" label="Ver listado" [outlined]="true"
+                icon="pi pi-angle-left" iconPos="left" />
             <p-button (click)="nextStep()" label="Siguiente"
-                icon="pi pi-angle-right" iconPos="right" 
-                [disabled]="presenter.formStep1.invalid"/>
+                icon="pi pi-angle-right" iconPos="right"
+                [disabled]="presenter.formStep1.invalid" />
         </div>
     </form>
 

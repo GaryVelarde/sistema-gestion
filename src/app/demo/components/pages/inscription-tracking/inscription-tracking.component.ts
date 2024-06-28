@@ -11,6 +11,7 @@ import {
 } from '@angular/forms';
 import { IUsuario } from 'src/app/demo/api/user';
 import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
     templateUrl: './inscription-tracking.component.html',
@@ -270,6 +271,9 @@ export class InscriptionTrackingComponent implements OnInit {
     ];
     modalUserDetail = false;
     inscriptionState = '';
+    totalTask = 0;
+    totalTaskIncomplete = 0;
+    totalTaskComplete = 0;
 
     tasks = [
         {
@@ -306,7 +310,8 @@ export class InscriptionTrackingComponent implements OnInit {
         private fb: FormBuilder,
         private confirmationService: ConfirmationService,
         private service: AuthService,
-        private elRef: ElementRef
+        private elRef: ElementRef,
+        private router: Router
     ) {
         this.commentsForm = this.fb.group({
             comment: this.comment,
@@ -316,8 +321,10 @@ export class InscriptionTrackingComponent implements OnInit {
         });
     }
 
-    ngOnInit() {
-        this.inscriptionSelected = this.registros[0];
+    ngOnInit() {}
+
+    goToInscription() {
+        this.router.navigate(['/pages/new-titulation-process']);
     }
 
     findIndexById(id: string): number {
@@ -339,11 +346,11 @@ export class InscriptionTrackingComponent implements OnInit {
         );
     }
 
-
     viewDetailsInscription(data: any) {
         if (data) {
             this.inscriptionSelected = data;
             this.inscriptionState = data.inscripciones[0].estado;
+            this.countTask();
         }
     }
 
@@ -370,6 +377,12 @@ export class InscriptionTrackingComponent implements OnInit {
     showEdition() {
         this.showEdit = true;
     }
+
+    cancelEdition() {
+        this.showEdit = false;
+    }
+
+    saveEdition() {}
 
     goToReview() {
         this.inscriptionState = 'En revisión';
@@ -432,6 +445,7 @@ export class InscriptionTrackingComponent implements OnInit {
         if (labelElement) {
             labelElement.classList.add('task-done');
         }
+        this.countTask();
     }
 
     isTaskDone(task: any): any {
@@ -441,19 +455,24 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     removeTask(taskId: string) {
-        const index = this.tasks.findIndex(task => task.id === taskId);
+        const index = this.tasks.findIndex((task) => task.id === taskId);
         if (index !== -1) {
             this.tasks.splice(index, 1);
         }
+        this.countTask();
     }
-    
 
-    countTask(taskId: string): void {
+    countTask(): void {
+        this.totalTask = 0;
+        this.totalTaskIncomplete = 0;
+        this.totalTaskComplete = 0;
         this.tasks.forEach((task) => {
-        
-            console.log(
-                `Task ${task.id}: ${task.description} - Checked: ${task.checked}`
-            );
+            if (task.checked) {
+                this.totalTaskComplete++;
+            } else {
+                this.totalTaskIncomplete++;
+            }
+            this.totalTask++;
             // Aquí puedes realizar la acción que necesites para cada tarea
         });
     }

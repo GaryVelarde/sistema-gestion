@@ -23,8 +23,11 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Proceso de titulación',
                 items: [
-                    { label: 'Inscripción', icon: 'pi pi-fw pi-id-card', routerLink: ['/pages/new-titulation-process'] },
-                    { label: 'Seguimiento', icon: 'pi pi-fw pi-list', routerLink: ['/pages/inscription-tracking'] }
+                    { label: 'Proyecto de Tesis', icon: 'pi pi-fw pi-file', routerLink: ['/pages/inscription-tracking'] },
+                    { label: 'Asesorías', icon: 'pi pi-fw pi-list', routerLink: ['/pages/'] },
+                    { label: 'Revisión de tesis', icon: 'pi pi-fw pi-list', routerLink: ['/pages/'] },
+                    { label: 'Sustentación', icon: 'pi pi-fw pi-list', routerLink: ['/pages/'] },
+                    { label: 'Obervaciones', icon: 'pi pi-fw pi-list', routerLink: ['/pages/'] },
                 ]
             },
             {

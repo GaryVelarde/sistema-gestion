@@ -15,8 +15,11 @@ export class Step1Component {
 	constructor(private router: Router, public presenter: InscriptionPresenter) { }
 
 	nextStep(): void{
-		console.log(this.presenter.formStep1)
 		void this.router.navigate(['pages/new-titulation-process/step2']);
+	}
+
+	goToList(): void {
+		void this.router.navigate(['pages/inscription-tracking']);
 	}
 	
 }

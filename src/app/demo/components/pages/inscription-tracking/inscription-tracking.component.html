@@ -2,6 +2,20 @@
 <div *ngIf="!inscriptionSelected" class="grid">
     <div class="col-12">
         <div class="card px-6 py-6">
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button
+                            pButton
+                            pRipple
+                            label="Inscribir un nuevo protecto de tesis"
+                            icon="pi pi-plus"
+                            class="p-button-success mr-2"
+                            (click)="goToInscription()"></button>
+                    </div>
+                </ng-template>              
+            </p-toolbar>
+        <div class="card">
             <p-table #dt [value]="registros" responsiveLayout="scroll"
                 [rows]="10"
                 [globalFilterFields]="['titulo_proyecto_tesis','nombre']"
@@ -18,7 +32,7 @@
                             <i class="pi pi-search"></i>
                             <input pInputText type="text"
                                 (input)="onGlobalFilter(dt, $event)"
-                                placeholder="Search..."
+                                placeholder="Buscar por título..."
                                 class="w-full sm:w-auto" />
                         </span>
                     </div>
@@ -72,6 +86,7 @@
                 </ng-template>
             </p-table>
         </div>
+        </div>
 
     </div>
 </div>
@@ -93,9 +108,15 @@
                     <p-button (click)="backList()" label="Regresar"
                         [outlined]="true"
                         icon="pi pi-angle-left" iconPos="left" />
-                    <p-button class="ml-3" (click)="showEdition()"
+                    <p-button *ngIf="!showEdit" class="ml-3" (click)="showEdition()"
                         label="Editar"
                         icon="pi pi-pencil" iconPos="left" />
+                    <p-button *ngIf="showEdit" class="ml-3" (click)="cancelEdition()"
+                        label="Cancelar edición"
+                        icon="pi pi-times" iconPos="right" />
+                    <p-button *ngIf="showEdit" class="ml-3" (click)="saveEdition()"
+                        label="Guardar cambios"
+                        icon="pi pi-save" iconPos="left" />
                 </div>
                 <div class="p-2">
                     <p-button
@@ -141,25 +162,55 @@
             </div>
             <div *ngIf="showEdit" class="grid col-12">
                 <div class="col-3"><p class="font-bold">Nro de
-                        expediente:</p><input type="text" pInputText [value]="inscriptionSelected.expediente" />
-                    </div>
+                        expediente:</p><input type="text" pInputText
+                        class="full-width"
+                        [value]="inscriptionSelected.expediente" />
+                </div>
                 <div class="col-3"><p class="font-bold">Escuala
-                        profesional:</p><input type="text" pInputText [value]="inscriptionSelected.escuela_profesional" />
-                    </div>
+                        profesional:</p><input type="text" pInputText
+                        class="full-width"
+                        [value]="inscriptionSelected.escuela_profesional" />
+                </div>
                 <div class="col-3"><p class="font-bold">Nro de
-                        oficio:</p><input type="text" pInputText [value]="inscriptionSelected.numero_oficio" />
-                    </div>
+                        oficio:</p><input type="text" pInputText
+                        class="full-width"
+                        [value]="inscriptionSelected.numero_oficio" />
+                </div>
                 <div class="col-3"><p class="font-bold">Nro de
-                        resolución:</p><input type="text" pInputText [value]="inscriptionSelected.numero_resolucion"  />
-                    </div>
+                        resolución:</p><input type="text" pInputText
+                        class="full-width"
+                        [value]="inscriptionSelected.numero_resolucion" />
+                </div>
             </div>
             <div class="grid col-12">
                 <div class="col-3"><p class="font-bold">Fecha de recepción a
-                        Facultad:</p><p><i class="pi pi-calendar"></i>
-                        {{inscriptionSelected.inscripciones[0].fecha_recepcion_facultad}}</p></div>
+                        Facultad:</p>
+                    <p *ngIf="!showEdit">
+                        <i class="pi pi-calendar"></i>
+                        {{inscriptionSelected.inscripciones[0].fecha_recepcion_facultad}}
+                    </p>
+                    <p-calendar *ngIf="showEdit"
+                        [(ngModel)]="inscriptionSelected.inscripciones[0].fecha_recepcion_facultad"
+                        [iconDisplay]="'input'"
+                        class="full-width"
+                        [showIcon]="true"
+                        dateFormat="yy-mm-dd"
+                        inputId="icondisplay" />
+                </div>
                 <div class="col-3"><p class="font-bold">Escuala de aprobación
-                        UDI:</p><p><i class="pi pi-calendar"></i>
-                        {{inscriptionSelected.inscripciones[0].fecha_aprobacion_UDI}}</p></div>
+                        UDI:</p>
+                    <p *ngIf="!showEdit">
+                        <i class="pi pi-calendar"></i>
+                        {{inscriptionSelected.inscripciones[0].fecha_aprobacion_UDI}}
+                    </p>
+                    <p-calendar *ngIf="showEdit"
+                        [(ngModel)]="inscriptionSelected.inscripciones[0].fecha_aprobacion_UDI"
+                        [iconDisplay]="'input'"
+                        class="full-width"
+                        [showIcon]="true"
+                        dateFormat="yy-mm-dd"
+                        inputId="icondisplay" />
+                </div>
                 <div class="col-3">
                 </div>
                 <div class="col-3">
@@ -181,10 +232,7 @@
                 </div>
 
             </div>
-            <div class="grid col-12"
-                style="display: flex; justify-content: center;">
-                <div class="ml-2 mr-2 separator"></div>
-            </div>
+            <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
                 <div class="col-6">
                     <p-table
@@ -229,23 +277,23 @@
                 <div class=" col-12">
                     <h5>Lista de tareas</h5>
                 </div>
-                <div class="col-4">
-                    <p-card style="text-align: center;">
-                        <p>Tareas incompletas <p-badge [value]="2"
+                <div class="col-4 text-align-center">
+                    <p-card>
+                        <p>Tareas incompletas <p-badge [value]="totalTaskIncomplete"
                                 severity="warning" />
                         </p>
                     </p-card>
                 </div>
-                <div class="col-4">
-                    <p-card style="text-align: center;">
-                        <p>Tareas terminadas <p-badge [value]="2"
+                <div class="col-4 text-align-center">
+                    <p-card>
+                        <p>Tareas terminadas <p-badge [value]="totalTaskComplete"
                                 severity="success" />
                         </p>
                     </p-card>
                 </div>
-                <div class="col-4">
-                    <p-card style="text-align: center;">
-                        <p>Total de tareas <p-badge [value]="2"
+                <div class="col-4 text-align-center">
+                    <p-card>
+                        <p>Total de tareas <p-badge [value]="totalTask"
                                 severity="info" />
                         </p>
                     </p-card>
@@ -267,7 +315,7 @@
                 <div class="col-1">
                     <p-button label="Enviar" [rounded]="true"
                         (click)="addTask()"
-                        [disabled]="!taskDescription.value.length" />
+                        [disabled]="tasksForm.invalid" />
                 </div>
 
                 <div class=" col-12">
@@ -317,7 +365,7 @@
                 <div class="col-1">
                     <p-button label="Enviar" [rounded]="true"
                         (click)="addComment()"
-                        [disabled]="!comment.value.length" />
+                        [disabled]="commentsForm.invalid" />
                 </div>
 
                 <div class=" col-12">
@@ -330,3 +378,5 @@
 
             </div>
         </div>
+    </div>
+</div>
