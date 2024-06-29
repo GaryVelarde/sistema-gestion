@@ -9,6 +9,7 @@ import { RouterModule } from '@angular/router';
         { path: 'users', loadChildren: () => import('./users/users.module').then(m => m.UsersModule) },
         { path: 'new-titulation-process', loadChildren: () => import('./inscription/insctiption.module').then(m => m.InsctiptionModule) },
         { path: 'inscription-tracking', loadChildren: () => import('./inscription-tracking/inscription-tracking.module').then(m => m.InscriptionTrackingModule) },
+        { path: 'events', loadChildren: () => import('./events/events.module').then(m => m.EventsModule) },
         { path: '**', redirectTo: '/notfound' }
     ])],
     exports: [RouterModule]

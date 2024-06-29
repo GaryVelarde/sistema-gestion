@@ -31,6 +31,12 @@ export class AppMenuComponent implements OnInit {
                 ]
             },
             {
+                label: 'Eventos',
+                items: [
+                    { label: 'Calendario', icon: 'pi pi-fw pi-calendar', routerLink: ['/pages/events'] },
+                ]
+            },
+            {
                 label: 'Home',
                 items: [
                     { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }
