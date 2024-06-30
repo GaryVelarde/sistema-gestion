@@ -13,99 +13,104 @@
                             class="p-button-success mr-2"
                             (click)="goToInscription()"></button>
                     </div>
-                </ng-template>              
+                </ng-template>
             </p-toolbar>
-        <div class="card">
-            <p-table #dt [value]="registros" responsiveLayout="scroll"
-                [rows]="10"
-                [globalFilterFields]="['titulo_proyecto_tesis','nombre']"
-                [paginator]="true" [rowsPerPageOptions]="[10,20,30]"
-                [showCurrentPageReport]="true"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                [(selection)]="selectedProducts" selectionMode="multiple"
-                [rowHover]="true" dataKey="id">
-                <ng-template pTemplate="caption">
-                    <div
-                        class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                        <h5 class="m-0">Seguimiento de inscripciones</h5>
-                        <span class="block mt-2 md:mt-0 p-input-icon-left">
-                            <i class="pi pi-search"></i>
-                            <input pInputText type="text"
-                                (input)="onGlobalFilter(dt, $event)"
-                                placeholder="Buscar por título..."
-                                class="w-full sm:w-auto" />
-                        </span>
-                    </div>
-                </ng-template>
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th style="width: 3rem">
-                            <p-tableheadercheckbox></p-tableheadercheckbox>
-                        </th>
-                        <th pSortableColumn="titulo_proyecto_tesis"
-                            style="width:60%">Título de
-                            tesis <p-sorticon
-                                field="titulo_proyecto_tesis"></p-sorticon></th>
-                        <th pSortableColumn="nombre" style="width:20%">Revisor
-                            <p-sorticon
-                                field="nombre"></p-sorticon></th>
-                        <th style="width:10%">Estado</th>
-                        <th style="width:10%"></th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-data>
-                    <tr>
-                        <td>
-                            <p-tablecheckbox [value]="data"></p-tablecheckbox>
-                        </td>
-                        <td style="width:14%; min-width:10rem;"><span
-                                class="p-column-title">Título de tesis</span>
-                            {{data.titulo_proyecto_tesis}}
-                        </td>
-                        <td style="width:14%; min-width:8rem;">
-                            <span class="p-column-title">Revisor</span>
-                            {{data.inscripciones[0].docente[0].nombre + ' ' +
-                            data.inscripciones[0].docente[0].apellidos}}
-                        </td>
-                        <td style="width:14%; min-width: 10rem;"><span
-                                class="p-column-title">estado</span>
-                            <span
-                                [class]="'product-badge status-' + (data.estado ? data.estado.toLowerCase() : '')">{{data.inscripciones[0].estado}}</span>
-                        </td>
-                        <td>
-                            <div class="flex">
-                                <p-button label="Ver detalle" [outlined]="true"
-                                    severity="contrast"
-                                    (click)="viewDetailsInscription(data)" />
+            <div class="card">
+                <p-table #dt [value]="registros" responsiveLayout="scroll"
+                    [rows]="10"
+                    [globalFilterFields]="['titulo_proyecto_tesis','nombre']"
+                    [paginator]="true" [rowsPerPageOptions]="[10,20,30]"
+                    [showCurrentPageReport]="true"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [(selection)]="selectedProducts" selectionMode="multiple"
+                    [rowHover]="true" dataKey="id">
+                    <ng-template pTemplate="caption">
+                        <div
+                            class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                            <h5 class="m-0">Seguimiento de inscripciones</h5>
+                            <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                <i class="pi pi-search"></i>
+                                <input pInputText type="text"
+                                    (input)="onGlobalFilter(dt, $event)"
+                                    placeholder="Buscar por título..."
+                                    class="w-full sm:w-auto" />
+                            </span>
+                        </div>
+                    </ng-template>
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 3rem">
+                                <p-tableheadercheckbox></p-tableheadercheckbox>
+                            </th>
+                            <th pSortableColumn="titulo_proyecto_tesis"
+                                style="width:60%">Título de
+                                tesis <p-sorticon
+                                    field="titulo_proyecto_tesis"></p-sorticon></th>
+                            <th pSortableColumn="nombre"
+                                style="width:20%">Revisor
+                                <p-sorticon
+                                    field="nombre"></p-sorticon></th>
+                            <th style="width:10%">Estado</th>
+                            <th style="width:10%"></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-data>
+                        <tr>
+                            <td>
+                                <p-tablecheckbox
+                                    [value]="data"></p-tablecheckbox>
+                            </td>
+                            <td style="width:14%; min-width:10rem;"><span
+                                    class="p-column-title">Título de
+                                    tesis</span>
+                                {{data.titulo_proyecto_tesis}}
+                            </td>
+                            <td style="width:14%; min-width:8rem;">
+                                <span class="p-column-title">Revisor</span>
+                                {{data.inscripciones[0].docente[0].nombre + ' '
+                                +
+                                data.inscripciones[0].docente[0].apellidos}}
+                            </td>
+                            <td style="width:14%; min-width: 10rem;"><span
+                                    class="p-column-title">estado</span>
+                                <span
+                                    [class]="'product-badge status-' + (data.estado ? data.estado.toLowerCase() : '')">{{data.inscripciones[0].estado}}</span>
+                            </td>
+                            <td>
+                                <div class="flex">
+                                    <p-button label="Ver detalle"
+                                        [outlined]="true"
+                                        severity="contrast"
+                                        (click)="viewDetailsInscription(data)" />
 
-                                <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
+                                    <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
                                 <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteProduct(product)"></button> -->
-                            </div>
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
-        </div>
-        <div class="card">
-            <p-table [value]="skeletonRows" responsiveLayout="scroll">
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th style="width:60%">Título de tesis</th>
-                        <th style="width:20%">Revisor</th>
-                        <th style="width:10%">Estado</th>
-                        <th style="width:10%"></th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-product>
-                    <tr>
-                        <td><p-skeleton /></td>
-                        <td><p-skeleton /></td>
-                        <td><p-skeleton /></td>
-                        <td><p-skeleton /></td>
-                    </tr>
-                </ng-template>
-            </p-table>
-        </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            <div class="card">
+                <p-table [value]="skeletonRows" responsiveLayout="scroll">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width:60%">Título de tesis</th>
+                            <th style="width:20%">Revisor</th>
+                            <th style="width:10%">Estado</th>
+                            <th style="width:10%"></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-product>
+                        <tr>
+                            <td><p-skeleton /></td>
+                            <td><p-skeleton /></td>
+                            <td><p-skeleton /></td>
+                            <td><p-skeleton /></td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
         </div>
 
     </div>
@@ -128,13 +133,16 @@
                     <p-button (click)="backList()" label="Regresar"
                         [outlined]="true"
                         icon="pi pi-angle-left" iconPos="left" />
-                    <p-button *ngIf="!showEdit" class="ml-3" (click)="showEdition()"
+                    <p-button *ngIf="!showEdit" class="ml-3"
+                        (click)="showEdition()"
                         label="Editar"
                         icon="pi pi-pencil" iconPos="left" />
-                    <p-button *ngIf="showEdit" class="ml-3" (click)="cancelEdition()"
+                    <p-button *ngIf="showEdit" class="ml-3"
+                        (click)="cancelEdition()"
                         label="Cancelar edición"
                         icon="pi pi-times" iconPos="right" />
-                    <p-button *ngIf="showEdit" class="ml-3" (click)="saveEdition()"
+                    <p-button *ngIf="showEdit" class="ml-3"
+                        (click)="saveEdition()"
                         label="Guardar cambios"
                         icon="pi pi-save" iconPos="left" />
                 </div>
@@ -233,7 +241,7 @@
                 </div>
                 <div class="col-3">
                 </div>
-                <div class="col-3">
+                <div class="card col-3">
                     <p class="font-bold">Estado:</p>
                     <p-tag *ngIf="inscriptionState === 'Inscrito'"
                         value="Inscrito" />
@@ -299,14 +307,16 @@
                 </div>
                 <div class="col-4 text-align-center">
                     <p-card>
-                        <p>Tareas incompletas <p-badge [value]="totalTaskIncomplete"
+                        <p>Tareas incompletas <p-badge
+                                [value]="totalTaskIncomplete"
                                 severity="warning" />
                         </p>
                     </p-card>
                 </div>
                 <div class="col-4 text-align-center">
                     <p-card>
-                        <p>Tareas terminadas <p-badge [value]="totalTaskComplete"
+                        <p>Tareas terminadas <p-badge
+                                [value]="totalTaskComplete"
                                 severity="success" />
                         </p>
                     </p-card>
@@ -390,9 +400,18 @@
 
                 <div class=" col-12">
                     <div *ngFor="let comment of comments" class="mb-3">
-                        <p-fieldset [legend]="comment.name" [toggleable]="true">
-                            <p [innerHTML]="formatText(comment.content)"></p>
-                        </p-fieldset>
+                        <div [ngSwitch]="comment.isComment">
+                            <p-fieldset *ngSwitchCase="true"
+                                [legend]="comment.name" [toggleable]="true">
+                                <p
+                                    [innerHTML]="formatText(comment.content)"></p>
+                            </p-fieldset>
+                            <p-fieldset *ngSwitchCase="false"
+                                [legend]="comment.name">
+                                <p
+                                    [innerHTML]="formatText(comment.content)"></p>
+                            </p-fieldset>
+                        </div>
                     </div>
                 </div>
 
@@ -400,3 +419,54 @@
         </div>
     </div>
 </div>
+<p-dialog
+    header="Confirmación de cancelación"
+    [modal]="true"
+    [(visible)]="showDialogCancel"
+    [style]="{ width: '50rem'}"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <div class="grid" style="height: 100%;">
+        <form [formGroup]="cancelattionForm" class="col-12">
+            <div class="col-12"><p class="font-bold">Por favor seleccione la
+                    fecha de recepción a
+                    secretaria:</p>
+                    <p-calendar
+                    class="max-w-full"
+                    [inline]="true"
+                    [showWeek]="true"
+                    [locale]="es"
+                    dateFormat="dd/mm/yy"
+                    formControlName="dateCancelationReception">
+                  </p-calendar>
+            </div>
+
+            <div class="col-12">
+                <p class="font-bold">Por favor digite el motivo de la
+                    cancelación:</p>
+
+                <textarea
+                    inputId="textarea"
+                    rows="4"
+                    style="width: 100%;"
+                    formControlName="cancelationComment"
+                    pInputTextarea></textarea>
+
+            </div>
+            <div class="footer mt-5">
+                <button
+                    pButton
+                    pRipple
+                    label="Regresar"
+                    icon="pi pi-angle-left"
+                    class="p-button-text"
+                    iconPos="left"
+                    (click)="hideCancelDialog()"></button>
+
+                <p-button label="Confirmar cancelación" iconPos="right"
+                    icon="pi pi-check" severity="danger"
+                    (click)="confirmCancelation()" />
+
+            </div>
+        </form>
+    </div>
+</p-dialog>

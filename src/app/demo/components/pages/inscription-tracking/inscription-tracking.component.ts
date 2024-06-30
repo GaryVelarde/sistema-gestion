@@ -261,15 +261,17 @@ export class InscriptionTrackingComponent implements OnInit {
         {
             name: 'John Doe',
             content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+            isComment: true,
         },
         {
             name: 'Alice Smith',
             content:
                 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            isComment: true,
         },
         // Agrega más elementos según sea necesario
     ];
-    modalUserDetail = false;
+    showDialogCancel = false;
     inscriptionState = '';
     totalTask = 0;
     totalTaskIncomplete = 0;
@@ -287,19 +289,30 @@ export class InscriptionTrackingComponent implements OnInit {
             checked: false,
         },
     ];
+    es: any;
+  
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     inscriptionSelected: any;
     showEdit = false;
     titleModalDetailIserSelected: string = '';
     public commentsForm: FormGroup;
     public tasksForm: FormGroup;
+    public cancelattionForm: FormGroup;
     private _comment: FormControl = new FormControl('', [Validators.required]);
+    private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
+    private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
     private _taskDescription: FormControl = new FormControl('', [
         Validators.required,
     ]);
 
     get comment() {
         return this._comment;
+    }
+    get cancelationComment() {
+        return this._cancelationComment;
+    }
+    get dateCancelationReception() {
+        return this._dateCancelationReception;
     }
     get taskDescription() {
         return this._taskDescription;
@@ -319,9 +332,26 @@ export class InscriptionTrackingComponent implements OnInit {
         this.tasksForm = this.fb.group({
             taskDescription: this.taskDescription,
         });
+        this.cancelattionForm = this.fb.group({
+            cancelationComment: this.cancelationComment,
+            dateCancelationReception: this.dateCancelationReception
+        });
     }
 
-    ngOnInit() {}
+    ngOnInit() {
+        this.es = {
+            firstDayOfWeek: 1,
+            dayNames: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
+            dayNamesShort: ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"],
+            dayNamesMin: ["D", "L", "M", "X", "J", "V", "S"],
+            monthNames: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+            monthNamesShort: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+            today: 'Hoy',
+            clear: 'Borrar',
+            dateFormat: 'dd/mm/yy',
+            weekHeader: 'Sm'
+          };
+    }
 
     goToInscription() {
         this.router.navigate(['/pages/new-titulation-process']);
@@ -385,34 +415,37 @@ export class InscriptionTrackingComponent implements OnInit {
     saveEdition() {}
 
     goToReview() {
+        this.addNotificationForChangeState(
+            'La inscripción del protecto de Tesis pasó a Revisión por Cesar Jauregui Saavedra'
+        );
         this.inscriptionState = 'En revisión';
     }
 
     goToObserved() {
+        this.addNotificationForChangeState(
+            'La inscripción del protecto de Tesis pasó a Observado por Cesar Jauregui Saavedra'
+        );
         this.inscriptionState = 'Observado';
     }
 
     goToCancelation() {
-        this.confirmationService.confirm({
-            header: 'Confirmación',
-            message:
-                'Estás a punto de cancelar esta inscripción, ¿estás seguro(a)?.',
-            acceptIcon: 'pi pi-check mr-2',
-            rejectIcon: 'pi pi-times mr-2',
-            rejectButtonStyleClass: 'p-button-sm',
-            acceptButtonStyleClass: 'p-button-outlined p-button-sm',
-            accept: () => {
-                this.inscriptionState = 'Cancelado';
-                this.messageService.add({
-                    key: 'tst',
-                    severity: 'info',
-                    summary: 'Confirmado',
-                    detail: 'Se ha realizado la cencelación de la inscripción.',
-                    life: 3000,
-                });
-            },
-            reject: () => {},
+        this.showDialogCancel = true;
+        
+    }
+
+    confirmCancelation() {
+        this.inscriptionState = 'Cancelado';
+        this.messageService.add({
+            key: 'tst',
+            severity: 'info',
+            summary: 'Confirmado',
+            detail: 'Se ha realizado la cencelación de la inscripción.',
+            life: 3000,
         });
+    }
+
+    hideCancelDialog() {
+        this.showDialogCancel = false;
     }
 
     goToApprove() {
@@ -426,6 +459,9 @@ export class InscriptionTrackingComponent implements OnInit {
             acceptButtonStyleClass: 'p-button-outlined p-button-sm',
             accept: () => {
                 this.inscriptionState = 'Aprobado';
+                this.addNotificationForChangeState(
+                    'La inscripción del protecto de Tesis pasó a Aprobado por Cesar Jauregui Saavedra'
+                );
                 this.messageService.add({
                     key: 'tst',
                     severity: 'info',
@@ -482,10 +518,19 @@ export class InscriptionTrackingComponent implements OnInit {
             this.comments.push({
                 name: 'Gary Velarde',
                 content: this.comment.value,
+                isComment: true,
             });
             this.comment.reset();
             this.scrollDown();
         }
+    }
+
+    addNotificationForChangeState(comment: string) {
+        this.comments.push({
+            name: 'Cesar Jauregui',
+            content: comment,
+            isComment: false,
+        });
     }
 
     addTask(): void {

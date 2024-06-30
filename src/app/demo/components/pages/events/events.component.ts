@@ -14,7 +14,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class EventsComponent implements OnInit {
     @ViewChild('calendar') calendarComponent: FullCalendarComponent;
-
+    @ViewChild('calendarDetail') calendarDetailComponent: FullCalendarComponent;
+    showEventDetailDoalog = false;
     // Define el arreglo de eventos
     events: EventInput[] = [
         {
@@ -65,6 +66,36 @@ export class EventsComponent implements OnInit {
         events: this.events,
         eventDrop: this.handleEventDrop.bind(this),
         eventResize: this.handleEventResize.bind(this),
+        slotDuration: '00:30:00', // Duración de cada intervalo en 15 minutos
+        slotLabelInterval: '00:30', // Etiqueta de cada intervalo en 15 minutos
+
+        //eventContent: this.customEventContent.bind(this),
+    };
+
+    calendarOptionsDetail: CalendarOptions = {
+        plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
+        initialView: 'timeGridWeek',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'timeGridWeek,timeGridDay',
+        },
+        buttonText: {
+            today: 'Hoy',
+            month: 'Mes',
+            week: 'Semana',
+            day: 'Día',
+            list: 'Lista',
+        },
+        locale: esLocale,
+        dateClick: this.handleDateClick.bind(this),
+        eventClick: this.handleEventClick.bind(this),
+        editable: true,
+        selectable: true,
+        eventResizableFromStart: true,
+        events: this.events,
+        eventDrop: this.handleEventDrop.bind(this),
+        eventResize: this.handleEventResize.bind(this),
         //eventContent: this.customEventContent.bind(this),
     };
 
@@ -88,6 +119,16 @@ export class EventsComponent implements OnInit {
         return { domNodes: [element] };
     }*/
 
+    updateCalendarOptions(duration: string, interval: string) {
+        const calendarApi = this.calendarComponent.getApi();
+        calendarApi.setOption('slotDuration', duration);
+        calendarApi.setOption('slotLabelInterval', interval);
+    }
+
+    incrementaHorario() {
+        this.updateCalendarOptions('00:10:00', '00:10');
+    }
+
     handleDateClick(arg) {
         this.eventForm.reset();
         this.eventForm.patchValue({
@@ -98,6 +139,7 @@ export class EventsComponent implements OnInit {
     }
 
     handleEventClick(arg) {
+        this.showEventDetailDoalog = true;
         alert('Event clicked: ' + arg.event.title);
     }
 

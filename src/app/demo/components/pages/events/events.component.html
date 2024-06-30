@@ -8,7 +8,7 @@
         </div>
         <div class="p-toolbar-group-right">
           <button type="button" pButton icon="pi pi-refresh"
-            class="p-button-secondary" label="Actualizar"></button>
+            class="p-button-secondary" label="Actualizar" (click)="incrementaHorario()"></button>
         </div>
       </p-toolbar>
       <full-calendar
@@ -46,4 +46,14 @@
       </div>
     </div>
   </form>
+</p-dialog>
+
+
+<p-dialog header="Añadir Evento" [style]="{ width: '100rem', height: '100rem' }" 
+  [(visible)]="showEventDetailDoalog" [modal]="true" [closable]="true" [resizable]="true">
+  <full-calendar
+        class="mt-4"
+        #calendarDetail
+        [options]="calendarOptionsDetail"
+        [events]="events"></full-calendar>
 </p-dialog>
