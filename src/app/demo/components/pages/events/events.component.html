@@ -1,9 +1,49 @@
 <div class="grid">
   <div class="col-12">
-    <h1>Calendar</h1>
-    <full-calendar
-      [options]="calendarOptions"
-      [events]="eventsPromise | async"></full-calendar>
-
+    <p-card>
+      <p-toolbar class="mt-3">
+        <div class="p-toolbar-group-left">
+          <button type="button" pButton icon="pi pi-plus" label="Añadir Evento"
+            (click)="displayDialog=true"></button>
+        </div>
+        <div class="p-toolbar-group-right">
+          <button type="button" pButton icon="pi pi-refresh"
+            class="p-button-secondary" label="Actualizar"></button>
+        </div>
+      </p-toolbar>
+      <full-calendar
+        class="mt-4"
+        #calendar
+        [options]="calendarOptions"
+        [events]="events"></full-calendar>
+    </p-card>
   </div>
 </div>
+
+<p-dialog header="Añadir Evento" [style]="{ width: '60rem', height: '60rem' }"
+  [(visible)]="displayDialog" [modal]="true" [closable]="false">
+  <form [formGroup]="eventForm" (ngSubmit)="addEvent()">
+    <div class="p-fluid">
+      <div class="p-field">
+        <label for="title">Título</label>
+        <input id="title" type="text" pInputText formControlName="title" />
+      </div>
+      <div class="p-field">
+        <label for="start">Inicio</label>
+        <p-calendar id="start" formControlName="start" dateFormat="yy-mm-dd"
+          showTime="true" hourFormat="24"></p-calendar>
+      </div>
+      <div class="p-field">
+        <label for="end">Fin</label>
+        <p-calendar id="end" formControlName="end" dateFormat="yy-mm-dd"
+          showTime="true" hourFormat="24"></p-calendar>
+      </div>
+      <div class="p-field">
+        <button type="submit" pButton label="Guardar" icon="pi pi-check"
+          [disabled]="eventForm.invalid"></button>
+        <button type="button" pButton label="Cancelar" icon="pi pi-times"
+          class="p-button-secondary" (click)="displayDialog=false"></button>
+      </div>
+    </div>
+  </form>
+</p-dialog>

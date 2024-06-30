@@ -26,6 +26,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { EventsComponent } from './events.component';
 import { EventsRoutingModule } from './events-routing.module';
+import { PanelModule } from 'primeng/panel';
 
 @NgModule({
     imports: [
@@ -56,6 +57,7 @@ import { EventsRoutingModule } from './events-routing.module';
         BadgeModule,
         SkeletonModule,
         FullCalendarModule,
+        PanelModule
     ],
     declarations: [EventsComponent],
 })
