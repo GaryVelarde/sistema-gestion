@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit } from '@angular/core';
 import { Product } from 'src/app/demo/api/product';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ProductService } from 'src/app/demo/service/product.service';
 import {
@@ -289,7 +289,6 @@ export class InscriptionTrackingComponent implements OnInit {
             checked: false,
         },
     ];
-    es: any;
   
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     inscriptionSelected: any;
@@ -324,7 +323,8 @@ export class InscriptionTrackingComponent implements OnInit {
         private confirmationService: ConfirmationService,
         private service: AuthService,
         private elRef: ElementRef,
-        private router: Router
+        private router: Router,
+        private config: PrimeNGConfig
     ) {
         this.commentsForm = this.fb.group({
             comment: this.comment,
@@ -339,7 +339,7 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.es = {
+        this.config.setTranslation({
             firstDayOfWeek: 1,
             dayNames: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
             dayNamesShort: ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"],
@@ -350,7 +350,8 @@ export class InscriptionTrackingComponent implements OnInit {
             clear: 'Borrar',
             dateFormat: 'dd/mm/yy',
             weekHeader: 'Sm'
-          };
+            //translations
+        });
     }
 
     goToInscription() {
