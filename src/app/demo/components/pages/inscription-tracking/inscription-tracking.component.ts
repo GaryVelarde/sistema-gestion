@@ -2,16 +2,15 @@ import { Component, ElementRef, OnInit } from '@angular/core';
 import { Product } from 'src/app/demo/api/product';
 import { ConfirmationService, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { ProductService } from 'src/app/demo/service/product.service';
 import {
     FormBuilder,
     FormControl,
     FormGroup,
     Validators,
 } from '@angular/forms';
-import { IUsuario } from 'src/app/demo/api/user';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
+import { InscriptionPresenter } from '../inscription/insctiption-presenter';
 
 @Component({
     templateUrl: './inscription-tracking.component.html',
@@ -20,8 +19,6 @@ import { Router } from '@angular/router';
 })
 export class InscriptionTrackingComponent implements OnInit {
     products: Product[] = [];
-
-    product: Product = {};
 
     rowsPerPageOptions = [5, 10, 20];
 
@@ -271,7 +268,11 @@ export class InscriptionTrackingComponent implements OnInit {
         },
         // Agrega más elementos según sea necesario
     ];
+
+    egressList = [];
     showDialogCancel = false;
+    showSelectNewReviwer = false;
+    showSelectNewStudent = false;
     inscriptionState = '';
     totalTask = 0;
     totalTaskIncomplete = 0;
@@ -289,11 +290,16 @@ export class InscriptionTrackingComponent implements OnInit {
             checked: false,
         },
     ];
-  
+    reviewersList = [];
+	filteredReviewers: any;
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     inscriptionSelected: any;
     showEdit = false;
     titleModalDetailIserSelected: string = '';
+    filteredStudents: any[];
+    filteredSecondStudents: any[];
+    getStudentListProcess = '';
+    studentsList = [];
     public commentsForm: FormGroup;
     public tasksForm: FormGroup;
     public cancelattionForm: FormGroup;
@@ -324,7 +330,8 @@ export class InscriptionTrackingComponent implements OnInit {
         private service: AuthService,
         private elRef: ElementRef,
         private router: Router,
-        private config: PrimeNGConfig
+        private config: PrimeNGConfig,
+        private presenter: InscriptionPresenter,
     ) {
         this.commentsForm = this.fb.group({
             comment: this.comment,
@@ -343,14 +350,13 @@ export class InscriptionTrackingComponent implements OnInit {
             firstDayOfWeek: 1,
             dayNames: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
             dayNamesShort: ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"],
-            dayNamesMin: ["D", "L", "M", "X", "J", "V", "S"],
+            dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
             monthNames: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
             monthNamesShort: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
             today: 'Hoy',
             clear: 'Borrar',
             dateFormat: 'dd/mm/yy',
             weekHeader: 'Sm'
-            //translations
         });
     }
 
@@ -380,6 +386,8 @@ export class InscriptionTrackingComponent implements OnInit {
     viewDetailsInscription(data: any) {
         if (data) {
             this.inscriptionSelected = data;
+            this.egressList = data.egresados;
+            console.log('egressList', this.egressList);
             this.inscriptionState = data.inscripciones[0].estado;
             this.countTask();
         }
@@ -406,6 +414,8 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     showEdition() {
+        this.callGetStudentList();
+        this.callGetTeachersList();
         this.showEdit = true;
     }
 
@@ -554,6 +564,53 @@ export class InscriptionTrackingComponent implements OnInit {
             top: document.body.scrollHeight,
             left: 0,
             behavior: 'smooth',
+        });
+    }
+
+    callGetTeachersList() {
+		this.service.getTeachersList().subscribe((res) => {
+			this.reviewersList = res.teachers;
+			console.log(res);
+		});
+	}
+
+    filterReviewers(event: any) {
+		const query = event.query.toLowerCase();
+        this.filteredReviewers = this.reviewersList.filter(
+            (student) =>
+                student.name.toLowerCase().includes(query) ||
+                student.surnames.toLowerCase().includes(query)
+        );
+	}
+
+    
+    filterStudents(event: { query: string }) {
+        const query = event.query.toLowerCase();
+        this.filteredStudents = this.studentsList.filter(
+            (student) =>
+                student.name.toLowerCase().includes(query) ||
+                student.surnames.toLowerCase().includes(query)
+        );
+        console.log('filteredCountries', this.filteredStudents);
+    }
+
+    filterSecondStudents(event: { query: string }) {
+        const query = event.query.toLowerCase();
+        this.filteredSecondStudents = this.studentsList.filter(
+            (student) =>
+                student.name.toLowerCase().includes(query) ||
+                student.surnames.toLowerCase().includes(query)
+        );
+        console.log('filteredCountries', this.filteredSecondStudents);
+    }
+
+    callGetStudentList() {
+        this.getStudentListProcess = 'charging';
+        this.service.getStudentsList().subscribe((res) => {
+            this.getStudentListProcess = 'complete';
+            this.studentsList = res.graduates_students;
+        }, (error) => {
+            this.getStudentListProcess = 'error';
         });
     }
 }

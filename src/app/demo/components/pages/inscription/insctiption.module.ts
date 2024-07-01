@@ -24,14 +24,26 @@ import { ToastModule } from 'primeng/toast';
 import { FileUploadModule } from 'primeng/fileupload';
 import { BadgeModule } from 'primeng/badge';
 import { ProgressBarModule } from 'primeng/progressbar';
-import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import {
+    provideHttpClient,
+    withInterceptorsFromDi,
+} from '@angular/common/http';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessagesModule } from 'primeng/messages';
 
-@NgModule({ declarations: [InsctiptionComponent, Step1Component, Step2Component, Step3Component, Step4Component],
+@NgModule({
+    declarations: [
+        InsctiptionComponent,
+        Step1Component,
+        Step2Component,
+        Step3Component,
+        Step4Component,
+    ],
     schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    exports: [RouterModule], imports: [CommonModule,
+    exports: [RouterModule],
+    imports: [
+        CommonModule,
         ReactiveFormsModule,
         FormsModule,
         StepsModule,
@@ -51,19 +63,25 @@ import { MessagesModule } from 'primeng/messages';
         CardModule,
         SkeletonModule,
         MessagesModule,
-        BadgeModule, ProgressBarModule,
+        BadgeModule,
+        ProgressBarModule,
         RouterModule.forChild([
             {
-                path: '', component: InsctiptionComponent, children: [
+                path: '',
+                component: InsctiptionComponent,
+                children: [
                     { path: '', redirectTo: 'step1', pathMatch: 'full' },
                     { path: 'step1', component: Step1Component },
                     { path: 'step2', component: Step2Component },
                     { path: 'step3', component: Step3Component },
                     { path: 'step4', component: Step4Component },
-                ]
-            }
-        ])], providers: [
+                ],
+            },
+        ]),
+    ],
+    providers: [
         InscriptionPresenter,
-        provideHttpClient(withInterceptorsFromDi())
-    ] })
-export class InsctiptionModule { }
+        provideHttpClient(withInterceptorsFromDi()),
+    ],
+})
+export class InsctiptionModule {}

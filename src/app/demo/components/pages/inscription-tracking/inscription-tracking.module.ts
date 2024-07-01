@@ -25,6 +25,9 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DividerModule } from 'primeng/divider';
 import { BadgeModule } from 'primeng/badge';
 import { SkeletonModule } from 'primeng/skeleton';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { InscriptionPresenter } from '../inscription/insctiption-presenter';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 @NgModule({
     imports: [
@@ -53,8 +56,13 @@ import { SkeletonModule } from 'primeng/skeleton';
         ConfirmDialogModule,
         DividerModule,
         BadgeModule,
-        SkeletonModule
+        SkeletonModule,
+        AutoCompleteModule,
     ],
     declarations: [InscriptionTrackingComponent],
+    providers: [
+        InscriptionPresenter,
+        provideHttpClient(withInterceptorsFromDi()),
+    ],
 })
 export class InscriptionTrackingModule {}

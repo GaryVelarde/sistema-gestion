@@ -217,13 +217,18 @@
                         <i class="pi pi-calendar"></i>
                         {{inscriptionSelected.inscripciones[0].fecha_recepcion_facultad}}
                     </p>
-                    <p-calendar *ngIf="showEdit"
-                        [(ngModel)]="inscriptionSelected.inscripciones[0].fecha_recepcion_facultad"
-                        [iconDisplay]="'input'"
-                        class="full-width"
-                        [showIcon]="true"
-                        dateFormat="yy-mm-dd"
-                        inputId="icondisplay" />
+                    <div *ngIf="showEdit" class="grid p-fluid">
+                        <div class="field col-12 md:col-12">
+                            <p-calendar *ngIf="showEdit"
+                                [(ngModel)]="inscriptionSelected.inscripciones[0].fecha_recepcion_facultad"
+                                [iconDisplay]="'input'"
+                                class="full-width"
+                                [showIcon]="true"
+                                dateFormat="yy-mm-dd"
+                                inputId="icondisplay" />
+                        </div>
+                    </div>
+
                 </div>
                 <div class="col-3"><p class="font-bold">Escuala de aprobación
                         UDI:</p>
@@ -262,8 +267,8 @@
             </div>
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
-                <div class="col-6">
-                    <p-table
+                <div class="col-4">
+                    <p-table *ngIf="!showSelectNewReviwer"
                         [value]="inscriptionSelected.inscripciones[0].docente">
                         <ng-template pTemplate="header">
                             <tr>
@@ -272,21 +277,49 @@
                         </ng-template>
                         <ng-template pTemplate="body" let-product>
                             <tr>
-                                <td>{{ product.nombre + ' ' + product.apellidos
-                                    }}</td>
+                                <td>
+                                    <div class="grid d-flex">
+                                        <div
+                                            class="mr-auto p-2 align-content-center">{{
+                                            product.nombre + ' ' +
+                                            product.apellidos
+                                            }}</div>
+                                        <div *ngIf="showEdit"
+                                            class="p-2"><p-button
+                                                icon="pi pi-trash"
+                                                [rounded]="true" [text]="true"
+                                                severity="danger" />
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                         </ng-template>
                     </p-table>
+                    <div *ngIf="showSelectNewReviwer" class="grid p-fluid mt-3">
+                        <div class="field col-12 md:col-12">
+                            <span class="p-float-label">
+                                <p-autoComplete
+                                    id="inputtext"
+                                    [suggestions]="filteredReviewers"
+                                    (completeMethod)="filterReviewers($event)"
+                                    field="name" />
+                                <label for="inputtext">Ingrese el nombre del
+                                    revisor</label>
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-6">
-                    <p-table
+                <div class="col-8">
+
+                    <p-table *ngIf="!showSelectNewReviwer"
                         [value]="inscriptionSelected.egresados">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th style="width: 50%;"><i
+                                <th style="width: 40%;"><i
                                         class="pi pi-users"></i>
                                     Estudiantes</th>
-                                <th style="width: 50%;"></th>
+                                <th style="width: 40%;"></th>
+                                <th style="width: 20%;"></th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-product>
@@ -294,9 +327,156 @@
                                 <td>{{ product.nombre + ' ' + product.apellidos
                                     }}</td>
                                 <td>{{ product.email }}</td>
+                                <td>
+                                    <div class="grid d-flex">
+                                        <div
+                                            class="mr-auto p-2 align-content-center">{{
+                                            product.celular
+                                            }}</div>
+                                        <div *ngIf="showEdit"
+                                            class="p-2"><p-button
+                                                icon="pi pi-trash"
+                                                [rounded]="true" [text]="true"
+                                                severity="danger" />
+                                        </div>
+                                    </div>
+                                </td>
                             </tr>
                         </ng-template>
                     </p-table>
+
+                    <div *ngIf="showSelectNewStudent" class="align-content: center;">
+                        <style>
+                            .p-field {
+                                margin-bottom: 1rem;
+                            }
+                            
+                            .p-error-message {
+                                display: flex;
+                                align-items: center;
+                                margin-top: 0.5rem;
+                                color: #dc3545;
+                            }
+                            
+                            .error-icon {
+                                margin-right: 0.5rem;
+                                font-size: 1.5rem;
+                                color: #dc3545;
+                            }
+                            
+                        </style>
+
+                        <div [ngSwitch]="getStudentListProcess">
+                            <ng-template [ngSwitchCase]="'charging'">
+                                <ng-container
+                                    *ngTemplateOutlet="studentListSkeleton"></ng-container>
+                            </ng-template>
+                            <ng-template [ngSwitchCase]="'error'">
+                                <ng-container
+                                    *ngTemplateOutlet="studentListError"></ng-container>
+                            </ng-template>
+                            <ng-template [ngSwitchCase]="'complete'">
+                                <ng-container
+                                    *ngTemplateOutlet="studentList"></ng-container>
+                            </ng-template>
+                            <ng-template ngSwitchDefault>
+                                <p>Invalid state</p>
+                            </ng-template>
+                        </div>
+                        <ng-template #studentListError>
+                            <div class="p-error-message">
+                                <i class="pi pi-times-circle error-icon"></i>
+                                <span>Ha ocurrido un error al traer la
+                                    información.</span>
+                                <button pButton type="button"
+                                    icon="pi pi-refresh"
+                                    class="p-button-text p-button-danger"
+                                    (click)="callGetStudentList()"></button>
+                            </div>
+                        </ng-template>
+                        <ng-template #studentListSkeleton>
+                            <div class="grid p-fluid mt-3">
+                                <div *ngIf="!studentsList.length"
+                                    class="field col-12 md:col-6">
+                                    <p-skeleton height="2rem"
+                                        styleClass="mb-2" />
+                                </div>
+                                <div *ngIf="!studentsList.length"
+                                    class="col-12 md:col-1">
+                                    <p-skeleton shape="circle" size="2rem"
+                                        styleClass="mr-2" />
+                                </div>
+                            </div>
+                        </ng-template>
+                        <ng-template #studentList>
+                            <div class="grid p-fluid mt-3">
+                                <div class="field col-12 md:col-6">
+                                    <span class="p-float-label">
+                                        <p-autoComplete
+                                            id="studentOne"
+                                            [suggestions]="filteredStudents"
+                                            (completeMethod)="filterStudents($event)"
+                                            field="name">
+                                            <ng-template let-student
+                                                pTemplate="item">
+                                                <div
+                                                    class="flex align-items-center gap-2">
+
+                                                    <div>{{ student.name + ' ' +
+                                                        student.surnames}}</div>
+                                                </div>
+                                            </ng-template>
+                                        </p-autoComplete>
+                                        <label for="studentOne">Ingrese el
+                                            nombre del
+                                            estudiante</label>
+                                    </span>
+
+                                </div>
+                                <div *ngIf="!presenter.studentTwoRequired"
+                                    class="col-12 md:col-1">
+                                    <p-button icon="pi pi-user-plus"
+                                        [rounded]="true"
+                                        [outlined]="true"
+                                        pTooltip="Agregar un segundo estudiante"
+                                        tooltipPosition="bottom"
+                                        (click)="presenter.showStudentTwo()" />
+                                </div>
+                                <div *ngIf="presenter.studentTwoRequired"
+                                    class="col-12 md:col-5">
+                                    <span class="p-float-label">
+                                        <p-autoComplete
+                                            id="studentTwo"
+                                            [suggestions]="filteredSecondStudents"
+                                            (completeMethod)="filterSecondStudents($event)"
+                                            field="name">
+                                            <ng-template let-student
+                                                pTemplate="item">
+                                                <div
+                                                    class="flex align-items-center gap-2">
+
+                                                    <div>{{ student.name + ' ' +
+                                                        student.surnames}}</div>
+                                                </div>
+                                            </ng-template>
+                                        </p-autoComplete>
+                                        <label for="studentTwo">Ingrese el
+                                            nombre del
+                                            segundo estudiante</label>
+                                    </span>
+                                </div>
+                                <div *ngIf="presenter.studentTwoRequired"
+                                    class="col-12 md:col-1">
+                                    <p-button icon="pi pi-times"
+                                        [rounded]="true" severity="danger"
+                                        [outlined]="true"
+                                        pTooltip="Eliminar el segundo estudiante"
+                                        tooltipPosition="bottom"
+                                        (click)="presenter.hideStudentTwo()" />
+                                </div>
+                            </div>
+                        </ng-template>
+                    </div>
                 </div>
             </div>
 
@@ -430,13 +610,12 @@
             <div class="col-12"><p class="font-bold">Por favor seleccione la
                     fecha de recepción a
                     secretaria:</p>
-                    <p-calendar
+                <p-calendar
                     class="max-w-full"
                     [inline]="true"
-                    [showWeek]="true"
                     dateFormat="dd/mm/yy"
                     formControlName="dateCancelationReception">
-                  </p-calendar>
+                </p-calendar>
             </div>
 
             <div class="col-12">
