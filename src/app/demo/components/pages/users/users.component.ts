@@ -434,7 +434,7 @@ export class UsersComponent implements OnInit {
                     email: this.email.value,
                     phone: this.number.value,
                     code: this.code.value,
-                    cycle: this.cycle.value,
+                    cycle: this.cycle.value.code,
                 };
                 break;
             case 'Estudiante':
@@ -445,7 +445,7 @@ export class UsersComponent implements OnInit {
                     email: this.email.value,
                     phone: this.number.value,
                     code: this.code.value,
-                    cycle: this.cycle.value,
+                    cycle: this.cycle.value.code,
                     career: this.career.value,
                 };
                 break;

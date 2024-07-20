@@ -14,12 +14,11 @@ import {
 
 @Component({
     selector: 'app-events',
-    templateUrl: './events.component.html',
-    styleUrls: ['./events.component.scss'],
+    templateUrl: './events-udi.component.html',
+    styleUrls: ['./events-udi.component.scss'],
 })
-export class EventsComponent implements OnInit, AfterViewInit {
+export class EventsUdiComponent implements OnInit, AfterViewInit {
     @ViewChild('calendar') calendarComponent: FullCalendarComponent;
-    @ViewChild('calendarDetail') calendarDetailComponent: FullCalendarComponent;
     showEventDetailDoalog = true;
     timeslots = [
         { name: '10 minutos', code: '00:10:00' },
@@ -94,30 +93,6 @@ export class EventsComponent implements OnInit, AfterViewInit {
         slotLabelInterval: '00:30',
     };
 
-    calendarOptionsDetail: CalendarOptions = {
-        plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
-        initialView: 'timeGridDay',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'timeGridWeek,timeGridDay',
-        },
-        buttonText: {
-            today: 'Hoy',
-            month: 'Mes',
-            week: 'Semana',
-            day: 'Día',
-            list: 'Lista',
-        },
-        locale: esLocale,
-        dateClick: this.handleDetailDateClick.bind(this),
-        //eventClick: this.handleEventClick.bind(this),
-        editable: true,
-        selectable: true,
-        eventResizableFromStart: true,
-        eventDrop: this.handleEventDrop.bind(this),
-        eventResize: this.handleEventResize.bind(this),
-    };
     public slotDurationForm: FormGroup;
     private _slotDuration: FormControl = new FormControl('', [
         Validators.required,
@@ -161,7 +136,6 @@ export class EventsComponent implements OnInit, AfterViewInit {
         this.slotDuration.setValue(this.timeslots[this.timeslots.length - 1]);
         this.watchSlotDuration();
         this.color.setValue('#ff0000');
-        console.log(this.color.value)
     }
 
     ngAfterViewInit(): void {
@@ -187,37 +161,25 @@ export class EventsComponent implements OnInit, AfterViewInit {
 
     handleDateClick(arg) {
         this.eventForm.reset();
-        this.eventForm.patchValue({
-            start: arg.date,
-            end: arg.date,
-        });
-        this.displayDialog = true;
-    }
-
-    handleDetailDateClick(arg) {
-        this.eventForm.reset();
-        this.eventForm.patchValue({
-            start: arg.date,
-            end: arg.date,
-        });
+        this.start.setValue(arg.date);
+        this.end.setValue(arg.date);
+        this.color.setValue('#ff0000');
         this.displayDialog = true;
     }
 
     handleEventClick(arg) {
         this.showEventDetailDoalog = true;
-        this.calendarDetailComponent
-            .getApi()
-            .setOption('events', this.eventsDetail);
+        
     }
 
-    renderizeCalendarDetails() {
-        this.calendarDetailComponent.getApi().render();
+    renderizeCalendar() {
+        this.calendarComponent.getApi().render();
     }
 
     addButtonToToolbarChunk() {
         const headerToolbars = document.querySelectorAll('.fc-header-toolbar');
-        if (headerToolbars.length > 1) {
-            const secondHeaderToolbar = headerToolbars[1];
+        if (headerToolbars.length >= 1) {
+            const secondHeaderToolbar = headerToolbars[0];
             if (secondHeaderToolbar) {
                 const toolbarChunk =
                     secondHeaderToolbar.querySelector('.fc-toolbar-chunk');
@@ -227,7 +189,7 @@ export class EventsComponent implements OnInit, AfterViewInit {
                     newButton.className =
                         'fc-today-button fc-button fc-button-primary';
                     newButton.addEventListener('click', () =>
-                        this.renderizeCalendarDetails()
+                        this.renderizeCalendar()
                     );
                     toolbarChunk.appendChild(newButton);
                 }
@@ -244,7 +206,6 @@ export class EventsComponent implements OnInit, AfterViewInit {
     }
 
     addEvent() {
-        console.log(this.color.value);
         if (this.eventForm.valid) {
             const newEvent: EventInput = {
                 title: this.title.value,

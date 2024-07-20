@@ -24,16 +24,17 @@ import { DividerModule } from 'primeng/divider';
 import { BadgeModule } from 'primeng/badge';
 import { SkeletonModule } from 'primeng/skeleton';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import { EventsComponent } from './events.component';
-import { EventsRoutingModule } from './events-routing.module';
 import { PanelModule } from 'primeng/panel';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { ColorPickerModule } from 'primeng/colorpicker';
+import { EventsUdiComponent } from './events-udi.component';
+import { EventsUdiRoutingModule } from './events-udi-routing.module';
+import { MessagesModule } from 'primeng/messages';
 
 @NgModule({
     imports: [
         CommonModule,
-        EventsRoutingModule,
+        EventsUdiRoutingModule,
         TableModule,
         FileUploadModule,
         ReactiveFormsModule,
@@ -61,8 +62,9 @@ import { ColorPickerModule } from 'primeng/colorpicker';
         FullCalendarModule,
         PanelModule,
         FloatLabelModule,
-        ColorPickerModule
+        ColorPickerModule,
+        MessagesModule
     ],
-    declarations: [EventsComponent],
+    declarations: [EventsUdiComponent],
 })
-export class EventsModule {}
+export class EventsUdiModule {}

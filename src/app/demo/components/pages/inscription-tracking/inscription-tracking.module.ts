@@ -28,6 +28,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { InscriptionPresenter } from '../inscription/insctiption-presenter';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { MessagesModule } from 'primeng/messages';
 
 @NgModule({
     imports: [
@@ -58,6 +59,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
         BadgeModule,
         SkeletonModule,
         AutoCompleteModule,
+        MessagesModule,
     ],
     declarations: [InscriptionTrackingComponent],
     providers: [

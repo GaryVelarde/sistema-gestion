@@ -10,6 +10,7 @@ import { RouterModule } from '@angular/router';
         { path: 'new-titulation-process', loadChildren: () => import('./inscription/insctiption.module').then(m => m.InsctiptionModule) },
         { path: 'inscription-tracking', loadChildren: () => import('./inscription-tracking/inscription-tracking.module').then(m => m.InscriptionTrackingModule) },
         { path: 'events', loadChildren: () => import('./events/events.module').then(m => m.EventsModule) },
+        { path: 'events-udi', loadChildren: () => import('./events-udi/events-udi.module').then(m => m.EventsUdiModule) },
         { path: '**', redirectTo: '/notfound' }
     ])],
     exports: [RouterModule]

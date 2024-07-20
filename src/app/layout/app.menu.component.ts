@@ -34,6 +34,7 @@ export class AppMenuComponent implements OnInit {
                 label: 'Eventos',
                 items: [
                     { label: 'Calendario', icon: 'pi pi-fw pi-calendar', routerLink: ['/pages/events'] },
+                    { label: 'Reuniones UDI', icon: 'pi pi-fw pi-calendar', routerLink: ['/pages/events-udi'] },
                 ]
             },
             {

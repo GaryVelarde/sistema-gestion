@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit } from '@angular/core';
 import { Product } from 'src/app/demo/api/product';
-import { ConfirmationService, MessageService, PrimeNGConfig } from 'primeng/api';
+import { ConfirmationService, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import {
     FormBuilder,
@@ -273,6 +273,7 @@ export class InscriptionTrackingComponent implements OnInit {
     showDialogCancel = false;
     showSelectNewReviwer = false;
     showSelectNewStudent = false;
+    showEditSudents = false;
     inscriptionState = '';
     totalTask = 0;
     totalTaskIncomplete = 0;
@@ -300,6 +301,7 @@ export class InscriptionTrackingComponent implements OnInit {
     filteredSecondStudents: any[];
     getStudentListProcess = '';
     studentsList = [];
+    alertForCancelation: Message[] | undefined;
     public commentsForm: FormGroup;
     public tasksForm: FormGroup;
     public cancelattionForm: FormGroup;
@@ -427,24 +429,28 @@ export class InscriptionTrackingComponent implements OnInit {
 
     goToReview() {
         this.addNotificationForChangeState(
-            'La inscripción del protecto de Tesis pasó a Revisión por Cesar Jauregui Saavedra'
+            'La inscripción del proyecto de Tesis pasó a Revisión por Cesar Jauregui Saavedra'
         );
         this.inscriptionState = 'En revisión';
     }
 
     goToObserved() {
         this.addNotificationForChangeState(
-            'La inscripción del protecto de Tesis pasó a Observado por Cesar Jauregui Saavedra'
+            'La inscripción del proyecto de Tesis pasó a Observado por Cesar Jauregui Saavedra'
         );
         this.inscriptionState = 'Observado';
     }
 
     goToCancelation() {
         this.showDialogCancel = true;
-        
+        this.alertForCancelation = [
+            { severity: 'warn', detail: 'Recuerda que una vez cancelada la inscripción no se podrá reabrir.' },
+        ];
     }
 
     confirmCancelation() {
+        this.cancelEdition();
+        this.showDialogCancel = false;
         this.inscriptionState = 'Cancelado';
         this.messageService.add({
             key: 'tst',
@@ -471,7 +477,7 @@ export class InscriptionTrackingComponent implements OnInit {
             accept: () => {
                 this.inscriptionState = 'Aprobado';
                 this.addNotificationForChangeState(
-                    'La inscripción del protecto de Tesis pasó a Aprobado por Cesar Jauregui Saavedra'
+                    'La inscripción del proyecto de Tesis pasó a Aprobado por Cesar Jauregui Saavedra'
                 );
                 this.messageService.add({
                     key: 'tst',

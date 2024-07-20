@@ -255,7 +255,10 @@
                                 <span class="p-float-label">
                                     <p-calendar
                                         inputId="egressDate"
-                                        formControlName="egressDate"></p-calendar>
+                                        [iconDisplay]="'input'"
+                                        formControlName="egressDate"
+                                        [showIcon]="true"
+                                        dateFormat="yy-mm-dd"></p-calendar>
                                     <label for="egressDate">Fecha de
                                         egreso</label>
                                 </span>
@@ -455,65 +458,6 @@
             <div *ngIf="modalUserDetail" class="content">
                 {{ userDetailSelected.name }}
             </div>
-        </p-dialog>
-
-        <p-dialog
-            [(visible)]="deleteProductDialog"
-            header="Confirm"
-            [modal]="true"
-            [style]="{ width: '450px' }">
-            <div class="flex align-items-center justify-content-center">
-                <i
-                    class="pi pi-exclamation-triangle mr-3"
-                    style="font-size: 2rem"></i>
-                <span *ngIf="product">Are you sure you want to delete <b>{{
-                        product.name }}</b>?</span>
-            </div>
-            <ng-template pTemplate="footer">
-                <button
-                    pButton
-                    pRipple
-                    icon="pi pi-times"
-                    class="p-button-text"
-                    label="No"
-                    (click)="deleteProductDialog = false"></button>
-                <button
-                    pButton
-                    pRipple
-                    icon="pi pi-check"
-                    class="p-button-text"
-                    label="Yes"
-                    (click)="confirmDelete()"></button>
-            </ng-template>
-        </p-dialog>
-
-        <p-dialog
-            [(visible)]="deleteProductsDialog"
-            header="Confirm"
-            [modal]="true"
-            [style]="{ width: '450px' }">
-            <div class="flex align-items-center justify-content-center">
-                <i
-                    class="pi pi-exclamation-triangle mr-3"
-                    style="font-size: 2rem"></i>
-                <span>Are you sure you want to delete selected products?</span>
-            </div>
-            <ng-template pTemplate="footer">
-                <button
-                    pButton
-                    pRipple
-                    icon="pi pi-times"
-                    class="p-button-text"
-                    label="No"
-                    (click)="deleteProductsDialog = false"></button>
-                <button
-                    pButton
-                    pRipple
-                    icon="pi pi-check"
-                    class="p-button-text"
-                    label="Yes"
-                    (click)="confirmDeleteSelected()"></button>
-            </ng-template>
         </p-dialog>
     </div>
 </div>
