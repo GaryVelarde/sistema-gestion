@@ -1,4 +1,10 @@
-import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
+import {
+    Component,
+    ViewChild,
+    OnInit,
+    AfterViewInit,
+    ChangeDetectorRef,
+} from '@angular/core';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -11,7 +17,11 @@ import {
     FormGroup,
     Validators,
 } from '@angular/forms';
-
+interface Task {
+    id: number;
+    title: string;
+    description: string;
+}
 @Component({
     selector: 'app-events',
     templateUrl: './events-udi.component.html',
@@ -19,7 +29,13 @@ import {
 })
 export class EventsUdiComponent implements OnInit, AfterViewInit {
     @ViewChild('calendar') calendarComponent: FullCalendarComponent;
-    showEventDetailDoalog = true;
+
+    pendingTasks: Task[];
+    inProgressTasks: Task[];
+    completedTasks: Task[];
+    draggedTask: Task | null = null;
+    addNewTaskDialog = false;
+    showEventDetail = false;
     timeslots = [
         { name: '10 minutos', code: '00:10:00' },
         { name: '15 minutos', code: '00:15:00' },
@@ -81,27 +97,53 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         slotLabelInterval: '00:30',
     };
 
-    users : any[] = [
-        { id: 0, name: 'Amy Elsner', image: 'amyelsner.png', role: 'Encargado' },
+    users: any[] = [
+        {
+            id: 0,
+            name: 'Amy Elsner',
+            image: 'amyelsner.png',
+            role: 'Encargado',
+        },
         { id: 1, name: 'Anna Fali', image: 'annafali.png', role: 'Miembro' },
-        { id: 2, name: 'Asiya Javayant', image: 'asiyajavayant.png', role: 'Miembro' },
-        { id: 3, name: 'Bernardo Dominic', image: 'bernardodominic.png', role: 'Miembro' },
-        { id: 4, name: 'Elwin Sharvill', image: 'elwinsharvill.png', role: 'Miembro' }
+        {
+            id: 2,
+            name: 'Asiya Javayant',
+            image: 'asiyajavayant.png',
+            role: 'Miembro',
+        },
+        {
+            id: 3,
+            name: 'Bernardo Dominic',
+            image: 'bernardodominic.png',
+            role: 'Miembro',
+        },
+        {
+            id: 4,
+            name: 'Elwin Sharvill',
+            image: 'elwinsharvill.png',
+            role: 'Miembro',
+        },
     ];
 
-    items: any[] | undefined ;
-
-
+    items: any[] | undefined;
 
     eventSelected: any;
 
     public slotDurationForm: FormGroup;
+    public taskForm: FormGroup;
     private _slotDuration: FormControl = new FormControl('', [
         Validators.required,
     ]);
     private _title: FormControl = new FormControl('', [Validators.required]);
+    private _titleTask: FormControl = new FormControl('', [
+        Validators.required,
+    ]);
     private _start: FormControl = new FormControl('', [Validators.required]);
     private _end: FormControl = new FormControl('', [Validators.required]);
+    private _endTask: FormControl = new FormControl('', [Validators.required]);
+    private _descriptionTask: FormControl = new FormControl('', [
+        Validators.required,
+    ]);
     private _color: FormControl = new FormControl('#ff0000', [
         Validators.required,
     ]);
@@ -112,17 +154,26 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     get title() {
         return this._title;
     }
+    get titleTask() {
+        return this._titleTask;
+    }
     get start() {
         return this._start;
     }
     get end() {
         return this._end;
     }
+    get endTask() {
+        return this._endTask;
+    }
     get color() {
         return this._color;
     }
+    get descriptionTask() {
+        return this._descriptionTask;
+    }
 
-    constructor(private fb: FormBuilder) {
+    constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef) {
         this.slotDurationForm = this.fb.group({
             slotDuration: this.slotDuration,
         });
@@ -132,6 +183,57 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             end: this.end,
             color: this.color,
         });
+        this.taskForm = this.fb.group({
+            titleTask: this.titleTask,
+            descriptionTask: this.descriptionTask,
+            endTask: this.endTask,
+        });
+        this.pendingTasks = [
+            {
+                id: 1,
+                title: 'Tarea 1',
+                description:
+                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+            },
+            {
+                id: 2,
+                title: 'Tarea 2',
+                description:
+                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+            },
+            {
+                id: 3,
+                title: 'Tarea 3',
+                description:
+                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+            },
+            {
+                id: 4,
+                title: 'Tarea 4',
+                description:
+                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+            },
+            {
+                id: 5,
+                title: 'Tarea 5',
+                description:
+                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+            },
+            {
+                id: 6,
+                title: 'Tarea 6',
+                description:
+                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+            },
+            {
+                id: 7,
+                title: 'Tarea 7',
+                description:
+                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+            },
+        ];
+        this.inProgressTasks = [];
+        this.completedTasks = [];
     }
 
     ngOnInit() {
@@ -139,11 +241,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.watchSlotDuration();
         this.color.setValue('#ff0000');
     }
-    
 
     ngAfterViewInit(): void {
         this.addButtonToToolbarChunk();
-        this.showEventDetailDoalog = false;
     }
 
     getBadge(user) {
@@ -153,7 +253,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     backCalendar() {
-        this.showEventDetailDoalog = false;
+        this.showEventDetail = false;
     }
 
     watchSlotDuration() {
@@ -183,7 +283,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     handleEventClick(arg) {
         this.eventSelected = arg;
         console.log('eventSelected', this.eventSelected);
-        this.showEventDetailDoalog = true;
+        this.showEventDetail = true;
     }
 
     renderizeCalendar() {
@@ -237,5 +337,100 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             calendarApi.addEvent(newEvent);
             this.displayDialog = false;
         }
+    }
+
+    dragStart(task: Task) {
+        this.draggedTask = task;
+    }
+
+    drop(event: any, column: 'pending' | 'inProgress' | 'completed') {
+        console.log('column', column);
+        if (this.draggedTask) {
+            const columnBefore = this.isTaskInPending(this.draggedTask.id);
+            console.log('column before', columnBefore);
+            if (
+                (columnBefore === 'inProgress' && column === 'pending') ||
+                (columnBefore === 'completed' && column === 'pending') ||
+                (columnBefore === 'completed' && column === 'inProgress')
+            ) {
+                return;
+            }
+            this.removeTask(this.draggedTask);
+            if (column === 'pending') {
+                this.pendingTasks = [...this.pendingTasks, this.draggedTask];
+            } else if (column === 'inProgress') {
+                this.inProgressTasks = [
+                    ...this.inProgressTasks,
+                    this.draggedTask,
+                ];
+            } else if (column === 'completed') {
+                this.completedTasks = [
+                    ...this.completedTasks,
+                    this.draggedTask,
+                ];
+            }
+            this.draggedTask = null;
+            this.cdr.detectChanges();
+        }
+    }
+
+    dragEnd() {
+        this.draggedTask = null;
+    }
+
+    removeTask(task: Task) {
+        this.pendingTasks = this.pendingTasks.filter((t) => t.id !== task.id);
+        this.inProgressTasks = this.inProgressTasks.filter(
+            (t) => t.id !== task.id
+        );
+        this.completedTasks = this.completedTasks.filter(
+            (t) => t.id !== task.id
+        );
+    }
+
+    deleteTask(task: Task) {
+        this.removeTask(task);
+    }
+
+    isTaskInPending(id: number): string {
+        let column = '';
+        if (this.pendingTasks.find((task) => task.id === id)) {
+            column = 'pending';
+        }
+        if (this.inProgressTasks.find((task) => task.id === id)) {
+            column = 'inProgress';
+        }
+        if (this.completedTasks.find((task) => task.id === id)) {
+            column = 'completed';
+        }
+        return column;
+    }
+
+    addTask() {
+        const newTask: Task = {
+            id: this.getMaxId() + 1,
+            title: this.titleTask.value,
+            description: this.descriptionTask.value,
+        };
+        if (!this.isTaskInPending(this.getMaxId() + 1)) {
+            this.pendingTasks = [...this.pendingTasks, newTask];
+            this.addNewTaskDialog = false;
+            this.taskForm.reset();
+        } else {
+            console.log('Task with this ID already exists.');
+        }
+    }
+
+    getMaxId(): number | null {
+        const allTasks = [
+            ...this.pendingTasks,
+            ...this.inProgressTasks,
+            ...this.completedTasks,
+        ];
+        if (allTasks.length === 0) {
+            return null;
+        }
+        const maxId = Math.max(...allTasks.map((task) => task.id));
+        return maxId;
     }
 }

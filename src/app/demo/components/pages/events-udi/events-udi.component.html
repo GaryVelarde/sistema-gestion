@@ -1,4 +1,4 @@
-<div *ngIf="!showEventDetailDoalog">
+<div *ngIf="!showEventDetail">
   <div class="grid">
     <div class="col-12">
       <p-card>
@@ -112,7 +112,7 @@
   </form> -->
 </p-dialog>
 
-<div *ngIf="showEventDetailDoalog" class="grid">
+<div *ngIf="showEventDetail" class="grid">
   <div class="col-12">
 
       <div class="card">
@@ -162,8 +162,8 @@
           <div class="card flex justify-content-center col-12">
 
               <h4
-                  class="font-bold">Título:
-                  {{eventSelected}}</h4>
+                  class="font-bold">
+                  {{eventSelected.event.title}}</h4>
 
           </div>
           <div *ngIf="!showEdit" class="grid col-12">
@@ -237,17 +237,98 @@
           <div class="grid col-12">
               <div class=" col-12">
                   <h5>Lista de tareas</h5>
+                  <button (click)="addNewTaskDialog=true">add</button>
               </div>
-  
+              <div class="col-12">
+                <div class="board-container">
+                  <div class="board-column pending-column" pDroppable (onDrop)="drop($event, 'pending')">
+                    <p class="column-header pending-column-header">PENDIENTE</p>
+                    <ul class="task-list">
+                      <li *ngFor="let task of pendingTasks" class="task-card"
+                          pDraggable (onDragStart)="dragStart(task)" (onDragEnd)="dragEnd()">
+                        <p class="task-title">{{ task.title }}</p>
+                        <p class="task-description">{{ task.description }}</p>
+                        <i class="pi pi-trash button-delete-task" (click)="deleteTask(task)"></i>
+                      </li>
+                    </ul>
+                  </div>
+                
+                  <div class="board-column in-course-column" pDroppable (onDrop)="drop($event, 'inProgress')">
+                    <p class="column-header in-course-column-header">EN CURSO</p>
+                    <ul class="task-list">
+                      <li *ngFor="let task of inProgressTasks" class="task-card"
+                          pDraggable (onDragStart)="dragStart(task)" (onDragEnd)="dragEnd()">
+                          <p class="task-title">{{ task.title }}</p>
+                          <p class="task-description">{{ task.description }}</p>
+                      </li>
+                    </ul>
+                  </div>
+                
+                  <div class="board-column finalize-column" pDroppable (onDrop)="drop($event, 'completed')">
+                    <p class="column-header finalize-column-header">FINALIZADO</p>
+                    <ul class="task-list">
+                      <li *ngFor="let task of completedTasks" class="task-card"
+                          pDraggable (onDragStart)="dragStart(task)" (onDragEnd)="dragEnd()">
+                          <p class="task-title">{{ task.title }}</p>
+                          <p class="task-description">{{ task.description }}</p>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
               <div class="ml-2 mr-2 separator"></div>
 
               <div class=" col-12">
                   <h5>Observaciones</h5>
-              </div>
-            
+              </div>            
       
 
           </div>
       </div>
   </div>
 </div>
+
+<p-dialog header="Añadir Evento" [style]="{ width: '60rem' }"
+  [(visible)]="addNewTaskDialog" [modal]="true" [closable]="false">
+  <div class="content">
+    <form [formGroup]="taskForm">
+      <div class="p-fluid grid field mt-5">
+        <p-floatLabel class="col-12">
+          <input id="title" type="text" pInputText formControlName="titleTask" />
+          <label for="title">Título</label>
+        </p-floatLabel>
+      </div>
+      <div class="p-fluid grid field mt-5">
+        <p-floatLabel class="col-12">
+          <input id="title" type="text" pInputText formControlName="descriptionTask" />
+          <label for="title">Descripción de la tarea</label>
+        </p-floatLabel>
+      </div>
+      <div class="field mt-4">
+        <p>Fecha de compromiso</p>
+        <p-calendar
+          formControlName="endTask"
+          dateFormat="yy-mm-dd"
+          class="max-w-full"
+          [inline]="true"
+          [showTime]="false"
+          [hourFormat]="24" />
+      </div>
+      <div class="footer mt-5">
+        <button
+          pButton
+          pRipple
+          label="Regresar"
+          icon="pi pi-angle-left"
+          class="p-button-text"
+          iconPos="left"
+          (click)="addNewTaskDialog=false"></button>
+
+        <p-button label="Registrar" iconPos="right"
+          icon="pi pi-check"
+          (click)="addTask()" />
+
+      </div>
+    </form>
+  </div>
+</p-dialog>

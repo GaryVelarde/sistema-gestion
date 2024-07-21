@@ -31,7 +31,7 @@ import { EventsUdiComponent } from './events-udi.component';
 import { EventsUdiRoutingModule } from './events-udi-routing.module';
 import { MessagesModule } from 'primeng/messages';
 import { ContextMenuModule } from 'primeng/contextmenu';
-import { DragDropModule } from '@angular/cdk/drag-drop';
+import { DragDropModule } from 'primeng/dragdrop';
 
 @NgModule({
     imports: [
