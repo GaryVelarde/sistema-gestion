@@ -30,12 +30,15 @@ import { ColorPickerModule } from 'primeng/colorpicker';
 import { EventsUdiComponent } from './events-udi.component';
 import { EventsUdiRoutingModule } from './events-udi-routing.module';
 import { MessagesModule } from 'primeng/messages';
+import { ContextMenuModule } from 'primeng/contextmenu';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @NgModule({
     imports: [
         CommonModule,
         EventsUdiRoutingModule,
         TableModule,
+        DragDropModule,
         FileUploadModule,
         ReactiveFormsModule,
         FormsModule,
@@ -63,7 +66,9 @@ import { MessagesModule } from 'primeng/messages';
         PanelModule,
         FloatLabelModule,
         ColorPickerModule,
-        MessagesModule
+        MessagesModule,
+        ContextMenuModule,
+        
     ],
     declarations: [EventsUdiComponent],
 })

@@ -49,18 +49,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         },
     ];
 
-    eventsDetail: EventInput[] = [
-        {
-            title: 'Reunion de profesores',
-            start: new Date(),
-            backgroundColor: '#FF5733', // Color de fondo del evento
-            borderColor: '#D32F2F', // Color del borde del evento (opcional)
-            editable: true,
-            startResizable: true,
-            durationEditable: true,
-        },
-    ];
-
     // Formulario reactivo
     eventForm: FormGroup;
     displayDialog: boolean = false;
@@ -92,6 +80,20 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         slotDuration: '00:30:00',
         slotLabelInterval: '00:30',
     };
+
+    users : any[] = [
+        { id: 0, name: 'Amy Elsner', image: 'amyelsner.png', role: 'Encargado' },
+        { id: 1, name: 'Anna Fali', image: 'annafali.png', role: 'Miembro' },
+        { id: 2, name: 'Asiya Javayant', image: 'asiyajavayant.png', role: 'Miembro' },
+        { id: 3, name: 'Bernardo Dominic', image: 'bernardodominic.png', role: 'Miembro' },
+        { id: 4, name: 'Elwin Sharvill', image: 'elwinsharvill.png', role: 'Miembro' }
+    ];
+
+    items: any[] | undefined ;
+
+
+
+    eventSelected: any;
 
     public slotDurationForm: FormGroup;
     private _slotDuration: FormControl = new FormControl('', [
@@ -137,9 +139,20 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.watchSlotDuration();
         this.color.setValue('#ff0000');
     }
+    
 
     ngAfterViewInit(): void {
         this.addButtonToToolbarChunk();
+        this.showEventDetailDoalog = false;
+    }
+
+    getBadge(user) {
+        if (user.role === 'Miembro') return 'info';
+        else if (user.role === 'Encargado') return 'warning';
+        else return null;
+    }
+
+    backCalendar() {
         this.showEventDetailDoalog = false;
     }
 
@@ -168,8 +181,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     handleEventClick(arg) {
+        this.eventSelected = arg;
+        console.log('eventSelected', this.eventSelected);
         this.showEventDetailDoalog = true;
-        
     }
 
     renderizeCalendar() {
