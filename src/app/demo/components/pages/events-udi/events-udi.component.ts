@@ -4,6 +4,7 @@ import {
     OnInit,
     AfterViewInit,
     ChangeDetectorRef,
+    ElementRef,
 } from '@angular/core';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import { FullCalendarComponent } from '@fullcalendar/angular';
@@ -17,10 +18,22 @@ import {
     FormGroup,
     Validators,
 } from '@angular/forms';
+import { DateFormatService } from 'src/app/services/date-format.service';
 interface Task {
     id: number;
     title: string;
     description: string;
+    dateEnd: string;
+}
+interface AutoCompleteCompleteEvent {
+    originalEvent: Event;
+    query: string;
+}
+
+interface Usuario {
+    id: number;
+    nombre: string;
+    apellidos: string;
 }
 @Component({
     selector: 'app-events',
@@ -29,13 +42,17 @@ interface Task {
 })
 export class EventsUdiComponent implements OnInit, AfterViewInit {
     @ViewChild('calendar') calendarComponent: FullCalendarComponent;
+    @ViewChild('cardBody') cardBody!: ElementRef;
+    resizeObserver!: ResizeObserver;
 
     pendingTasks: Task[];
     inProgressTasks: Task[];
     completedTasks: Task[];
     draggedTask: Task | null = null;
-    addNewTaskDialog = false;
     showEventDetail = false;
+    newEventDialog = false;
+    newTaskDialog = false;
+    taskSelectedId: number;
     timeslots = [
         { name: '10 minutos', code: '00:10:00' },
         { name: '15 minutos', code: '00:15:00' },
@@ -43,11 +60,26 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         { name: '30 minutos', code: '00:30:00' },
     ];
 
+    comments = [
+        {
+            name: 'John Doe',
+            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+            isComment: true,
+        },
+        {
+            name: 'Alice Smith',
+            content:
+                'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            isComment: true,
+        },
+    ];
+
     // Define el arreglo de eventos
     events: EventInput[] = [
         {
             title: 'Evento 1',
-            start: new Date(),
+            start: '2024-07-23T14:20:00',
+            end: '2024-07-23T15:20:00',
             backgroundColor: '#FF5733', // Color de fondo del evento
             borderColor: '#FF5733', // Color del borde del evento (opcional)
             editable: true,
@@ -56,7 +88,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         },
         {
             title: 'Evento 2',
-            start: new Date(),
+            start: '2024-07-23T14:20:00',
+            end: '2024-07-23T15:20:00',
             backgroundColor: '#337DFF',
             borderColor: '#337DFF',
             editable: true,
@@ -64,10 +97,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             durationEditable: true,
         },
     ];
-
-    // Formulario reactivo
-    eventForm: FormGroup;
-    displayDialog: boolean = false;
 
     calendarOptions: CalendarOptions = {
         plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
@@ -95,6 +124,12 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         eventResize: this.handleEventResize.bind(this),
         slotDuration: '00:30:00',
         slotLabelInterval: '00:30',
+        slotLabelFormat: {
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true // Esto establece el formato de 12 horas con AM/PM
+        }
+
     };
 
     users: any[] = [
@@ -125,34 +160,54 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         },
     ];
 
-    items: any[] | undefined;
-
     eventSelected: any;
 
+    public eventForm: FormGroup;
     public slotDurationForm: FormGroup;
     public taskForm: FormGroup;
+    public managerForm: FormGroup;
+    public participantsForm: FormGroup;
+    public commentsForm: FormGroup;
     private _slotDuration: FormControl = new FormControl('', [
         Validators.required,
     ]);
     private _title: FormControl = new FormControl('', [Validators.required]);
+    private _description: FormControl = new FormControl('', [
+        Validators.required,
+    ]);
+    private _eventLink: FormControl = new FormControl('');
     private _titleTask: FormControl = new FormControl('', [
         Validators.required,
     ]);
     private _start: FormControl = new FormControl('', [Validators.required]);
     private _end: FormControl = new FormControl('', [Validators.required]);
     private _endTask: FormControl = new FormControl('', [Validators.required]);
+    private _assignedUser: FormControl = new FormControl([] as Usuario[], [Validators.required]);
     private _descriptionTask: FormControl = new FormControl('', [
         Validators.required,
     ]);
     private _color: FormControl = new FormControl('#ff0000', [
         Validators.required,
     ]);
+    private _usersManager: FormControl = new FormControl([] as Usuario[], [
+        Validators.required,
+    ]);
+    private _usersParticipants: FormControl = new FormControl([] as Usuario[], [
+        Validators.required,
+    ]);
+    private _comment: FormControl = new FormControl('', [Validators.required]);
 
     get slotDuration() {
         return this._slotDuration;
     }
     get title() {
         return this._title;
+    }
+    get eventLink() {
+        return this._eventLink;
+    }
+    get description() {
+        return this._description;
     }
     get titleTask() {
         return this._titleTask;
@@ -172,13 +227,42 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     get descriptionTask() {
         return this._descriptionTask;
     }
+    get usersManager() {
+        return this._usersManager;
+    }
+    get usersParticipants() {
+        return this._usersParticipants;
+    }
+    get assignedUser() {
+        return this._assignedUser;
+    }
+    get comment() {
+        return this._comment;
+    }
+    selectedItems: Usuario[] | undefined;
 
-    constructor(private fb: FormBuilder, private cdr: ChangeDetectorRef) {
+    usuarios: Usuario[] = [
+        { id: 1, nombre: 'Ana', apellidos: 'Benavidez Ayala' },
+        { id: 2, nombre: 'Gary', apellidos: 'Gomez Bazalar' },
+        { id: 3, nombre: 'María', apellidos: 'Villanueva Alarcón' },
+        { id: 4, nombre: 'Carlos', apellidos: 'Ramirez Perez' },
+        { id: 5, nombre: 'Luis', apellidos: 'Lopez Fernandez' },
+        // Agrega más usuarios según sea necesario
+    ];
+    filteredItems: Usuario[] | undefined;
+
+    constructor(
+        private fb: FormBuilder,
+        private cdr: ChangeDetectorRef,
+        private dateFormatService: DateFormatService
+    ) {
         this.slotDurationForm = this.fb.group({
             slotDuration: this.slotDuration,
         });
         this.eventForm = this.fb.group({
             title: this.title,
+            description: this.description,
+            eventLink: this.eventLink,
             start: this.start,
             end: this.end,
             color: this.color,
@@ -187,69 +271,85 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             titleTask: this.titleTask,
             descriptionTask: this.descriptionTask,
             endTask: this.endTask,
+            assignedUser: this.assignedUser,
+        });
+        this.managerForm = this.fb.group({
+            usersManager: this.usersManager,
+        });
+        this.participantsForm = this.fb.group({
+            usersParticipants: this.usersParticipants,
+        });
+        this.commentsForm = this.fb.group({
+            comment: this.comment,
         });
         this.pendingTasks = [
             {
                 id: 1,
                 title: 'Tarea 1',
-                description:
-                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+                dateEnd: '26-07-2024'
             },
             {
                 id: 2,
                 title: 'Tarea 2',
-                description:
-                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
-            },
+                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+                dateEnd: '23-07-2024'
+            }
+        ];
+
+        this.inProgressTasks = [
             {
                 id: 3,
                 title: 'Tarea 3',
-                description:
-                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+                dateEnd: '23-07-2024'
             },
             {
                 id: 4,
                 title: 'Tarea 4',
-                description:
-                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+                dateEnd: '23-07-2024'
             },
             {
                 id: 5,
                 title: 'Tarea 5',
-                description:
-                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
-            },
+                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+                dateEnd: '23-07-2024'
+            }
+        ];
+
+        this.completedTasks = [
             {
                 id: 6,
                 title: 'Tarea 6',
-                description:
-                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+                dateEnd: '23-07-2024'
             },
             {
                 id: 7,
                 title: 'Tarea 7',
-                description:
-                    'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
-            },
+                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
+                dateEnd: '23-07-2024'
+            }
         ];
-        this.inProgressTasks = [];
-        this.completedTasks = [];
     }
 
     ngOnInit() {
+        this.watchUsersManager();
         this.slotDuration.setValue(this.timeslots[this.timeslots.length - 1]);
         this.watchSlotDuration();
         this.color.setValue('#ff0000');
     }
 
     ngAfterViewInit(): void {
-        this.addButtonToToolbarChunk();
-    }
-
-    getBadge(user) {
-        if (user.role === 'Miembro') return 'info';
-        else if (user.role === 'Encargado') return 'warning';
-        else return null;
+        this.resizeObserver = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                this.renderizeCalendar();
+            }
+        });
+        if (this.cardBody && this.cardBody.nativeElement) {
+            this.resizeObserver.observe(this.cardBody.nativeElement);
+        }
     }
 
     backCalendar() {
@@ -274,10 +374,17 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
     handleDateClick(arg) {
         this.eventForm.reset();
-        this.start.setValue(arg.date);
-        this.end.setValue(arg.date);
+        this.managerForm.reset();
+        this.participantsForm.reset();
+        const dateInfo = this.dateFormatService.formatDateWithEndTime(arg.dateStr);
+        if (dateInfo.start === "00:00") {
+            dateInfo.start = "07:00 AM"
+            dateInfo.end = "08:00 AM"
+        }
+        this.start.setValue(dateInfo.day + ' ' + dateInfo.start);
+        this.end.setValue(dateInfo.day + ' ' + dateInfo.end);
         this.color.setValue('#ff0000');
-        this.displayDialog = true;
+        this.newEventDialog = true; 
     }
 
     handleEventClick(arg) {
@@ -290,27 +397,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.calendarComponent.getApi().render();
     }
 
-    addButtonToToolbarChunk() {
-        const headerToolbars = document.querySelectorAll('.fc-header-toolbar');
-        if (headerToolbars.length >= 1) {
-            const secondHeaderToolbar = headerToolbars[0];
-            if (secondHeaderToolbar) {
-                const toolbarChunk =
-                    secondHeaderToolbar.querySelector('.fc-toolbar-chunk');
-                if (toolbarChunk) {
-                    const newButton = document.createElement('button');
-                    newButton.innerText = 'Recargar calendario';
-                    newButton.className =
-                        'fc-today-button fc-button fc-button-primary';
-                    newButton.addEventListener('click', () =>
-                        this.renderizeCalendar()
-                    );
-                    toolbarChunk.appendChild(newButton);
-                }
-            }
-        }
-    }
-
     handleEventDrop(eventDropInfo) {
         alert('Event dropped to ' + eventDropInfo.event.start);
     }
@@ -320,11 +406,15 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     addEvent() {
+        console.log('this.start.value', this.start.value)
+        console.log(this.dateFormatService.formatDateToISO(this.start.value));
+        console.log('this.end.value', this.end.value)
+        console.log(this.dateFormatService.formatDateToISO(this.end.value));
         if (this.eventForm.valid) {
             const newEvent: EventInput = {
                 title: this.title.value,
-                start: this.start.value,
-                end: this.end.value,
+                start: this.dateFormatService.formatDateToISO(this.start.value),
+                end: this.dateFormatService.formatDateToISO(this.end.value),
                 allDay: false,
                 editable: true,
                 startResizable: true,
@@ -335,7 +425,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             this.events.push(newEvent);
             const calendarApi = this.calendarComponent.getApi();
             calendarApi.addEvent(newEvent);
-            this.displayDialog = false;
+            this.newEventDialog = false;
         }
     }
 
@@ -344,10 +434,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     drop(event: any, column: 'pending' | 'inProgress' | 'completed') {
-        console.log('column', column);
         if (this.draggedTask) {
             const columnBefore = this.isTaskInPending(this.draggedTask.id);
-            console.log('column before', columnBefore);
             if (
                 (columnBefore === 'inProgress' && column === 'pending') ||
                 (columnBefore === 'completed' && column === 'pending') ||
@@ -388,8 +476,23 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         );
     }
 
+    showNewTaskDialog() {
+        this.taskForm.reset();
+        this.newTaskDialog = true;
+        this.taskSelectedId = 0;
+    }
+
     deleteTask(task: Task) {
         this.removeTask(task);
+    }
+
+    editTask(task: Task) {
+        this.taskForm.reset();
+        this.titleTask.setValue(task.title);
+        this.descriptionTask.setValue(task.description);
+        this.endTask.setValue(this.dateFormatService.formatDateDDMMYYYY(task.dateEnd));
+        this.taskSelectedId = task.id;
+        this.newTaskDialog = true;
     }
 
     isTaskInPending(id: number): string {
@@ -406,20 +509,39 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         return column;
     }
 
-    addTask() {
+    addTask(id: number) {
+        if (id > 0) {
+            const taskIndex = this.pendingTasks.findIndex(task => task.id === id);
+            const updateTask: Task = {
+                id: this.getMaxId() + 1,
+                title: this.titleTask.value,
+                description: this.descriptionTask.value,
+                dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value)
+            };
+            if (taskIndex !== -1) {
+                this.pendingTasks[taskIndex] = { ...this.pendingTasks[taskIndex], ...updateTask };
+            } else {
+                console.error(`Task with id ${id} not found.`);
+            }
+            this.newTaskDialog = false;
+            this.taskForm.reset();
+            return;
+        }
         const newTask: Task = {
             id: this.getMaxId() + 1,
             title: this.titleTask.value,
             description: this.descriptionTask.value,
+            dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value)
         };
         if (!this.isTaskInPending(this.getMaxId() + 1)) {
             this.pendingTasks = [...this.pendingTasks, newTask];
-            this.addNewTaskDialog = false;
+            this.newTaskDialog = false;
             this.taskForm.reset();
         } else {
             console.log('Task with this ID already exists.');
         }
     }
+
 
     getMaxId(): number | null {
         const allTasks = [
@@ -432,5 +554,64 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         }
         const maxId = Math.max(...allTasks.map((task) => task.id));
         return maxId;
+    }
+
+    search(event: AutoCompleteCompleteEvent) {
+        const query = event.query.toLowerCase();
+        this.filteredItems = this.usuarios
+            .filter(
+                (usuario) =>
+                    usuario.nombre.toLowerCase().includes(query) ||
+                    usuario.apellidos.toLowerCase().includes(query)
+            )
+            .map((usuario) => ({
+                ...usuario,
+                fullName: `${usuario.nombre} ${usuario.apellidos}`,
+            }));
+    }
+
+    watchUsersManager(): void {
+        this.usersManager.valueChanges.pipe().subscribe((value) => {
+            console.log(value);
+        });
+    }
+
+    addComment(event: KeyboardEvent): void {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (this.comment.value) {
+                this.comments.push({
+                    name: 'Gary Velarde',
+                    content: this.comment.value,
+                    isComment: true,
+                });
+                this.comment.setValue('');
+                this.comment.reset();
+                this.scrollDown();
+            }
+        }
+        
+    }
+
+    scrollDown(): void {
+        window.scroll({
+            top: document.body.scrollHeight,
+            left: 0,
+            behavior: 'smooth',
+        });
+    }
+
+    formatText(text: string): string {
+        return text.replace(/\n/g, '<br>');
+    }
+
+    getFirstLetter(str: string): string {
+        if (!str) {
+            console.error('The string is empty');
+            return '';
+        }
+        const firstLetter = str.charAt(0);
+        const firstLetterUpper = firstLetter.toUpperCase();
+        return firstLetterUpper;
     }
 }

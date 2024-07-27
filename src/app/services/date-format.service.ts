@@ -1,0 +1,198 @@
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DateFormatService {
+
+  constructor() { }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid date string');
+    }
+
+    const day = ('0' + date.getDate()).slice(-2);
+    const month = ('0' + (date.getMonth() + 1)).slice(-2); // Los meses son 0-indexed
+    const year = date.getFullYear();
+
+    let hours = date.getHours();
+    const minutes = ('0' + date.getMinutes()).slice(-2);
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // La hora 0 debería ser 12
+    const strTime = ('0' + hours).slice(-2) + ':' + minutes + ' ' + ampm;
+
+    return `${day}/${month}/${year} ${strTime}`;
+  }
+
+  formatDateDDMMYYYY(date: Date | string): string {
+    let dateObj: Date;
+
+    // Verificar si el parámetro es una cadena
+    if (typeof date === 'string') {
+      // Intentar analizar la fecha en formato 'dd-mm-yyyy'
+      const parts = date.split('-');
+      if (parts.length === 3) {
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Los meses en JavaScript son 0-indexados
+        const year = parseInt(parts[2], 10);
+        dateObj = new Date(year, month, day);
+      } else {
+        // Convertir la cadena al objeto Date si no está en el formato esperado
+        dateObj = new Date(date);
+      }
+    } else {
+      dateObj = date;
+    }
+
+    // Asegurarse de que dateObj sea un objeto Date válido
+    if (isNaN(dateObj.getTime())) {
+      console.error('Invalid date');
+      return '';
+    }
+
+    const day = ('0' + dateObj.getDate()).slice(-2);
+    const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+    const year = dateObj.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  }
+
+  formatDateCalendar(date: string): string {
+    let dateObj: Date;
+
+    // Analizar la fecha y la hora en el formato 'dd-mm-yyyy hh:mm'
+    const dateTimeParts = date.split(' ');
+    if (dateTimeParts.length === 2) {
+      const dateParts = dateTimeParts[0].split('-');
+      const timeParts = dateTimeParts[1].split(':');
+      if (dateParts.length === 3 && timeParts.length === 2) {
+        const day = parseInt(dateParts[0], 10);
+        const month = parseInt(dateParts[1], 10) - 1; // Los meses en JavaScript son 0-indexados
+        const year = parseInt(dateParts[2], 10);
+        const hours = parseInt(timeParts[0], 10);
+        const minutes = parseInt(timeParts[1], 10);
+        dateObj = new Date(year, month, day, hours, minutes);
+      } else {
+        console.error('Invalid date format');
+        return '';
+      }
+    } else {
+      console.error('Invalid date format');
+      return '';
+    }
+
+    // Asegurarse de que dateObj sea un objeto Date válido
+    if (isNaN(dateObj.getTime())) {
+      console.error('Invalid date');
+      return '';
+    }
+
+    const year = dateObj.getFullYear();
+    const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+    const day = ('0' + dateObj.getDate()).slice(-2);
+    const hours = ('0' + dateObj.getHours()).slice(-2);
+    const minutes = ('0' + dateObj.getMinutes()).slice(-2);
+    const seconds = '00'; // Asumimos segundos en '00'
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+
+  }
+
+  formatDateToISO(date: string): string {
+    let dateObj: Date;
+  
+    // Verificar si la cadena está en el formato 'dd-mm-yyyy hh:mm AM/PM'
+    const regexDDMMYYYYAMPM = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2} (AM|PM)$/;
+    if (regexDDMMYYYYAMPM.test(date)) {
+      const [datePart, timePart, period] = date.split(' ');
+      const [day, month, year] = datePart.split('-').map(Number);
+      const [hours, minutes] = timePart.split(':').map(Number);
+  
+      let adjustedHours = hours;
+      if (period === 'PM' && hours !== 12) {
+        adjustedHours += 12;
+      }
+      if (period === 'AM' && hours === 12) {
+        adjustedHours = 0;
+      }
+  
+      dateObj = new Date(year, month - 1, day, adjustedHours, minutes);
+    } else {
+      // Intentar crear un objeto Date a partir de la cadena de entrada
+      dateObj = new Date(date);
+    }
+  
+    // Asegurarse de que dateObj sea un objeto Date válido
+    if (isNaN(dateObj.getTime())) {
+      console.error('Invalid date');
+      return '';
+    }
+  
+    const year = dateObj.getFullYear();
+    const month = ('0' + (dateObj.getMonth() + 1)).slice(-2); // Los meses en JavaScript son 0-indexados
+    const day = ('0' + dateObj.getDate()).slice(-2);
+    const hours = ('0' + dateObj.getHours()).slice(-2);
+    const minutes = ('0' + dateObj.getMinutes()).slice(-2);
+    const seconds = ('0' + dateObj.getSeconds()).slice(-2);
+  
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+  }
+
+  formatDateWithEndTime(date: string): { day: string, start: string, end: string } {
+    let dateObj: Date;
+    let start: string;
+    let end: string;
+
+    if (date.includes('T')) {
+      // Parsear el formato "2024-07-26T18:30:00-05:00"
+      dateObj = new Date(date);
+      if (isNaN(dateObj.getTime())) {
+        console.error('Invalid date');
+        return { day: '', start: '', end: '' };
+      }
+
+      const hours = dateObj.getHours();
+      const minutes = ('0' + dateObj.getMinutes()).slice(-2);
+      const startHours12 = hours % 12 === 0 ? 12 : hours % 12;
+      const startPeriod = hours >= 12 ? 'PM' : 'AM';
+      start = `${startHours12}:${minutes} ${startPeriod}`;
+
+      // Calcular una hora más para el end time
+      const endDateObj = new Date(dateObj.getTime() + 60 * 60 * 1000);
+      const endHours = endDateObj.getHours();
+      const endMinutes = ('0' + endDateObj.getMinutes()).slice(-2);
+      const endHours12 = endHours % 12 === 0 ? 12 : endHours % 12;
+      const endPeriod = endHours >= 12 ? 'PM' : 'AM';
+      end = `${endHours12}:${endMinutes} ${endPeriod}`;
+    } else {
+      // Parsear el formato "2024-07-03"
+      const parts = date.split('-');
+      const year = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1; // Los meses en JavaScript son 0-indexados
+      const day = parseInt(parts[2], 10);
+
+      // Crear el objeto Date usando año, mes y día
+      dateObj = new Date(year, month, day);
+
+      if (isNaN(dateObj.getTime())) {
+        console.error('Invalid date');
+        return { day: '', start: '', end: '' };
+      }
+
+      start = '00:00';
+      end = '00:00';
+    }
+
+    const dayFormatted = ('0' + dateObj.getDate()).slice(-2);
+    const monthFormatted = ('0' + (dateObj.getMonth() + 1)).slice(-2); // Los meses en JavaScript son 0-indexados
+    const yearFormatted = dateObj.getFullYear();
+    const formattedDay = `${dayFormatted}-${monthFormatted}-${yearFormatted}`;
+
+    return { day: formattedDay, start, end };
+  }
+
+}

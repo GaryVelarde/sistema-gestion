@@ -32,6 +32,9 @@ import { EventsUdiRoutingModule } from './events-udi-routing.module';
 import { MessagesModule } from 'primeng/messages';
 import { ContextMenuModule } from 'primeng/contextmenu';
 import { DragDropModule } from 'primeng/dragdrop';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { SidebarModule } from 'primeng/sidebar';
+import { AvatarModule } from 'primeng/avatar';
 
 @NgModule({
     imports: [
@@ -68,7 +71,9 @@ import { DragDropModule } from 'primeng/dragdrop';
         ColorPickerModule,
         MessagesModule,
         ContextMenuModule,
-        
+        AutoCompleteModule,
+        SidebarModule,
+        AvatarModule,
     ],
     declarations: [EventsUdiComponent],
 })

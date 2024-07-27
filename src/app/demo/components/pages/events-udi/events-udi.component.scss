@@ -99,3 +99,23 @@
     color: red;
     cursor: pointer;
   }
+
+  .button-edit-task {
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .half-screen-sidebar {
+    width: 50% !important;
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 0;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.d-none {
+  display: none;
+}
