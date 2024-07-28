@@ -178,277 +178,6 @@
         </div>
 
         <p-dialog
-            [(visible)]="modalNewUser"
-            [style]="{ width: '60rem' }"
-            header="Product Details"
-            [modal]="true"
-            class="p-fluid"
-            [maximizable]="true">
-            <div class="content">
-                <form [formGroup]="userForm">
-                    <div class="field mt-4">
-                        <span class="p-float-label">
-                            <p-dropdown
-                                formControlName="role"
-                                inputId="role"
-                                [autoDisplayFirst]="false"
-                                [options]="roles"
-                                optionLabel="name"></p-dropdown>
-                            <label for="role">Seleccione un rol</label>
-                        </span>
-                        <small
-                            class="pl-2 text-error"
-                            *ngIf="role.dirty && role.errors">El nombre es
-                            requerido.</small>
-                    </div>
-                    <div *ngIf="role.value.code === 'Estudiante'">
-                        <div class="formgrid grid mt-5">
-                            <div class="field col">
-                                <span class="p-float-label">
-                                    <input
-                                        type="text"
-                                        id="career"
-                                        pInputText
-                                        formControlName="career" />
-                                    <label for="career">Carrera</label>
-                                </span>
-                                <small
-                                    class="pl-2 text-error"
-                                    *ngIf="career.dirty && career.errors">La
-                                    carrera es requerida.</small>
-                            </div>
-                            <div class="field col">
-                                <span class="p-float-label">
-                                    <p-dropdown
-                                        formControlName="cycle"
-                                        inputId="cycle"
-                                        [autoDisplayFirst]="false"
-                                        [options]="cycles"
-                                        optionLabel="name"></p-dropdown>
-                                    <label for="cycle">Seleccione el
-                                        ciclo</label>
-                                </span>
-                                <small
-                                    class="pl-2 text-error"
-                                    *ngIf="cycle.dirty && cycle.errors">El ciclo
-                                    es requerido.</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div *ngIf="role.value.code === 'Egresado'">
-                        <div class="formgrid grid mt-5">
-                            <div class="field col">
-                                <span class="p-float-label">
-                                    <input
-                                        type="text"
-                                        id="career"
-                                        pInputText
-                                        formControlName="career" />
-                                    <label for="career">Carrera</label>
-                                </span>
-                                <small
-                                    class="pl-2 text-error"
-                                    *ngIf="career.dirty && career.errors">La
-                                    carrera es requerida.</small>
-                            </div>
-                            <div class="field col">
-                                <span class="p-float-label">
-                                    <p-calendar
-                                        inputId="egressDate"
-                                        [iconDisplay]="'input'"
-                                        formControlName="egressDate"
-                                        [showIcon]="true"
-                                        dateFormat="yy-mm-dd"></p-calendar>
-                                    <label for="egressDate">Fecha de
-                                        egreso</label>
-                                </span>
-                                <small
-                                    class="pl-2 text-error"
-                                    *ngIf="
-                                        egressDate.dirty && egressDate.errors
-                                    ">La fecha de egreso es requerida.</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field mt-4">
-                        <span class="p-float-label">
-                            <input
-                                type="text"
-                                id="name"
-                                pInputText
-                                formControlName="name" />
-                            <label for="name">Nombres completos</label>
-                        </span>
-                        <small
-                            class="pl-2 text-error"
-                            *ngIf="name.dirty && name.errors">El nombre es
-                            requerido.</small>
-                    </div>
-                    <div class="field mt-4">
-                        <span class="p-float-label">
-                            <input
-                                type="text"
-                                id="lastName"
-                                pInputText
-                                formControlName="lastName" />
-                            <label for="lastName">Apellidos completos</label>
-                        </span>
-                        <small
-                            class="pl-2 text-error"
-                            *ngIf="lastName.dirty && lastName.errors">El
-                            apellido es requerido.</small>
-                    </div>
-
-                    <div class="formgrid grid mt-4">
-                        <div class="field col">
-                            <span class="p-float-label">
-                                <input
-                                    type="text"
-                                    id="code"
-                                    pInputText
-                                    formControlName="code" />
-                                <label for="code">Código</label>
-                            </span>
-                            <small
-                                class="pl-2 text-error"
-                                *ngIf="code.dirty && code.errors">El código es
-                                requerido.</small>
-                        </div>
-
-                        <div class="field col">
-                            <span class="p-float-label">
-                                <input
-                                    type="text"
-                                    id="number"
-                                    pInputText
-                                    formControlName="number" />
-                                <label for="number">Celular</label>
-                            </span>
-                            <small
-                                class="pl-2 text-error"
-                                *ngIf="number.dirty && number.errors">El celular
-                                es requerido.</small>
-                        </div>
-                    </div>
-                    <div class="formgrid grid mt-4">
-                        <div class="field col">
-                            <span class="p-float-label">
-                                <input
-                                    type="email"
-                                    id="email"
-                                    pInputText
-                                    formControlName="email" />
-                                <label for="email">Correo</label>
-                            </span>
-                            <small
-                                class="pl-2 text-error"
-                                *ngIf="email.dirty && email.errors">El nombre es
-                                requerido.</small>
-                        </div>
-                    </div>
-                    <div *ngIf="role.value.code === 'Docente'">
-                        <div class="grid formgrid mt-4 pl-1">
-                            <div class="col-12 md:col-4">
-                                <div class="field-checkbox">
-                                    <p-checkbox
-                                        name="group1"
-                                        value="Revisor"
-                                        formControlName="reviewer"
-                                        id="Revisor"></p-checkbox>
-                                    <label for="ny">Revisor</label>
-                                </div>
-                            </div>
-                            <div class="col-12 md:col-4">
-                                <div class="field-checkbox">
-                                    <p-checkbox
-                                        name="group1"
-                                        value="Asesor"
-                                        formControlName="adviser"
-                                        id="adviser"></p-checkbox>
-                                    <label for="sf">Asesor</label>
-                                </div>
-                            </div>
-                            <div class="col-12 md:col-4">
-                                <div class="field-checkbox">
-                                    <p-checkbox
-                                        name="group1"
-                                        value="Jurado"
-                                        formControlName="jury"
-                                        id="jury"></p-checkbox>
-                                    <label for="la">Jurado</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="formgrid grid mt-5">
-                            <div class="field col">
-                                <span class="p-float-label">
-                                    <input
-                                        type="text"
-                                        id="career"
-                                        pInputText
-                                        formControlName="career" />
-                                    <label for="career">Carrera</label>
-                                </span>
-                                <small
-                                    class="pl-2 text-error"
-                                    *ngIf="career.dirty && career.errors">La
-                                    carrera es requerida.</small>
-                            </div>
-                            <div class="field col">
-                                <span class="p-float-label">
-                                    <input
-                                        type="text"
-                                        id="line"
-                                        pInputText
-                                        formControlName="line" />
-                                    <label for="line">Línea</label>
-                                </span>
-                                <small
-                                    class="pl-2 text-error"
-                                    *ngIf="line.dirty && line.errors">la línea
-                                    es requerida.</small>
-                            </div>
-                        </div>
-                        <div class="field mt-4">
-                            <span class="p-float-label">
-                                <textarea
-                                    inputId="subLine"
-                                    rows="3"
-                                    cols="30"
-                                    formControlName="subLine"
-                                    pInputTextarea></textarea>
-                                <label for="subLine">Sub línea</label>
-                            </span>
-                            <small
-                                class="pl-2 text-error"
-                                *ngIf="subLine.dirty && subLine.errors">Las sub
-                                líneas son requeridas.</small>
-                        </div>
-                    </div>
-
-                    <div class="footer mt-5">
-                        <button
-                            pButton
-                            pRipple
-                            label="Cancelar"
-                            icon="pi pi-times"
-                            class="p-button-text"
-                            iconPos="right"
-                            (click)="hideDialog()"></button>
-                        <button
-                            pButton
-                            pRipple
-                            label="Guardar"
-                            icon="pi pi-check"
-                            iconPos="right"
-                            [disabled]="!userForm.valid"
-                            (click)="callPostNewUser()"></button>
-                    </div>
-                </form>
-            </div>
-        </p-dialog>
-
-        <p-dialog
             [(visible)]="modalUserDetail"
             [style]="{ width: '60rem' }"
             [header]="titleModalDetailIserSelected"
@@ -461,3 +190,282 @@
         </p-dialog>
     </div>
 </div>
+<p-sidebar [(visible)]="modalNewUser" [style]="{'width': '40%'}" position="right">
+    <ng-template pTemplate="header">
+        <span class="font-semibold text-xl">Detalle del usuario</span>
+    </ng-template>
+    <div class="content">
+        <form [formGroup]="userForm">
+            <div class="field mt-4">
+                <span class="p-float-label">
+                    <p-dropdown
+                        formControlName="role"
+                        inputId="role"
+                        class="w-full"
+                        [autoDisplayFirst]="false"
+                        [options]="roles"
+                        optionLabel="name"></p-dropdown>
+                    <label for="role">Seleccione un rol</label>
+                </span>
+                <small
+                    class="pl-2 text-error"
+                    *ngIf="role.dirty && role.errors">El rol es
+                    requerido.</small>
+            </div>
+            <div *ngIf="role.value.code === 'Estudiante'">
+                <div class="formgrid grid mt-5">
+                    <div class="field col">
+                        <span class="p-float-label">
+                            <input
+                                type="text"
+                                id="career"
+                                class="w-full"
+                                pInputText
+                                formControlName="career" />
+                            <label for="career">Carrera</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="career.dirty && career.errors">La
+                            carrera es requerida.</small>
+                    </div>
+                    <div class="field col">
+                        <span class="p-float-label">
+                            <p-dropdown
+                                formControlName="cycle"
+                                inputId="cycle"
+                                class="w-full"
+                                [autoDisplayFirst]="false"
+                                [options]="cycles"
+                                optionLabel="name"></p-dropdown>
+                            <label for="cycle">Seleccione el
+                                ciclo</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="cycle.dirty && cycle.errors">El ciclo
+                            es requerido.</small>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="role.value.code === 'Egresado'">
+                <div class="formgrid grid mt-5">
+                    <div class="field col">
+                        <span class="p-float-label">
+                            <input
+                                type="text"
+                                id="career"
+                                class="w-full"
+                                pInputText
+                                formControlName="career" />
+                            <label for="career">Carrera</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="career.dirty && career.errors">La
+                            carrera es requerida.</small>
+                    </div>
+                    <div class="field col">
+                        <span class="p-float-label">
+                            <p-calendar
+                                inputId="egressDate"
+                                [iconDisplay]="'input'"
+                                formControlName="egressDate"
+                                class="w-full"
+                                [showIcon]="true"
+                                dateFormat="yy-mm-dd"></p-calendar>
+                            <label for="egressDate">Fecha de
+                                egreso</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="
+                                egressDate.dirty && egressDate.errors
+                            ">La fecha de egreso es requerida.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="field mt-4">
+                <span class="p-float-label">
+                    <input
+                        type="text"
+                        id="name"
+                        class="w-full"
+                        pInputText
+                        formControlName="name" />
+                    <label for="name">Nombres completos</label>
+                </span>
+                <small
+                    class="pl-2 text-error"
+                    *ngIf="name.dirty && name.errors">El nombre es
+                    requerido.</small>
+            </div>
+            <div class="field mt-4">
+                <span class="p-float-label">
+                    <input
+                        type="text"
+                        id="lastName"
+                        class="w-full"
+                        pInputText
+                        formControlName="lastName" />
+                    <label for="lastName">Apellidos completos</label>
+                </span>
+                <small
+                    class="pl-2 text-error"
+                    *ngIf="lastName.dirty && lastName.errors">El
+                    apellido es requerido.</small>
+            </div>
+
+            <div class="formgrid grid mt-4">
+                <div class="field col">
+                    <span class="p-float-label">
+                        <input
+                            type="text"
+                            id="code"
+                            class="w-full"
+                            pInputText
+                            formControlName="code" />
+                        <label for="code">Código</label>
+                    </span>
+                    <small
+                        class="pl-2 text-error"
+                        *ngIf="code.dirty && code.errors">El código es
+                        requerido.</small>
+                </div>
+
+                <div class="field col">
+                    <span class="p-float-label">
+                        <input
+                            type="text"
+                            id="number"
+                            class="w-full"
+                            pInputText
+                            formControlName="number" />
+                        <label for="number">Celular</label>
+                    </span>
+                    <small
+                        class="pl-2 text-error"
+                        *ngIf="number.dirty && number.errors">El celular
+                        es requerido.</small>
+                </div>
+            </div>
+            <div class="formgrid grid mt-4">
+                <div class="field col">
+                    <span class="p-float-label">
+                        <input
+                            type="email"
+                            id="email"
+                            class="w-full"
+                            pInputText
+                            formControlName="email" />
+                        <label for="email">Correo</label>
+                    </span>
+                    <small
+                        class="pl-2 text-error"
+                        *ngIf="email.dirty && email.errors">El nombre es
+                        requerido.</small>
+                </div>
+            </div>
+            <div *ngIf="role.value.code === 'Docente'">
+                <div class="grid formgrid mt-4 pl-1">
+                    <div class="col-12 md:col-4">
+                        <div class="field-checkbox">
+                            <p-checkbox
+                                name="group1"
+                                value="Revisor"
+                                formControlName="reviewer"
+                                id="Revisor"></p-checkbox>
+                            <label for="ny">Revisor</label>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-4">
+                        <div class="field-checkbox">
+                            <p-checkbox
+                                name="group1"
+                                value="Asesor"
+                                formControlName="adviser"
+                                id="adviser"></p-checkbox>
+                            <label for="sf">Asesor</label>
+                        </div>
+                    </div>
+                    <div class="col-12 md:col-4">
+                        <div class="field-checkbox">
+                            <p-checkbox
+                                name="group1"
+                                value="Jurado"
+                                formControlName="jury"
+                                id="jury"></p-checkbox>
+                            <label for="la">Jurado</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="formgrid grid mt-5">
+                    <div class="field col">
+                        <span class="p-float-label">
+                            <input
+                                type="text"
+                                id="career"
+                                class="w-full"
+                                pInputText
+                                formControlName="career" />
+                            <label for="career">Carrera</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="career.dirty && career.errors">La
+                            carrera es requerida.</small>
+                    </div>
+                    <div class="field col">
+                        <span class="p-float-label">
+                            <input
+                                type="text"
+                                id="line"
+                                class="w-full"
+                                pInputText
+                                formControlName="line" />
+                            <label for="line">Línea</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="line.dirty && line.errors">la línea
+                            es requerida.</small>
+                    </div>
+                </div>
+                <div class="field mt-4">
+                    <span class="p-float-label">
+                        <textarea
+                            inputId="subLine"
+                            rows="3"
+                            cols="30"
+                            class="w-full"
+                            formControlName="subLine"
+                            pInputTextarea></textarea>
+                        <label for="subLine">Sub línea</label>
+                    </span>
+                    <small
+                        class="pl-2 text-error"
+                        *ngIf="subLine.dirty && subLine.errors">Las sub
+                        líneas son requeridas.</small>
+                </div>
+            </div>
+            <div class="footer">
+                <button
+                    pButton
+                    pRipple
+                    label="Regresar"
+                    icon="pi pi-angle-left"
+                    class="p-button-text"
+                    iconPos="left"
+                    (click)="hideDialog()"></button>
+                <button
+                    pButton
+                    pRipple
+                    label="Guardar"
+                    icon="pi pi-check"
+                    iconPos="right"
+                    [disabled]="!userForm.valid"
+                    (click)="callPostNewUser()"></button>
+              </div>
+        </form>
+    </div>
+  </p-sidebar>

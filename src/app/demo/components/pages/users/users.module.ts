@@ -19,6 +19,7 @@ import { UsersRoutingModule } from './users-routing.module';
 import { CheckboxModule } from 'primeng/checkbox';
 import { CalendarModule } from 'primeng/calendar';
 import { SkeletonModule } from 'primeng/skeleton';
+import { SidebarModule } from 'primeng/sidebar';
 
 @NgModule({
     imports: [
@@ -42,6 +43,7 @@ import { SkeletonModule } from 'primeng/skeleton';
         CheckboxModule,
         CalendarModule,
         SkeletonModule,
+        SidebarModule,
     ],
     declarations: [UsersComponent]
 })
