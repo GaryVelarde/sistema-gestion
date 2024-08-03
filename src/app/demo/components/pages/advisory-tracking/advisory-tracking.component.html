@@ -1,20 +1,7 @@
 <p-toast key="tst"></p-toast>
-<div *ngIf="!inscriptionSelected" class="grid">
+<div *ngIf="!advisorySelected" class="grid">
     <div class="col-12">
         <div class="card px-6 py-6">
-            <p-toolbar styleClass="mb-4">
-                <ng-template pTemplate="left">
-                    <div class="my-2">
-                        <button
-                            pButton
-                            pRipple
-                            label="Inscribir un nuevo protecto de tesis"
-                            icon="pi pi-plus"
-                            class="p-button-success mr-2"
-                            (click)="goToInscription()"></button>
-                    </div>
-                </ng-template>
-            </p-toolbar>
             <div class="card">
                 <p-table #dt [value]="registros" responsiveLayout="scroll"
                     [rows]="10"
@@ -27,7 +14,7 @@
                     <ng-template pTemplate="caption">
                         <div
                             class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">Seguimiento de inscripciones</h5>
+                            <h5 class="m-0">Seguimiento de asesorías</h5>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search"></i>
                                 <input pInputText type="text"
@@ -38,15 +25,15 @@
                         </div>
                     </ng-template>
                     <ng-template pTemplate="header">
-                        <tr> 
+                        <tr>
                             <th pSortableColumn="titulo_proyecto_tesis"
                                 style="width:60%">Título de
-                                tesis <p-sortIcon
-                                    field="titulo_proyecto_tesis"></p-sortIcon></th>
+                                tesis <p-sorticon
+                                    field="titulo_proyecto_tesis"></p-sorticon></th>
                             <th pSortableColumn="nombre"
                                 style="width:20%">Revisor
-                                <p-sorIcon
-                                    field="nombre"></p-sorIcon></th>
+                                <p-soricon
+                                    field="nombre"></p-soricon></th>
                             <th style="width:10%">Estado</th>
                             <th style="width:10%"></th>
                         </tr>
@@ -56,18 +43,24 @@
                             <td style="width:14%; min-width:10rem;"><span
                                     class="p-column-title">Título de
                                     tesis</span>
-                                {{data.titulo_proyecto_tesis}}
+                                {{data.degree_processes.thesis_project_title}}
                             </td>
                             <td style="width:14%; min-width:8rem;">
-                                <span class="p-column-title">Revisor</span>
-                                {{data.inscripciones[0].docente[0].nombre + ' '
-                                +
-                                data.inscripciones[0].docente[0].apellidos}}
+                                <div *ngIf="data.reviewer.length < 1">
+                                    sin asignar
+                                </div>
+                                <div *ngIf="data.reviewer.length > 0">
+                                    <span class="p-column-title">Revisor</span>
+                                    {{data.inscripciones[0].docente[0].nombre +
+                                    ' '
+                                    +
+                                    data.inscripciones[0].docente[0].apellidos}}
+                                </div>
                             </td>
                             <td style="width:14%; min-width: 10rem;"><span
                                     class="p-column-title">estado</span>
                                 <span
-                                    [class]="'product-badge status-' + (data.estado ? data.estado.toLowerCase() : '')">{{data.inscripciones[0].estado}}</span>
+                                    [class]="'product-badge status-' + (data.status ? data.status.toLowerCase() : '')">{{data.status}}</span>
                             </td>
                             <td>
                                 <div class="flex">
@@ -117,7 +110,7 @@
         </div>
     </ng-template>
 </p-confirmDialog>
-<div *ngIf="inscriptionSelected" class="grid">
+<div *ngIf="advisorySelected" class="grid">
     <div class="col-12">
 
         <div class="card">
@@ -126,38 +119,44 @@
                     <p-button (click)="backList()" label="Regresar"
                         [outlined]="true"
                         icon="pi pi-angle-left" iconPos="left" />
-                    <p-button *ngIf="!showEdit && inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="ml-3"
+                    <p-button
+                        *ngIf="!showEdit && advisoryState !== 'Cancelado' && advisoryState !== 'Aprobado'"
+                        class="ml-3"
                         (click)="showEdition()"
                         label="Editar"
                         icon="pi pi-pencil" iconPos="left" />
-                    <p-button *ngIf="showEdit && inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="ml-3"
+                    <p-button
+                        *ngIf="showEdit && advisoryState !== 'Cancelado' && advisoryState !== 'Aprobado'"
+                        class="ml-3"
                         (click)="cancelEdition()"
                         label="Cancelar edición"
                         icon="pi pi-times" iconPos="right" />
-                    <p-button *ngIf="showEdit && inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="ml-3"
+                    <p-button
+                        *ngIf="showEdit && advisoryState !== 'Cancelado' && advisoryState !== 'Aprobado'"
+                        class="ml-3"
                         (click)="saveEdition()"
                         label="Guardar cambios"
                         icon="pi pi-save" iconPos="left" />
                 </div>
                 <div class="p-2">
                     <p-button
-                        *ngIf="inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'"
-                        label="Cancelar inscripción"
+                        *ngIf="advisoryState !== 'Cancelado' && advisoryState !== 'Aprobado'"
+                        label="Cancelar asesoría"
                         [outlined]="true"
                         class="mr-3"
                         icon="pi pi-times" iconPos="left"
                         severity="danger" (click)="goToCancelation()" />
                     <p-button
-                        *ngIf="inscriptionState === 'Inscrito' || inscriptionState === 'Observado'"
+                        *ngIf="advisoryState === 'Inscrito' || advisoryState === 'Observado'"
                         label="Pasar a revisión" [outlined]="true"
                         icon="pi pi-angle-right" iconPos="right"
                         severity="info" (click)="goToReview()" />
-                    <p-button *ngIf="inscriptionState === 'En revisión'"
+                    <p-button *ngIf="advisoryState === 'En revisión'"
                         label="Observado" [outlined]="true"
                         icon="pi pi-exclamation-circle" iconPos="left"
                         severity="warning" (click)="goToObserved()" />
                     <p-button
-                        *ngIf="inscriptionState === 'En revisión'"
+                        *ngIf="advisoryState === 'En revisión'"
                         class="ml-3"
                         label="Aprobado" [outlined]="true"
                         icon="pi pi-angle-right" iconPos="right"
@@ -168,109 +167,189 @@
 
                 <h4
                     class="font-bold">Título:
-                    {{inscriptionSelected.titulo_proyecto_tesis}}</h4>
+                    {{advisorySelected.titulo_proyecto_tesis}}</h4>
 
             </div>
             <div *ngIf="!showEdit" class="grid col-12">
                 <div class="col-3"><p class="font-bold">Nro de
-                        expediente:</p><p>{{inscriptionSelected.expediente}}</p></div>
+                        expediente:</p><p>{{advisorySelected.degree_processes.file}}</p></div>
                 <div class="col-3"><p class="font-bold">Escuala
-                        profesional:</p><p>{{inscriptionSelected.escuela_profesional}}</p></div>
+                        profesional:</p><p>{{advisorySelected.degree_processes.professional_school}}</p></div>
                 <div class="col-3"><p class="font-bold">Nro de
-                        oficio:</p><p>{{inscriptionSelected.numero_oficio}}</p></div>
+                        oficio:</p><p>{{advisorySelected.degree_processes.office_number}}</p></div>
                 <div class="col-3"><p class="font-bold">Nro de
-                        resolución:</p><p>{{inscriptionSelected.numero_resolucion}}</p></div>
+                        resolución:</p><p>{{advisorySelected.degree_processes.resolution_number}}</p></div>
             </div>
             <div *ngIf="showEdit" class="grid col-12">
                 <div class="col-3"><p class="font-bold">Nro de
                         expediente:</p><input type="text" pInputText
                         class="full-width"
-                        [value]="inscriptionSelected.expediente" />
+                        [value]="advisorySelected.expediente" />
                 </div>
                 <div class="col-3"><p class="font-bold">Escuala
                         profesional:</p><input type="text" pInputText
                         class="full-width"
-                        [value]="inscriptionSelected.escuela_profesional" />
+                        [value]="advisorySelected.escuela_profesional" />
                 </div>
                 <div class="col-3"><p class="font-bold">Nro de
                         oficio:</p><input type="text" pInputText
                         class="full-width"
-                        [value]="inscriptionSelected.numero_oficio" />
+                        [value]="advisorySelected.numero_oficio" />
                 </div>
                 <div class="col-3"><p class="font-bold">Nro de
                         resolución:</p><input type="text" pInputText
                         class="full-width"
-                        [value]="inscriptionSelected.numero_resolucion" />
+                        [value]="advisorySelected.numero_resolucion" />
                 </div>
             </div>
             <div class="grid col-12">
-                <div class="col-3"><p class="font-bold">Fecha de recepción a
+                <div class="col-3"><p class="font-bold">Fecha de recepción de la
+                        asesoría a
                         Facultad:</p>
-                    <p *ngIf="!showEdit">
+                    <p
+                        *ngIf="advisorySelected.reception_date_faculty !== '0000-00-00'">
                         <i class="pi pi-calendar"></i>
-                        {{inscriptionSelected.inscripciones[0].fecha_recepcion_facultad}}
+                        {{advisorySelected.reception_date_faculty}}
                     </p>
-                    <div *ngIf="showEdit" class="grid p-fluid">
+                    <div
+                        *ngIf="advisorySelected.reception_date_faculty === '0000-00-00'"
+                        class="grid p-fluid">
                         <div class="field col-12 md:col-12">
-                            <p-calendar *ngIf="showEdit"
-                                [(ngModel)]="inscriptionSelected.inscripciones[0].fecha_recepcion_facultad"
+                            <p-calendar
                                 [iconDisplay]="'input'"
                                 class="full-width"
                                 [showIcon]="true"
-                                dateFormat="yy-mm-dd"
+                                dateFormat="dd-mm-yy"
                                 inputId="icondisplay" />
                         </div>
                     </div>
 
                 </div>
-                <div class="col-3"><p class="font-bold">Fecha de aprobación
+                <div class="col-3"><p class="font-bold">Fecha de aprobación a
+                        asesoría
                         UDI:</p>
-                    <p *ngIf="!showEdit">
+                    <p
+                        *ngIf="advisorySelected.approval_date_udi !== '0000-00-00'">
                         <i class="pi pi-calendar"></i>
-                        {{inscriptionSelected.inscripciones[0].fecha_aprobacion_UDI}}
+                        {{advisorySelected.approval_date_udi}}
                     </p>
-                    <p-calendar *ngIf="showEdit"
-                        [(ngModel)]="inscriptionSelected.inscripciones[0].fecha_aprobacion_UDI"
-                        [iconDisplay]="'input'"
-                        class="full-width"
-                        [showIcon]="true"
-                        dateFormat="yy-mm-dd"
-                        inputId="icondisplay" />
+                    <div
+                        *ngIf="advisorySelected.approval_date_udi === '0000-00-00'"
+                        class="grid p-fluid">
+                        <div class="field col-12 md:col-12">
+                            <p-calendar
+                                [iconDisplay]="'input'"
+                                class="full-width"
+                                [showIcon]="true"
+                                dateFormat="dd-mm-yy"
+                                inputId="icondisplay" />
+                        </div>
+                    </div>
+
                 </div>
-                <div class="col-3">
+                <div class="col-3"><p class="font-bold">Fecha de pago:</p>
+                    <p *ngIf="advisorySelected.payment_date !== '0000-00-00'">
+                        <i class="pi pi-calendar"></i>
+                        {{advisorySelected.payment_date}}
+                    </p>
+                    <div *ngIf="advisorySelected.payment_date === '0000-00-00'"
+                        class="grid p-fluid">
+                        <div class="field col-12 md:col-12">
+                            <p-calendar
+                                [iconDisplay]="'input'"
+                                class="full-width"
+                                [showIcon]="true"
+                                dateFormat="dd-mm-yy"
+                                inputId="icondisplay" />
+                        </div>
+                    </div>
+
                 </div>
                 <div class="card col-3">
                     <p class="font-bold">Estado:</p>
-                    <p-tag *ngIf="inscriptionState === 'Inscrito'"
-                        value="Inscrito" />
-                    <p-tag *ngIf="inscriptionState === 'En revisión'"
+                    <p-tag *ngIf="advisoryState === 'En Asesoría'"
+                        value="En asesoría" />
+                    <p-tag *ngIf="advisoryState === 'En revisión'"
                         severity="info"
                         value="En revisión" />
-                    <p-tag *ngIf="inscriptionState === 'Observado'"
+                    <p-tag *ngIf="advisoryState === 'Observado'"
                         severity="warning"
                         value="Observado" />
-                    <p-tag *ngIf="inscriptionState === 'Cancelado'"
+                    <p-tag *ngIf="advisoryState === 'Cancelado'"
                         severity="danger"
                         value="Cancelado" />
-                    <p-tag *ngIf="inscriptionState === 'Aprobado'"
+                    <p-tag *ngIf="advisoryState === 'Aprobado'"
                         severity="success"
                         value="Aprobado" />
                 </div>
+            </div>
+            <div class="grid col-12">
+                <div class="col-3"><p class="font-bold">Fecha de envío a
+                        secretaría:</p>
+                    <p
+                        *ngIf="advisorySelected.shipment_date_secretary !== '0000-00-00'">
+                        <i class="pi pi-calendar"></i>
+                        {{advisorySelected.shipment_date_secretary}}
+                    </p>
+                    <div
+                        *ngIf="advisorySelected.shipment_date_secretary === '0000-00-00'"
+                        class="grid p-fluid">
+                        <div class="field col-12 md:col-12">
+                            <p-calendar
+                                [iconDisplay]="'input'"
+                                class="full-width"
+                                [showIcon]="true"
+                                dateFormat="dd-mm-yy"
+                                inputId="icondisplay" />
+                        </div>
+                    </div>
 
+                </div>
+                <div class="col-3">
+                    <p class="font-bold">Nro de
+                        informe:
+                    </p>
+                    <p
+                        *ngIf="advisorySelected.report !== 0">{{advisorySelected.report}}</p>
+                    <div *ngIf="advisorySelected.report === 0">
+                        <input type="text" pInputText
+                            class="full-width" />
+                    </div>
+                </div>
+                <div class="col-3"><p class="font-bold">Fecha de resolución:</p>
+                    <p
+                        *ngIf="advisorySelected.resolution_date !== '0000-00-00'">
+                        <i class="pi pi-calendar"></i>
+                        {{advisorySelected.resolution_date}}
+                    </p>
+                    <div
+                        *ngIf="advisorySelected.resolution_date === '0000-00-00'"
+                        class="grid p-fluid">
+                        <div class="field col-12 md:col-12">
+                            <p-calendar
+                                [iconDisplay]="'input'"
+                                class="full-width"
+                                [showIcon]="true"
+                                dateFormat="dd-mm-yy"
+                                inputId="icondisplay" />
+                        </div>
+                    </div>
+
+                </div>
             </div>
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
                 <div class="col-4">
                     <p-table *ngIf="!showSelectNewReviwer"
-                        [value]="inscriptionSelected.inscripciones[0].docente">
+                        [value]="advisorySelected.reviewer">
                         <ng-template pTemplate="header">
                             <tr>
                                 <th><i class="pi pi-user"></i> Revisor</th>
                                 <th *ngIf="showEdit" style="width: 10px;">
                                     <p-button *ngIf="showEdit"
-                                    icon="pi pi-pencil"
-                                    [rounded]="true" [text]="true"
-                                    severity="info" />
+                                        icon="pi pi-pencil"
+                                        [rounded]="true" [text]="true"
+                                        severity="info" />
                                 </th>
                             </tr>
                         </ng-template>
@@ -278,9 +357,9 @@
                             <tr>
                                 <td>
                                     {{
-                                        product.nombre + ' ' +
-                                        product.apellidos
-                                        }}
+                                    product.nombre + ' ' +
+                                    product.apellidos
+                                    }}
                                 </td>
                             </tr>
                         </ng-template>
@@ -288,7 +367,7 @@
                     <div *ngIf="showSelectNewReviwer" class="grid p-fluid mt-3">
                         <div class="field col-12 md:col-12">
                             <span class="p-float-label">
-                                <p-autoComplete
+                                <p-autocomplete
                                     id="inputtext"
                                     [suggestions]="filteredReviewers"
                                     (completeMethod)="filterReviewers($event)"
@@ -302,7 +381,7 @@
                 <div class="col-8">
 
                     <p-table *ngIf="!showSelectNewReviwer"
-                        [value]="inscriptionSelected.egresados">
+                        [value]="advisorySelected.egresados">
                         <ng-template pTemplate="header">
                             <tr>
                                 <th style="width: 35%;"><i
@@ -311,9 +390,10 @@
                                 <th style="width: 35%;"></th>
                                 <th style="width: 30%;">
                                     <p-button *ngIf="showEdit"
-                                    icon="pi pi-pencil"
-                                    [rounded]="true" [text]="true"
-                                    severity="info" (click)="showEditSudents = true" />
+                                        icon="pi pi-pencil"
+                                        [rounded]="true" [text]="true"
+                                        severity="info"
+                                        (click)="showEditSudents = true" />
                                 </th>
                             </tr>
                         </ng-template>
@@ -324,12 +404,12 @@
                                 <td>{{ product.email }}</td>
                                 <td>
                                     {{
-                                        product.celular
+                                    product.celular
                                     }}
                                 </td>
                             </tr>
                         </ng-template>
-                    </p-table>                   
+                    </p-table>
                 </div>
             </div>
 
@@ -361,7 +441,9 @@
                         </p>
                     </p-card>
                 </div>
-                <div *ngIf="inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="col-11">
+                <div
+                    *ngIf="advisoryState !== 'Cancelado' && advisoryState !== 'Aprobado'"
+                    class="col-11">
                     <form [formGroup]="tasksForm">
                         <span class="p-float-label">
                             <input
@@ -375,7 +457,9 @@
                         </span>
                     </form>
                 </div>
-                <div *ngIf="inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="col-1">
+                <div
+                    *ngIf="advisoryState !== 'Cancelado' && advisoryState !== 'Aprobado'"
+                    class="col-1">
                     <p-button label="Enviar" [rounded]="true"
                         (click)="addTask()"
                         [disabled]="tasksForm.invalid" />
@@ -390,7 +474,7 @@
                                 [(ngModel)]="task.checked"
                                 [binary]="true"
                                 #checkbox
-                                [disabled]="inscriptionState === 'Cancelado' || inscriptionState === 'Aprobado'"
+                                [disabled]="advisoryState === 'Cancelado' || advisoryState === 'Aprobado'"
                                 (onChange)="taskDone(task.id, checkbox)"></p-checkbox>
                             <label class="ml-3" [for]="task.id"
                                 [ngClass]="isTaskDone(task)">{{ task.description
@@ -399,7 +483,7 @@
                         <div class="p-2 col-1">
                             <p-button icon="pi pi-trash" [rounded]="true"
                                 [text]="true" severity="danger"
-                                [disabled]="task.checked || inscriptionState === 'Cancelado' || inscriptionState === 'Aprobado'"
+                                [disabled]="task.checked || advisoryState === 'Cancelado' || advisoryState === 'Aprobado'"
                                 (click)="removeTask(task.id)" />
                         </div>
                         <p-divider
@@ -410,44 +494,51 @@
                 <div class="ml-2 mr-2 separator"></div>
 
                 <div class=" col-12">
-                    <h5>Observaciones</h5>
+                    <h5>Comentarios</h5>
                 </div>
-                <div *ngIf="inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="col-11">
-                    <form [formGroup]="commentsForm">
-                        <span class="p-float-label">
-                            <textarea
-                                inputId="textarea"
-                                rows="4"
-                                style="width: 100%;"
-                                formControlName="comment"
-                                pInputTextarea></textarea>
-                            <label for="textarea">Escribe tu observación
-                                aquí...</label>
-                        </span>
-                    </form>
-                </div>
-                <div *ngIf="inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="col-1">
-                    <p-button label="Enviar" [rounded]="true"
-                        (click)="addComment()"
-                        [disabled]="commentsForm.invalid" />
-                </div>
-
-                <div class=" col-12">
-                    <div *ngFor="let comment of comments" class="mb-3">
-                        <div [ngSwitch]="comment.isComment">
-                            <p-fieldset *ngSwitchCase="true"
-                                [legend]="comment.name" [toggleable]="true">
-                                <p
-                                    [innerHTML]="formatText(comment.content)"></p>
-                            </p-fieldset>
-                            <p-fieldset *ngSwitchCase="false"
-                                [legend]="comment.name">
-                                <p
-                                    [innerHTML]="formatText(comment.content)"></p>
-                            </p-fieldset>
-                        </div>
+                <div class="col-12 grid">
+                    <div class="mb-4 w-full flex align-items-center">
+                      <p-avatar 
+                          label="G" 
+                          size="large" />
+                      <div class="ml-3 w-full">
+                        <form [formGroup]="commentsForm" style="width: inherit;">
+                          <span class="p-float-label">
+                              <textarea
+                                  inputId="textarea"
+                                  rows="3"
+                                  style="width: 100%;"
+                                  formControlName="comment"
+                                  pInputTextarea 
+                                  (keydown.enter)="addComment($event)"></textarea>
+                              <label for="textarea">Escribe tu comentario
+                                  aquí...</label>
+                          </span>
+                      </form>
                     </div>
+                   
+                    
                 </div>
+                <div class=" col-12">
+                  <div *ngFor="let comment of reversedComments" class="mb-4 flex align-items-center">
+                    <p-avatar 
+                      [label]="getFirstLetter(comment.name)" 
+                      styleClass="ml-3" 
+                      size="large" />
+                    <div class="ml-3 w-full">
+                      <div
+                        class="flex justify-content-between mb-2">
+                        <span class="block text-900">
+                          {{comment.name}}</span>
+                        <span class="block text-700">1 Jun 17:58 pm</span>
+                      </div>
+                      <span
+                        class="block text-900 border-1 surface-ground surface-border p-2 border-round"
+                        style="word-break: break-all;">{{comment.content}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
             </div>
         </div>
@@ -461,14 +552,15 @@
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
     <div class="grid" style="height: 100%;">
         <form [formGroup]="cancelattionForm" class="col-12">
-            <div class="p-fluid col-12"><p class="font-bold">Por favor seleccione la
+            <div class="p-fluid col-12"><p class="font-bold">Por favor
+                    seleccione la
                     fecha de recepción a
                     secretaria:</p>
-                    <p-calendar 
-                        [iconDisplay]="'input'"
-                        class="full-width"
-                        [showIcon]="true"
-                        dateFormat="yy-mm-dd" />
+                <p-calendar
+                    [iconDisplay]="'input'"
+                    class="full-width"
+                    [showIcon]="true"
+                    dateFormat="yy-mm-dd" />
                 <!-- <p-calendar
                     class="max-w-full"
                     [inline]="true"
@@ -489,7 +581,8 @@
                     pInputTextarea></textarea>
 
             </div>
-            <p-messages [(value)]="alertForCancelation" [enableService]="false" [closable]="false" />
+            <p-messages [(value)]="alertForCancelation" [enableService]="false"
+                [closable]="false" />
             <div class="footer mt-5">
                 <button
                     pButton
@@ -535,7 +628,7 @@
                     }
                     
                 </style>
-    
+
                 <div [ngSwitch]="getStudentListProcess">
                     <ng-template [ngSwitchCase]="'charging'">
                         <ng-container
@@ -582,7 +675,7 @@
                     <div class="grid p-fluid mt-3">
                         <div class="field col-12 md:col-6">
                             <span class="p-float-label">
-                                <p-autoComplete
+                                <p-autocomplete
                                     id="studentOne"
                                     [suggestions]="filteredStudents"
                                     (completeMethod)="filterStudents($event)"
@@ -591,17 +684,17 @@
                                         pTemplate="item">
                                         <div
                                             class="flex align-items-center gap-2">
-    
+
                                             <div>{{ student.name + ' ' +
                                                 student.surnames}}</div>
                                         </div>
                                     </ng-template>
-                                </p-autoComplete>
+                                </p-autocomplete>
                                 <label for="studentOne">Ingrese el
                                     nombre del
                                     estudiante</label>
                             </span>
-    
+
                         </div>
                         <div *ngIf="!presenter.studentTwoRequired"
                             class="col-12 md:col-1">
@@ -615,7 +708,7 @@
                         <div *ngIf="presenter.studentTwoRequired"
                             class="col-12 md:col-5">
                             <span class="p-float-label">
-                                <p-autoComplete
+                                <p-autocomplete
                                     id="studentTwo"
                                     [suggestions]="filteredSecondStudents"
                                     (completeMethod)="filterSecondStudents($event)"
@@ -624,12 +717,12 @@
                                         pTemplate="item">
                                         <div
                                             class="flex align-items-center gap-2">
-    
+
                                             <div>{{ student.name + ' ' +
                                                 student.surnames}}</div>
                                         </div>
                                     </ng-template>
-                                </p-autoComplete>
+                                </p-autocomplete>
                                 <label for="studentTwo">Ingrese el
                                     nombre del
                                     segundo estudiante</label>
@@ -649,5 +742,5 @@
             </div>
         </div>
     </div>
-    
+
 </p-dialog>

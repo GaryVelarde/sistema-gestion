@@ -11,6 +11,7 @@ import { RouterModule } from '@angular/router';
         { path: 'inscription-tracking', loadChildren: () => import('./inscription-tracking/inscription-tracking.module').then(m => m.InscriptionTrackingModule) },
         { path: 'events', loadChildren: () => import('./events/events.module').then(m => m.EventsModule) },
         { path: 'events-udi', loadChildren: () => import('./events-udi/events-udi.module').then(m => m.EventsUdiModule) },
+        { path: 'asesorias', loadChildren: () => import('./advisory-tracking/advisory-tracking.module').then(m => m.AdvisoryTrackingModule) },
         { path: '**', redirectTo: '/notfound' }
     ])],
     exports: [RouterModule]

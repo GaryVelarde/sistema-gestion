@@ -12,16 +12,6 @@
                             icon="pi pi-plus"
                             class="p-button-success mr-2"
                             (click)="openNew()"></button>
-                        <button
-                            pButton
-                            pRipple
-                            label="Eliminar"
-                            icon="pi pi-trash"
-                            class="p-button-danger"
-                            (click)="deleteSelectedProducts()"
-                            [disabled]="
-                                !selectedProducts || !selectedProducts.length
-                            "></button>
                     </div>
                 </ng-template>
 

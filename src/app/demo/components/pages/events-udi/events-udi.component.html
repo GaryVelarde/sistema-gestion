@@ -4,7 +4,7 @@
       <p-card>
         <p-toolbar class="mt-3">
           <div class="p-toolbar-group-left">
-            <button type="button" pButton icon="pi pi-plus" label="Añadir Evento"
+            <button type="button" pButton icon="pi pi-plus" label="Nueva reunión"
               (click)="newEventDialog=true"></button>
           </div>
   
@@ -162,6 +162,10 @@
                   <div class="board-column pending-column" pDroppable (onDrop)="drop($event, 'pending')">
                     <p class="column-header pending-column-header">PENDIENTE</p>
                     <ul class="task-list">
+                      <div *ngIf="pendingTasks.length < 1" class="text-align-center mt-5">
+                        <p><i class="pi pi-check"></i>
+                          No quedan tareas pendientes.</p>
+                      </div>
                       <li *ngFor="let task of pendingTasks" class="task-card"
                           pDraggable (onDragStart)="dragStart(task)" (onDragEnd)="dragEnd()">
                         <p class="task-title">{{ task.title }}</p>
@@ -182,6 +186,10 @@
                   <div class="board-column in-course-column" pDroppable (onDrop)="drop($event, 'inProgress')">
                     <p class="column-header in-course-column-header">EN CURSO</p>
                     <ul class="task-list">
+                      <div *ngIf="inProgressTasks.length < 1" class="text-align-center mt-5">
+                        <p><i class="pi pi-check"></i>
+                          No quedan tareas en curso.</p>
+                      </div>
                       <li *ngFor="let task of inProgressTasks" class="task-card"
                           pDraggable (onDragStart)="dragStart(task)" (onDragEnd)="dragEnd()">
                           <p class="task-title">{{ task.title }}</p>
@@ -230,7 +238,7 @@
                               formControlName="comment"
                               pInputTextarea 
                               (keydown.enter)="addComment($event)"></textarea>
-                          <label for="textarea">Escribe tu observación
+                          <label for="textarea">Escribe tu comentario
                               aquí...</label>
                       </span>
                   </form>
@@ -239,7 +247,7 @@
                 
             </div>
             <div class=" col-12">
-              <div *ngFor="let comment of comments" class="mb-4 flex align-items-center">
+              <div *ngFor="let comment of reversedComments" class="mb-4 flex align-items-center">
                 <p-avatar 
                   [label]="getFirstLetter(comment.name)" 
                   styleClass="ml-3" 
@@ -256,20 +264,6 @@
                     style="word-break: break-all;">{{comment.content}}</span>
                 </div>
               </div>
-                <!--<div *ngFor="let comment of comments" class="mb-3">
-                    <div [ngSwitch]="comment.isComment">
-                        <p-fieldset *ngSwitchCase="true"
-                            [legend]="comment.name" [toggleable]="true">
-                            <p
-                                [innerHTML]="formatText(comment.content)"></p>
-                        </p-fieldset>
-                        <p-fieldset *ngSwitchCase="false"
-                            [legend]="comment.name">
-                            <p
-                                [innerHTML]="formatText(comment.content)"></p>
-                        </p-fieldset>
-                    </div>
-                </div>-->
             </div>
           </div>
       </div>

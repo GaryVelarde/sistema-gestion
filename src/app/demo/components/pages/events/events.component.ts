@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -11,6 +11,8 @@ import {
     FormGroup,
     Validators,
 } from '@angular/forms';
+import { PrimeNGConfig } from 'primeng/api';
+import { DateFormatService } from 'src/app/services/date-format.service';
 
 @Component({
     selector: 'app-events',
@@ -20,6 +22,9 @@ import {
 export class EventsComponent implements OnInit, AfterViewInit {
     @ViewChild('calendar') calendarComponent: FullCalendarComponent;
     @ViewChild('calendarDetail') calendarDetailComponent: FullCalendarComponent;
+    @ViewChild('cardBody') cardBody!: ElementRef;
+    resizeObserver!: ResizeObserver;
+
     showEventDetailDoalog = true;
     timeslots = [
         { name: '10 minutos', code: '00:10:00' },
@@ -64,7 +69,7 @@ export class EventsComponent implements OnInit, AfterViewInit {
 
     // Formulario reactivo
     eventForm: FormGroup;
-    displayDialog: boolean = false;
+    newEventDialog: boolean = false;
 
     calendarOptions: CalendarOptions = {
         plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
@@ -128,6 +133,10 @@ export class EventsComponent implements OnInit, AfterViewInit {
     private _color: FormControl = new FormControl('#ff0000', [
         Validators.required,
     ]);
+    private _eventLink: FormControl = new FormControl('');
+    private _description: FormControl = new FormControl('', [
+        Validators.required,
+    ]);
 
     get slotDuration() {
         return this._slotDuration;
@@ -144,13 +153,21 @@ export class EventsComponent implements OnInit, AfterViewInit {
     get color() {
         return this._color;
     }
+    get eventLink() {
+        return this._eventLink;
+    }
+    get description() {
+        return this._description;
+    }
 
-    constructor(private fb: FormBuilder) {
+    constructor(private fb: FormBuilder, private config: PrimeNGConfig, private dateFormatService: DateFormatService,) {
         this.slotDurationForm = this.fb.group({
             slotDuration: this.slotDuration,
         });
         this.eventForm = this.fb.group({
             title: this.title,
+            description: this.description,
+            eventLink: this.eventLink,
             start: this.start,
             end: this.end,
             color: this.color,
@@ -161,12 +178,35 @@ export class EventsComponent implements OnInit, AfterViewInit {
         this.slotDuration.setValue(this.timeslots[this.timeslots.length - 1]);
         this.watchSlotDuration();
         this.color.setValue('#ff0000');
-        console.log(this.color.value)
+        this.config.setTranslation({
+            firstDayOfWeek: 1,
+            dayNames: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
+            dayNamesShort: ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"],
+            dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+            monthNames: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+            monthNamesShort: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+            today: 'Hoy',
+            clear: 'Borrar',
+            dateFormat: 'dd/mm/yy',
+            weekHeader: 'Sm'
+        });
     }
 
     ngAfterViewInit(): void {
-        this.addButtonToToolbarChunk();
         this.showEventDetailDoalog = false;
+        this.resizeObserver = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                this.renderizeCalendar();
+            }
+        });
+        if (this.cardBody && this.cardBody.nativeElement) {
+            this.resizeObserver.observe(this.cardBody.nativeElement);
+        }
+    }
+
+
+    renderizeCalendar() {
+        this.calendarComponent.getApi().render();
     }
 
     watchSlotDuration() {
@@ -186,12 +226,16 @@ export class EventsComponent implements OnInit, AfterViewInit {
     }
 
     handleDateClick(arg) {
-        this.eventForm.reset();
-        this.eventForm.patchValue({
-            start: arg.date,
-            end: arg.date,
-        });
-        this.displayDialog = true;
+        const dateInfo = this.dateFormatService.formatDateWithEndTime(arg.dateStr);
+        if (dateInfo.start === "00:00") {
+            dateInfo.start = "07:00 AM"
+            dateInfo.end = "08:00 AM"
+        }
+        this.start.setValue(dateInfo.day + ' ' + dateInfo.start);
+        this.end.setValue(dateInfo.day + ' ' + dateInfo.end);
+        this.color.setValue('#ff0000');
+        console.log('this.color.value', this.color.value)
+        this.newEventDialog = true;
     }
 
     handleDetailDateClick(arg) {
@@ -200,7 +244,7 @@ export class EventsComponent implements OnInit, AfterViewInit {
             start: arg.date,
             end: arg.date,
         });
-        this.displayDialog = true;
+        this.newEventDialog = true;
     }
 
     handleEventClick(arg) {
@@ -214,27 +258,6 @@ export class EventsComponent implements OnInit, AfterViewInit {
         this.calendarDetailComponent.getApi().render();
     }
 
-    addButtonToToolbarChunk() {
-        const headerToolbars = document.querySelectorAll('.fc-header-toolbar');
-        if (headerToolbars.length > 1) {
-            const secondHeaderToolbar = headerToolbars[1];
-            if (secondHeaderToolbar) {
-                const toolbarChunk =
-                    secondHeaderToolbar.querySelector('.fc-toolbar-chunk');
-                if (toolbarChunk) {
-                    const newButton = document.createElement('button');
-                    newButton.innerText = 'Recargar calendario';
-                    newButton.className =
-                        'fc-today-button fc-button fc-button-primary';
-                    newButton.addEventListener('click', () =>
-                        this.renderizeCalendarDetails()
-                    );
-                    toolbarChunk.appendChild(newButton);
-                }
-            }
-        }
-    }
-
     handleEventDrop(eventDropInfo) {
         alert('Event dropped to ' + eventDropInfo.event.start);
     }
@@ -244,12 +267,11 @@ export class EventsComponent implements OnInit, AfterViewInit {
     }
 
     addEvent() {
-        console.log(this.color.value);
         if (this.eventForm.valid) {
             const newEvent: EventInput = {
                 title: this.title.value,
-                start: this.start.value,
-                end: this.end.value,
+                start: this.dateFormatService.formatDateToISO(this.start.value),
+                end: this.dateFormatService.formatDateToISO(this.end.value),
                 allDay: false,
                 editable: true,
                 startResizable: true,
@@ -260,7 +282,7 @@ export class EventsComponent implements OnInit, AfterViewInit {
             this.events.push(newEvent);
             const calendarApi = this.calendarComponent.getApi();
             calendarApi.addEvent(newEvent);
-            this.displayDialog = false;
+            this.newEventDialog = false;
         }
     }
 }

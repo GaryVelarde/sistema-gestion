@@ -19,6 +19,7 @@ import {
     Validators,
 } from '@angular/forms';
 import { DateFormatService } from 'src/app/services/date-format.service';
+import { PrimeNGConfig } from 'primeng/api';
 interface Task {
     id: number;
     title: string;
@@ -74,12 +75,80 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         },
     ];
 
+    data = [
+        {
+            "id": 97,
+            "title": "Reunión UDI 6",
+            "description": "Descripción de la Reunión de UDI",
+            "start_date": "14/07/2024 15:05",
+            "due_date": "15/07/2024 15:05",
+            "color": "#fff544",
+            "status": "En Progreso",
+            "meeting_url": "https://testaa.com",
+            "created_at": "25/07/2024 20:25:59",
+            "managers": [
+                {
+                    "id": 5,
+                    "name": "Ana",
+                    "surnames": "Benavidez Ayala",
+                    "code": 15467824,
+                    "email": "manuel@test.com",
+                    "phone": 987145312,
+                    "orcid": null,
+                    "cip": null
+                }
+            ],
+            "participants": [
+                {
+                    "id": 2,
+                    "name": "Ana",
+                    "surnames": "Benavidez Ayala",
+                    "code": 15467824,
+                    "email": "ana@test.com",
+                    "phone": 987145312,
+                    "orcid": null,
+                    "cip": null
+                },
+                {
+                    "id": 3,
+                    "name": "Ana",
+                    "surnames": "Benavidez Ayala",
+                    "code": 15467824,
+                    "email": "jose@test.com",
+                    "phone": 987145312,
+                    "orcid": null,
+                    "cip": null
+                },
+                {
+                    "id": 6,
+                    "name": "Ana",
+                    "surnames": "Benavidez Ayala",
+                    "code": 15467824,
+                    "email": "manuels@test.com",
+                    "phone": 987145312,
+                    "orcid": null,
+                    "cip": null
+                },
+                {
+                    "id": 7,
+                    "name": "Ana",
+                    "surnames": "Benavidez Ayala",
+                    "code": 15467824,
+                    "email": "maaaanuels@test.com",
+                    "phone": 987145312,
+                    "orcid": null,
+                    "cip": null
+                }
+            ]
+        }
+    ]
+
     // Define el arreglo de eventos
     events: EventInput[] = [
         {
             title: 'Evento 1',
-            start: '2024-07-23T14:20:00',
-            end: '2024-07-23T15:20:00',
+            start: '2024-08-23T14:20:00',
+            end: '2024-08-23T15:20:00',
             backgroundColor: '#FF5733', // Color de fondo del evento
             borderColor: '#FF5733', // Color del borde del evento (opcional)
             editable: true,
@@ -88,8 +157,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         },
         {
             title: 'Evento 2',
-            start: '2024-07-23T14:20:00',
-            end: '2024-07-23T15:20:00',
+            start: '2024-08-23T14:20:00',
+            end: '2024-08-23T15:20:00',
             backgroundColor: '#337DFF',
             borderColor: '#337DFF',
             editable: true,
@@ -239,6 +308,10 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     get comment() {
         return this._comment;
     }
+
+    get reversedComments() {
+        return this.comments.slice().reverse();
+    }
     selectedItems: Usuario[] | undefined;
 
     usuarios: Usuario[] = [
@@ -254,7 +327,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     constructor(
         private fb: FormBuilder,
         private cdr: ChangeDetectorRef,
-        private dateFormatService: DateFormatService
+        private dateFormatService: DateFormatService,
+        private config: PrimeNGConfig,
     ) {
         this.slotDurationForm = this.fb.group({
             slotDuration: this.slotDuration,
@@ -319,18 +393,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         ];
 
         this.completedTasks = [
-            {
-                id: 6,
-                title: 'Tarea 6',
-                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
-                dateEnd: '23-07-2024'
-            },
-            {
-                id: 7,
-                title: 'Tarea 7',
-                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
-                dateEnd: '23-07-2024'
-            }
+
         ];
     }
 
@@ -339,6 +402,18 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.slotDuration.setValue(this.timeslots[this.timeslots.length - 1]);
         this.watchSlotDuration();
         this.color.setValue('#ff0000');
+        this.config.setTranslation({
+            firstDayOfWeek: 1,
+            dayNames: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
+            dayNamesShort: ["dom", "lun", "mar", "mié", "jue", "vie", "sáb"],
+            dayNamesMin: ["Do", "Lu", "Ma", "Mi", "Ju", "Vi", "Sa"],
+            monthNames: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+            monthNamesShort: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+            today: 'Hoy',
+            clear: 'Borrar',
+            dateFormat: 'dd/mm/yy',
+            weekHeader: 'Sm'
+        });
     }
 
     ngAfterViewInit(): void {
@@ -384,7 +459,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.start.setValue(dateInfo.day + ' ' + dateInfo.start);
         this.end.setValue(dateInfo.day + ' ' + dateInfo.end);
         this.color.setValue('#ff0000');
-        this.newEventDialog = true; 
+        this.newEventDialog = true;
     }
 
     handleEventClick(arg) {
@@ -406,10 +481,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     addEvent() {
-        console.log('this.start.value', this.start.value)
-        console.log(this.dateFormatService.formatDateToISO(this.start.value));
-        console.log('this.end.value', this.end.value)
-        console.log(this.dateFormatService.formatDateToISO(this.end.value));
         if (this.eventForm.valid) {
             const newEvent: EventInput = {
                 title: this.title.value,
@@ -587,18 +658,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
                 });
                 this.comment.setValue('');
                 this.comment.reset();
-                this.scrollDown();
             }
         }
-        
-    }
-
-    scrollDown(): void {
-        window.scroll({
-            top: document.body.scrollHeight,
-            left: 0,
-            behavior: 'smooth',
-        });
     }
 
     formatText(text: string): string {

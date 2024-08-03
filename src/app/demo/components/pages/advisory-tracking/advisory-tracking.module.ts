@@ -23,18 +23,18 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DividerModule } from 'primeng/divider';
 import { BadgeModule } from 'primeng/badge';
 import { SkeletonModule } from 'primeng/skeleton';
-import { FullCalendarModule } from '@fullcalendar/angular';
-import { EventsComponent } from './events.component';
-import { EventsRoutingModule } from './events-routing.module';
-import { PanelModule } from 'primeng/panel';
-import { FloatLabelModule } from 'primeng/floatlabel';
-import { ColorPickerModule } from 'primeng/colorpicker';
-import { SidebarModule } from 'primeng/sidebar';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { InscriptionPresenter } from '../inscription/insctiption-presenter';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
+import { MessagesModule } from 'primeng/messages';
+import { AdvisoryTrackingRoutingModule } from './advisory-tracking-routing.module';
+import { AdvisoryTrackingComponent } from './advisory-tracking.component';
+import { AvatarModule } from 'primeng/avatar';
 
 @NgModule({
     imports: [
         CommonModule,
-        EventsRoutingModule,
+        AdvisoryTrackingRoutingModule,
         TableModule,
         FileUploadModule,
         ReactiveFormsModule,
@@ -59,12 +59,14 @@ import { SidebarModule } from 'primeng/sidebar';
         DividerModule,
         BadgeModule,
         SkeletonModule,
-        FullCalendarModule,
-        PanelModule,
-        FloatLabelModule,
-        ColorPickerModule,
-        SidebarModule
+        AutoCompleteModule,
+        MessagesModule,
+        AvatarModule,
     ],
-    declarations: [EventsComponent],
+    declarations: [AdvisoryTrackingComponent],
+    providers: [
+        InscriptionPresenter,
+        provideHttpClient(withInterceptorsFromDi()),
+    ],
 })
-export class EventsModule {}
+export class AdvisoryTrackingModule {}
