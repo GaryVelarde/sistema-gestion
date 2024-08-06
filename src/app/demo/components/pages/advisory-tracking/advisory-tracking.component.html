@@ -77,7 +77,7 @@
                     </ng-template>
                 </p-table>
             </div>
-            <div class="card">
+            <div *ngIf="false" class="card">
                 <p-table [value]="skeletonRows" responsiveLayout="scroll">
                     <ng-template pTemplate="header">
                         <tr>
@@ -167,7 +167,7 @@
 
                 <h4
                     class="font-bold">Título:
-                    {{advisorySelected.titulo_proyecto_tesis}}</h4>
+                    {{advisorySelected.degree_processes.thesis_project_title}}</h4>
 
             </div>
             <div *ngIf="!showEdit" class="grid col-12">

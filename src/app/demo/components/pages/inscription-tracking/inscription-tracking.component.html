@@ -84,7 +84,7 @@
                     </ng-template>
                 </p-table>
             </div>
-            <div class="card">
+            <div *ngIf="false" class="card">
                 <p-table [value]="skeletonRows" responsiveLayout="scroll">
                     <ng-template pTemplate="header">
                         <tr>
@@ -410,44 +410,51 @@
                 <div class="ml-2 mr-2 separator"></div>
 
                 <div class=" col-12">
-                    <h5>Observaciones</h5>
+                    <h5>Comentarios</h5>
                 </div>
-                <div *ngIf="inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="col-11">
-                    <form [formGroup]="commentsForm">
-                        <span class="p-float-label">
-                            <textarea
-                                inputId="textarea"
-                                rows="4"
-                                style="width: 100%;"
-                                formControlName="comment"
-                                pInputTextarea></textarea>
-                            <label for="textarea">Escribe tu observación
-                                aquí...</label>
-                        </span>
-                    </form>
-                </div>
-                <div *ngIf="inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="col-1">
-                    <p-button label="Enviar" [rounded]="true"
-                        (click)="addComment()"
-                        [disabled]="commentsForm.invalid" />
-                </div>
-
-                <div class=" col-12">
-                    <div *ngFor="let comment of comments" class="mb-3">
-                        <div [ngSwitch]="comment.isComment">
-                            <p-fieldset *ngSwitchCase="true"
-                                [legend]="comment.name" [toggleable]="true">
-                                <p
-                                    [innerHTML]="formatText(comment.content)"></p>
-                            </p-fieldset>
-                            <p-fieldset *ngSwitchCase="false"
-                                [legend]="comment.name">
-                                <p
-                                    [innerHTML]="formatText(comment.content)"></p>
-                            </p-fieldset>
-                        </div>
+                <div class="col-12 grid">
+                    <div class="mb-4 w-full flex align-items-center">
+                      <p-avatar 
+                          label="G" 
+                          size="large" />
+                      <div class="ml-3 w-full">
+                        <form [formGroup]="commentsForm" style="width: inherit;">
+                          <span class="p-float-label">
+                              <textarea
+                                  inputId="textarea"
+                                  rows="3"
+                                  style="width: 100%;"
+                                  formControlName="comment"
+                                  pInputTextarea 
+                                  (keydown.enter)="addComment($event)"></textarea>
+                              <label for="textarea">Escribe tu comentario
+                                  aquí...</label>
+                          </span>
+                      </form>
                     </div>
+                   
+                    
                 </div>
+                <div class=" col-12">
+                  <div *ngFor="let comment of reversedComments" class="mb-4 flex align-items-center">
+                    <p-avatar 
+                      [label]="getFirstLetter(comment.name)" 
+                      styleClass="ml-3" 
+                      size="large" />
+                    <div class="ml-3 w-full">
+                      <div
+                        class="flex justify-content-between mb-2">
+                        <span class="block text-900">
+                          {{comment.name}}</span>
+                        <span class="block text-700">1 Jun 17:58 pm</span>
+                      </div>
+                      <span
+                        class="block text-900 border-1 surface-ground surface-border p-2 border-round"
+                        style="word-break: break-all;">{{comment.content}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
             </div>
         </div>

@@ -66,12 +66,14 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             name: 'John Doe',
             content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
             isComment: true,
+            date: 'Tue Aug 01 2024 13:54:47 GMT-0500 (hora estándar de Perú)'
         },
         {
             name: 'Alice Smith',
             content:
                 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
             isComment: true,
+            date: 'Tue Aug 01 2024 13:54:47 GMT-0500 (hora estándar de Perú)'
         },
     ];
 
@@ -146,8 +148,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     // Define el arreglo de eventos
     events: EventInput[] = [
         {
-            title: 'Evento 1',
-            start: '2024-08-23T14:20:00',
+            title: 'Reunión de profesores',
+            start: '2024-08-23T14:30:00',
             end: '2024-08-23T15:20:00',
             backgroundColor: '#FF5733', // Color de fondo del evento
             borderColor: '#FF5733', // Color del borde del evento (opcional)
@@ -157,7 +159,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         },
         {
             title: 'Evento 2',
-            start: '2024-08-23T14:20:00',
+            start: '2024-08-23T14:30:00',
             end: '2024-08-23T15:20:00',
             backgroundColor: '#337DFF',
             borderColor: '#337DFF',
@@ -414,6 +416,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             dateFormat: 'dd/mm/yy',
             weekHeader: 'Sm'
         });
+        this.callGetEventsUdi();
     }
 
     ngAfterViewInit(): void {
@@ -424,6 +427,23 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         });
         if (this.cardBody && this.cardBody.nativeElement) {
             this.resizeObserver.observe(this.cardBody.nativeElement);
+        }
+    }
+
+    callGetEventsUdi() {
+        for(let event of this.data) {
+            const ev: EventInput = {
+                title: event.title,
+                start: this.dateFormatService.formatDateCalendar(event.start_date),
+                end: this.dateFormatService.formatDateCalendar(event.due_date),
+                backgroundColor: event.color, 
+                borderColor: event.color,
+                editable: true,
+                startResizable: true,
+                durationEditable: true,
+                event_udi: event
+            }
+            this.events.push(ev);
         }
     }
 
@@ -465,6 +485,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     handleEventClick(arg) {
         this.eventSelected = arg;
         console.log('eventSelected', this.eventSelected);
+        console.log('eventSelected 2', this.eventSelected.event._def.extendedProps.event_udi);
         this.showEventDetail = true;
     }
 
@@ -473,11 +494,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     handleEventDrop(eventDropInfo) {
-        alert('Event dropped to ' + eventDropInfo.event.start);
     }
 
     handleEventResize(eventResizeInfo) {
-        alert('Event resized to ' + eventResizeInfo.event.end);
     }
 
     addEvent() {
@@ -655,6 +674,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
                     name: 'Gary Velarde',
                     content: this.comment.value,
                     isComment: true,
+                    date: new Date().toString()
                 });
                 this.comment.setValue('');
                 this.comment.reset();

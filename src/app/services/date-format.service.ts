@@ -64,31 +64,59 @@ export class DateFormatService {
   formatDateCalendar(date: string): string {
     let dateObj: Date;
 
-    // Analizar la fecha y la hora en el formato 'dd-mm-yyyy hh:mm'
+    // Analizar la fecha y la hora en los formatos 'dd-mm-yyyy hh:mm' y 'dd/mm/yyyy hh:mm'
     const dateTimeParts = date.split(' ');
     if (dateTimeParts.length === 2) {
-      const dateParts = dateTimeParts[0].split('-');
-      const timeParts = dateTimeParts[1].split(':');
-      if (dateParts.length === 3 && timeParts.length === 2) {
-        const day = parseInt(dateParts[0], 10);
-        const month = parseInt(dateParts[1], 10) - 1; // Los meses en JavaScript son 0-indexados
-        const year = parseInt(dateParts[2], 10);
-        const hours = parseInt(timeParts[0], 10);
-        const minutes = parseInt(timeParts[1], 10);
-        dateObj = new Date(year, month, day, hours, minutes);
-      } else {
+        const datePart = dateTimeParts[0];
+        const timePart = dateTimeParts[1];
+        
+        let day, month, year, hours, minutes;
+        
+        if (datePart.includes('-')) {
+            // Formato 'dd-mm-yyyy'
+            const dateParts = datePart.split('-');
+            if (dateParts.length === 3) {
+                day = parseInt(dateParts[0], 10);
+                month = parseInt(dateParts[1], 10) - 1; // Los meses en JavaScript son 0-indexados
+                year = parseInt(dateParts[2], 10);
+            } else {
+                console.error('Invalid date format');
+                return '';
+            }
+        } else if (datePart.includes('/')) {
+            // Formato 'dd/mm/yyyy'
+            const dateParts = datePart.split('/');
+            if (dateParts.length === 3) {
+                day = parseInt(dateParts[0], 10);
+                month = parseInt(dateParts[1], 10) - 1; // Los meses en JavaScript son 0-indexados
+                year = parseInt(dateParts[2], 10);
+            } else {
+                console.error('Invalid date format');
+                return '';
+            }
+        } else {
+            console.error('Invalid date format');
+            return '';
+        }
+
+        const timeParts = timePart.split(':');
+        if (timeParts.length === 2) {
+            hours = parseInt(timeParts[0], 10);
+            minutes = parseInt(timeParts[1], 10);
+            dateObj = new Date(year, month, day, hours, minutes);
+        } else {
+            console.error('Invalid time format');
+            return '';
+        }
+    } else {
         console.error('Invalid date format');
         return '';
-      }
-    } else {
-      console.error('Invalid date format');
-      return '';
     }
 
     // Asegurarse de que dateObj sea un objeto Date válido
     if (isNaN(dateObj.getTime())) {
-      console.error('Invalid date');
-      return '';
+        console.error('Invalid date');
+        return '';
     }
 
     const year = dateObj.getFullYear();
@@ -99,8 +127,7 @@ export class DateFormatService {
     const seconds = '00'; // Asumimos segundos en '00'
 
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-
-  }
+}
 
   formatDateToISO(date: string): string {
     let dateObj: Date;
@@ -193,6 +220,52 @@ export class DateFormatService {
     const formattedDay = `${dayFormatted}-${monthFormatted}-${yearFormatted}`;
 
     return { day: formattedDay, start, end };
+  }
+
+  formatDateForComments(dateString: string): string {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    };
+    const formattedDate = new Intl.DateTimeFormat('es-PE', options).format(date);
+    
+    // Modificar el formato de la hora
+    let [datePart, timePart] = formattedDate.split(', ');
+    timePart = timePart.replace(' p. m.', ' pm').replace(' a. m.', ' am');
+    
+    return `${datePart.replace(/de /g, '')} - ${timePart}`;
+  }
+
+  formatTimeDifference(dateInput: Date | string): string {
+    let date: Date;
+
+    // Convert string input to Date
+    if (typeof dateInput === 'string') {
+      date = new Date(dateInput);
+    } else {
+      date = dateInput;
+    }
+
+    const now = new Date();
+    const diffInMilliseconds = now.getTime() - date.getTime();
+    const diffInMinutes = Math.floor(diffInMilliseconds / (1000 * 60));
+    const diffInHours = Math.floor(diffInMilliseconds / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+
+    if (diffInDays > 0) {
+      return `hace ${diffInDays} ${diffInDays > 1 ? 'días' : 'día'}`;
+    } else if (diffInHours > 0) {
+      return `hace ${diffInHours} ${diffInHours > 1 ? 'horas' : 'hora'}`;
+    } else if (diffInMinutes > 0) {
+      return `hace ${diffInMinutes} ${diffInMinutes > 1 ? 'minutos' : 'minuto'}`;
+    } else {
+      return 'hace un momento';
+    }
   }
 
 }

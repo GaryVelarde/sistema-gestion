@@ -29,6 +29,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { InscriptionPresenter } from '../inscription/insctiption-presenter';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { MessagesModule } from 'primeng/messages';
+import { AvatarModule } from 'primeng/avatar';
 
 @NgModule({
     imports: [
@@ -60,6 +61,7 @@ import { MessagesModule } from 'primeng/messages';
         SkeletonModule,
         AutoCompleteModule,
         MessagesModule,
+        AvatarModule,
     ],
     declarations: [InscriptionTrackingComponent],
     providers: [

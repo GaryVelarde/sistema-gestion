@@ -325,6 +325,10 @@ export class InscriptionTrackingComponent implements OnInit {
         return this._taskDescription;
     }
 
+    get reversedComments() {
+        return this.comments.slice().reverse();
+    }
+
     constructor(
         private messageService: MessageService,
         private fb: FormBuilder,
@@ -530,15 +534,18 @@ export class InscriptionTrackingComponent implements OnInit {
         });
     }
 
-    addComment(): void {
-        if (this.comment.value) {
-            this.comments.push({
-                name: 'Gary Velarde',
-                content: this.comment.value,
-                isComment: true,
-            });
-            this.comment.reset();
-            this.scrollDown();
+    addComment(event: KeyboardEvent): void {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (this.comment.value) {
+                this.comments.push({
+                    name: 'Gary Velarde',
+                    content: this.comment.value,
+                    isComment: true,
+                });
+                this.comment.setValue('');
+                this.comment.reset();
+            }
         }
     }
 
@@ -618,5 +625,15 @@ export class InscriptionTrackingComponent implements OnInit {
         }, (error) => {
             this.getStudentListProcess = 'error';
         });
+    }
+
+    getFirstLetter(str: string): string {
+        if (!str) {
+            console.error('The string is empty');
+            return '';
+        }
+        const firstLetter = str.charAt(0);
+        const firstLetterUpper = firstLetter.toUpperCase();
+        return firstLetterUpper;
     }
 }
