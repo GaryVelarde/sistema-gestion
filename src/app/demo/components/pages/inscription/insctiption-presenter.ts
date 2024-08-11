@@ -179,9 +179,9 @@ export class InscriptionPresenter {
     }
 
     callExecute(): any {
-        let studentsArray = [this.student.value.code.id];
+        let studentsArray = [this.student.value.id];
         if (this.studentTwo.value) {
-            studentsArray.push(this.studentTwo.value.code.id);
+            studentsArray.push(this.studentTwo.value.id);
         }
         console.log(this.uploadedFiles);
         let files: string[] = [];
@@ -189,19 +189,18 @@ export class InscriptionPresenter {
             console.log('arch', file.name);
             files.push(file.name);
         }
-        console.log('this.uploadedFiles', this.uploadedFiles);
         const request = {
-            expediente: this.fileNumber.value,
-            escuela_profesional: this.professionalSchool.value.code,
-            titulo_proyecto_tesis: this.title.value,
-            numero_oficio: this.jobNumber.value,
-            numero_resolucion: this.resolutionNumber.value,
-            fecha_recepcion_facultad: this.receptionDate.value,
-            fecha_aprobacion_udi: this.approveDate.value,
-            user_id: this.reviewer.value.code.id,
+            file: this.fileNumber.value,
+            professional_school: this.professionalSchool.value.code,
+            thesis_project_title: this.title.value,
+            office_number: this.jobNumber.value,
+            resolution_number: this.resolutionNumber.value,
+            reception_date_faculty: this.receptionDate.value,
+            approval_date_udi: this.approveDate.value,
+            user_id: this.reviewer.value.id,
             user_ids: studentsArray,
-            archivos: this.uploadedFiles,
-            descripcion: 'hola',
+            archives: this.uploadedFiles,
+            description: this.comments.value,
         };
         console.log(request);
         return request;

@@ -20,11 +20,13 @@ import {
 } from '@angular/forms';
 import { DateFormatService } from 'src/app/services/date-format.service';
 import { PrimeNGConfig } from 'primeng/api';
+import { AuthService } from 'src/app/services/auth.service';
 interface Task {
     id: number;
     title: string;
     description: string;
     dateEnd: string;
+    user_name: string;
 }
 interface AutoCompleteCompleteEvent {
     originalEvent: Event;
@@ -46,9 +48,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     @ViewChild('cardBody') cardBody!: ElementRef;
     resizeObserver!: ResizeObserver;
 
-    pendingTasks: Task[];
-    inProgressTasks: Task[];
-    completedTasks: Task[];
+    pendingTasks: Task[] = [];
+    inProgressTasks: Task[] = [];
+    completedTasks: Task[] = [];
     draggedTask: Task | null = null;
     showEventDetail = false;
     newEventDialog = false;
@@ -79,11 +81,11 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
     data = [
         {
-            "id": 97,
+            "id": 1,
             "title": "Reunión UDI 6",
             "description": "Descripción de la Reunión de UDI",
-            "start_date": "14/07/2024 15:05",
-            "due_date": "15/07/2024 15:05",
+            "start_date": "14/08/2024 15:05",
+            "due_date": "15/08/2024 15:05",
             "color": "#fff544",
             "status": "En Progreso",
             "meeting_url": "https://testaa.com",
@@ -203,34 +205,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
     };
 
-    users: any[] = [
-        {
-            id: 0,
-            name: 'Amy Elsner',
-            image: 'amyelsner.png',
-            role: 'Encargado',
-        },
-        { id: 1, name: 'Anna Fali', image: 'annafali.png', role: 'Miembro' },
-        {
-            id: 2,
-            name: 'Asiya Javayant',
-            image: 'asiyajavayant.png',
-            role: 'Miembro',
-        },
-        {
-            id: 3,
-            name: 'Bernardo Dominic',
-            image: 'bernardodominic.png',
-            role: 'Miembro',
-        },
-        {
-            id: 4,
-            name: 'Elwin Sharvill',
-            image: 'elwinsharvill.png',
-            role: 'Miembro',
-        },
-    ];
-
     eventSelected: any;
 
     public eventForm: FormGroup;
@@ -331,6 +305,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         private cdr: ChangeDetectorRef,
         private dateFormatService: DateFormatService,
         private config: PrimeNGConfig,
+        private service: AuthService,
     ) {
         this.slotDurationForm = this.fb.group({
             slotDuration: this.slotDuration,
@@ -358,7 +333,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.commentsForm = this.fb.group({
             comment: this.comment,
         });
-        this.pendingTasks = [
+        /*this.pendingTasks = [
             {
                 id: 1,
                 title: 'Tarea 1',
@@ -396,7 +371,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
         this.completedTasks = [
 
-        ];
+        ];*/
     }
 
     ngOnInit() {
@@ -431,12 +406,12 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     callGetEventsUdi() {
-        for(let event of this.data) {
+        for (let event of this.data) {
             const ev: EventInput = {
                 title: event.title,
                 start: this.dateFormatService.formatDateCalendar(event.start_date),
                 end: this.dateFormatService.formatDateCalendar(event.due_date),
-                backgroundColor: event.color, 
+                backgroundColor: event.color,
                 borderColor: event.color,
                 editable: true,
                 startResizable: true,
@@ -484,8 +459,18 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
     handleEventClick(arg) {
         this.eventSelected = arg;
-        console.log('eventSelected', this.eventSelected);
         console.log('eventSelected 2', this.eventSelected.event._def.extendedProps.event_udi);
+        this.getTask(this.eventSelected.event._def.extendedProps.event_udi.id);
+        const usersManager: Usuario[] = [];
+        for (let user of this.eventSelected.event._def.extendedProps.event_udi.managers) {
+            const userArr = {
+                id: user.id,
+                nombre: user.name,
+                apellidos: user.surnames,
+            }
+            usersManager.push(userArr);
+        }
+        this.usersManager.setValue(usersManager);
         this.showEventDetail = true;
     }
 
@@ -525,30 +510,40 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
     drop(event: any, column: 'pending' | 'inProgress' | 'completed') {
         if (this.draggedTask) {
-            const columnBefore = this.isTaskInPending(this.draggedTask.id);
-            if (
-                (columnBefore === 'inProgress' && column === 'pending') ||
-                (columnBefore === 'completed' && column === 'pending') ||
-                (columnBefore === 'completed' && column === 'inProgress')
-            ) {
-                return;
-            }
-            this.removeTask(this.draggedTask);
-            if (column === 'pending') {
-                this.pendingTasks = [...this.pendingTasks, this.draggedTask];
-            } else if (column === 'inProgress') {
-                this.inProgressTasks = [
-                    ...this.inProgressTasks,
-                    this.draggedTask,
-                ];
-            } else if (column === 'completed') {
-                this.completedTasks = [
-                    ...this.completedTasks,
-                    this.draggedTask,
-                ];
-            }
-            this.draggedTask = null;
-            this.cdr.detectChanges();
+            console.log('draggedTask', this.draggedTask)
+            console.log('draggedTask.id', this.draggedTask.id)
+            const taskId = this.draggedTask.id;
+            this.service.updateStatusTask(this.eventSelected.event._def.extendedProps.event_udi.id,
+                taskId.toString(), column).pipe().subscribe((res: any) => {
+                    if (res.status) {
+                        
+                        const columnBefore = this.isTaskInPending(taskId);
+                        if (
+                            (columnBefore === 'inProgress' && column === 'pending') ||
+                            (columnBefore === 'completed' && column === 'pending') ||
+                            (columnBefore === 'completed' && column === 'inProgress')
+                        ) {
+                            return;
+                        }
+                        this.removeTask(this.draggedTask);
+                        if (column === 'pending') {
+                            this.pendingTasks = [...this.pendingTasks, this.draggedTask];
+                        } else if (column === 'inProgress') {
+                            this.inProgressTasks = [
+                                ...this.inProgressTasks,
+                                this.draggedTask,
+                            ];
+                        } else if (column === 'completed') {
+                            this.completedTasks = [
+                                ...this.completedTasks,
+                                this.draggedTask,
+                            ];
+                        }
+                        this.draggedTask = null;
+                        this.cdr.detectChanges();
+                    }
+                })
+
         }
     }
 
@@ -557,13 +552,19 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     removeTask(task: Task) {
-        this.pendingTasks = this.pendingTasks.filter((t) => t.id !== task.id);
-        this.inProgressTasks = this.inProgressTasks.filter(
-            (t) => t.id !== task.id
-        );
-        this.completedTasks = this.completedTasks.filter(
-            (t) => t.id !== task.id
-        );
+        this.service.deleteTask(this.eventSelected.event._def.extendedProps.event_udi.id,
+            task.id.toString()
+        ).pipe().subscribe((res: any) => {
+            if (res.status) {
+                this.pendingTasks = this.pendingTasks.filter((t) => t.id !== task.id);
+                this.inProgressTasks = this.inProgressTasks.filter(
+                    (t) => t.id !== task.id
+                );
+                this.completedTasks = this.completedTasks.filter(
+                    (t) => t.id !== task.id
+                );
+            }
+        })
     }
 
     showNewTaskDialog() {
@@ -606,7 +607,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
                 id: this.getMaxId() + 1,
                 title: this.titleTask.value,
                 description: this.descriptionTask.value,
-                dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value)
+                dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
+                user_name: ''
             };
             if (taskIndex !== -1) {
                 this.pendingTasks[taskIndex] = { ...this.pendingTasks[taskIndex], ...updateTask };
@@ -617,19 +619,31 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             this.taskForm.reset();
             return;
         }
-        const newTask: Task = {
-            id: this.getMaxId() + 1,
-            title: this.titleTask.value,
-            description: this.descriptionTask.value,
-            dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value)
-        };
-        if (!this.isTaskInPending(this.getMaxId() + 1)) {
-            this.pendingTasks = [...this.pendingTasks, newTask];
-            this.newTaskDialog = false;
-            this.taskForm.reset();
-        } else {
-            console.log('Task with this ID already exists.');
+        const request = {
+            "title": this.titleTask.value,
+            "description": this.descriptionTask.value,
+            "commitment_date": this.dateFormatService.formatDateYYYYMMDD(this.endTask.value),
+            "user_id": this.assignedUser.value.id
         }
+        this.service.addTask(this.eventSelected.event._def.extendedProps.event_udi.id, request).pipe().subscribe((res: any) => {
+            if (res.status) {
+                const newTask: Task = {
+                    id: this.getMaxId() + 1,
+                    title: this.titleTask.value,
+                    description: this.descriptionTask.value,
+                    dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
+                    user_name: this.assignedUser.value.fullName
+                };
+                if (!this.isTaskInPending(this.getMaxId() + 1)) {
+                    this.pendingTasks = [...this.pendingTasks, newTask];
+                    this.newTaskDialog = false;
+                    this.taskForm.reset();
+                } else {
+                    console.log('Task with this ID already exists.');
+                }
+            }
+        })
+
     }
 
 
@@ -694,5 +708,49 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         const firstLetter = str.charAt(0);
         const firstLetterUpper = firstLetter.toUpperCase();
         return firstLetterUpper;
+    }
+
+    getTask(taskId: string) {
+        this.pendingTasks = [];
+        this.inProgressTasks = [];
+        this.completedTasks = [];
+        this.service.getTask(taskId).pipe().subscribe((res) => {
+            console.log(res);
+            for (let task of res.data) {
+                if (task.status === 'pending') {
+                    this.pendingTasks.push(
+                        {
+                            id: task.id,
+                            title: task.title,
+                            description: task.description,
+                            dateEnd: task.commitment_date,
+                            user_name: task.user.name + ' ' + task.user.surnames
+                        }
+                    )
+                }
+                if (task.status === 'inProgress') {
+                    this.inProgressTasks.push(
+                        {
+                            id: task.id,
+                            title: task.title,
+                            description: task.description,
+                            dateEnd: task.commitment_date,
+                            user_name: task.user.name + ' ' + task.user.surnames
+                        }
+                    )
+                }
+                if (task.status === 'completed') {
+                    this.completedTasks.push(
+                        {
+                            id: task.id,
+                            title: task.title,
+                            description: task.description,
+                            dateEnd: task.commitment_date,
+                            user_name: task.user.name + ' ' + task.user.surnames
+                        }
+                    )
+                }
+            }
+        })
     }
 }

@@ -84,8 +84,8 @@
 
           </div>
           <div *ngIf="!showEdit" class="grid col-12">
-            <div class="col-3"><p class="font-bold">Descripción de la reunión:</p><p>{{eventSelected}}</p></div>
-            <div class="col-3"><p class="font-bold">Url de la reunión:</p><p>{{eventSelected}}</p></div>
+            <div class="col-3"><p class="font-bold">Descripción de la reunión:</p><p>{{eventSelected.event._def.extendedProps.event_udi.description}}</p></div>
+            <div class="col-3"><p class="font-bold">Url de la reunión:</p><p>{{eventSelected.event._def.extendedProps.event_udi.meeting_url}}</p></div>
               <div class="col-3"><p class="font-bold">Fecha y hora de inicio:</p><p>
                 <i class="pi pi-calendar" style="font-size: 1rem"></i>
                 {{dateFormatService.formatDate(eventSelected.event.start)}}</p></div>
@@ -175,7 +175,7 @@
                         <p class="task-title">{{ task.title }}</p>
                         <p class="task-description">{{ task.description }}</p>
                         <div class="grid mr-2 ml-1 mt-1">
-                          <b class="task-description" style="padding-top: 5px;">Asignado a Gary Velarde Rios</b>
+                          <b class="task-description" style="padding-top: 5px;">Asignado a {{task.user_name}}</b>
                         </div>
                         <div class="grid mr-2 ml-1 mt-1 mt-2">
                           <i class="pi pi-pencil button-edit-task mr-2" (click)="editTask(task)"></i>
@@ -199,7 +199,7 @@
                           <p class="task-title">{{ task.title }}</p>
                           <p class="task-description">{{ task.description }}</p>
                           <div class="grid mr-2 ml-1 mt-1">
-                            <b class="task-description" style="padding-top: 5px;">Asignado a Gary Velarde Rios</b>
+                            <b class="task-description" style="padding-top: 5px;">Asignado a {{task.user_name}}</b>
                             <p class="ml-auto task-description">{{ task.dateEnd }}</p>
                           </div>
                       </li>
@@ -214,7 +214,7 @@
                           <p class="task-title">{{ task.title }}</p>
                           <p class="task-description">{{ task.description }}</p>
                           <div class="grid mr-2 ml-1 mt-1">
-                            <b class="task-description" style="padding-top: 5px;">Asignado a Gary Velarde Rios</b>
+                            <b class="task-description" style="padding-top: 5px;">Asignado a {{task.user_name}}</b>
                             <p class="ml-auto task-description">{{ task.dateEnd }}</p>
                           </div>
                       </li>

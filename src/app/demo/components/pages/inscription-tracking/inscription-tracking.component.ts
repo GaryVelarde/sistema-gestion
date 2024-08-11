@@ -24,235 +24,105 @@ export class InscriptionTrackingComponent implements OnInit {
 
     registros = [
         {
-            id: 12,
-            expediente: 1226,
-            escuela_profesional: 'IET',
-            titulo_proyecto_tesis:
-                'Desarrollo de una aplicación móvil para la gestión de tareas escolares',
-            numero_oficio: '124-114',
-            numero_resolucion: '113-114',
-            estado_general: 'Inscripción',
-            inscripciones: [
+            "id": 1,
+            "file": 111,
+            "professional_school": "ISI",
+            "thesis_project_title": "a",
+            "office_number": "11",
+            "resolution_number": "11",
+            "general_status": "Inscripción",
+            "inscriptions": [
                 {
-                    id: 12,
-                    proceso_titulacion_id: 12,
-                    fecha_recepcion_facultad: '2205-01-15',
-                    fecha_aprobacion_UDI: '2024-06-08',
-                    estado: 'Inscrito',
-                    docente: [
+                    "id": 1,
+                    "degree_processes_id": 1,
+                    "reception_date_faculty": "2024-08-07",
+                    "approval_date_udi": "2024-08-07",
+                    "status": "Inscrito",
+                    "teachers": [
                         {
-                            id: 2,
-                            nombre: 'César',
-                            apellidos: 'Jauregui',
-                        },
-                    ],
-                    observaciones: [
-                        {
-                            id: 12,
-                            inscripcion_id: 12,
-                            descripcion: 'Observación',
-                            created_at: '2024-06-20T05:28:52.000000Z',
-                        },
-                    ],
-                    archivos: [
-                        {
-                            id: 7,
-                            inscripcion_id: 12,
-                            archivo:
-                                'https://pub-5f6388a436924c6bb9869b960ccdcfab.r2.dev/uploads/lyPWqo2epLojcnfGOFDRz5mRHqai05Q3gx77Iygc.png',
-                            created_at: '2024-06-20T05:28:52.000000Z',
-                        },
-                    ],
-                },
+                            "id": 5,
+                            "name": "Cesar",
+                            "surnames": "Jauregui Saavedra",
+                            "code": 11525320,
+                            "email": "cesarjauregui@test.com",
+                            "phone": 986457511,
+                            "orcid": null,
+                            "cip": null
+                        }
+                    ]
+                }
             ],
-            egresados: [
+            "graduates": [
                 {
-                    id: 3,
-                    nombre: 'María',
-                    apellidos: 'Velarde',
-                    email: 'maria@test.com',
-                    celular: 123456789,
+                    "id": 4,
+                    "name": "Ana",
+                    "surnames": "Benavidez Ayala",
+                    "email": "fffacccasds@testt.com",
+                    "phone": 987145312,
+                    "code": 15467824
                 },
                 {
-                    id: 4,
-                    nombre: 'Pedro',
-                    apellidos: 'González',
-                    email: 'pedro@test.com',
-                    celular: 123456789,
-                },
-            ],
+                    "id": 5,
+                    "name": "Cesar",
+                    "surnames": "Jauregui",
+                    "email": "cesar@testt.com",
+                    "phone": 987145312,
+                    "code": 15467824
+                }
+            ]
         },
         {
-            id: 13,
-            expediente: 1227,
-            escuela_profesional: 'IET',
-            titulo_proyecto_tesis:
-                'Análisis de la eficiencia energética en edificios inteligentes',
-            numero_oficio: '125-115',
-            numero_resolucion: '114-115',
-            estado_general: 'Inscripción',
-            inscripciones: [
+            "id": 2,
+            "file": 222,
+            "professional_school": "ISI",
+            "thesis_project_title": "La inteligencia artificial",
+            "office_number": "11",
+            "resolution_number": "11",
+            "general_status": "Inscripción",
+            "inscriptions": [
                 {
-                    id: 13,
-                    proceso_titulacion_id: 13,
-                    fecha_recepcion_facultad: '2205-01-15',
-                    fecha_aprobacion_UDI: '2024-06-08',
-                    estado: 'Inscrito',
-                    docente: [
+                    "id": 1,
+                    "degree_processes_id": 1,
+                    "reception_date_faculty": "2024-08-07",
+                    "approval_date_udi": "2024-08-07",
+                    "status": "Inscrito",
+                    "teachers": [
                         {
-                            id: 3,
-                            nombre: 'Luis',
-                            apellidos: 'Pérez',
-                        },
-                    ],
-                    observaciones: [
-                        {
-                            id: 13,
-                            inscripcion_id: 13,
-                            descripcion: 'Observación',
-                            created_at: '2024-06-20T05:28:52.000000Z',
-                        },
-                    ],
-                    archivos: [
-                        {
-                            id: 8,
-                            inscripcion_id: 13,
-                            archivo:
-                                'https://pub-5f6388a436924c6bb9869b960ccdcfab.r2.dev/uploads/lyPWqo2epLojcnfGOFDRz5mRHqai05Q3gx77Iygc.png',
-                            created_at: '2024-06-20T05:28:52.000000Z',
-                        },
-                    ],
-                },
+                            "id": 1,
+                            "name": "Ramiro",
+                            "surnames": "Torres Marquez",
+                            "code": 11525320,
+                            "email": "cesarjauregui@test.com",
+                            "phone": 986457511,
+                            "orcid": null,
+                            "cip": null
+                        }
+                    ]
+                }
             ],
-            egresados: [
+            "graduates": [
                 {
-                    id: 5,
-                    nombre: 'Ana',
-                    apellidos: 'López',
-                    email: 'ana@test.com',
-                    celular: 123456789,
+                    "id": 4,
+                    "name": "Mario",
+                    "surnames": "Ayala Sanchez",
+                    "email": "mario@testt.com",
+                    "phone": 987145312,
+                    "code": 15467824
                 },
                 {
-                    id: 6,
-                    nombre: 'Roberto',
-                    apellidos: 'García',
-                    email: 'roberto@test.com',
-                    celular: 123456789,
-                },
-            ],
-        },
-        {
-            id: 14,
-            expediente: 1228,
-            escuela_profesional: 'IET',
-            titulo_proyecto_tesis:
-                'Desarrollo de un sistema de gestión de inventario para una cadena de supermercados',
-            numero_oficio: '126-116',
-            numero_resolucion: '115-116',
-            estado_general: 'Inscripción',
-            inscripciones: [
-                {
-                    id: 14,
-                    proceso_titulacion_id: 14,
-                    fecha_recepcion_facultad: '2205-01-15',
-                    fecha_aprobacion_UDI: '2024-06-08',
-                    estado: 'Inscrito',
-                    docente: [
-                        {
-                            id: 4,
-                            nombre: 'Carlos',
-                            apellidos: 'Martínez',
-                        },
-                    ],
-                    observaciones: [
-                        {
-                            id: 14,
-                            inscripcion_id: 14,
-                            descripcion: 'Observación',
-                            created_at: '2024-06-20T05:28:52.000000Z',
-                        },
-                    ],
-                    archivos: [
-                        {
-                            id: 9,
-                            inscripcion_id: 14,
-                            archivo:
-                                'https://pub-5f6388a436924c6bb9869b960ccdcfab.r2.dev/uploads/lyPWqo2epLojcnfGOFDRz5mRHqai05Q3gx77Iygc.png',
-                            created_at: '2024-06-20T05:28:52.000000Z',
-                        },
-                    ],
-                },
-            ],
-            egresados: [
-                {
-                    id: 7,
-                    nombre: 'Sandra',
-                    apellidos: 'Ramírez',
-                    email: 'sandra@test.com',
-                    celular: 123456789,
-                },
-                {
-                    id: 8,
-                    nombre: 'Pedro',
-                    apellidos: 'Pérez',
-                    email: 'pedro@test.com',
-                    celular: 123456789,
-                },
-            ],
-        },
-        {
-            id: 15,
-            expediente: 1229,
-            escuela_profesional: 'IET',
-            titulo_proyecto_tesis:
-                'Implementación de un sistema de gestión de recursos humanos para empresas',
-            numero_oficio: '127-117',
-            numero_resolucion: '116-117',
-            estado_general: 'Inscripción',
-            inscripciones: [
-                {
-                    id: 15,
-                    proceso_titulacion_id: 15,
-                    fecha_recepcion_facultad: '2205-01-15',
-                    fecha_aprobacion_UDI: '2024-06-08',
-                    estado: 'Inscrito',
-                    docente: [
-                        {
-                            id: 5,
-                            nombre: 'Elena',
-                            apellidos: 'Gómez',
-                        },
-                    ],
-                    observaciones: [
-                        {
-                            id: 15,
-                            inscripcion_id: 15,
-                            descripcion: 'Observación',
-                            created_at: '2024-06-20T05:28:52.000000Z',
-                        },
-                    ],
-                    archivos: [
-                        {
-                            id: 10,
-                            inscripcion_id: 15,
-                            archivo:
-                                'https://pub-5f6388a436924c6bb9869b960ccdcfab.r2.dev/uploads/lyPWqo2epLojcnfGOFDRz5mRHqai05Q3gx77Iygc.png',
-                            created_at: '2024-06-20T05:28:52.000000Z',
-                        },
-                    ],
-                },
-            ],
-            egresados: [
-                {
-                    id: 9,
-                    nombre: 'Miguel',
-                    apellidos: 'Fernández',
-                    email: 'miguel@test.com',
-                    celular: 123456789,
-                },
-            ],
-        },
+                    "id": 5,
+                    "name": "Daniel",
+                    "surnames": "Minaya Alvarez",
+                    "email": "daniel@testt.com",
+                    "phone": 987145312,
+                    "code": 15467824
+                }
+            ]
+        }
     ];
+
+    graduatesList: [] = [];
+    reviewerList: [] = [];
 
     comments = [
         {
@@ -269,7 +139,6 @@ export class InscriptionTrackingComponent implements OnInit {
         // Agrega más elementos según sea necesario
     ];
 
-    egressList = [];
     showDialogCancel = false;
     showSelectNewReviwer = false;
     showSelectNewStudent = false;
@@ -292,7 +161,7 @@ export class InscriptionTrackingComponent implements OnInit {
         },
     ];
     reviewersList = [];
-	filteredReviewers: any;
+    filteredReviewers: any;
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     inscriptionSelected: any;
     showEdit = false;
@@ -392,15 +261,18 @@ export class InscriptionTrackingComponent implements OnInit {
     viewDetailsInscription(data: any) {
         if (data) {
             this.inscriptionSelected = data;
-            this.egressList = data.egresados;
-            console.log('egressList', this.egressList);
-            this.inscriptionState = data.inscripciones[0].estado;
+            this.graduatesList = data.graduates;
+            this.reviewerList = data.inscriptions[0].teachers;
+            this.inscriptionState = data.inscriptions[0].status;
             this.countTask();
         }
     }
 
     backList() {
         this.inscriptionSelected = null;
+        this.graduatesList = [];
+        this.reviewerList = [];
+        this.inscriptionState = null;
     }
 
     get severity(): string {
@@ -429,7 +301,7 @@ export class InscriptionTrackingComponent implements OnInit {
         this.showEdit = false;
     }
 
-    saveEdition() {}
+    saveEdition() { }
 
     goToReview() {
         this.addNotificationForChangeState(
@@ -491,7 +363,7 @@ export class InscriptionTrackingComponent implements OnInit {
                     life: 3000,
                 });
             },
-            reject: () => {},
+            reject: () => { },
         });
     }
 
@@ -530,7 +402,6 @@ export class InscriptionTrackingComponent implements OnInit {
                 this.totalTaskIncomplete++;
             }
             this.totalTask++;
-            // Aquí puedes realizar la acción que necesites para cada tarea
         });
     }
 
@@ -557,14 +428,17 @@ export class InscriptionTrackingComponent implements OnInit {
         });
     }
 
-    addTask(): void {
-        if (this.taskDescription.value) {
-            this.tasks.push({
-                id: '11',
-                description: this.taskDescription.value,
-                checked: false,
-            });
-            this.taskDescription.reset();
+    addTask(event: KeyboardEvent): void {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (this.taskDescription.value) {
+                this.tasks.push({
+                    id: '11',
+                    description: this.taskDescription.value,
+                    checked: false,
+                });
+                this.taskDescription.reset();
+            }
         }
     }
 
@@ -581,22 +455,22 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     callGetTeachersList() {
-		this.service.getTeachersList().subscribe((res) => {
-			this.reviewersList = res.teachers;
-			console.log(res);
-		});
-	}
+        this.service.getTeachersList().subscribe((res) => {
+            this.reviewersList = res.teachers;
+            console.log(res);
+        });
+    }
 
     filterReviewers(event: any) {
-		const query = event.query.toLowerCase();
+        const query = event.query.toLowerCase();
         this.filteredReviewers = this.reviewersList.filter(
             (student) =>
                 student.name.toLowerCase().includes(query) ||
                 student.surnames.toLowerCase().includes(query)
         );
-	}
+    }
 
-    
+
     filterStudents(event: { query: string }) {
         const query = event.query.toLowerCase();
         this.filteredStudents = this.studentsList.filter(

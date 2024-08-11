@@ -61,6 +61,39 @@ export class DateFormatService {
     return `${day}-${month}-${year}`;
   }
 
+  formatDateYYYYMMDD(date: Date | string): string {
+    let dateObj: Date;
+
+    // Verificar si el parámetro es una cadena
+    if (typeof date === 'string') {
+      // Intentar analizar la fecha en formato 'dd-mm-yyyy'
+      const parts = date.split('-');
+      if (parts.length === 3) {
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Los meses en JavaScript son 0-indexados
+        const year = parseInt(parts[2], 10);
+        dateObj = new Date(year, month, day);
+      } else {
+        // Convertir la cadena al objeto Date si no está en el formato esperado
+        dateObj = new Date(date);
+      }
+    } else {
+      dateObj = date;
+    }
+
+    // Asegurarse de que dateObj sea un objeto Date válido
+    if (isNaN(dateObj.getTime())) {
+      console.error('Invalid date');
+      return '';
+    }
+
+    const day = ('0' + dateObj.getDate()).slice(-2);
+    const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+    const year = dateObj.getFullYear();
+
+    return `${year}-${month}-${day}`;
+  }
+
   formatDateCalendar(date: string): string {
     let dateObj: Date;
 

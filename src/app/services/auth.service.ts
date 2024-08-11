@@ -22,7 +22,11 @@ export class AuthService {
   }
 
   postInscription(rq: any): Observable<any> {
-    return this.http.post(`${this.API_URL}/inscripcion`, rq);
+    return this.http.post(`${this.API_URL}/inscription`, rq);
+  }
+
+  getInscription(): Observable<any> {
+    return this.http.get(`${this.API_URL}/inscription`);
   }
 
   logout(): Observable<any> {
@@ -59,6 +63,26 @@ export class AuthService {
 
   getStudentsList(): Observable<any> {
     return this.http.get(`${this.API_URL}/graduates-students`, this.header);
+  }
+
+  getTask(taskId: string): Observable<any> {
+    return this.http.get(`${this.API_URL}/meeting/${taskId}/task`, this.header);
+  }
+
+  updateStatusTask(reunionId: string, taskId: string, status: string) {
+    return this.http.put(`${this.API_URL}/meeting/${reunionId}/task/${taskId}/status`,
+      {
+        "status": status
+      },
+      this.header);
+  }
+
+  deleteTask(reunionId: string, taskId: string) {
+    return this.http.delete(`${this.API_URL}/meeting/${reunionId}/task/${taskId}`, this.header);
+  }
+
+  addTask(reunionId: string, request: any) {
+    return this.http.post(`${this.API_URL}/meeting/${reunionId}/task`, request, this.header);
   }
 
 }

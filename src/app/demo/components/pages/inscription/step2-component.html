@@ -60,7 +60,7 @@
             <div class="grid p-fluid mt-3">
                 <div *ngIf="studentsList.length" class="field col-12 md:col-6">
                     <span class="p-float-label">
-                        <p-autocomplete
+                        <p-autoComplete
                             id="studentOne"
                             formControlName="student"
                             [suggestions]="filteredStudents"
@@ -73,7 +73,7 @@
                                         student.surnames}}</div>
                                 </div>
                             </ng-template>
-                        </p-autocomplete>
+                        </p-autoComplete>
                         <label for="studentOne">Ingrese el nombre del
                             estudiante</label>
                     </span>
@@ -89,7 +89,7 @@
                 </div>
                 <div *ngIf="presenter.studentTwoRequired" class="col-12 md:col-5">
                     <span class="p-float-label">
-                        <p-autocomplete
+                        <p-autoComplete
                             id="studentTwo"
                             formControlName="studentTwo"
                             [suggestions]="filteredSecondStudents"
@@ -102,7 +102,7 @@
                                         student.surnames}}</div>
                                 </div>
                             </ng-template>
-                        </p-autocomplete>
+                        </p-autoComplete>
                         <label for="studentTwo">Ingrese el nombre del
                             segundo estudiante</label>
                     </span>
