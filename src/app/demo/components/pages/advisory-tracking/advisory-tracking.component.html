@@ -216,6 +216,7 @@
                         class="grid p-fluid">
                         <div class="field col-12 md:col-12">
                             <p-calendar
+                                placeholder="Seleccione una fecha"
                                 [iconDisplay]="'input'"
                                 class="full-width"
                                 [showIcon]="true"
@@ -238,6 +239,7 @@
                         class="grid p-fluid">
                         <div class="field col-12 md:col-12">
                             <p-calendar
+                                placeholder="Seleccione una fecha"
                                 [iconDisplay]="'input'"
                                 class="full-width"
                                 [showIcon]="true"
@@ -256,6 +258,7 @@
                         class="grid p-fluid">
                         <div class="field col-12 md:col-12">
                             <p-calendar
+                                placeholder="Seleccione una fecha"
                                 [iconDisplay]="'input'"
                                 class="full-width"
                                 [showIcon]="true"
@@ -296,6 +299,7 @@
                         class="grid p-fluid">
                         <div class="field col-12 md:col-12">
                             <p-calendar
+                                placeholder="Seleccione una fecha"
                                 [iconDisplay]="'input'"
                                 class="full-width"
                                 [showIcon]="true"
@@ -312,7 +316,7 @@
                     <p
                         *ngIf="advisorySelected.report !== 0">{{advisorySelected.report}}</p>
                     <div *ngIf="advisorySelected.report === 0">
-                        <input type="text" pInputText
+                        <input type="text" pInputText placeholder="Complete la información"
                             class="full-width" />
                     </div>
                 </div>
@@ -327,6 +331,7 @@
                         class="grid p-fluid">
                         <div class="field col-12 md:col-12">
                             <p-calendar
+                                placeholder="Seleccione una fecha"
                                 [iconDisplay]="'input'"
                                 class="full-width"
                                 [showIcon]="true"
@@ -338,19 +343,13 @@
                 </div>
             </div>
             <div class="ml-2 mr-2 separator"></div>
-            <div class="grid col-12">
-                <div class="col-4">
-                    <p-table *ngIf="!showSelectNewReviwer"
-                        [value]="advisorySelected.reviewer">
+            <div *ngIf="!showEdit" class="grid col-12">
+                <div class="col-6">
+                    <p-table *ngIf="reviewersList.length"
+                        [value]="reviewersList">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th><i class="pi pi-user"></i> Revisor</th>
-                                <th *ngIf="showEdit" style="width: 10px;">
-                                    <p-button *ngIf="showEdit"
-                                        icon="pi pi-pencil"
-                                        [rounded]="true" [text]="true"
-                                        severity="info" />
-                                </th>
+                                <th colspan="3">Revisor</th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-product>
@@ -364,47 +363,32 @@
                             </tr>
                         </ng-template>
                     </p-table>
-                    <div *ngIf="showSelectNewReviwer" class="grid p-fluid mt-3">
-                        <div class="field col-12 md:col-12">
-                            <span class="p-float-label">
-                                <p-autocomplete
-                                    id="inputtext"
-                                    [suggestions]="filteredReviewers"
-                                    (completeMethod)="filterReviewers($event)"
-                                    field="name" />
-                                <label for="inputtext">Ingrese el nombre del
-                                    revisor</label>
-                            </span>
-                        </div>
+                    <div *ngIf="!reviewersList.length">
+                        <p>Seleccione un asesor de tesis</p>
                     </div>
                 </div>
-                <div class="col-8">
-
-                    <p-table *ngIf="!showSelectNewReviwer"
-                        [value]="advisorySelected.egresados">
+                <div class="col-6">
+                    <p-table
+                        [value]="graduatesList">
                         <ng-template pTemplate="header">
                             <tr>
-                                <th style="width: 35%;"><i
-                                        class="pi pi-users"></i>
-                                    Estudiantes</th>
-                                <th style="width: 35%;"></th>
-                                <th style="width: 30%;">
-                                    <p-button *ngIf="showEdit"
-                                        icon="pi pi-pencil"
-                                        [rounded]="true" [text]="true"
-                                        severity="info"
-                                        (click)="showEditSudents = true" />
-                                </th>
+                                <th colspan="3">
+                                    {{
+                                        graduatesList.length > 1 
+                                        ? 'Detalle de los estudiantes' 
+                                        : 'Detalle del estudiante' 
+                                    }}
+                                    </th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-product>
                             <tr>
-                                <td>{{ product.nombre + ' ' + product.apellidos
+                                <td>{{ product.name + ' ' + product.surnames
                                     }}</td>
                                 <td>{{ product.email }}</td>
                                 <td>
                                     {{
-                                    product.celular
+                                    product.phone
                                     }}
                                 </td>
                             </tr>
@@ -443,26 +427,20 @@
                 </div>
                 <div
                     *ngIf="advisoryState !== 'Cancelado' && advisoryState !== 'Aprobado'"
-                    class="col-11">
+                    class="col-12">
                     <form [formGroup]="tasksForm">
                         <span class="p-float-label">
-                            <input
-                                type="text"
-                                style="width: 100%;"
-                                id="taskDescription"
-                                pInputText
-                                formControlName="taskDescription" />
+                            <textarea
+                                  inputId="taskDescription"
+                                  rows="1"
+                                  style="width: 100%; resize: none;"
+                                  formControlName="taskDescription"
+                                  pInputTextarea 
+                                  (keydown.enter)="addTask($event)"></textarea>
                             <label for="taskDescription">Escribe la tarea
                                 aquí...</label>
                         </span>
                     </form>
-                </div>
-                <div
-                    *ngIf="advisoryState !== 'Cancelado' && advisoryState !== 'Aprobado'"
-                    class="col-1">
-                    <p-button label="Enviar" [rounded]="true"
-                        (click)="addTask()"
-                        [disabled]="tasksForm.invalid" />
                 </div>
 
                 <div class=" col-12">
@@ -493,7 +471,7 @@
                 </div>
                 <div class="ml-2 mr-2 separator"></div>
 
-                <div class=" col-12">
+                <!--<div class=" col-12">
                     <h5>Comentarios</h5>
                 </div>
                 <div class="col-12 grid">
@@ -519,27 +497,30 @@
                    
                     
                 </div>
-                <div class=" col-12">
-                  <div *ngFor="let comment of reversedComments" class="mb-4 flex align-items-center">
-                    <p-avatar 
-                      [label]="getFirstLetter(comment.name)" 
-                      styleClass="ml-3" 
-                      size="large" />
-                    <div class="ml-3 w-full">
-                      <div
-                        class="flex justify-content-between mb-2">
-                        <span class="block text-900">
-                          {{comment.name}}</span>
-                        <span class="block text-700">1 Jun 17:58 pm</span>
+                <div class="col-12">
+                    <div *ngFor="let comment of visibleComments" class="mb-4 flex align-items-center">
+                      <p-avatar 
+                        [label]="getFirstLetter(comment.name)" 
+                        styleClass="ml-3" 
+                        size="large" />
+                      <div class="ml-3 w-full">
+                        <div class="flex justify-content-between mb-2">
+                          <span class="block text-900">{{comment.name}}</span>
+                          <span class="block text-700">1 Jun 17:58 pm</span>
+                        </div>
+                        <span class="block text-900 border-1 surface-ground surface-border p-2 border-round" style="word-break: break-all;">
+                          {{comment.content}}
+                        </span>
                       </div>
-                      <span
-                        class="block text-900 border-1 surface-ground surface-border p-2 border-round"
-                        style="word-break: break-all;">{{comment.content}}</span>
                     </div>
+                    
+                    <ng-container *ngIf="reversedComments.length > 10">
+                        <button *ngIf="!showAllComments" pButton label="Ver más" icon="pi pi-chevron-down" class="p-button-text" (click)="showAll()"></button>
+                        <button *ngIf="showAllComments" pButton label="ver menos" icon="pi pi-chevron-up" class="p-button-text" (click)="showLess()"></button>
+                      </ng-container>
                   </div>
-                </div>
-              </div>
-
+              </div>-->
+                <app-comments class="w-full" [comments]="comments"></app-comments>
             </div>
         </div>
     </div>

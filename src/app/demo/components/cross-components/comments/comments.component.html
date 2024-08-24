@@ -1,0 +1,54 @@
+<div class=" col-12">
+  <h5>Comentarios</h5>
+</div>
+<div class="col-12 grid">
+  <div class="mb-4 w-full flex align-items-center ml-3">
+    <p-avatar
+      label="G"
+      size="large" />
+    <div class="ml-3 w-full">
+      <form [formGroup]="commentsForm" style="width: inherit;">
+        <span class="p-float-label">
+          <textarea
+            inputId="textarea"
+            rows="3"
+            style="width: 100%;"
+            formControlName="comment"
+            pInputTextarea
+            (keydown.enter)="addComment($event)"></textarea>
+          <label for="textarea">Escribe tu comentario
+            aquí...</label>
+        </span>
+      </form>
+    </div>
+
+  </div>
+  <div class="col-12 content-comments">
+    <div *ngFor="let comment of visibleComments"
+      class="mb-4 flex align-items-center">
+      <p-avatar
+        [label]="getFirstLetter(comment.name)"
+        styleClass="ml-3"
+        size="large" />
+      <div class="ml-3 w-full">
+        <div class="flex justify-content-between mb-2">
+          <span class="block text-900">{{comment.name}}</span>
+          <span class="block text-700">1 Jun 17:58 pm</span>
+        </div>
+        <span
+          class="block text-900 border-1 surface-ground surface-border p-2 border-round"
+          style="word-break: break-all;">
+          {{comment.content}}
+        </span>
+      </div>
+    </div>
+  </div>
+  <ng-container *ngIf="reversedComments.length > 5">
+    <button *ngIf="!showAllComments" pButton [label]="'Ver más (' + (comments.length -5) + ' ' + ((comments.length -5) > 1 ? 'comentarios' : 'comentario') + ')'"
+      icon="pi pi-chevron-down" class="p-button-text"
+      (click)="showAll()"></button>
+    <button *ngIf="showAllComments" pButton label="Ver menos"
+      icon="pi pi-chevron-up" class="p-button-text"
+      (click)="showLess()"></button>
+  </ng-container>
+</div>

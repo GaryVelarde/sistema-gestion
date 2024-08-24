@@ -21,6 +21,7 @@ import {
 import { DateFormatService } from 'src/app/services/date-format.service';
 import { PrimeNGConfig } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth.service';
+import { Router } from '@angular/router';
 interface Task {
     id: number;
     title: string;
@@ -88,60 +89,40 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             "due_date": "15/08/2024 15:05",
             "color": "#fff544",
             "status": "En Progreso",
-            "meeting_url": "https://testaa.com",
+            "meeting_url": "https://primeng.org/icons",
             "created_at": "25/07/2024 20:25:59",
             "managers": [
                 {
-                    "id": 5,
-                    "name": "Ana",
-                    "surnames": "Benavidez Ayala",
-                    "code": 15467824,
-                    "email": "manuel@test.com",
-                    "phone": 987145312,
-                    "orcid": null,
-                    "cip": null
+                    "id": 2,
+                    "name": "Lic. Ornela Bravo",
+                    "surnames": "Tijerina",
+                    "code": 12590671,
+                    "email": "lgamboa@example.net",
+                    "phone": 612512384,
+                    "orcid": "inventore",
+                    "cip": 79581284
                 }
             ],
             "participants": [
                 {
-                    "id": 2,
-                    "name": "Ana",
-                    "surnames": "Benavidez Ayala",
-                    "code": 15467824,
-                    "email": "ana@test.com",
-                    "phone": 987145312,
-                    "orcid": null,
-                    "cip": null
+                    "id": 9,
+                    "name": "Axel Lira Manzanares",
+                    "surnames": "Preciado",
+                    "code": 56550234,
+                    "email": "peres.regina@example.org",
+                    "phone": 608053584,
+                    "orcid": "occaecati",
+                    "cip": 25255441
                 },
                 {
-                    "id": 3,
-                    "name": "Ana",
-                    "surnames": "Benavidez Ayala",
-                    "code": 15467824,
-                    "email": "jose@test.com",
-                    "phone": 987145312,
-                    "orcid": null,
-                    "cip": null
-                },
-                {
-                    "id": 6,
-                    "name": "Ana",
-                    "surnames": "Benavidez Ayala",
-                    "code": 15467824,
-                    "email": "manuels@test.com",
-                    "phone": 987145312,
-                    "orcid": null,
-                    "cip": null
-                },
-                {
-                    "id": 7,
-                    "name": "Ana",
-                    "surnames": "Benavidez Ayala",
-                    "code": 15467824,
-                    "email": "maaaanuels@test.com",
-                    "phone": 987145312,
-                    "orcid": null,
-                    "cip": null
+                    "id": 8,
+                    "name": "Emilia Delfina Macías Serna",
+                    "surnames": "Ortega",
+                    "code": 14149080,
+                    "email": "quinonez.cristobal@example.com",
+                    "phone": 721170880,
+                    "orcid": "et",
+                    "cip": 35852992
                 }
             ]
         }
@@ -290,14 +271,16 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
     selectedItems: Usuario[] | undefined;
 
-    usuarios: Usuario[] = [
-        { id: 1, nombre: 'Ana', apellidos: 'Benavidez Ayala' },
+    usuarios: Usuario[] = [];/*[
+        { id: 1, nombre: 'Cesar', apellidos: 'Jauregui' },
         { id: 2, nombre: 'Gary', apellidos: 'Gomez Bazalar' },
         { id: 3, nombre: 'María', apellidos: 'Villanueva Alarcón' },
         { id: 4, nombre: 'Carlos', apellidos: 'Ramirez Perez' },
-        { id: 5, nombre: 'Luis', apellidos: 'Lopez Fernandez' },
+        { id: 5, nombre: 'Ana', apellidos: 'Benavide' },
+        { id: 6, nombre: 'Luis', apellidos: 'Benavidez Ayala' },
         // Agrega más usuarios según sea necesario
-    ];
+    ];*/
+
     filteredItems: Usuario[] | undefined;
 
     constructor(
@@ -306,6 +289,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         private dateFormatService: DateFormatService,
         private config: PrimeNGConfig,
         private service: AuthService,
+        private router: Router,
     ) {
         this.slotDurationForm = this.fb.group({
             slotDuration: this.slotDuration,
@@ -376,6 +360,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
     ngOnInit() {
         this.watchUsersManager();
+        this.getTeachersList();
         this.slotDuration.setValue(this.timeslots[this.timeslots.length - 1]);
         this.watchSlotDuration();
         this.color.setValue('#ff0000');
@@ -460,17 +445,29 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     handleEventClick(arg) {
         this.eventSelected = arg;
         console.log('eventSelected 2', this.eventSelected.event._def.extendedProps.event_udi);
-        this.getTask(this.eventSelected.event._def.extendedProps.event_udi.id);
         const usersManager: Usuario[] = [];
+        const usersParticipants: Usuario[] = [];
         for (let user of this.eventSelected.event._def.extendedProps.event_udi.managers) {
             const userArr = {
                 id: user.id,
                 nombre: user.name,
                 apellidos: user.surnames,
+                fullName: user.name + ' ' + user.surnames
             }
             usersManager.push(userArr);
         }
+        for (let user of this.eventSelected.event._def.extendedProps.event_udi.participants) {
+            const userArr = {
+                id: user.id,
+                nombre: user.name,
+                apellidos: user.surnames,
+                fullName: user.name + ' ' + user.surnames
+            }
+            usersParticipants.push(userArr);
+        }
         this.usersManager.setValue(usersManager);
+        this.usersParticipants.setValue(usersParticipants);
+        this.getTask(this.eventSelected.event._def.extendedProps.event_udi.id);
         this.showEventDetail = true;
     }
 
@@ -516,7 +513,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             this.service.updateStatusTask(this.eventSelected.event._def.extendedProps.event_udi.id,
                 taskId.toString(), column).pipe().subscribe((res: any) => {
                     if (res.status) {
-                        
+
                         const columnBefore = this.isTaskInPending(taskId);
                         if (
                             (columnBefore === 'inProgress' && column === 'pending') ||
@@ -582,6 +579,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.titleTask.setValue(task.title);
         this.descriptionTask.setValue(task.description);
         this.endTask.setValue(this.dateFormatService.formatDateDDMMYYYY(task.dateEnd));
+        
         this.taskSelectedId = task.id;
         this.newTaskDialog = true;
     }
@@ -676,7 +674,13 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
     watchUsersManager(): void {
         this.usersManager.valueChanges.pipe().subscribe((value) => {
-            console.log(value);
+            console.log('usersManager',value);
+        });
+    }
+
+    watchUsersParticipants(): void {
+        this.usersParticipants.valueChanges.pipe().subscribe((value) => {
+            console.log('usersParticipants',value);
         });
     }
 
@@ -752,5 +756,21 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
                 }
             }
         })
+    }
+
+    getTeachersList() {
+        this.service.getTeachersList().pipe().subscribe((res: any) => {
+            if (res) {
+                for (let teachers of res.teachers)
+                    this.usuarios.push(
+                        { id: teachers.id, nombre: teachers.name, apellidos: teachers.surnames },
+                    )
+            }
+            console.log(this.usuarios);
+        })
+    }
+
+    redirectToUrl() {
+        window.open(this.eventSelected.event._def.extendedProps.event_udi.meeting_url, '_blank');
     }
 }

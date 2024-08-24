@@ -30,6 +30,7 @@ import { InscriptionPresenter } from '../inscription/insctiption-presenter';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { MessagesModule } from 'primeng/messages';
 import { AvatarModule } from 'primeng/avatar';
+import { CrossComponentsModule } from '../../cross-components/Cross.module';
 
 @NgModule({
     imports: [
@@ -62,6 +63,7 @@ import { AvatarModule } from 'primeng/avatar';
         AutoCompleteModule,
         MessagesModule,
         AvatarModule,
+        CrossComponentsModule,
     ],
     declarations: [InscriptionTrackingComponent],
     providers: [

@@ -69,7 +69,6 @@ export class AdvisoryTrackingComponent implements OnInit {
                 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
             isComment: true,
         },
-        // Agrega más elementos según sea necesario
     ];
 
     egressList = [];
@@ -95,7 +94,8 @@ export class AdvisoryTrackingComponent implements OnInit {
         },
     ];
     reviewersList = [];
-	filteredReviewers: any;
+    graduatesList = []
+    filteredReviewers: any;
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     advisorySelected: any;
     showEdit = false;
@@ -105,19 +105,14 @@ export class AdvisoryTrackingComponent implements OnInit {
     getStudentListProcess = '';
     studentsList = [];
     alertForCancelation: Message[] | undefined;
-    public commentsForm: FormGroup;
     public tasksForm: FormGroup;
     public cancelattionForm: FormGroup;
-    private _comment: FormControl = new FormControl('', [Validators.required]);
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
     private _taskDescription: FormControl = new FormControl('', [
         Validators.required,
     ]);
 
-    get comment() {
-        return this._comment;
-    }
     get cancelationComment() {
         return this._cancelationComment;
     }
@@ -142,9 +137,6 @@ export class AdvisoryTrackingComponent implements OnInit {
         private config: PrimeNGConfig,
         private presenter: InscriptionPresenter,
     ) {
-        this.commentsForm = this.fb.group({
-            comment: this.comment,
-        });
         this.tasksForm = this.fb.group({
             taskDescription: this.taskDescription,
         });
@@ -196,8 +188,10 @@ export class AdvisoryTrackingComponent implements OnInit {
         console.log('aaa', data)
         if (data) {
             this.advisorySelected = data;
-            this.egressList = data.egresados;
+            this.reviewersList = data.reviewer;
+            this.graduatesList = data.degree_processes.graduates;
             console.log('egressList', this.egressList);
+            console.log('graduatesList', this.graduatesList);
             this.advisoryState = this.advisorySelected.status;
             this.countTask();
         }
@@ -205,22 +199,8 @@ export class AdvisoryTrackingComponent implements OnInit {
 
     backList() {
         this.advisorySelected = null;
-    }
-
-    get severity(): string {
-        let severity = '';
-        switch (this.advisorySelected.inscripciones[0].estado) {
-            case 'inscrito':
-                severity = 'success';
-                break;
-            case 'observado':
-                severity = 'warning';
-                break;
-            case 'cancelado':
-                severity = 'danger';
-                break;
-        }
-        return severity;
+        this.reviewersList = [];
+        this.graduatesList = [];
     }
 
     showEdition() {
@@ -233,7 +213,7 @@ export class AdvisoryTrackingComponent implements OnInit {
         this.showEdit = false;
     }
 
-    saveEdition() {}
+    saveEdition() { }
 
     goToReview() {
         this.addNotificationForChangeState(
@@ -295,17 +275,21 @@ export class AdvisoryTrackingComponent implements OnInit {
                     life: 3000,
                 });
             },
-            reject: () => {},
+            reject: () => { },
         });
     }
 
-    taskDone(inputId: string): void {
+    taskDone(inputId: string, checkbox: any): void {
         const labelElement = this.elRef.nativeElement.querySelector(
             `label[for="${inputId}"]`
         );
         if (labelElement) {
             labelElement.classList.add('task-done');
         }
+        if (checkbox) {
+            checkbox.disabled = true;
+        }
+    
         this.countTask();
     }
 
@@ -338,21 +322,6 @@ export class AdvisoryTrackingComponent implements OnInit {
         });
     }
 
-    addComment(event: KeyboardEvent): void {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            if (this.comment.value) {
-                this.comments.push({
-                    name: 'Gary Velarde',
-                    content: this.comment.value,
-                    isComment: true,
-                });
-                this.comment.setValue('');
-                this.comment.reset();
-            }
-        }
-    }
-
     addNotificationForChangeState(comment: string) {
         this.comments.push({
             name: 'Cesar Jauregui',
@@ -361,14 +330,17 @@ export class AdvisoryTrackingComponent implements OnInit {
         });
     }
 
-    addTask(): void {
-        if (this.taskDescription.value) {
-            this.tasks.push({
-                id: '11',
-                description: this.taskDescription.value,
-                checked: false,
-            });
-            this.taskDescription.reset();
+    addTask(event: KeyboardEvent): void {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (this.taskDescription.value) {
+                this.tasks.push({
+                    id: '11',
+                    description: this.taskDescription.value,
+                    checked: false,
+                });
+                this.taskDescription.reset();
+            }
         }
     }
 
@@ -385,22 +357,22 @@ export class AdvisoryTrackingComponent implements OnInit {
     }
 
     callGetTeachersList() {
-		this.service.getTeachersList().subscribe((res) => {
-			this.reviewersList = res.teachers;
-			console.log(res);
-		});
-	}
+        this.service.getTeachersList().subscribe((res) => {
+            this.reviewersList = res.teachers;
+            console.log(res);
+        });
+    }
 
     filterReviewers(event: any) {
-		const query = event.query.toLowerCase();
+        const query = event.query.toLowerCase();
         this.filteredReviewers = this.reviewersList.filter(
             (student) =>
                 student.name.toLowerCase().includes(query) ||
                 student.surnames.toLowerCase().includes(query)
         );
-	}
+    }
 
-    
+
     filterStudents(event: { query: string }) {
         const query = event.query.toLowerCase();
         this.filteredStudents = this.studentsList.filter(

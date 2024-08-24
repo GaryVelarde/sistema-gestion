@@ -85,7 +85,12 @@
           </div>
           <div *ngIf="!showEdit" class="grid col-12">
             <div class="col-3"><p class="font-bold">Descripción de la reunión:</p><p>{{eventSelected.event._def.extendedProps.event_udi.description}}</p></div>
-            <div class="col-3"><p class="font-bold">Url de la reunión:</p><p>{{eventSelected.event._def.extendedProps.event_udi.meeting_url}}</p></div>
+            <div class="col-3"><p class="font-bold">Url de la reunión:</p>
+              <p class="p-url" (click)="redirectToUrl()">
+                <i class="pi pi-link" style="font-size: 1rem"></i> 
+                {{eventSelected.event._def.extendedProps.event_udi.meeting_url}}
+              </p>
+            </div>
               <div class="col-3"><p class="font-bold">Fecha y hora de inicio:</p><p>
                 <i class="pi pi-calendar" style="font-size: 1rem"></i>
                 {{dateFormatService.formatDate(eventSelected.event.start)}}</p></div>
@@ -145,7 +150,6 @@
             <span class="p-fluid">
                 <p-autoComplete 
                     formControlName="usersParticipants"
-                    [(ngModel)]="selectedItems" 
                     [suggestions]="filteredItems" 
                     (completeMethod)="search($event)" 
                     field="fullName" 
@@ -224,7 +228,7 @@
               </div>
               <div class="ml-2 mr-2 separator"></div>
 
-              <div class=" col-12">
+              <!--<div class=" col-12">
                   <h5>Comentarios</h5>
               </div>          
               <div class="col-12 grid">
@@ -269,7 +273,8 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div>-->
+          <app-comments class="w-full" [comments]="comments"></app-comments>
       </div>
   </div>
 </div>

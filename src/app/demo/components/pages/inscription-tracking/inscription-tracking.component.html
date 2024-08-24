@@ -229,13 +229,18 @@
                         <i class="pi pi-calendar"></i>
                         {{inscriptionSelected.inscriptions[0].approval_date_udi}}
                     </p>
-                    <p-calendar *ngIf="showEdit"
+                    <div *ngIf="showEdit" class="grid p-fluid">
+                        <div class="field col-12 md:col-12">
+                            <p-calendar *ngIf="showEdit"
                         [(ngModel)]="inscriptionSelected.inscriptions[0].approval_date_udi"
                         [iconDisplay]="'input'"
                         class="full-width"
                         [showIcon]="true"
                         dateFormat="yy-mm-dd"
                         inputId="icondisplay" />
+                        </div>
+                    </div>
+                    
                 </div>
                 <div class="col-3">
                 </div>
@@ -387,10 +392,10 @@
                 </div>
                 <div class="ml-2 mr-2 separator"></div>
 
-                <div class=" col-12">
+                 <!--<div class=" col-12">
                     <h5>Comentarios</h5>
                 </div>
-                <div class="col-12 grid">
+               <div class="col-12 grid">
                     <div class="mb-4 w-full flex align-items-center">
                       <p-avatar 
                           label="G" 
@@ -432,8 +437,8 @@
                     </div>
                   </div>
                 </div>
-              </div>
-
+              </div>-->
+              <app-comments class="w-full" [comments]="comments"></app-comments>
             </div>
         </div>
     </div>

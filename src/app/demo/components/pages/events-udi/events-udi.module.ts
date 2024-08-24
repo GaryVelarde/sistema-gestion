@@ -35,6 +35,7 @@ import { DragDropModule } from 'primeng/dragdrop';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { SidebarModule } from 'primeng/sidebar';
 import { AvatarModule } from 'primeng/avatar';
+import { CrossComponentsModule } from '../../cross-components/Cross.module';
 
 @NgModule({
     imports: [
@@ -74,6 +75,7 @@ import { AvatarModule } from 'primeng/avatar';
         AutoCompleteModule,
         SidebarModule,
         AvatarModule,
+        CrossComponentsModule,
     ],
     declarations: [EventsUdiComponent],
 })
