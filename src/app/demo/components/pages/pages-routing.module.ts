@@ -12,6 +12,8 @@ import { RouterModule } from '@angular/router';
         { path: 'events', loadChildren: () => import('./events/events.module').then(m => m.EventsModule) },
         { path: 'events-udi', loadChildren: () => import('./events-udi/events-udi.module').then(m => m.EventsUdiModule) },
         { path: 'asesorias', loadChildren: () => import('./advisory-tracking/advisory-tracking.module').then(m => m.AdvisoryTrackingModule) },
+        { path: 'articulos-semilleros', loadChildren: () => import('./hotbed-tracking/hotbed-tracking.module').then(m => m.HotbedTrackingModule) },
+        { path: 'registrar-semilleros', loadChildren: () => import('./hotbed-register/hotbed-register.module').then(m => m.HotbedRegisterModule) },
         { path: '**', redirectTo: '/notfound' }
     ])],
     exports: [RouterModule]
