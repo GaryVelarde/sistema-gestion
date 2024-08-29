@@ -10,7 +10,8 @@ import {
 } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
-import { InscriptionPresenter } from '../inscription/insctiption-presenter';
+import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { IStudent } from '../../cross-interfaces/comments-interfaces';
 
 @Component({
     templateUrl: './inscription-tracking.component.html',
@@ -55,20 +56,12 @@ export class InscriptionTrackingComponent implements OnInit {
             "graduates": [
                 {
                     "id": 4,
-                    "name": "Ana",
-                    "surnames": "Benavidez Ayala",
-                    "email": "fffacccasds@testt.com",
-                    "phone": 987145312,
-                    "code": 15467824
+                    "name": "Mario",
+                    "surnames": "Ayala Sanchez",
+                    "email": "mario@testt.com",
+                    "phone": '987145312',
+                    "code": '15467824'
                 },
-                {
-                    "id": 5,
-                    "name": "Cesar",
-                    "surnames": "Jauregui",
-                    "email": "cesar@testt.com",
-                    "phone": 987145312,
-                    "code": 15467824
-                }
             ]
         },
         {
@@ -106,20 +99,81 @@ export class InscriptionTrackingComponent implements OnInit {
                     "name": "Mario",
                     "surnames": "Ayala Sanchez",
                     "email": "mario@testt.com",
-                    "phone": 987145312,
-                    "code": 15467824
+                    "phone": '987145312',
+                    "code": '15467824'
                 },
                 {
                     "id": 5,
                     "name": "Daniel",
                     "surnames": "Minaya Alvarez",
                     "email": "daniel@testt.com",
-                    "phone": 987145312,
-                    "code": 15467824
+                    "phone": '987145312',
+                    "code": '15467824'
                 }
             ]
         }
     ];
+
+    usuarios: IStudent[] = [
+        {
+            "id": 4,
+            "name": "Mario",
+            "surnames": "Ayala Sanchez",
+            "email": "mario@testt.com",
+            "phone": '987145312',
+            "code": '15467824'
+        },
+        {
+            "id": 5,
+            "name": "Daniel",
+            "surnames": "Minaya Alvarez",
+            "email": "daniel@testt.com",
+            "phone": '987145312',
+            "code": '15467824'
+        },
+        {
+            "id": 6,
+            "name": "Lucía",
+            "surnames": "Martinez Herrera",
+            "email": "lucia@testt.com",
+            "phone": '981245312',
+            "code": '12547896'
+        },
+        {
+            "id": 7,
+            "name": "Javier",
+            "surnames": "Lopez Diaz",
+            "email": "javier@testt.com",
+            "phone": '987654321',
+            "code": '11457832'
+        },
+        {
+            "id": 8,
+            "name": "Ana",
+            "surnames": "Perez Morales",
+            "email": "ana@testt.com",
+            "phone": '986532147',
+            "code": '11326745'
+        },
+        {
+            "id": 9,
+            "name": "Carlos",
+            "surnames": "Ramirez Soto",
+            "email": "carlos@testt.com",
+            "phone": '985641237',
+            "code": '15478965'
+        },
+        {
+            "id": 10,
+            "name": "Valeria",
+            "surnames": "Rojas Gutierrez",
+            "email": "valeria@testt.com",
+            "phone": '984512376',
+            "code": '12547896'
+        }
+    ];
+
+    filteredItems: any[] | undefined;
 
     graduatesList: [] = [];
     reviewerList: [] = [];
@@ -171,15 +225,19 @@ export class InscriptionTrackingComponent implements OnInit {
     getStudentListProcess = '';
     studentsList = [];
     alertForCancelation: Message[] | undefined;
-    public commentsForm: FormGroup;
-    public tasksForm: FormGroup;
-    public cancelattionForm: FormGroup;
+    commentsForm: FormGroup;
+    tasksForm: FormGroup;
+    cancelattionForm: FormGroup;
+    studentsForm: FormGroup;
+    teacherForm: FormGroup;
     private _comment: FormControl = new FormControl('', [Validators.required]);
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
     private _taskDescription: FormControl = new FormControl('', [
         Validators.required,
     ]);
+    private _students: FormControl = new FormControl([] as IStudent[], [Validators.required]);
+    private _teacher: FormControl = new FormControl([] as any[], [Validators.required]);
 
     get comment() {
         return this._comment;
@@ -197,6 +255,12 @@ export class InscriptionTrackingComponent implements OnInit {
     get reversedComments() {
         return this.comments.slice().reverse();
     }
+    get students() {
+        return this._students;
+    }
+    get teacher() {
+        return this._teacher;
+    }
 
     constructor(
         private messageService: MessageService,
@@ -206,7 +270,6 @@ export class InscriptionTrackingComponent implements OnInit {
         private elRef: ElementRef,
         private router: Router,
         private config: PrimeNGConfig,
-        private presenter: InscriptionPresenter,
     ) {
         this.commentsForm = this.fb.group({
             comment: this.comment,
@@ -217,6 +280,12 @@ export class InscriptionTrackingComponent implements OnInit {
         this.cancelattionForm = this.fb.group({
             cancelationComment: this.cancelationComment,
             dateCancelationReception: this.dateCancelationReception
+        });
+        this.studentsForm = this.fb.group({
+            students: this.students,
+        });
+        this.teacherForm = this.fb.group({
+            teacher: this.teacher,
         });
     }
 
@@ -233,6 +302,8 @@ export class InscriptionTrackingComponent implements OnInit {
             dateFormat: 'dd/mm/yy',
             weekHeader: 'Sm'
         });
+        this.watchStudents();
+        this.watchTeacher();
     }
 
     goToInscription() {
@@ -273,6 +344,9 @@ export class InscriptionTrackingComponent implements OnInit {
         this.graduatesList = [];
         this.reviewerList = [];
         this.inscriptionState = null;
+        this.showEdit = false;
+        this.studentsForm.reset();
+        this.teacherForm.reset();
     }
 
     get severity(): string {
@@ -292,16 +366,35 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     showEdition() {
-        this.callGetStudentList();
-        this.callGetTeachersList();
+        //this.callGetStudentList();
+        //this.callGetTeachersList();
         this.showEdit = true;
+        console.log('this.graduatesList', this.graduatesList);
+        const arrStudents = this.addFullNameProperty(this.graduatesList);
+        this.students.setValue(arrStudents);
+    }
+
+    test() {
+        this.students.setValue([{
+            "id": 5,
+            "name": "Cesar",
+            "surnames": "Jauregui",
+            "email": "cesar@testt.com",
+            "phone": '987145312',
+            "code": '15467824'
+        }]);
     }
 
     cancelEdition() {
+        this.studentsForm.reset();
+        this.teacherForm.reset();
         this.showEdit = false;
     }
 
-    saveEdition() { }
+    saveEdition() {
+        this.graduatesList = this.students.value;
+        this.showEdit = false;
+     }
 
     goToReview() {
         this.addNotificationForChangeState(
@@ -509,5 +602,47 @@ export class InscriptionTrackingComponent implements OnInit {
         const firstLetter = str.charAt(0);
         const firstLetterUpper = firstLetter.toUpperCase();
         return firstLetterUpper;
+    }
+
+    search(event: AutoCompleteCompleteEvent) {
+        const query = event.query.toLowerCase();
+        this.filteredItems = this.usuarios
+            .filter(
+                (usuario) =>
+                    usuario.name.toLowerCase().includes(query) ||
+                    usuario.surnames.toLowerCase().includes(query)
+            )
+            .map((usuario) => ({
+                ...usuario,
+                fullName: `${usuario.name} ${usuario.surnames}`,
+            }));
+    }
+
+    watchStudents() {
+        this.students.valueChanges.pipe().subscribe((res: IStudent[]) => {
+            console.log(res);
+            if (res.length > 2) {
+                const students = [...res];
+                students.splice(2, 1);
+                this.students.setValue(students);
+            }
+        })
+    }
+
+    watchTeacher() {
+        this.teacher.valueChanges.pipe().subscribe((res: any[]) => {
+            if (res.length > 1) {
+                const teacher = [...res];
+                teacher.splice(1, 1);
+                this.teacher.setValue(teacher);
+            }
+        })
+    }
+
+    addFullNameProperty(data: any[]): any[] {
+        return data.map(item => ({
+            ...item,
+            fullName: `${item.name} ${item.surnames}`
+        }));
     }
 }

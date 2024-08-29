@@ -6,6 +6,11 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ButtonModule } from 'primeng/button';
+import { UserSelectionComponent } from './user-selection/user-selection.component';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { SkeletonModule } from 'primeng/skeleton';
+import { FloatLabelModule } from 'primeng/floatlabel';
+
 
 @NgModule({
   imports: [
@@ -15,9 +20,12 @@ import { ButtonModule } from 'primeng/button';
     FormsModule,
     InputTextModule,
     InputTextareaModule,
-    ButtonModule
+    ButtonModule,
+    AutoCompleteModule,
+    SkeletonModule,
+    FloatLabelModule
   ],
-  declarations: [CommentsComponent],
-  exports: [CommentsComponent]
+  declarations: [CommentsComponent, UserSelectionComponent],
+  exports: [CommentsComponent, UserSelectionComponent]
 })
 export class CrossComponentsModule { }

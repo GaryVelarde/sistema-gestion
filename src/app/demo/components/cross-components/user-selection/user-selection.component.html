@@ -1,0 +1,57 @@
+<div [ngSwitch]="getStudentListProcess">
+  <ng-template [ngSwitchCase]="'charging'">
+    <ng-container *ngTemplateOutlet="studentListSkeleton"></ng-container>
+  </ng-template>
+  <ng-template [ngSwitchCase]="'error'">
+    <ng-container *ngTemplateOutlet="studentListError"></ng-container>
+  </ng-template>
+  <ng-template [ngSwitchCase]="'complete'">
+    <ng-container *ngTemplateOutlet="studentList"></ng-container>
+  </ng-template>
+  <ng-template ngSwitchDefault>
+    <p>Invalid state</p>
+  </ng-template>
+</div>
+<ng-template #studentListError>
+  <div class="p-error-message">
+      <i class="pi pi-times-circle error-icon"></i>
+      <span>Ha ocurrido un error al traer la información.</span>
+      <button pButton type="button" icon="pi pi-refresh"
+          class="p-button-text p-button-danger" (click)="callGetStudentList()"></button>
+  </div>
+</ng-template>
+<ng-template #studentListSkeleton>
+  <div class="grid p-fluid mt-3">
+      <div *ngIf="!studentsList.length" class="field col-12">
+          <p-skeleton height="2rem" styleClass="mb-2" />
+      </div>
+  </div>
+</ng-template>
+<ng-template #studentList>
+  <div class="grid p-fluid mt-3">
+      <div *ngIf="studentsList.length" class="field col-12">
+          <span class="p-float-label">
+            <form [formGroup]="studentForm">
+                <p-autoComplete
+                id="studentOne"
+                formControlName="studentFormControl"
+                [suggestions]="filteredStudents"
+                (completeMethod)="filterStudents($event)"
+                field="name">
+                <ng-template let-student pTemplate="item">
+                    <div class="flex align-items-center gap-2">
+
+                        <div>{{ student.name + ' ' +
+                            student.surnames}}</div>
+                    </div>
+                </ng-template>
+            </p-autoComplete>
+            </form>
+              
+              <!--<label for="studentOne">Ingrese el nombre del
+                  estudiante</label>-->
+          </span>
+
+      </div>
+  </div>
+</ng-template>

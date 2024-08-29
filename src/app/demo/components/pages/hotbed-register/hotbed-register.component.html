@@ -1,57 +1,92 @@
 <div class="grid">
   <div class="col-12">
     <div class="card px-6 py-6">
-      <h3>Registro de artículos</h3>
-      <p-stepper>
-        <p-stepperPanel header="Header I">
-            <ng-template pTemplate="content" let-nextCallback="nextCallback" let-index="index">
-                <div class="flex flex-column h-12rem">
-                    <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
-                        Content I
-                    </div>
+      <h3>Registro de artículo de investigación</h3>
+
+      <div class="grid mt-3">
+        <form [formGroup]="articleForm" class="full-width">
+          <div class="col-12">
+
+            <p-floatLabel>
+              <textarea
+                formControlName="title"
+                class="full-width"
+                rows="3"
+                pInputTextarea>
+              </textarea>
+              <label for="title">Título del artículo</label>
+            </p-floatLabel>
+
+          </div>
+          <div class="col-12">
+            <div style="display: flex;">
+              <input #fileInput type="file" name="archives[]"
+                class="mt-2 custom-file-input mr-auto" multiple
+                (change)="onFileChange($event)"
+                accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip,.xls,.xlsx" />
+              <p-button icon="pi pi-trash" [rounded]="true"
+                [text]="true" severity="danger"
+                [disabled]="!filesSelected"
+                (click)="clearFile()" />
+            </div>
+
+            <div class="flex flex-column mt-2">
+              <div
+                class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
+                <span *ngIf="filesSelected.length < 1" class="p-3">No se ha
+                  seleccionado ningún archivo</span>
+                <div *ngIf="filesSelected.length > 0" class="p-3">
+                  <div *ngFor="let file of filesSelected">
+                    <i *ngIf="file.type === 'docx' || file.type === 'doc'"
+                      class="pi pi-file-word" style="font-size: 1.5rem"></i>
+                    <i *ngIf="file.type === 'pdf'" class="pi pi-file-pdf"
+                      style="font-size: 1.5rem"></i>
+                    <i *ngIf="file.type === 'xls' || file.type === 'xlsx'"
+                      class="pi pi-file-excel" style="font-size: 1.5rem"></i>
+                    <i
+                      *ngIf="file.type === 'jpg' || file.type === 'jpeg' || file.type === 'png'"
+                      class="pi pi-image" style="font-size: 1.5rem"></i>
+                    <i *ngIf="file.type === 'zip'" class="pi pi-folder"
+                      style="font-size: 1.5rem"></i>
+                    <span class="pl-3">{{file.name}}</span>
+                  </div>
                 </div>
-                <div class="flex pt-4 justify-content-end">
-                    <p-button 
-                        label="Next" 
-                        icon="pi pi-arrow-right" 
-                        iconPos="right" 
-                        (onClick)="nextCallback.emit()" />
-                </div>
-            </ng-template>
-        </p-stepperPanel>
-        <p-stepperPanel header="Header II">
-            <ng-template pTemplate="content" let-prevCallback="prevCallback" let-nextCallback="nextCallback" let-index="index">
-                <div class="flex flex-column h-12rem">
-                    <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
-                        Content II
-                    </div>
-                </div>
-                <div class="flex pt-4 justify-content-between">
-                    <p-button 
-                        label="Back" 
-                        icon="pi pi-arrow-left" 
-                        (onClick)="prevCallback.emit()" />
-                    <p-button 
-                        label="Next" 
-                        icon="pi pi-arrow-right" 
-                        iconPos="right" 
-                        (onClick)="nextCallback.emit()" />
-                </div>
-            </ng-template>
-        </p-stepperPanel>
-        <p-stepperPanel header="Header III">
-            <ng-template pTemplate="content" let-prevCallback="prevCallback" let-index="index">
-                <div class="flex flex-column h-12rem">
-                    <div class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium">
-                        Content III
-                    </div>
-                </div>
-                <div class="flex pt-4 justify-content-start">
-                    <p-button label="Back" icon="pi pi-arrow-left" (onClick)="prevCallback.emit()" />
-                </div>
-            </ng-template>
-        </p-stepperPanel>
-    </p-stepper>
+              </div>
+            </div>
+          </div>
+          <!--<div class="col-6">
+          <app-user-selection typeUserList="semilleros" (userSelected)="watchUserSelectedRecibed($event)"></app-user-selection>
+        </div>-->
+          <div style="display: flex;">
+            <div class="col-8">
+              <form [formGroup]="studentsForm">
+                <p>Estudiantes</p>
+                <span class="p-fluid">
+                  <p-autoComplete
+                    formControlName="students"
+                    [suggestions]="filteredItems"
+                    (completeMethod)="search($event)"
+                    field="fullName"
+                    [multiple]="true" />
+                </span>
+              </form>
+            </div>
+
+            <div class="col-4">
+              <p>Grupo</p>
+              <input type="text" class="full-width" pInputText
+                formControlName="group" />
+            </div>
+          </div>
+
+          <div class="flex gap-3 mt-3">
+            <p-button (click)="backToList()" label="Regresar" [outlined]="true"
+              icon="pi pi-angle-left" iconPos="left" />
+            <p-button (click)="nextStep()" label="Siguiente"
+              icon="pi pi-angle-right" iconPos="right" [disabled]="false"
+              [disabled]="!articleForm" />
+          </div>
+        </form>
+      </div>
     </div>
   </div>
-</div>

@@ -6,3 +6,12 @@ export interface IComment {
     isComment: boolean,
     date: Date, 
 }
+
+export interface IStudent {
+    code: string,
+    email: string,
+    id: number,
+    name: string,
+    phone: string,
+    surnames: string,
+}

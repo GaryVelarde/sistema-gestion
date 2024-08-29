@@ -320,6 +320,35 @@
                 </div>
             </div>
 
+            <div *ngIf="showEdit" class="grid col-12">
+                <div class="col-6">
+                    <form [formGroup]="teacherForm">
+                        <b class="mb-2">Revisor</b>
+                        <span class="p-fluid">
+                            <p-autoComplete 
+                                formControlName="teacher"
+                                [suggestions]="filteredItems" 
+                                (completeMethod)="search($event)" 
+                                field="fullName" 
+                                [multiple]="true" />
+                        </span>
+                      </form>
+                </div>
+                <div class="col-6">
+                    <form [formGroup]="studentsForm">
+                        <b class="mb-2">Estudiantes</b>
+                        <span class="p-fluid">
+                            <p-autoComplete 
+                                formControlName="students"
+                                [suggestions]="filteredItems" 
+                                (completeMethod)="search($event)" 
+                                field="fullName" 
+                                [multiple]="true" />
+                        </span>
+                      </form>
+                </div>
+            </div>
+
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
                 <div class=" col-12">

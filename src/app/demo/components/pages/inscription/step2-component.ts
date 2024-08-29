@@ -68,7 +68,7 @@ export class Step2Component implements OnInit {
         this.getStudentListProcess = 'charging';
         this.service.getStudentsList().subscribe((res) => {
             this.getStudentListProcess = 'complete';
-            this.studentsList = res.graduates_students;
+            this.studentsList = res.data;
         }, (error) => {
             this.getStudentListProcess = 'error';
         });

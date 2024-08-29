@@ -65,6 +65,10 @@ export class AuthService {
     return this.http.get(`${this.API_URL}/graduates-students`, this.header);
   }
 
+  getSeedBeds(): Observable<any> {
+    return this.http.get(`${this.API_URL}/seedbeds`, this.header);
+  }
+
   getTask(taskId: string): Observable<any> {
     return this.http.get(`${this.API_URL}/meeting/${taskId}/task`, this.header);
   }
@@ -84,5 +88,15 @@ export class AuthService {
   addTask(reunionId: string, request: any) {
     return this.http.post(`${this.API_URL}/meeting/${reunionId}/task`, request, this.header);
   }
+
+  postRegisterArticle(request: any) {
+    return this.http.post(`${this.API_URL}/article`, request, this.header);
+  }
+
+  postRegisterArticleFile(request: any, id: string) {
+    return this.http.post(`${this.API_URL}/article/${id}/archive`, request, this.header);
+  }
+
+
 
 }
