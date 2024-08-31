@@ -15,3 +15,14 @@ export interface IStudent {
     phone: string,
     surnames: string,
 }
+
+export interface ITeacher {
+    id: number,
+    name: string,
+    surnames: string,
+    code: number,
+    email: string,
+    phone: number,
+    orcid: string,
+    cip: number
+}

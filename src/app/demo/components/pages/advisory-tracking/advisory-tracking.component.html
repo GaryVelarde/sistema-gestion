@@ -268,7 +268,7 @@
                     </div>
 
                 </div>
-                <div class="card col-3">
+                <div class="card col-3" style="max-height: 100px;">
                     <p class="font-bold">Estado:</p>
                     <p-tag *ngIf="advisoryState === 'En Asesoría'"
                         value="En asesoría" />
@@ -365,6 +365,12 @@
                     </p-table>
                     <div *ngIf="!reviewersList.length">
                         <p>Seleccione un asesor de tesis</p>
+                        <app-user-selection 
+                            #userSelection 
+                            typeUserList="docentes" 
+                            maxUsersAllow="1" 
+                            (userSelected)="getUserSelected($event)" >
+                        </app-user-selection>
                     </div>
                 </div>
                 <div class="col-6">

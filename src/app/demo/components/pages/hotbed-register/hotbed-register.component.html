@@ -1,8 +1,8 @@
+<p-toast />
 <div class="grid">
   <div class="col-12">
     <div class="card px-6 py-6">
       <h3>Registro de artículo de investigación</h3>
-
       <div class="grid mt-3">
         <form [formGroup]="articleForm" class="full-width">
           <div class="col-12">
@@ -26,7 +26,7 @@
                 accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip,.xls,.xlsx" />
               <p-button icon="pi pi-trash" [rounded]="true"
                 [text]="true" severity="danger"
-                [disabled]="!filesSelected"
+                [disabled]="filesSelected.length < 1"
                 (click)="clearFile()" />
             </div>
 
@@ -54,22 +54,15 @@
               </div>
             </div>
           </div>
-          <!--<div class="col-6">
-          <app-user-selection typeUserList="semilleros" (userSelected)="watchUserSelectedRecibed($event)"></app-user-selection>
-        </div>-->
           <div style="display: flex;">
             <div class="col-8">
-              <form [formGroup]="studentsForm">
-                <p>Estudiantes</p>
-                <span class="p-fluid">
-                  <p-autoComplete
-                    formControlName="students"
-                    [suggestions]="filteredItems"
-                    (completeMethod)="search($event)"
-                    field="fullName"
-                    [multiple]="true" />
-                </span>
-              </form>
+              <p>Estudiantes</p>
+              <app-user-selection 
+                #userSelection 
+                typeUserList="semilleros" 
+                maxUsersAllow="2" 
+                (userSelected)="getUserSelected($event)" >
+              </app-user-selection>
             </div>
 
             <div class="col-4">
@@ -79,12 +72,12 @@
             </div>
           </div>
 
+
           <div class="flex gap-3 mt-3">
             <p-button (click)="backToList()" label="Regresar" [outlined]="true"
               icon="pi pi-angle-left" iconPos="left" />
-            <p-button (click)="nextStep()" label="Siguiente"
-              icon="pi pi-angle-right" iconPos="right" [disabled]="false"
-              [disabled]="!articleForm" />
+            <p-button (click)="nextStep()" label="Registrar artículo"
+              icon="pi pi-angle-right" iconPos="right" [disabled]="!articleForm.valid || !studentsForm.valid" />
           </div>
         </form>
       </div>

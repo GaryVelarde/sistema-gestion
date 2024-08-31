@@ -10,6 +10,8 @@ import { UserSelectionComponent } from './user-selection/user-selection.componen
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { SkeletonModule } from 'primeng/skeleton';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { LoaderComponent } from './loader/loader.component';
+import { CardErrorComponent } from './card-error/card-error.component';
 
 
 @NgModule({
@@ -25,7 +27,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
     SkeletonModule,
     FloatLabelModule
   ],
-  declarations: [CommentsComponent, UserSelectionComponent],
-  exports: [CommentsComponent, UserSelectionComponent]
+  declarations: [CommentsComponent, UserSelectionComponent, LoaderComponent, CardErrorComponent],
+  exports: [CommentsComponent, UserSelectionComponent, LoaderComponent, CardErrorComponent]
 })
 export class CrossComponentsModule { }

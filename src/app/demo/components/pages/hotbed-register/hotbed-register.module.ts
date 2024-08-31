@@ -10,6 +10,7 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
 import { AutoCompleteModule } from 'primeng/autocomplete';
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
   imports: [
@@ -24,6 +25,8 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
     InputTextareaModule,
     CrossComponentsModule,
     AutoCompleteModule,
+    ToastModule,
+    CrossComponentsModule,
   ],
   declarations: [HotbedRegisterComponent]
 })

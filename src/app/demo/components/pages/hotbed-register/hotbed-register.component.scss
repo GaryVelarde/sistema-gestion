@@ -7,6 +7,7 @@ input[type=file] {
 }
 
 .custom-file-input {
+  cursor: pointer;
   height: 36px;
   max-height: 36px;
   display: inline-block;

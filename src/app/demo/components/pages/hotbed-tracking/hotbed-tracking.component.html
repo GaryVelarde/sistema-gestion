@@ -1,5 +1,5 @@
 <p-toast key="tst"></p-toast>
-<div *ngIf="!hotbedSelected" class="grid">
+<div *ngIf="!viewDetail" class="grid">
     <div class="col-12">
         <div class="card px-6 py-6">
             <p-toolbar styleClass="mb-4">
@@ -15,95 +15,120 @@
                     </div>
                 </ng-template>
             </p-toolbar>
-            <div class="card">
-                <p-table #dt [value]="registros" responsiveLayout="scroll"
-                    [rows]="10"
-                    [globalFilterFields]="['title','nombre']"
-                    [paginator]="true" [rowsPerPageOptions]="[10,20,30]"
-                    [showCurrentPageReport]="true"
-                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
-                    [(selection)]="selectedProducts" selectionMode="multiple"
-                    [rowHover]="true" dataKey="id">
-                    <ng-template pTemplate="caption">
-                        <div
-                            class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <h5 class="m-0">Seguimiento de artículos</h5>
-                            <span class="block mt-2 md:mt-0 p-input-icon-left">
-                                <i class="pi pi-search"></i>
-                                <input pInputText type="text"
-                                    (input)="onGlobalFilter(dt, $event)"
-                                    placeholder="Buscar por título..."
-                                    class="w-full sm:w-auto" />
-                            </span>
-                        </div>
-                    </ng-template>
-                    <ng-template pTemplate="header">
-                        <tr> 
-                            <th pSortableColumn="title"
-                                style="width:60%">Título der artículo
-                                 <p-sortIcon
-                                    field="thesis_project_title"></p-sortIcon></th>
-                            <th pSortableColumn="name"
-                                style="width:20%">Estudiante(s)
-                                <p-sortIcon
-                                    field="status"></p-sortIcon></th>
-                            <th style="width:10%">Estado</th>
-                            <th style="width:10%"></th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-data>
-                        <tr>
-                            <td style="width:14%; min-width:10rem;"><span
-                                    class="p-column-title">Título de
-                                    tesis</span>
-                                {{data.title}}
-                            </td>
-                            <td style="width:14%; min-width:8rem;">
-                                <span class="p-column-title">Revisor</span>
-                                {{data.inscriptions[0].teachers[0].name + ' '
-                                +
-                                data.inscriptions[0].teachers[0].surnames}}
-                            </td>
-                            <td style="width:14%; min-width: 10rem;"><span
-                                    class="p-column-title">estado</span>
-                                <span
-                                  >{{data.inscriptions[0].status}}</span>
-                            </td>
-                            <td>
-                                <div class="flex">
-                                    <p-button label="Ver detalle"
-                                        [outlined]="true"
-                                        severity="contrast"
-                                        (click)="viewDetailsInscription(data)" />
+            <div [ngSwitch]="getArticleListProcess">
+                <ng-template [ngSwitchCase]="'charging'">
+                  <ng-container *ngTemplateOutlet="skeletonArticleList"></ng-container>
+                </ng-template>
+                <ng-template [ngSwitchCase]="'error'">
+                  <ng-container *ngTemplateOutlet="articleListError"></ng-container>
+                </ng-template>
+                <ng-template [ngSwitchCase]="'complete'">
+                  <ng-container *ngTemplateOutlet="articleList"></ng-container>
+                </ng-template>
+                <ng-template ngSwitchDefault>
+                  <p>Invalid state</p>
+                </ng-template>
+              </div>
 
-                                    <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
-                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteProduct(product)"></button> -->
-                                </div>
-                            </td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </div>
-            <div *ngIf="false" class="card">
-                <p-table [value]="skeletonRows" responsiveLayout="scroll">
-                    <ng-template pTemplate="header">
-                        <tr>
-                            <th style="width:60%">Título de tesis</th>
-                            <th style="width:20%">Revisor</th>
-                            <th style="width:10%">Estado</th>
-                            <th style="width:10%"></th>
-                        </tr>
-                    </ng-template>
-                    <ng-template pTemplate="body" let-product>
-                        <tr>
-                            <td><p-skeleton /></td>
-                            <td><p-skeleton /></td>
-                            <td><p-skeleton /></td>
-                            <td><p-skeleton /></td>
-                        </tr>
-                    </ng-template>
-                </p-table>
-            </div>
+              <ng-template #articleListError>
+                <app-card-error [message]="messageError" (reload)="handleReload($event)"></app-card-error>
+              </ng-template>
+              <ng-template #articleList>
+                <div class="card">
+                    <p-table #dt [value]="registros" responsiveLayout="scroll"
+                        [rows]="10"
+                        [globalFilterFields]="['title','name']"
+                        [paginator]="true" [rowsPerPageOptions]="[10,20,30]"
+                        [showCurrentPageReport]="true"
+                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                        [(selection)]="selectedProducts"
+                        [rowHover]="true" dataKey="id">
+                        <ng-template pTemplate="caption">
+                            <div
+                                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                <h5 class="m-0">Seguimiento de asesorías</h5>
+                                <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text"
+                                        (input)="onGlobalFilter(dt, $event)"
+                                        placeholder="Buscar por título..."
+                                        class="w-full sm:w-auto" />
+                                </span>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="titulo_proyecto_tesis"
+                                    style="width:60%">Título del
+                                    artículo <p-sortIcon
+                                        field="title"></p-sortIcon></th>
+                                <th pSortableColumn="nombre"
+                                    style="width:20%">Estudiante(s)
+                                    <p-sortIcon
+                                        field="nombre"></p-sortIcon></th>
+                                <th style="width:10%">Estado</th>
+                                <th style="width:10%"></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-data>
+                            <tr>
+                                <td style="width:14%; min-width:10rem;"><span
+                                        class="p-column-title">Título de
+                                        tesis</span>
+                                    {{data.title}}
+                                </td>
+                                <td style="width:20%; min-width:8rem;">
+                                    <div *ngIf="data.seedbeds.length < 2">
+                                        <span>{{data.seedbeds[0].name}}</span>
+                                    </div>
+                                    <div *ngIf="data.seedbeds.length > 1">
+                                        <span>{{data.seedbeds[0].name + ' y ' + data.seedbeds[1].name}}</span>
+                                    </div>
+                                </td>
+                                <td style="width:20%; min-width: 10rem;"><span
+                                        class="p-column-title">estado</span>
+                                    <span
+                                        [class]="'product-badge status-' + (data.status ? data.status.toLowerCase() : '')">{{data.status}}</span>
+                                </td>
+                                <td>
+                                    <div class="flex">
+                                        <p-button label="Ver detalle"
+                                            [outlined]="true"
+                                            severity="contrast"
+                                            (click)="viewDetailsHotbed(data)" />
+    
+                                        <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
+                                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteProduct(product)"></button> -->
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+              </ng-template>
+            
+            <ng-template #skeletonArticleList>
+                <div class="card">
+                    <p-table [value]="skeletonRows" responsiveLayout="scroll">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width:60%">Título del artículo</th>
+                                <th style="width:20%">Estudiante(s)</th>
+                                <th style="width:10%">Estado</th>
+                                <th style="width:10%"></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-product>
+                            <tr>
+                                <td><p-skeleton /></td>
+                                <td><p-skeleton /></td>
+                                <td><p-skeleton /></td>
+                                <td><p-skeleton /></td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </ng-template>
         </div>
 
     </div>

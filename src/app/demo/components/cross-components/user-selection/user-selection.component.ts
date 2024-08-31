@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -8,52 +9,51 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./user-selection.component.scss']
 })
 export class UserSelectionComponent implements OnInit {
-  @Output() userSelected: EventEmitter<any> = new EventEmitter<any>();
+  @Output() userSelected: EventEmitter<any[]> = new EventEmitter<any[]>();
   @Input() typeUserList: string;
+  @Input() maxUsersAllow: number;
 
   getStudentListProcess = '';
   filteredStudents: any[];
   studentsList = [];
-
-  studentForm: FormGroup;
-  studentFormControl = new FormControl([], [Validators.required]);
+  filteredItems: any[] | undefined;
+  userForm: FormGroup;
+  userFormControl = new FormControl([], [Validators.required]);
 
 
   constructor(private service: AuthService, private fb: FormBuilder) {
-    this.studentForm = this.fb.group({
-      studentFormControl: this.studentFormControl,
+    this.userForm = this.fb.group({
+      userFormControl: this.userFormControl,
     })
   }
 
   ngOnInit() {
-    if(this.typeUserList === 'estudiantes') {
-      this.callGetStudentList();
-    } else {
-      this.callGetSeedBedsList();
+    this.watchUser()
+    switch (this.typeUserList) {
+      case 'estudiantes':
+        this.callGetStudentList();
+        break;
+      case 'semilleros':
+        this.callGetSeedBedsList();
+        break;
+      case 'docentes':
+        this.callTeachersList();
+        break;
     }
-    this.watchStudent()
   }
 
-  filterCountry(event: any) {
-    const filtered: any[] = [];
-    const query = event.query;
-    for (let i = 0; i < this.studentsList.length; i++) {
-      const country = this.studentsList[i];
-      if (country.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(country);
-      }
-    }
-    this.filteredStudents = filtered;
-  }
-
-  filterStudents(event: { query: string }) {
+  search(event: AutoCompleteCompleteEvent) {
     const query = event.query.toLowerCase();
-    this.filteredStudents = this.studentsList.filter(
-      (student) =>
-        student.name.toLowerCase().includes(query) ||
-        student.surnames.toLowerCase().includes(query)
-    );
-    console.log('filteredCountries', this.filteredStudents);
+    this.filteredItems = this.studentsList
+      .filter(
+        (usuario) =>
+          usuario.name.toLowerCase().includes(query) ||
+          usuario.surnames.toLowerCase().includes(query)
+      )
+      .map((usuario) => ({
+        ...usuario,
+        fullName: `${usuario.name} ${usuario.surnames}`,
+      }));
   }
 
   callGetStudentList() {
@@ -82,13 +82,35 @@ export class UserSelectionComponent implements OnInit {
     });
   }
 
-  watchStudent() {
-    this.studentFormControl.valueChanges.pipe().subscribe((res: any) => {
-      if (res.email) {
-        this.userSelected.emit(res);
+  callTeachersList() {
+    this.getStudentListProcess = 'charging';
+    this.service.getTeachersList().subscribe((res) => {
+      if (res.data) {
+        this.getStudentListProcess = 'complete';
+        this.studentsList = res.data;
       }
+
+    }, (error) => {
+      this.getStudentListProcess = 'error';
+    });
+  }
+
+  watchUser() {
+    this.userFormControl.valueChanges.pipe().subscribe((res: any) => {
+      console.log(this.maxUsersAllow)
+      console.log(res)
+      if (res.length > this.maxUsersAllow) {
+        const users = [...res];
+        users.splice(this.maxUsersAllow, 1);
+        console.log('users', users)
+        this.userFormControl.setValue(users);
+      }
+      this.userSelected.emit(this.userFormControl.value);
     })
   }
 
-
+  clearComponent() {
+    this.userForm.reset();
+    this.userFormControl.setValue([]);
+  }
 }

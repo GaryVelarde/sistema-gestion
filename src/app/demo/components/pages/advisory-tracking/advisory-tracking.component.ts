@@ -107,11 +107,13 @@ export class AdvisoryTrackingComponent implements OnInit {
     alertForCancelation: Message[] | undefined;
     public tasksForm: FormGroup;
     public cancelattionForm: FormGroup;
+    public advisoryForm: FormGroup;
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
     private _taskDescription: FormControl = new FormControl('', [
         Validators.required,
     ]);
+    private _advisory: FormControl = new FormControl([], [Validators.required]);
 
     get cancelationComment() {
         return this._cancelationComment;
@@ -122,9 +124,11 @@ export class AdvisoryTrackingComponent implements OnInit {
     get taskDescription() {
         return this._taskDescription;
     }
-
     get reversedComments() {
         return this.comments.slice().reverse();
+    }
+    get advisory() {
+        return this._advisory;
     }
 
     constructor(
@@ -143,6 +147,9 @@ export class AdvisoryTrackingComponent implements OnInit {
         this.cancelattionForm = this.fb.group({
             cancelationComment: this.cancelationComment,
             dateCancelationReception: this.dateCancelationReception
+        });
+        this.advisoryForm = this.fb.group({
+            advisory: this.advisory,
         });
     }
 
@@ -204,8 +211,6 @@ export class AdvisoryTrackingComponent implements OnInit {
     }
 
     showEdition() {
-        this.callGetStudentList();
-        this.callGetTeachersList();
         this.showEdit = true;
     }
 
@@ -412,4 +417,9 @@ export class AdvisoryTrackingComponent implements OnInit {
         const firstLetterUpper = firstLetter.toUpperCase();
         return firstLetterUpper;
     }
+
+    getUserSelected(userSelected: any){
+        console.log('userSelected', userSelected)
+        this.advisory.setValue(userSelected);
+      }
 }

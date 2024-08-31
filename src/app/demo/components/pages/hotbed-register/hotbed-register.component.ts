@@ -4,6 +4,10 @@ import { Router } from '@angular/router';
 import { IStudent } from '../../cross-interfaces/comments-interfaces';
 import { AuthService } from 'src/app/services/auth.service';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { LoaderService } from 'src/app/layout/service/loader.service';
+import { finalize } from 'rxjs';
+import { MessageService } from 'primeng/api';
+import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
 
 @Component({
   selector: 'app-hotbed-register',
@@ -13,11 +17,13 @@ import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
     `.p-stepper {
         flex-basis: 50rem;
     } `
-  ]
+  ],
+  providers: [MessageService]
 
 })
 export class HotbedRegisterComponent implements OnInit {
   @ViewChild('fileInput') fileInput: ElementRef;
+  @ViewChild('userSelection') userSelection: UserSelectionComponent;
 
 
   usuarios: IStudent[] = [
@@ -82,8 +88,7 @@ export class HotbedRegisterComponent implements OnInit {
   articleForm: FormGroup;
   studentsForm: FormGroup;
   private _title = new FormControl('', [Validators.required]);
-  private _file = new FormControl(File || null, [Validators.required]);
-  private _user = new FormControl({} as IStudent, [Validators.required]);
+  private _file = new FormControl(File || null);
   private _group = new FormControl('', [Validators.required]);
   private _students = new FormControl([] as IStudent[], [Validators.required])
 
@@ -92,9 +97,6 @@ export class HotbedRegisterComponent implements OnInit {
   }
   get file() {
     return this._file;
-  }
-  get user() {
-    return this._user;
   }
   get group() {
     return this._group;
@@ -108,11 +110,12 @@ export class HotbedRegisterComponent implements OnInit {
   formData = new FormData();
 
 
-  constructor(private fb: FormBuilder, private cd: ChangeDetectorRef, private router: Router, private service: AuthService) {
+  constructor(private fb: FormBuilder, private cd: ChangeDetectorRef, private router: Router, private service: AuthService,
+    private loaderService: LoaderService, private messageService: MessageService,
+  ) {
     this.articleForm = this.fb.group({
       title: this.title,
       file: this.file,
-      user: this.user,
       group: this.group
     });
     this.studentsForm = this.fb.group({
@@ -165,23 +168,37 @@ export class HotbedRegisterComponent implements OnInit {
   }
 
   nextStep() {
-    console.log(this.articleForm.value)
+    this.loaderService.show();
     const rq = {
       title: this.title.value,
       group: this.group.value,
-      user_ids: [this.user.value.id]
+      user_ids: this.getIds(this.students.value)
     }
-    this.service.postRegisterArticle(rq).pipe().subscribe((res: any) => {
-      console.log(res);
-      if (res.status) {
-        this.service.postRegisterArticleFile(this.formData, '1').pipe().subscribe((res: any) => {
-          if (res.status) {
-
-          }
-          console.log('res archivo', res);
-        })
-      }
-    });
+    this.service.postRegisterArticle(rq).pipe(
+    ).subscribe(
+      (res: any) => {
+        if (res.status) {
+          this.service.postRegisterArticleFile(this.formData, res.id).pipe(
+            finalize(() => {
+              this.loaderService.hide();
+            })
+          ).subscribe(
+            (res: any) => {
+              if (res.status) {
+                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'El artículo se ha registrado de manera correcta.' });
+                this.clearValues();
+              }
+            }, (error) => {
+              this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ha ocurrido un error al guardar los archivos.' });
+              console.log('error 2', error);
+            })
+        }
+      },
+      (error) => {
+        this.loaderService.hide();
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ha ocurrido un error al registrar el artículo.' });
+        console.log('error 1', error);
+      });
   }
 
   getFileType(fileName: string): string | null {
@@ -198,13 +215,6 @@ export class HotbedRegisterComponent implements OnInit {
     this.formData = new FormData();
     this.file.setValue(null);
     this.fileInput.nativeElement.value = ''; // Limpiar el valor del input file
-  }
-
-  watchUserSelectedRecibed(user: IStudent) {
-    console.log('user', user);
-    if (user.code) {
-      this.user.setValue(user);
-    }
   }
 
   search(event: AutoCompleteCompleteEvent) {
@@ -229,5 +239,21 @@ export class HotbedRegisterComponent implements OnInit {
         this.students.setValue(students);
       }
     })
+  }
+
+  getIds(arr: IStudent[]) {
+    return arr.map(item => item.id);
+  }
+
+  clearValues() {
+    this.students.setValue([]);
+    this.articleForm.reset();
+    this.clearFile();
+    this.userSelection.clearComponent();
+  }
+
+  getUserSelected(userSelected: any){
+    console.log('userSelected', userSelected)
+    this.students.setValue(userSelected);
   }
 }

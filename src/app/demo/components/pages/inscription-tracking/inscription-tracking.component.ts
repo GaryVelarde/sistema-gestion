@@ -11,7 +11,7 @@ import {
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
-import { IStudent } from '../../cross-interfaces/comments-interfaces';
+import { IStudent, ITeacher } from '../../cross-interfaces/comments-interfaces';
 
 @Component({
     templateUrl: './inscription-tracking.component.html',
@@ -81,14 +81,14 @@ export class InscriptionTrackingComponent implements OnInit {
                     "status": "Inscrito",
                     "teachers": [
                         {
-                            "id": 1,
-                            "name": "Ramiro",
-                            "surnames": "Torres Marquez",
-                            "code": 11525320,
-                            "email": "cesarjauregui@test.com",
-                            "phone": 986457511,
-                            "orcid": null,
-                            "cip": null
+                            "id": 9,
+                            "name": "Daniela Agustina Leal Nieves Hijo",
+                            "surnames": "Carbajal",
+                            "code": 37726580,
+                            "email": "wrobles@example.com",
+                            "phone": 951812965,
+                            "orcid": "voluptatem",
+                            "cip": 68751388
                         }
                     ]
                 }
@@ -173,6 +173,39 @@ export class InscriptionTrackingComponent implements OnInit {
         }
     ];
 
+    teachers: ITeacher[] = [
+        {
+            "id": 3,
+            "name": "Nadia Daniela Vallejo Rodríguez",
+            "surnames": "Gil",
+            "code": 45778452,
+            "email": "joshua65@example.net",
+            "phone": 297546617,
+            "orcid": "esse",
+            "cip": 38344486
+        },
+        {
+            "id": 7,
+            "name": "Ashley Esquibel Hijo",
+            "surnames": "Brito",
+            "code": 56427284,
+            "email": "kochoa@example.org",
+            "phone": 177932979,
+            "orcid": "possimus",
+            "cip": 47213143
+        },
+        {
+            "id": 9,
+            "name": "Daniela Agustina Leal Nieves Hijo",
+            "surnames": "Carbajal",
+            "code": 37726580,
+            "email": "wrobles@example.com",
+            "phone": 951812965,
+            "orcid": "voluptatem",
+            "cip": 68751388
+        }
+    ]
+
     filteredItems: any[] | undefined;
 
     graduatesList: [] = [];
@@ -237,7 +270,7 @@ export class InscriptionTrackingComponent implements OnInit {
         Validators.required,
     ]);
     private _students: FormControl = new FormControl([] as IStudent[], [Validators.required]);
-    private _teacher: FormControl = new FormControl([] as any[], [Validators.required]);
+    private _teacher: FormControl = new FormControl([] as ITeacher[], [Validators.required]);
 
     get comment() {
         return this._comment;
@@ -371,7 +404,9 @@ export class InscriptionTrackingComponent implements OnInit {
         this.showEdit = true;
         console.log('this.graduatesList', this.graduatesList);
         const arrStudents = this.addFullNameProperty(this.graduatesList);
+        const arrTeacher = this.addFullNameProperty(this.reviewerList);
         this.students.setValue(arrStudents);
+        this.teacher.setValue(arrTeacher);
     }
 
     test() {
@@ -393,8 +428,9 @@ export class InscriptionTrackingComponent implements OnInit {
 
     saveEdition() {
         this.graduatesList = this.students.value;
+        this.reviewerList = this.teacher.value;
         this.showEdit = false;
-     }
+    }
 
     goToReview() {
         this.addNotificationForChangeState(
@@ -618,6 +654,20 @@ export class InscriptionTrackingComponent implements OnInit {
             }));
     }
 
+    searchTeachers(event: AutoCompleteCompleteEvent) {
+        const query = event.query.toLowerCase();
+        this.filteredItems = this.teachers
+            .filter(
+                (usuario) =>
+                    usuario.name.toLowerCase().includes(query) ||
+                    usuario.surnames.toLowerCase().includes(query)
+            )
+            .map((usuario) => ({
+                ...usuario,
+                fullName: `${usuario.name} ${usuario.surnames}`,
+            }));
+    }
+
     watchStudents() {
         this.students.valueChanges.pipe().subscribe((res: IStudent[]) => {
             console.log(res);
@@ -630,7 +680,7 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     watchTeacher() {
-        this.teacher.valueChanges.pipe().subscribe((res: any[]) => {
+        this.teacher.valueChanges.pipe().subscribe((res: ITeacher[]) => {
             if (res.length > 1) {
                 const teacher = [...res];
                 teacher.splice(1, 1);

@@ -22,16 +22,14 @@ import { DateFormatService } from 'src/app/services/date-format.service';
 import { PrimeNGConfig } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
+import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { LoaderService } from 'src/app/layout/service/loader.service';
 interface Task {
     id: number;
     title: string;
     description: string;
     dateEnd: string;
     user_name: string;
-}
-interface AutoCompleteCompleteEvent {
-    originalEvent: Event;
-    query: string;
 }
 
 interface Usuario {
@@ -290,6 +288,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         private config: PrimeNGConfig,
         private service: AuthService,
         private router: Router,
+        private loaderService: LoaderService
     ) {
         this.slotDurationForm = this.fb.group({
             slotDuration: this.slotDuration,
@@ -377,6 +376,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             weekHeader: 'Sm'
         });
         this.callGetEventsUdi();
+        this.loaderService.hide();
     }
 
     ngAfterViewInit(): void {
