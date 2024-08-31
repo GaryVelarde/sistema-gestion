@@ -1,32 +1,33 @@
 .loader-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #1e366d; /* Fondo semi-transparente */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000; /* Superponer sobre todo */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #1e366d; /* Fondo semi-transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Superponer sobre todo */
+  /* Removed opacity and transition since handled by Angular animations */
+}
+
+.loader {
+  width: 100px;
+  height: 100px;
+  background-image: url('/assets/img/uch-loader.png'); // Ruta a tu imagen
+  background-size: contain; // Ajusta la imagen para cubrir todo el div
+  background-position: center; // Centra la imagen dentro del div
+  background-repeat: no-repeat; // Evita que la imagen se repita
+  animation: fade-in-out 1.5s infinite;
+}
+
+/* Definición de la animación de fade-in-out */
+@keyframes fade-in-out {
+  0%, 100% {
+    opacity: 0; /* Comienza invisible */
   }
-  
-  .loader {
-    width: 100px;
-    height: 100px;
-    background-image: url('/assets/img/uch-loader.png'); // Ruta a tu imagen
-    background-size: contain; // Ajusta la imagen para cubrir todo el div
-    background-position: center; // Centra la imagen dentro del div
-    background-repeat: no-repeat; // Evita que la imagen se repita
-    animation: fade-in-out 1.5s infinite;
+  100% {
+    opacity: 1; /* Se hace visible en el medio */
   }
-  
-  /* Definición de la animación */
-  @keyframes fade-in-out {
-    0%, 100% {
-      opacity: 0; /* Comienza invisible */
-    }
-    50% {
-      opacity: 1; /* Se hace visible en el medio */
-    }
-  }
+}

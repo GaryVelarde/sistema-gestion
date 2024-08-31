@@ -288,7 +288,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         private config: PrimeNGConfig,
         private service: AuthService,
         private router: Router,
-        private loaderService: LoaderService
     ) {
         this.slotDurationForm = this.fb.group({
             slotDuration: this.slotDuration,
@@ -376,7 +375,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             weekHeader: 'Sm'
         });
         this.callGetEventsUdi();
-        this.loaderService.hide();
     }
 
     ngAfterViewInit(): void {

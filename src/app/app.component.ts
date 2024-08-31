@@ -17,7 +17,9 @@ export class AppComponent implements OnInit {
             if (event instanceof NavigationStart) {
               this.loaderService.show();
             } else if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
-              this.loaderService.hide();
+              setTimeout(() => {
+                this.loaderService.hide();
+              }, 800);
             }
           });
     }

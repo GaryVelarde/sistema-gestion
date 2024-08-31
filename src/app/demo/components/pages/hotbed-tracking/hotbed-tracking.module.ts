@@ -12,6 +12,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ToolbarModule } from 'primeng/toolbar';
 import { SkeletonModule } from 'primeng/skeleton';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
+import { TimelineModule } from 'primeng/timeline';
+import { CardModule } from 'primeng/card';
 
 @NgModule({
   imports: [
@@ -28,6 +30,8 @@ import { CrossComponentsModule } from '../../cross-components/Cross.module';
     ToolbarModule,
     SkeletonModule,
     CrossComponentsModule,
+    TimelineModule,
+    CardModule,
   ],
   declarations: [HotbedTrackingComponent]
 })
