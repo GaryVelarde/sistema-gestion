@@ -24,24 +24,33 @@
 
   </div>
   <div class="col-12 content-comments">
-    <div *ngFor="let comment of visibleComments"
-      class="mb-4 flex align-items-center">
-      <p-avatar
-        [label]="getFirstLetter(comment.name)"
-        styleClass="ml-3"
-        size="large" />
-      <div class="ml-3 w-full">
-        <div class="flex justify-content-between mb-2">
-          <span class="block text-900">{{comment.name}}</span>
-          <span class="block text-700">1 Jun 17:58 pm</span>
-        </div>
-        <span
-          class="block text-900 border-1 surface-ground surface-border p-2 border-round"
-          style="word-break: break-all;">
-          {{comment.content}}
-        </span>
-      </div>
+    <div *ngIf="comments.length > 0">
+      <ng-container *ngTemplateOutlet="commentsList"></ng-container>
     </div>
+    <div *ngIf="comments.length < 1">
+      <span class="ml-3">Sé el primero en dejar un comentario</span>
+    </div>
+    <ng-template #commentsList>
+      <div *ngFor="let comment of visibleComments"
+      class="mb-4 flex align-items-center">
+        <p-avatar
+          [label]="getFirstLetter(comment.name)"
+          styleClass="ml-3"
+          size="large" />
+        <div class="ml-3 w-full">
+          <div class="flex justify-content-between mb-2">
+            <span class="block text-900">{{comment.name}}</span>
+            <span class="block text-700">1 Jun 17:58 pm</span>
+          </div>
+          <span
+            class="block text-900 border-1 surface-ground surface-border p-2 border-round"
+            style="word-break: break-all;">
+            {{comment.content}}
+          </span>
+        </div>
+      </div>
+    </ng-template>
+    
   </div>
   <ng-container *ngIf="reversedComments.length > 5">
     <button *ngIf="!showAllComments" pButton [label]="'Ver más (' + (comments.length -5) + ' ' + ((comments.length -5) > 1 ? 'comentarios' : 'comentario') + ')'"

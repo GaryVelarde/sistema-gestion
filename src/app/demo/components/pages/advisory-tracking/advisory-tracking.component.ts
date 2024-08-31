@@ -11,6 +11,7 @@ import {
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { InscriptionPresenter } from '../inscription/insctiption-presenter';
+import { LoaderService } from 'src/app/layout/service/loader.service';
 
 @Component({
     templateUrl: './advisory-tracking.component.html',
@@ -108,12 +109,15 @@ export class AdvisoryTrackingComponent implements OnInit {
     public tasksForm: FormGroup;
     public cancelattionForm: FormGroup;
     public advisoryForm: FormGroup;
+    public studentForm: FormGroup;
+    public dataForm: FormGroup;
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
     private _taskDescription: FormControl = new FormControl('', [
         Validators.required,
     ]);
     private _advisory: FormControl = new FormControl([], [Validators.required]);
+    private _students: FormControl = new FormControl([], [Validators.required]);
 
     get cancelationComment() {
         return this._cancelationComment;
@@ -130,6 +134,9 @@ export class AdvisoryTrackingComponent implements OnInit {
     get advisory() {
         return this._advisory;
     }
+    get students() {
+        return this._students;
+    }
 
     constructor(
         private messageService: MessageService,
@@ -139,7 +146,7 @@ export class AdvisoryTrackingComponent implements OnInit {
         private elRef: ElementRef,
         private router: Router,
         private config: PrimeNGConfig,
-        private presenter: InscriptionPresenter,
+        private loaderService: LoaderService,
     ) {
         this.tasksForm = this.fb.group({
             taskDescription: this.taskDescription,
@@ -150,6 +157,9 @@ export class AdvisoryTrackingComponent implements OnInit {
         });
         this.advisoryForm = this.fb.group({
             advisory: this.advisory,
+        });
+        this.studentForm = this.fb.group({
+            students: this.students,
         });
     }
 
@@ -192,22 +202,27 @@ export class AdvisoryTrackingComponent implements OnInit {
     }
 
     viewDetailsInscription(data: any) {
-        console.log('aaa', data)
+        this.loaderService.show();
         if (data) {
             this.advisorySelected = data;
             this.reviewersList = data.reviewer;
             this.graduatesList = data.degree_processes.graduates;
-            console.log('egressList', this.egressList);
-            console.log('graduatesList', this.graduatesList);
             this.advisoryState = this.advisorySelected.status;
             this.countTask();
         }
+        setTimeout(() => {
+            this.loaderService.hide();
+        }, 800);
     }
 
     backList() {
+        this.loaderService.show();
         this.advisorySelected = null;
         this.reviewersList = [];
         this.graduatesList = [];
+        setTimeout(() => {
+            this.loaderService.hide();
+        }, 800);
     }
 
     showEdition() {
@@ -294,7 +309,7 @@ export class AdvisoryTrackingComponent implements OnInit {
         if (checkbox) {
             checkbox.disabled = true;
         }
-    
+
         this.countTask();
     }
 
@@ -418,8 +433,13 @@ export class AdvisoryTrackingComponent implements OnInit {
         return firstLetterUpper;
     }
 
-    getUserSelected(userSelected: any){
+    getUserSelected(userSelected: any) {
         console.log('userSelected', userSelected)
         this.advisory.setValue(userSelected);
-      }
+    }
+
+    getStudentSelected(userSelected: any) {
+        console.log('students', userSelected)
+        this.students.setValue(userSelected);
+    }
 }

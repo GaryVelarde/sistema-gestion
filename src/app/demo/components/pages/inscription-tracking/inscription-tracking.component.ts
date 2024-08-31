@@ -12,6 +12,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { IStudent, ITeacher } from '../../cross-interfaces/comments-interfaces';
+import { LoaderService } from 'src/app/layout/service/loader.service';
 
 @Component({
     templateUrl: './inscription-tracking.component.html',
@@ -303,6 +304,7 @@ export class InscriptionTrackingComponent implements OnInit {
         private elRef: ElementRef,
         private router: Router,
         private config: PrimeNGConfig,
+        private loaderService: LoaderService,
     ) {
         this.commentsForm = this.fb.group({
             comment: this.comment,
@@ -363,6 +365,7 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     viewDetailsInscription(data: any) {
+        this.loaderService.show();
         if (data) {
             this.inscriptionSelected = data;
             this.graduatesList = data.graduates;
@@ -370,9 +373,13 @@ export class InscriptionTrackingComponent implements OnInit {
             this.inscriptionState = data.inscriptions[0].status;
             this.countTask();
         }
+        setTimeout(() => {
+            this.loaderService.hide();
+        }, 800);
     }
 
     backList() {
+        this.loaderService.show();
         this.inscriptionSelected = null;
         this.graduatesList = [];
         this.reviewerList = [];
@@ -380,6 +387,9 @@ export class InscriptionTrackingComponent implements OnInit {
         this.showEdit = false;
         this.studentsForm.reset();
         this.teacherForm.reset();
+        setTimeout(() => {
+            this.loaderService.hide();
+        }, 800);
     }
 
     get severity(): string {
@@ -399,8 +409,6 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     showEdition() {
-        //this.callGetStudentList();
-        //this.callGetTeachersList();
         this.showEdit = true;
         console.log('this.graduatesList', this.graduatesList);
         const arrStudents = this.addFullNameProperty(this.graduatesList);

@@ -59,11 +59,11 @@ export class HotbedTrackingComponent implements OnInit {
     }
   ];*/
   events = [
-    { status: 'En desarrollo', date: '15/10/2020 10:30', icon: 'pi pi-pencil', color: '#9C27B0' },
-    { status: 'Revisado', date: '15/10/2020 14:00', icon: 'pi pi-check', color: '#673AB7' },
-    { status: 'Envió a revista ', date: '15/10/2020 16:15', icon: 'pi pi-sign-in', color: '#FF9800' },
-    { status: 'Indexado', date: '16/10/2020 10:00', icon: 'pi pi-paperclip', color: '#607D8B' },
-    { status: 'Pagado', date: '16/10/2020 10:00', icon: 'pi pi-wallet', color: '#607D8B' }
+    { status: 'En desarrollo', date: '15-10-2020 10:30', icon: 'pi pi-pencil', color: '#6366f1', message: 'El artículo pasó a desarrollo el día ' },
+    { status: 'Revisado', date: '15-10-2020 14:00', icon: 'pi pi-check', color: '#6366f1' },
+    { status: 'Envió a revista ', date: '15-10-2020 16:15', icon: 'pi pi-sign-in', color: '#6366f1' },
+    { status: 'Indexado', date: '00-00-0000 00:00', icon: 'pi pi-paperclip', color: '#607D8B' },
+    { status: 'Pagado', date: '00-00-0000 00:00', icon: 'pi pi-wallet', color: '#607D8B' }
 ];
 
   viewDetail = false;
@@ -85,12 +85,12 @@ export class HotbedTrackingComponent implements OnInit {
 
   viewDetailsHotbed(data: any) {
     this.loaderService.show();
+    this.viewDetail = true;
+    this.articleSelected = data;
+    console.log(this.articleSelected);
     setTimeout(() => {
       this.loaderService.hide();
     }, 800);
-    this.viewDetail = true;
-    this.articleSelected = data;
-    console.log(this.articleSelected)
   }
 
   getArticleList() {

@@ -9,9 +9,11 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./user-selection.component.scss']
 })
 export class UserSelectionComponent implements OnInit {
-  @Output() userSelected: EventEmitter<any[]> = new EventEmitter<any[]>();
   @Input() typeUserList: string;
   @Input() maxUsersAllow: number;
+  @Input() usersPreSelected: any[] = [];
+  @Output() userSelected: EventEmitter<any[]> = new EventEmitter<any[]>();
+
 
   getStudentListProcess = '';
   filteredStudents: any[];
@@ -40,6 +42,7 @@ export class UserSelectionComponent implements OnInit {
         this.callTeachersList();
         break;
     }
+    this.userFormControl.setValue(this.usersPreSelected);
   }
 
   search(event: AutoCompleteCompleteEvent) {
@@ -112,5 +115,12 @@ export class UserSelectionComponent implements OnInit {
   clearComponent() {
     this.userForm.reset();
     this.userFormControl.setValue([]);
+  }
+
+  addFullNameProperty(data: any[]): any[] {
+    return data.map(item => ({
+      ...item,
+      fullName: `${item.name} ${item.surnames}`
+    }));
   }
 }

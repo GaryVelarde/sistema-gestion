@@ -188,8 +188,8 @@
             </div>
             <div *ngIf="!showEdit" class="grid col-12">
                 <div class="col-12">
-                    <p-button (click)="viewHistory=true" label="Ver histórico"
-                    icon="pi pi-book" iconPos="left" />
+                    <p-button (click)="viewHistory=true" label="Ver línea de trabajo"
+                    icon="pi pi-clock" iconPos="left" />
                 </div>
                 <div class="col-3"><p class="font-bold">Escuala
                         profesional:</p><p>{{articleSelected.title}}</p></div>
@@ -213,11 +213,9 @@
                         icon="pi pi-angle-left" iconPos="left" />
         </div>
     </div>
-    <div class="card flex justify-content-center col-12">
-        <h4 class="font-bold">Título:
-            {{articleSelected.title}}
-        </h4>
-    </div>
+    <p class="font-bold">Línea de trabajo de 
+        "{{articleSelected.title}}"
+    </p>
     <p-timeline [value]="events" align="alternate" styleClass="customized-timeline">
         <ng-template pTemplate="marker" let-event>
             <span 
@@ -227,10 +225,15 @@
             </span>
         </ng-template>
         <ng-template pTemplate="content" let-event>
-            <p-card [header]="event.status" [subheader]="event.date" >
-                <p>
+            <p-card>
+                <h5 class="font-bold">{{event.status}}</h5>
+                <p>{{event.date === '00-00-0000 00:00' ? '--/--/--- ----' : event.date}}</p>
+                <p *ngIf="event.date !== '00-00-0000 00:00'">
                     Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditate
                     neque quas!
+                </p>
+                <p *ngIf="event.date === '00-00-0000 00:00'">
+                    Aún no pasa a {{event.status}}
                 </p>
             </p-card>
         </ng-template>

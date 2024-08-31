@@ -72,6 +72,7 @@ export class UsersComponent implements OnInit {
     userDetailSelected: IUsuario;
     titleModalDetailIserSelected: string = '';
     getUserProcess = '';
+    messageError = 'No se ha podido cargar la lista de usuarios. Por favor vuelva a intentarlo más tarde.'
     public userForm: FormGroup;
     private _role: FormControl = new FormControl('', [Validators.required]);
     private _name: FormControl = new FormControl('', [Validators.required]);
@@ -462,5 +463,11 @@ export class UsersComponent implements OnInit {
             }
             console.log(res);
         });
+    }
+
+    handleReload(reload: boolean) {
+        if (reload) {
+            this.callGetUserList();
+        }
     }
 }

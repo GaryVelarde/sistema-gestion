@@ -343,9 +343,10 @@
                 </div>
             </div>
             <div class="ml-2 mr-2 separator"></div>
-            <div *ngIf="!showEdit" class="grid col-12">
+            <div class="grid col-12">
                 <div class="col-6">
-                    <p-table *ngIf="reviewersList.length"
+                    <div *ngIf="reviewersList.length > 0">
+                        <p-table
                         [value]="reviewersList">
                         <ng-template pTemplate="header">
                             <tr>
@@ -363,18 +364,20 @@
                             </tr>
                         </ng-template>
                     </p-table>
-                    <div *ngIf="!reviewersList.length">
+                    </div>
+                    
+                    <div *ngIf="!reviewersList.length || showEdit">
                         <p>Seleccione un asesor de tesis</p>
                         <app-user-selection 
                             #userSelection 
                             typeUserList="docentes" 
                             maxUsersAllow="1" 
-                            (userSelected)="getUserSelected($event)" >
+                            (userSelected)="getUserSelected($event)">
                         </app-user-selection>
                     </div>
                 </div>
                 <div class="col-6">
-                    <p-table
+                    <p-table  *ngIf="!showEdit"
                         [value]="graduatesList">
                         <ng-template pTemplate="header">
                             <tr>
@@ -400,6 +403,15 @@
                             </tr>
                         </ng-template>
                     </p-table>
+                    <div *ngIf="showEdit">
+                        <p>Estudiante(s)</p>
+                        <app-user-selection 
+                            #userSelection 
+                            typeUserList="estudiantes" 
+                            maxUsersAllow="2" 
+                            (userSelected)="getStudentSelected($event)">
+                        </app-user-selection>
+                    </div>
                 </div>
             </div>
 

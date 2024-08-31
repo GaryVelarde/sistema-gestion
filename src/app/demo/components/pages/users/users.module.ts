@@ -20,31 +20,33 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { CalendarModule } from 'primeng/calendar';
 import { SkeletonModule } from 'primeng/skeleton';
 import { SidebarModule } from 'primeng/sidebar';
+import { CrossComponentsModule } from "../../cross-components/Cross.module";
 
 @NgModule({
     imports: [
-        CommonModule,
-        UsersRoutingModule,
-        TableModule,
-        FileUploadModule,
-        ReactiveFormsModule,
-        FormsModule,
-        ButtonModule,
-        RippleModule,
-        ToastModule,
-        ToolbarModule,
-        RatingModule,
-        InputTextModule,
-        InputTextareaModule,
-        DropdownModule,
-        RadioButtonModule,
-        InputNumberModule,
-        DialogModule,
-        CheckboxModule,
-        CalendarModule,
-        SkeletonModule,
-        SidebarModule,
-    ],
+    CommonModule,
+    UsersRoutingModule,
+    TableModule,
+    FileUploadModule,
+    ReactiveFormsModule,
+    FormsModule,
+    ButtonModule,
+    RippleModule,
+    ToastModule,
+    ToolbarModule,
+    RatingModule,
+    InputTextModule,
+    InputTextareaModule,
+    DropdownModule,
+    RadioButtonModule,
+    InputNumberModule,
+    DialogModule,
+    CheckboxModule,
+    CalendarModule,
+    SkeletonModule,
+    SidebarModule,
+    CrossComponentsModule,
+],
     declarations: [UsersComponent]
 })
 export class UsersModule { }
