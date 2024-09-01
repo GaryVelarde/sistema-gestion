@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Product } from 'src/app/demo/api/product';
-import { MessageService } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ProductService } from 'src/app/demo/service/product.service';
 import {
@@ -67,7 +67,19 @@ export class UsersComponent implements OnInit {
         { name: 'IX', code: 'IX' },
         { name: 'X', code: 'X' },
     ];
-
+    breadcrumbItems: MenuItem[] = [
+        { icon: 'pi pi-home', route: '/' },
+        { label: 'Gestión de usuarios' }, 
+        { label: 'Usuarios', visible: true},
+    ];
+    columnTitles: string[] = [
+        'Código',
+        'Nombres completos',
+        'Correo',
+        'Celular',
+        'Estado',
+        ''
+      ];
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     userDetailSelected: IUsuario;
     titleModalDetailIserSelected: string = '';

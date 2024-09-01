@@ -31,6 +31,7 @@ import {
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessagesModule } from 'primeng/messages';
+import { CrossComponentsModule } from '../../cross-components/Cross.module';
 
 @NgModule({
     declarations: [
@@ -65,6 +66,7 @@ import { MessagesModule } from 'primeng/messages';
         MessagesModule,
         BadgeModule,
         ProgressBarModule,
+        CrossComponentsModule,
         RouterModule.forChild([
             {
                 path: '',

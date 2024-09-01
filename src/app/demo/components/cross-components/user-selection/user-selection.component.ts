@@ -42,7 +42,8 @@ export class UserSelectionComponent implements OnInit {
         this.callTeachersList();
         break;
     }
-    this.userFormControl.setValue(this.usersPreSelected);
+    console.log('this.usersPreSelected', this.usersPreSelected)
+    this.userFormControl.setValue(this.addFullNameProperty(this.usersPreSelected));
   }
 
   search(event: AutoCompleteCompleteEvent) {

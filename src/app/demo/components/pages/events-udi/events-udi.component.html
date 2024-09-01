@@ -1,234 +1,422 @@
 <div [ngClass]="{ 'd-none': showEventDetail }">
-  <div class="grid" #cardBody>
-    <div class="col-12">
-      <p-card>
-        <p-toolbar class="mt-3">
-          <div class="p-toolbar-group-left">
-            <button type="button" pButton icon="pi pi-plus" label="Nueva reunión"
-              (click)="newEventDialog=true"></button>
-          </div>
-  
-          <div class="p-toolbar-group-right">
-            <p style="margin: 0 1rem 0 0;">Ver en intervalos de</p>
-            <form [formGroup]="slotDurationForm">
-  
-              <p-dropdown
-                formControlName="slotDuration"
-                [options]="timeslots"
-                optionLabel="name" />
-            </form>
-          </div>
-        </p-toolbar>
-        <full-calendar
-          class="mt-4"
-          #calendar
-          [options]="calendarOptions"
-          [events]="events"></full-calendar>
-      </p-card>
+    <div class="grid" #cardBody>
+        <div class="col-12">
+            <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+            <p-card>
+                <p-toolbar class="mt-3">
+                    <div class="p-toolbar-group-left">
+                        <button
+                            type="button"
+                            pButton
+                            icon="pi pi-plus"
+                            label="Nueva reunión"
+                            (click)="newEventDialog = true"
+                        ></button>
+                    </div>
+
+                    <div class="p-toolbar-group-right">
+                        <p style="margin: 0 1rem 0 0">Ver en intervalos de</p>
+                        <form [formGroup]="slotDurationForm">
+                            <p-dropdown
+                                formControlName="slotDuration"
+                                [options]="timeslots"
+                                optionLabel="name"
+                            />
+                        </form>
+                    </div>
+                </p-toolbar>
+                <full-calendar
+                    class="mt-4"
+                    #calendar
+                    [options]="calendarOptions"
+                    [events]="events"
+                ></full-calendar>
+            </p-card>
+        </div>
     </div>
-  </div>
 </div>
 
 <div *ngIf="showEventDetail" class="grid">
-  <div class="col-12">
-
-      <div class="card">
-          <div class="grid d-flex col-12">
-              <div class="mr-auto p-2">
-                  <p-button (click)="backCalendar()" label="Regresar"
-                      [outlined]="true"
-                      icon="pi pi-angle-left" iconPos="left" />
-                  <p-button *ngIf="!showEdit && inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="ml-3"
-                      (click)="showEdition()"
-                      label="Editar"
-                      icon="pi pi-pencil" iconPos="left" />
-                  <p-button *ngIf="showEdit && inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="ml-3"
-                      (click)="cancelEdition()"
-                      label="Cancelar edición"
-                      icon="pi pi-times" iconPos="right" />
-                  <p-button *ngIf="showEdit && inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="ml-3"
-                      (click)="saveEdition()"
-                      label="Guardar cambios"
-                      icon="pi pi-save" iconPos="left" />
-              </div>
-              <div class="p-2">
-                  <p-button
-                      *ngIf="inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'"
-                      label="Cancelar reunión"
-                      [outlined]="true"
-                      class="mr-3"
-                      icon="pi pi-times" iconPos="left"
-                      severity="danger" (click)="goToCancelation()" />
-                  <p-button
-                      *ngIf="inscriptionState === 'Inscrito' || inscriptionState === 'Observado'"
-                      label="Pasar a revisión" [outlined]="true"
-                      icon="pi pi-angle-right" iconPos="right"
-                      severity="info" (click)="goToReview()" />
-                  <p-button *ngIf="inscriptionState === 'En revisión'"
-                      label="Observado" [outlined]="true"
-                      icon="pi pi-exclamation-circle" iconPos="left"
-                      severity="warning" (click)="goToObserved()" />
-                  <p-button
-                      *ngIf="inscriptionState === 'En revisión'"
-                      class="ml-3"
-                      label="Aprobado" [outlined]="true"
-                      icon="pi pi-angle-right" iconPos="right"
-                      severity="success" (click)="goToApprove()" />
-              </div>
-          </div>
-          <div class="card flex justify-content-center col-12">
-
-              <h4
-                  class="font-bold">
-                  {{eventSelected.event.title}}</h4>
-
-          </div>
-          <div *ngIf="!showEdit" class="grid col-12">
-            <div class="col-3"><p class="font-bold">Descripción de la reunión:</p><p>{{eventSelected.event._def.extendedProps.event_udi.description}}</p></div>
-            <div class="col-3"><p class="font-bold">Url de la reunión:</p>
-              <p class="p-url" (click)="redirectToUrl()">
-                <i class="pi pi-link" style="font-size: 1rem"></i> 
-                {{eventSelected.event._def.extendedProps.event_udi.meeting_url}}
-              </p>
-            </div>
-              <div class="col-3"><p class="font-bold">Fecha y hora de inicio:</p><p>
-                <i class="pi pi-calendar" style="font-size: 1rem"></i>
-                {{dateFormatService.formatDate(eventSelected.event.start)}}</p></div>
-              <div class="col-3"><p class="font-bold">Fecha y hora de fin:</p><p>
-                <i class="pi pi-calendar" style="font-size: 1rem"></i>
-                {{dateFormatService.formatDate(eventSelected.event.end)}}</p></div>
-          </div>
-          <div *ngIf="showEdit" class="grid col-12">
-              <div class="col-3"><p class="font-bold">Nro de
-                      expediente:</p><input type="text" pInputText
-                      class="full-width"
-                      [value]="eventSelected" />
-              </div>
-              <div class="col-3"><p class="font-bold">Escuala
-                      profesional:</p><input type="text" pInputText
-                      class="full-width"
-                      [value]="eventSelected.escuela_profesional" />
-              </div>
-              <div class="col-3"><p class="font-bold">Nro de
-                      oficio:</p><input type="text" pInputText
-                      class="full-width"
-                      [value]="eventSelected.numero_oficio" />
-              </div>
-              <div class="col-3"><p class="font-bold">Nro de
-                      resolución:</p><input type="text" pInputText
-                      class="full-width"
-                      [value]="eventSelected.numero_resolucion" />
-              </div>
-          </div>
-          <div class="ml-2 mr-2 separator"></div>
-          <div class="grid col-12">
-            <div class=" col-12">
-              <h5>Lista de encargados</h5>
-            </div>
-            <div class="card w-full">
-              <p>Digite el nombre del <b>encargado</b> y seleccionelo para registrarlo en la reunión.</p>
-              <form [formGroup]="managerForm">
-                <span class="p-fluid">
-                    <p-autoComplete 
-                        formControlName="usersManager"
-                        [suggestions]="filteredItems" 
-                        (completeMethod)="search($event)" 
-                        field="fullName" 
-                        [multiple]="true" />
-                </span>
-              </form>
-            </div>
-          </div>
-        <div class="ml-2 mr-2 separator"></div>
-        <div class="grid col-12">
-          <div class=" col-12">
-            <h5>Lista de participantes</h5>
-        </div>
-        <div class="card w-full">
-          <p>Digite el nombre del <b>participante</b> y seleccionelo para registrarlo en la reunión.</p>
-          <form [formGroup]="participantsForm">
-            <span class="p-fluid">
-                <p-autoComplete 
-                    formControlName="usersParticipants"
-                    [suggestions]="filteredItems" 
-                    (completeMethod)="search($event)" 
-                    field="fullName" 
-                    [multiple]="true" />
-            </span>
-          </form>
-        </div>
-          </div>
-          <div class="ml-2 mr-2 separator"></div>
-          <div class="grid col-12 mt-2">
-              <div class="grid col-12 d-flex bd-highlight">
-                  <h5 class="mr-auto p-2 bd-highlight">Tareas</h5>
-                  <button type="button" class="b-2 bd-highlight" pButton icon="pi pi-plus" label="nueva tarea"
-                  (click)="showNewTaskDialog()"></button>
-              </div>
-              <div class="col-12">
-                <div class="board-container">
-                  <div class="board-column pending-column" pDroppable (onDrop)="drop($event, 'pending')">
-                    <p class="column-header pending-column-header">PENDIENTE</p>
-                    <ul class="task-list">
-                      <div *ngIf="pendingTasks.length < 1" class="text-align-center mt-5">
-                        <p><i class="pi pi-check"></i>
-                          No quedan tareas pendientes.</p>
-                      </div>
-                      <li *ngFor="let task of pendingTasks" class="task-card"
-                          pDraggable (onDragStart)="dragStart(task)" (onDragEnd)="dragEnd()">
-                        <p class="task-title">{{ task.title }}</p>
-                        <p class="task-description">{{ task.description }}</p>
-                        <div class="grid mr-2 ml-1 mt-1">
-                          <b class="task-description" style="padding-top: 5px;">Asignado a {{task.user_name}}</b>
-                        </div>
-                        <div class="grid mr-2 ml-1 mt-1 mt-2">
-                          <i class="pi pi-pencil button-edit-task mr-2" (click)="editTask(task)"></i>
-                          <i class="pi pi-trash button-delete-task" (click)="deleteTask(task)"></i>
-                          <p class="ml-auto task-description" style="padding-top: 5px;">{{ task.dateEnd }}</p>
-                        </div>
-                       
-                      </li>
-                    </ul>
-                  </div>
-                
-                  <div class="board-column in-course-column" pDroppable (onDrop)="drop($event, 'inProgress')">
-                    <p class="column-header in-course-column-header">EN CURSO</p>
-                    <ul class="task-list">
-                      <div *ngIf="inProgressTasks.length < 1" class="text-align-center mt-5">
-                        <p><i class="pi pi-check"></i>
-                          No quedan tareas en curso.</p>
-                      </div>
-                      <li *ngFor="let task of inProgressTasks" class="task-card"
-                          pDraggable (onDragStart)="dragStart(task)" (onDragEnd)="dragEnd()">
-                          <p class="task-title">{{ task.title }}</p>
-                          <p class="task-description">{{ task.description }}</p>
-                          <div class="grid mr-2 ml-1 mt-1">
-                            <b class="task-description" style="padding-top: 5px;">Asignado a {{task.user_name}}</b>
-                            <p class="ml-auto task-description">{{ task.dateEnd }}</p>
-                          </div>
-                      </li>
-                    </ul>
-                  </div>
-                
-                  <div class="board-column finalize-column" pDroppable (onDrop)="drop($event, 'completed')">
-                    <p class="column-header finalize-column-header">FINALIZADO</p>
-                    <ul class="task-list">
-                      <li *ngFor="let task of completedTasks" class="task-card"
-                          pDraggable (onDragStart)="dragStart(task)" (onDragEnd)="dragEnd()">
-                          <p class="task-title">{{ task.title }}</p>
-                          <p class="task-description">{{ task.description }}</p>
-                          <div class="grid mr-2 ml-1 mt-1">
-                            <b class="task-description" style="padding-top: 5px;">Asignado a {{task.user_name}}</b>
-                            <p class="ml-auto task-description">{{ task.dateEnd }}</p>
-                          </div>
-                      </li>
-                    </ul>
-                  </div>
+    <div class="col-12">
+        <app-breadcrumb [items]="detailsBreadcrumbItems"></app-breadcrumb>
+        <div class="card">
+            <div class="grid d-flex col-12">
+                <div class="mr-auto p-2">
+                    <p-button
+                        (click)="backCalendar()"
+                        label="Regresar"
+                        [outlined]="true"
+                        icon="pi pi-angle-left"
+                        iconPos="left"
+                    />
+                    <p-button
+                        *ngIf="
+                            !showEdit &&
+                            inscriptionState !== 'Cancelado' &&
+                            inscriptionState !== 'Aprobado'
+                        "
+                        class="ml-3"
+                        (click)="showEdition()"
+                        label="Editar"
+                        icon="pi pi-pencil"
+                        iconPos="left"
+                    />
+                    <p-button
+                        *ngIf="
+                            showEdit &&
+                            inscriptionState !== 'Cancelado' &&
+                            inscriptionState !== 'Aprobado'
+                        "
+                        class="ml-3"
+                        (click)="cancelEdition()"
+                        label="Cancelar edición"
+                        icon="pi pi-times"
+                        iconPos="right"
+                    />
+                    <p-button
+                        *ngIf="
+                            showEdit &&
+                            inscriptionState !== 'Cancelado' &&
+                            inscriptionState !== 'Aprobado'
+                        "
+                        class="ml-3"
+                        (click)="saveEdition()"
+                        label="Guardar cambios"
+                        icon="pi pi-save"
+                        iconPos="left"
+                    />
                 </div>
-              </div>
-              <div class="ml-2 mr-2 separator"></div>
+                <div class="p-2">
+                    <p-button
+                        *ngIf="
+                            inscriptionState !== 'Cancelado' &&
+                            inscriptionState !== 'Aprobado'
+                        "
+                        label="Cancelar reunión"
+                        [outlined]="true"
+                        class="mr-3"
+                        icon="pi pi-times"
+                        iconPos="left"
+                        severity="danger"
+                        (click)="goToCancelation()"
+                    />
+                    <p-button
+                        *ngIf="
+                            inscriptionState === 'Inscrito' ||
+                            inscriptionState === 'Observado'
+                        "
+                        label="Pasar a revisión"
+                        [outlined]="true"
+                        icon="pi pi-angle-right"
+                        iconPos="right"
+                        severity="info"
+                        (click)="goToReview()"
+                    />
+                    <p-button
+                        *ngIf="inscriptionState === 'En revisión'"
+                        label="Observado"
+                        [outlined]="true"
+                        icon="pi pi-exclamation-circle"
+                        iconPos="left"
+                        severity="warning"
+                        (click)="goToObserved()"
+                    />
+                    <p-button
+                        *ngIf="inscriptionState === 'En revisión'"
+                        class="ml-3"
+                        label="Aprobado"
+                        [outlined]="true"
+                        icon="pi pi-angle-right"
+                        iconPos="right"
+                        severity="success"
+                        (click)="goToApprove()"
+                    />
+                </div>
+            </div>
+            <div class="card flex justify-content-center col-12">
+                <h4 class="font-bold">
+                    {{ eventSelected.event.title }}
+                </h4>
+            </div>
+            <div *ngIf="!showEdit" class="grid col-12">
+                <div class="col-3">
+                    <p class="font-bold">Descripción de la reunión:</p>
+                    <p>
+                        {{
+                            eventSelected.event._def.extendedProps.event_udi
+                                .description
+                        }}
+                    </p>
+                </div>
+                <div class="col-3">
+                    <p class="font-bold">Url de la reunión:</p>
+                    <p class="p-url" (click)="redirectToUrl()">
+                        <i class="pi pi-link" style="font-size: 1rem"></i>
+                        {{
+                            eventSelected.event._def.extendedProps.event_udi
+                                .meeting_url
+                        }}
+                    </p>
+                </div>
+                <div class="col-3">
+                    <p class="font-bold">Fecha y hora de inicio:</p>
+                    <p>
+                        <i class="pi pi-clock" style="font-size: 1rem"></i>
+                        {{
+                            dateFormatService.formatDate(
+                                eventSelected.event.start
+                            )
+                        }}
+                    </p>
+                </div>
+                <div class="col-3">
+                    <p class="font-bold">Fecha y hora de fin:</p>
+                    <p>
+                        <i class="pi pi-clock" style="font-size: 1rem"></i>
+                        {{
+                            dateFormatService.formatDate(
+                                eventSelected.event.end
+                            )
+                        }}
+                    </p>
+                </div>
+            </div>
+            <div *ngIf="showEdit" class="grid col-12">
+                <div class="col-3">
+                    <p class="font-bold">Nro de expediente:</p>
+                    <input
+                        type="text"
+                        pInputText
+                        class="full-width"
+                        [value]="eventSelected"
+                    />
+                </div>
+                <div class="col-3">
+                    <p class="font-bold">Escuala profesional:</p>
+                    <input
+                        type="text"
+                        pInputText
+                        class="full-width"
+                        [value]="eventSelected.escuela_profesional"
+                    />
+                </div>
+                <div class="col-3">
+                    <p class="font-bold">Nro de oficio:</p>
+                    <input
+                        type="text"
+                        pInputText
+                        class="full-width"
+                        [value]="eventSelected.numero_oficio"
+                    />
+                </div>
+                <div class="col-3">
+                    <p class="font-bold">Nro de resolución:</p>
+                    <input
+                        type="text"
+                        pInputText
+                        class="full-width"
+                        [value]="eventSelected.numero_resolucion"
+                    />
+                </div>
+            </div>
+            <div class="ml-2 mr-2 separator"></div>
+            <div class="grid col-12">
+                <div class="col-12">
+                    <h5>Lista de encargados</h5>
+                </div>
+                <div class="card w-full">
+                    <p>
+                        Digite el nombre del <b>encargado</b> y seleccionelo
+                        para registrarlo en la reunión.
+                    </p>
+                    <form [formGroup]="managerForm">
+                        <span class="p-fluid">
+                            <p-autoComplete
+                                formControlName="usersManager"
+                                [suggestions]="filteredItems"
+                                (completeMethod)="search($event)"
+                                field="fullName"
+                                [multiple]="true"
+                            />
+                        </span>
+                    </form>
+                </div>
+            </div>
+            <div class="ml-2 mr-2 separator"></div>
+            <div class="grid col-12">
+                <div class="col-12">
+                    <h5>Lista de participantes</h5>
+                </div>
+                <div class="card w-full">
+                    <p>
+                        Digite el nombre del <b>participante</b> y seleccionelo
+                        para registrarlo en la reunión.
+                    </p>
+                    <form [formGroup]="participantsForm">
+                        <span class="p-fluid">
+                            <p-autoComplete
+                                formControlName="usersParticipants"
+                                [suggestions]="filteredItems"
+                                (completeMethod)="search($event)"
+                                field="fullName"
+                                [multiple]="true"
+                            />
+                        </span>
+                    </form>
+                </div>
+            </div>
+            <div class="ml-2 mr-2 separator"></div>
+            <div class="grid col-12 mt-2">
+                <div class="grid col-12 d-flex bd-highlight">
+                    <h5 class="mr-auto p-2 bd-highlight">Tareas</h5>
+                    <button
+                        type="button"
+                        class="b-2 bd-highlight"
+                        pButton
+                        icon="pi pi-plus"
+                        label="nueva tarea"
+                        (click)="showNewTaskDialog()"
+                    ></button>
+                </div>
+                <div class="col-12">
+                    <div class="board-container">
+                        <div
+                            class="board-column pending-column"
+                            pDroppable
+                            (onDrop)="drop($event, 'pending')"
+                        >
+                            <p class="column-header pending-column-header">
+                                PENDIENTE
+                            </p>
+                            <ul class="task-list">
+                                <div
+                                    *ngIf="pendingTasks.length < 1"
+                                    class="text-align-center mt-5"
+                                >
+                                    <p>
+                                        <i class="pi pi-check"></i> No quedan
+                                        tareas pendientes.
+                                    </p>
+                                </div>
+                                <li
+                                    *ngFor="let task of pendingTasks"
+                                    class="task-card"
+                                    pDraggable
+                                    (onDragStart)="dragStart(task)"
+                                    (onDragEnd)="dragEnd()"
+                                >
+                                    <p class="task-title">{{ task.title }}</p>
+                                    <p class="task-description">
+                                        {{ task.description }}
+                                    </p>
+                                    <div class="grid mr-2 ml-1 mt-1">
+                                        <b
+                                            class="task-description"
+                                            style="padding-top: 5px"
+                                            >Asignado a {{ task.user_name }}</b
+                                        >
+                                    </div>
+                                    <div class="grid mr-2 ml-1 mt-1 mt-2">
+                                        <i
+                                            class="pi pi-pencil button-edit-task mr-2"
+                                            (click)="editTask(task)"
+                                        ></i>
+                                        <i
+                                            class="pi pi-trash button-delete-task"
+                                            (click)="deleteTask(task)"
+                                        ></i>
+                                        <p
+                                            class="ml-auto task-description"
+                                            style="padding-top: 5px"
+                                        >
+                                            {{ task.dateEnd }}
+                                        </p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
 
-              <!--<div class=" col-12">
+                        <div
+                            class="board-column in-course-column"
+                            pDroppable
+                            (onDrop)="drop($event, 'inProgress')"
+                        >
+                            <p class="column-header in-course-column-header">
+                                EN CURSO
+                            </p>
+                            <ul class="task-list">
+                                <div
+                                    *ngIf="inProgressTasks.length < 1"
+                                    class="text-align-center mt-5"
+                                >
+                                    <p>
+                                        <i class="pi pi-check"></i> No quedan
+                                        tareas en curso.
+                                    </p>
+                                </div>
+                                <li
+                                    *ngFor="let task of inProgressTasks"
+                                    class="task-card"
+                                    pDraggable
+                                    (onDragStart)="dragStart(task)"
+                                    (onDragEnd)="dragEnd()"
+                                >
+                                    <p class="task-title">{{ task.title }}</p>
+                                    <p class="task-description">
+                                        {{ task.description }}
+                                    </p>
+                                    <div class="grid mr-2 ml-1 mt-1">
+                                        <b
+                                            class="task-description"
+                                            style="padding-top: 5px"
+                                            >Asignado a {{ task.user_name }}</b
+                                        >
+                                        <p class="ml-auto task-description">
+                                            {{ task.dateEnd }}
+                                        </p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div
+                            class="board-column finalize-column"
+                            pDroppable
+                            (onDrop)="drop($event, 'completed')"
+                        >
+                            <p class="column-header finalize-column-header">
+                                FINALIZADO
+                            </p>
+                            <ul class="task-list">
+                                <li
+                                    *ngFor="let task of completedTasks"
+                                    class="task-card"
+                                    pDraggable
+                                    (onDragStart)="dragStart(task)"
+                                    (onDragEnd)="dragEnd()"
+                                >
+                                    <p class="task-title">{{ task.title }}</p>
+                                    <p class="task-description">
+                                        {{ task.description }}
+                                    </p>
+                                    <div class="grid mr-2 ml-1 mt-1">
+                                        <b
+                                            class="task-description"
+                                            style="padding-top: 5px"
+                                            >Asignado a {{ task.user_name }}</b
+                                        >
+                                        <p class="ml-auto task-description">
+                                            {{ task.dateEnd }}
+                                        </p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="ml-2 mr-2 separator"></div>
+
+                <!--<div class=" col-12">
                   <h5>Comentarios</h5>
               </div>          
               <div class="col-12 grid">
@@ -274,184 +462,234 @@
               </div>
             </div>
           </div>-->
-          <app-comments class="w-full" [comments]="comments"></app-comments>
-      </div>
-  </div>
+                <app-comments
+                    class="w-full"
+                    module="reuniones-udi"
+                    [id]="eventSelected.event._def.extendedProps.event_udi.id"
+                ></app-comments>
+            </div>
+        </div>
+    </div>
 </div>
-</div>
-<p-sidebar [(visible)]="newEventDialog" [style]="{'width': '40%'}" position="right">
-  <ng-template pTemplate="header">
-      <span class="font-semibold text-xl">Agendar una nueva reunión</span>
-  </ng-template>
-  <div class="content">
-    <form [formGroup]="eventForm">
-      <div class="p-fluid grid field mt-4">
-        <p-floatLabel class="col-8">
-          <input id="title" type="text" pInputText formControlName="title" />
-          <label for="title">Título</label>
-        </p-floatLabel>
-        <div class="col-4 d-flex m-auto">
-          <p-colorPicker formControlName="color" />
-          <p class="m-auto">Color del evento</p>
-          
-        </div>
-      </div>
-      <div class="p-fluid grid field mt-5">
-        <div class="field col-12 md:col-12">
-          <span class="p-float-label">
-              <textarea
-                  formControlName="description"
-                  inputId="textarea"
-                  rows="4"
-                  cols="30"
-                  pInputTextarea></textarea>
-              <label for="textarea">Descripción</label>
-          </span>
-        </div>
-      </div>
-      <div class="p-fluid field mt-1">
-        <p-floatLabel class="col-12">
-          <input id="title" type="text" pInputText formControlName="eventLink" />
-          <label for="title">Url de la reunión (opcional)</label>
-        </p-floatLabel>
-      </div>
-      <div class="grid p-fluid field mt-1">
-        <div class="col-6">
-          <p>Inicio</p>
-          <p-calendar
-                formControlName="start"
-                [iconDisplay]="'input'"
-                [showIcon]="true"
-                [showTime]="true" 
-                [hourFormat]="12"
-                dateFormat="dd-mm-yy"></p-calendar>
-        </div>
-        <div class="col-6">
-          <p>Fin</p>
-          <p-calendar
-                formControlName="end"
-                [iconDisplay]="'input'"
-                [showIcon]="true"
-                [showTime]="true" 
-                [hourFormat]="12"
-                dateFormat="dd-mm-yy"></p-calendar>
-        </div>
-      </div>
-      <div class="grid p-fluid field mt-4">
-        <div class="col-12">
-          <p>Digite el nombre del <b>encargado</b> y seleccionelo para registrarlo en la reunión.</p>
-          <form [formGroup]="managerForm">
-            <span class="p-fluid">
-                <p-autoComplete 
-                    formControlName="usersManager"
-                    [suggestions]="filteredItems" 
-                    (completeMethod)="search($event)" 
-                    field="fullName" 
-                    [multiple]="true" />
-            </span>
-          </form>
-        </div>
-      </div>
-      <div class="grid p-fluid field mt-4">
-        <div class="col-12">
-          <p>Digite el nombre del <b>participante</b> y seleccionelo para registrarlo en la reunión.</p>
-          <form [formGroup]="participantsForm">
-            <span class="p-fluid">
-                <p-autoComplete 
-                    formControlName="usersParticipants"
-                    [suggestions]="filteredItems" 
-                    (completeMethod)="search($event)" 
-                    field="fullName" 
-                    [multiple]="true" />
-            </span>
-          </form>
-        </div>
-      </div>
-        <div class="footer">
-          <button
-            pButton
-            pRipple
-            label="Regresar"
-            icon="pi pi-angle-left"
-            class="p-button-text"
-            iconPos="left"
-            (click)="newEventDialog=false"></button>
-  
-          <p-button label="Registrar" iconPos="right"
-            icon="pi pi-check"
-            [disabled]="eventForm.invalid || managerForm.invalid || participantsForm.invalid"
-            (click)="addEvent()" />
-        </div>
-    </form>
-  </div>
+<p-sidebar
+    [(visible)]="newEventDialog"
+    [style]="{ width: '40%' }"
+    position="right"
+>
+    <ng-template pTemplate="header">
+        <span class="font-semibold text-xl">Agendar una nueva reunión</span>
+    </ng-template>
+    <div class="content">
+        <form [formGroup]="eventForm">
+            <div class="p-fluid grid field mt-4">
+                <p-floatLabel class="col-8">
+                    <input
+                        id="title"
+                        type="text"
+                        pInputText
+                        formControlName="title"
+                    />
+                    <label for="title">Título</label>
+                </p-floatLabel>
+                <div class="col-4 d-flex m-auto">
+                    <p-colorPicker formControlName="color" />
+                    <p class="m-auto">Color del evento</p>
+                </div>
+            </div>
+            <div class="p-fluid grid field mt-5">
+                <div class="field col-12 md:col-12">
+                    <span class="p-float-label">
+                        <textarea
+                            formControlName="description"
+                            inputId="textarea"
+                            rows="4"
+                            cols="30"
+                            pInputTextarea
+                        ></textarea>
+                        <label for="textarea">Descripción</label>
+                    </span>
+                </div>
+            </div>
+            <div class="p-fluid field mt-1">
+                <p-floatLabel class="col-12">
+                    <input
+                        id="title"
+                        type="text"
+                        pInputText
+                        formControlName="eventLink"
+                    />
+                    <label for="title">Url de la reunión (opcional)</label>
+                </p-floatLabel>
+            </div>
+            <div class="grid p-fluid field mt-1">
+                <div class="col-6">
+                    <p>Inicio</p>
+                    <p-calendar
+                        formControlName="start"
+                        [iconDisplay]="'input'"
+                        [showIcon]="true"
+                        [showTime]="true"
+                        [hourFormat]="12"
+                        dateFormat="dd-mm-yy"
+                    ></p-calendar>
+                </div>
+                <div class="col-6">
+                    <p>Fin</p>
+                    <p-calendar
+                        formControlName="end"
+                        [iconDisplay]="'input'"
+                        [showIcon]="true"
+                        [showTime]="true"
+                        [hourFormat]="12"
+                        dateFormat="dd-mm-yy"
+                    ></p-calendar>
+                </div>
+            </div>
+            <div class="grid p-fluid field mt-4">
+                <div class="col-12">
+                    <p>
+                        Digite el nombre del <b>encargado</b> y seleccionelo
+                        para registrarlo en la reunión.
+                    </p>
+                    <form [formGroup]="managerForm">
+                        <span class="p-fluid">
+                            <p-autoComplete
+                                formControlName="usersManager"
+                                [suggestions]="filteredItems"
+                                (completeMethod)="search($event)"
+                                field="fullName"
+                                [multiple]="true"
+                            />
+                        </span>
+                    </form>
+                </div>
+            </div>
+            <div class="grid p-fluid field mt-4">
+                <div class="col-12">
+                    <p>
+                        Digite el nombre del <b>participante</b> y seleccionelo
+                        para registrarlo en la reunión.
+                    </p>
+                    <form [formGroup]="participantsForm">
+                        <span class="p-fluid">
+                            <p-autoComplete
+                                formControlName="usersParticipants"
+                                [suggestions]="filteredItems"
+                                (completeMethod)="search($event)"
+                                field="fullName"
+                                [multiple]="true"
+                            />
+                        </span>
+                    </form>
+                </div>
+            </div>
+            <div class="footer">
+                <button
+                    pButton
+                    pRipple
+                    label="Regresar"
+                    icon="pi pi-angle-left"
+                    class="p-button-text"
+                    iconPos="left"
+                    (click)="newEventDialog = false"
+                ></button>
+
+                <p-button
+                    label="Registrar"
+                    iconPos="right"
+                    icon="pi pi-check"
+                    [disabled]="
+                        eventForm.invalid ||
+                        managerForm.invalid ||
+                        participantsForm.invalid
+                    "
+                    (click)="addEvent()"
+                />
+            </div>
+        </form>
+    </div>
 </p-sidebar>
 
-<p-sidebar [(visible)]="newTaskDialog" [style]="{'width': '40%'}" position="right">
-  <ng-template pTemplate="header">
-      <span class="font-semibold text-xl">Detalle de la tarea</span>
-  </ng-template>
-  <div class="content">
-    <form [formGroup]="taskForm">
-      <div class="p-fluid grid field mt-4">
-        <p-floatLabel class="col-12">
-          <input id="title" type="text" pInputText formControlName="titleTask" />
-          <label for="title">Título</label>
-        </p-floatLabel>
-      </div>
-      <div class="p-fluid grid field mt-5">
-        <div class="field col-12 md:col-12">
-          <span class="p-float-label">
-              <textarea
-                  inputId="textarea"
-                  rows="4"
-                  cols="30"
-                  formControlName="descriptionTask"
-                  pInputTextarea></textarea>
-              <label for="textarea">Descripción de la tarea</label>
-          </span>
-      </div>
-        
-      </div>
-      
-      <div class="grid p-fluid field mt-1">
-        <div class="col-12">
-          <p>Fecha de compromiso</p>
-          <p-calendar
-                [iconDisplay]="'input'"
-                [showIcon]="true"
-                formControlName="endTask"
-                dateFormat="dd-mm-yy"></p-calendar>
-        </div>
-      </div>
-      <div class="grid p-fluid field mt-1">
-        <div class="col-12">
-          <p>Digite el nombre del <b>responsable</b> de la tarea.</p>
-          <span class="p-fluid">
-            <p-autoComplete 
-                formControlName="assignedUser"
-                [suggestions]="filteredItems" 
-                (completeMethod)="search($event)" 
-                field="fullName" 
-                [multiple]="false" />
-          </span>
-        </div>
-      </div>
-      <div class="footer">
-        <button
-          pButton
-          pRipple
-          label="Regresar"
-          icon="pi pi-angle-left"
-          class="p-button-text"
-          iconPos="left"
-          (click)="newTaskDialog=false"></button>
+<p-sidebar
+    [(visible)]="newTaskDialog"
+    [style]="{ width: '40%' }"
+    position="right"
+>
+    <ng-template pTemplate="header">
+        <span class="font-semibold text-xl">Detalle de la tarea</span>
+    </ng-template>
+    <div class="content">
+        <form [formGroup]="taskForm">
+            <div class="p-fluid grid field mt-4">
+                <p-floatLabel class="col-12">
+                    <input
+                        id="title"
+                        type="text"
+                        pInputText
+                        formControlName="titleTask"
+                    />
+                    <label for="title">Título</label>
+                </p-floatLabel>
+            </div>
+            <div class="p-fluid grid field mt-5">
+                <div class="field col-12 md:col-12">
+                    <span class="p-float-label">
+                        <textarea
+                            inputId="textarea"
+                            rows="4"
+                            cols="30"
+                            formControlName="descriptionTask"
+                            pInputTextarea
+                        ></textarea>
+                        <label for="textarea">Descripción de la tarea</label>
+                    </span>
+                </div>
+            </div>
 
-        <p-button label="Guardar" iconPos="right"
-          icon="pi pi-check"
-          [disabled]="taskForm.invalid"
-          (click)="addTask(taskSelectedId)" />
+            <div class="grid p-fluid field mt-1">
+                <div class="col-12">
+                    <p>Fecha de compromiso</p>
+                    <p-calendar
+                        [iconDisplay]="'input'"
+                        [showIcon]="true"
+                        formControlName="endTask"
+                        dateFormat="dd-mm-yy"
+                    ></p-calendar>
+                </div>
+            </div>
+            <div class="grid p-fluid field mt-1">
+                <div class="col-12">
+                    <p>Digite el nombre del <b>responsable</b> de la tarea.</p>
+                    <span class="p-fluid">
+                        <p-autoComplete
+                            formControlName="assignedUser"
+                            [suggestions]="filteredItems"
+                            (completeMethod)="search($event)"
+                            field="fullName"
+                            [multiple]="false"
+                        />
+                    </span>
+                </div>
+            </div>
+            <div class="footer">
+                <button
+                    pButton
+                    pRipple
+                    label="Regresar"
+                    icon="pi pi-angle-left"
+                    class="p-button-text"
+                    iconPos="left"
+                    (click)="newTaskDialog = false"
+                ></button>
 
-      </div>
-    </form>
-  </div>
+                <p-button
+                    label="Guardar"
+                    iconPos="right"
+                    icon="pi pi-check"
+                    [disabled]="taskForm.invalid"
+                    (click)="addTask(taskSelectedId)"
+                />
+            </div>
+        </form>
+    </div>
 </p-sidebar>

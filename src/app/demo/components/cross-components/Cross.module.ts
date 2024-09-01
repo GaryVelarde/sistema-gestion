@@ -12,6 +12,11 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { LoaderComponent } from './loader/loader.component';
 import { CardErrorComponent } from './card-error/card-error.component';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { RouterModule } from '@angular/router';
+import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
+import { TableModule } from 'primeng/table';
+import { SkeletonTableComponent } from './skeleton-table/skeleton-table.component';
 
 
 @NgModule({
@@ -25,9 +30,13 @@ import { CardErrorComponent } from './card-error/card-error.component';
     ButtonModule,
     AutoCompleteModule,
     SkeletonModule,
-    FloatLabelModule
+    FloatLabelModule,
+    BreadcrumbModule,
+    RouterModule,
+    TableModule,
+    SkeletonModule,
   ],
-  declarations: [CommentsComponent, UserSelectionComponent, LoaderComponent, CardErrorComponent],
-  exports: [CommentsComponent, UserSelectionComponent, LoaderComponent, CardErrorComponent]
+  declarations: [CommentsComponent, UserSelectionComponent, LoaderComponent, CardErrorComponent, BreadcrumbComponent, SkeletonTableComponent],
+  exports: [CommentsComponent, UserSelectionComponent, LoaderComponent, CardErrorComponent, BreadcrumbComponent, SkeletonTableComponent]
 })
 export class CrossComponentsModule { }

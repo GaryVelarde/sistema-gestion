@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -64,13 +64,38 @@ export class HotbedTrackingComponent implements OnInit {
     { status: 'Envió a revista ', date: '15-10-2020 16:15', icon: 'pi pi-sign-in', color: '#6366f1' },
     { status: 'Indexado', date: '00-00-0000 00:00', icon: 'pi pi-paperclip', color: '#607D8B' },
     { status: 'Pagado', date: '00-00-0000 00:00', icon: 'pi pi-wallet', color: '#607D8B' }
-];
+  ];
+
+  breadcrumbItems: MenuItem[] = [
+    { icon: 'pi pi-home', route: '/' },
+    { label: 'Semillero' },
+    { label: 'Artículos', visible: true },
+  ];
+  detailsBreadcrumbItems: MenuItem[] = [
+    { icon: 'pi pi-home', route: '/' },
+    { label: 'Semillero' },
+    { label: 'Artículos' },
+    { label: 'Detalle del artículo', visible: true },
+  ];
+  timeLineBreadcrumbItems: MenuItem[] = [
+    { icon: 'pi pi-home', route: '/' },
+    { label: 'Semillero' },
+    { label: 'Artículos' },
+    { label: 'Detalle del artículo' },
+    { label: 'Línea de tiempo', visible: true },
+  ];
 
   viewDetail = false;
   viewHistory = false;
   articleSelected: any;
   getArticleListProcess = '';
   skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
+  columnTitles: string[] = [
+    'Título del artículo',
+    'Estudiante(s)',
+    'Estado',
+    ''
+  ];
   messageError: string = 'Se produjo un error al cargar la lista de artículos. Por favor, inténtelo de nuevo más tarde';
 
   constructor(private router: Router, private service: AuthService, private loaderService: LoaderService) { }
@@ -117,13 +142,13 @@ export class HotbedTrackingComponent implements OnInit {
   }
 
   handleReload(reload: boolean) {
-    if(reload){
+    if (reload) {
       this.getArticleList();
     }
   }
 
   test() {
-    this.registros =[
+    this.registros = [
       {
         "id": 1,
         "title": "Titulo de prueba",
@@ -173,10 +198,27 @@ export class HotbedTrackingComponent implements OnInit {
 
   backList() {
     this.loaderService.show();
+    this.viewDetail = false;
+    this.articleSelected = {};
     setTimeout(() => {
       this.loaderService.hide();
     }, 800);
-    this.viewDetail = false;
-    this.articleSelected = {};
+  }
+
+  backToDetail(){
+    this.loaderService.show();
+    this.viewDetail = true;
+    this.viewHistory = false;
+    setTimeout(() => {
+      this.loaderService.hide();
+    }, 800);
+  }
+
+  goToHistory() {
+    this.loaderService.show();
+    this.viewHistory = true;
+    setTimeout(() => {
+      this.loaderService.hide();
+    }, 800);
   }
 }

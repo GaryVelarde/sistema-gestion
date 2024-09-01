@@ -19,7 +19,8 @@ import { AppSidebarComponent } from "./app.sidebar.component";
 import { AppLayoutComponent } from "./app.layout.component";
 import { AvatarModule } from 'primeng/avatar';
 
-@NgModule({ declarations: [
+@NgModule({
+    declarations: [
         AppMenuitemComponent,
         AppTopBarComponent,
         AppFooterComponent,
@@ -27,7 +28,8 @@ import { AvatarModule } from 'primeng/avatar';
         AppSidebarComponent,
         AppLayoutComponent,
     ],
-    exports: [AppLayoutComponent], imports: [BrowserModule,
+    exports: [AppLayoutComponent], 
+    imports: [BrowserModule,
         FormsModule,
         BrowserAnimationsModule,
         InputTextModule,
@@ -38,5 +40,6 @@ import { AvatarModule } from 'primeng/avatar';
         RippleModule,
         RouterModule,
         AvatarModule,
-        AppConfigModule], providers: [provideHttpClient(withInterceptorsFromDi())] })
+        AppConfigModule], providers: [provideHttpClient(withInterceptorsFromDi())]
+})
 export class AppLayoutModule { }

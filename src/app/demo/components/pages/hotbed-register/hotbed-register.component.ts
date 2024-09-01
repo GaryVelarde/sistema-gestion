@@ -252,7 +252,7 @@ export class HotbedRegisterComponent implements OnInit {
     this.userSelection.clearComponent();
   }
 
-  getUserSelected(userSelected: any){
+  getUserSelected(userSelected: any) {
     console.log('userSelected', userSelected)
     this.students.setValue(userSelected);
   }

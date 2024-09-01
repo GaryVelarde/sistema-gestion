@@ -50,7 +50,7 @@ export class InscriptionPresenter {
     reviewerIsValid = false;
     reviewerSelected: any;
     uploadedFiles: any[] = [];
-
+    
     get receptionDate() {
         return this._receptionDate;
     }

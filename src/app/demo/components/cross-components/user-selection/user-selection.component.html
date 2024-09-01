@@ -1,51 +1,56 @@
 <div [ngSwitch]="getStudentListProcess">
-  <ng-template [ngSwitchCase]="'charging'">
-    <ng-container *ngTemplateOutlet="studentListSkeleton"></ng-container>
-  </ng-template>
-  <ng-template [ngSwitchCase]="'error'">
-    <ng-container *ngTemplateOutlet="studentListError"></ng-container>
-  </ng-template>
-  <ng-template [ngSwitchCase]="'complete'">
-    <ng-container *ngTemplateOutlet="studentList"></ng-container>
-  </ng-template>
-  <ng-template ngSwitchDefault>
-    <p>Invalid state</p>
-  </ng-template>
+    <ng-template [ngSwitchCase]="'charging'">
+        <ng-container *ngTemplateOutlet="studentListSkeleton"></ng-container>
+    </ng-template>
+    <ng-template [ngSwitchCase]="'error'">
+        <ng-container *ngTemplateOutlet="studentListError"></ng-container>
+    </ng-template>
+    <ng-template [ngSwitchCase]="'complete'">
+        <ng-container *ngTemplateOutlet="studentList"></ng-container>
+    </ng-template>
+    <ng-template ngSwitchDefault>
+        <p>Invalid state</p>
+    </ng-template>
 </div>
 <ng-template #studentListError>
-  <div class="p-error-message">
-      <i class="pi pi-times-circle error-icon"></i>
-      <span>Ha ocurrido un error al traer la información.</span>
-      <button pButton type="button" icon="pi pi-refresh"
-          class="p-button-text p-button-danger" (click)="callGetStudentList()"></button>
-  </div>
+    <div class="p-error-message">
+        <i class="pi pi-times-circle error-icon"></i>
+        <span>Ha ocurrido un error al traer la información.</span>
+        <button
+            pButton
+            type="button"
+            icon="pi pi-refresh"
+            class="p-button-text p-button-danger"
+            (click)="callGetStudentList()"
+        ></button>
+    </div>
 </ng-template>
 <ng-template #studentListSkeleton>
-  <div class="grid p-fluid">
-      <div *ngIf="!studentsList.length" class="field col-12">
-          <p-skeleton height="3rem" styleClass="mb-2" />
-      </div>
-  </div>
+    <div class="grid p-fluid">
+        <div *ngIf="!studentsList.length" class="field col-12">
+            <p-skeleton height="3rem" styleClass="mb-2" />
+        </div>
+    </div>
 </ng-template>
 <ng-template #studentList>
-  <div class="grid p-fluid">
-      <div *ngIf="studentsList.length" class="field col-12">
-          <span class="p-float-label">
-            <form [formGroup]="userForm">
-              <span class="p-fluid">
-                <p-autoComplete
-                  formControlName="userFormControl"
-                  [suggestions]="filteredItems"
-                  (completeMethod)="search($event)"
-                  field="fullName"
-                  [multiple]="true" />
-              </span>
-            </form>
-              
-              <!--<label for="studentOne">Ingrese el nombre del
-                  estudiante</label>-->
-          </span>
+    <div class="grid p-fluid">
+        <div *ngIf="studentsList.length" class="field col-12">
+            <span class="p-float-label">
+                <form [formGroup]="userForm">
+                    <span class="p-fluid">
+                        <p-autoComplete
+                            formControlName="userFormControl"
+                            [suggestions]="filteredItems"
+                            (completeMethod)="search($event)"
+                            field="fullName"
+                            [multiple]="true"
+                        />
+                    </span>
+                </form>
 
-      </div>
-  </div>
+                <!--<label for="studentOne">Ingrese el nombre del
+                  estudiante</label>-->
+            </span>
+        </div>
+    </div>
 </ng-template>

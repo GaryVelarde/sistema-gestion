@@ -19,7 +19,7 @@ import {
     Validators,
 } from '@angular/forms';
 import { DateFormatService } from 'src/app/services/date-format.service';
-import { PrimeNGConfig } from 'primeng/api';
+import { MenuItem, PrimeNGConfig } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
@@ -55,6 +55,17 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     newEventDialog = false;
     newTaskDialog = false;
     taskSelectedId: number;
+    breadcrumbItems: MenuItem[] = [
+        { icon: 'pi pi-home', route: '/' },
+        { label: 'Eventos' },
+        { label: 'Reuniones UDI', visible: true },
+    ];
+    detailsBreadcrumbItems: MenuItem[] = [
+        { icon: 'pi pi-home', route: '/' },
+        { label: 'Eventos' },
+        { label: 'Reuniones UDI' },
+        { label: 'Detalle de la reunión', visible: true },
+    ];
     timeslots = [
         { name: '10 minutos', code: '00:10:00' },
         { name: '15 minutos', code: '00:15:00' },
@@ -83,8 +94,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             "id": 1,
             "title": "Reunión UDI 6",
             "description": "Descripción de la Reunión de UDI",
-            "start_date": "14/08/2024 15:05",
-            "due_date": "15/08/2024 15:05",
+            "start_date": "14/09/2024 15:05",
+            "due_date": "15/09/2024 15:05",
             "color": "#fff544",
             "status": "En Progreso",
             "meeting_url": "https://primeng.org/icons",
@@ -287,7 +298,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         private dateFormatService: DateFormatService,
         private config: PrimeNGConfig,
         private service: AuthService,
-        private router: Router,
+        private loaderService: LoaderService,
     ) {
         this.slotDurationForm = this.fb.group({
             slotDuration: this.slotDuration,
@@ -405,10 +416,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         }
     }
 
-    backCalendar() {
-        this.showEventDetail = false;
-    }
-
     watchSlotDuration() {
         this.slotDuration.valueChanges.pipe().subscribe((value) => {
             if (value.code.length) {
@@ -441,6 +448,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     handleEventClick(arg) {
+        this.loaderService.show();
         this.eventSelected = arg;
         console.log('eventSelected 2', this.eventSelected.event._def.extendedProps.event_udi);
         const usersManager: Usuario[] = [];
@@ -467,6 +475,20 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.usersParticipants.setValue(usersParticipants);
         this.getTask(this.eventSelected.event._def.extendedProps.event_udi.id);
         this.showEventDetail = true;
+        setTimeout(() => {
+            this.loaderService.hide();
+        }, 800);
+    }
+
+    backCalendar() {
+        this.loaderService.show();
+        this.showEventDetail = false;
+        this.eventSelected = null;
+        this.usersManager.setValue([]);
+        this.usersParticipants.setValue([]);
+        setTimeout(() => {
+            this.loaderService.hide();
+        }, 800);
     }
 
     renderizeCalendar() {
@@ -577,7 +599,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.titleTask.setValue(task.title);
         this.descriptionTask.setValue(task.description);
         this.endTask.setValue(this.dateFormatService.formatDateDDMMYYYY(task.dateEnd));
-        
+
         this.taskSelectedId = task.id;
         this.newTaskDialog = true;
     }
@@ -672,13 +694,13 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
     watchUsersManager(): void {
         this.usersManager.valueChanges.pipe().subscribe((value) => {
-            console.log('usersManager',value);
+            console.log('usersManager', value);
         });
     }
 
     watchUsersParticipants(): void {
         this.usersParticipants.valueChanges.pipe().subscribe((value) => {
-            console.log('usersParticipants',value);
+            console.log('usersParticipants', value);
         });
     }
 

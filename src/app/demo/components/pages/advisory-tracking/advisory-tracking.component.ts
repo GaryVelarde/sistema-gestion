@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit } from '@angular/core';
 import { Product } from 'src/app/demo/api/product';
-import { ConfirmationService, Message, MessageService, PrimeNGConfig } from 'primeng/api';
+import { ConfirmationService, MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import {
     FormBuilder,
@@ -20,43 +20,54 @@ import { LoaderService } from 'src/app/layout/service/loader.service';
 })
 export class AdvisoryTrackingComponent implements OnInit {
     products: Product[] = [];
-
-    rowsPerPageOptions = [5, 10, 20];
-
-    registros = [
-        {
-            "id": 1,
-            "degree_processes_id": 1,
-            "inscription_id": 1,
-            "reception_date_faculty": "0000-00-00",
-            "payment_date": "0000-00-00",
-            "approval_date_udi": "0000-00-00",
-            "shipment_date_secretary": "0000-00-00",
-            "report": 0,
-            "resolution_date": "0000-00-00",
-            "status": "En Asesoría",
-            "reviewer": [],
-            "degree_processes": {
-                "id": 1,
-                "file": 1222,
-                "professional_school": "IET",
-                "thesis_project_title": "Ingeniería de SISTEMAS 2024",
-                "office_number": "123-113",
-                "resolution_number": "112-113",
-                "general_status": "Asesoría",
-                "graduates": [
-                    {
-                        "id": 2,
-                        "name": "Ana",
-                        "surnames": "Benavidez Ayala",
-                        "email": "ana@test.com",
-                        "phone": 987145312,
-                        "code": 15467824
-                    }
-                ]
-            }
-        },
+    breadcrumbItems: MenuItem[] = [
+        { icon: 'pi pi-home', route: '/' },
+        { label: 'Proceso de titulación' },
+        { label: 'Asesorías', visible: true },
     ];
+    detailBreadcrumbItems: MenuItem[] = [
+        { icon: 'pi pi-home', route: '/' },
+        { label: 'Proceso de titulación' },
+        { label: 'Asesorías', },
+        { label: 'Detalle de asesoría', visible: true },
+    ];
+    rowsPerPageOptions = [5, 10, 20];
+    registros = [];
+    getStatusList = '';
+    //[
+    //     {
+    //         "id": 1,
+    //         "degree_processes_id": 1,
+    //         "inscription_id": 1,
+    //         "reception_date_faculty": "0000-00-00",
+    //         "payment_date": "0000-00-00",
+    //         "approval_date_udi": "0000-00-00",
+    //         "shipment_date_secretary": "0000-00-00",
+    //         "report": 0,
+    //         "resolution_date": "0000-00-00",
+    //         "status": "En Asesoría",
+    //         "reviewer": [],
+    //         "degree_processes": {
+    //             "id": 1,
+    //             "file": 1222,
+    //             "professional_school": "IET",
+    //             "thesis_project_title": "Ingeniería de SISTEMAS 2024",
+    //             "office_number": "123-113",
+    //             "resolution_number": "112-113",
+    //             "general_status": "Asesoría",
+    //             "graduates": [
+    //                 {
+    //                     "id": 13,
+    //                     "name": "Ana",
+    //                     "surnames": "Benavidez Ayala",
+    //                     "email": "anas@test.com",
+    //                     "phone": 987145312,
+    //                     "code": 15467824
+    //                 },
+    //             ]
+    //         }
+    //     },
+    // ];
 
     comments = [
         {
@@ -98,6 +109,12 @@ export class AdvisoryTrackingComponent implements OnInit {
     graduatesList = []
     filteredReviewers: any;
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
+    columnTitles: string[] = [
+        'Título del tesis',
+        'Revisor',
+        'Estado',
+        ''
+      ];
     advisorySelected: any;
     showEdit = false;
     titleModalDetailIserSelected: string = '';
@@ -164,6 +181,7 @@ export class AdvisoryTrackingComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.getAdvisoryList();
         this.config.setTranslation({
             firstDayOfWeek: 1,
             dayNames: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
@@ -176,6 +194,18 @@ export class AdvisoryTrackingComponent implements OnInit {
             dateFormat: 'dd/mm/yy',
             weekHeader: 'Sm'
         });
+    }
+
+    getAdvisoryList() {
+        this.getStatusList = 'charging';
+        this.service.getAdvisoryList().pipe().subscribe(
+            (res: any) => {
+                this.registros = res.data;
+                this.getStatusList = 'complete';
+                console.log(res.data)
+            }, (error) => {
+                this.getStatusList = 'error';
+            });
     }
 
     goToInscription() {
@@ -205,7 +235,7 @@ export class AdvisoryTrackingComponent implements OnInit {
         this.loaderService.show();
         if (data) {
             this.advisorySelected = data;
-            this.reviewersList = data.reviewer;
+            this.reviewersList = data.reviewer[0];
             this.graduatesList = data.degree_processes.graduates;
             this.advisoryState = this.advisorySelected.status;
             this.countTask();

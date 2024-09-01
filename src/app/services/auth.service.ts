@@ -101,5 +101,20 @@ export class AuthService {
     return this.http.get(`${this.API_URL}/article`, this.header);
   }
 
+  getCommentsByInscription(id: number): Observable<any> {
+    return this.http.get(`${this.API_URL}/inscription/${id}/observations`, this.header);
+  }
+
+  getCommentsByAdvisory(id: number): Observable<any> {
+    return this.http.get(`${this.API_URL}/advisory/${id}/observations`, this.header);
+  }
+
+  getCommentsByEventsUDI(id: number): Observable<any> {
+    return this.http.get(`${this.API_URL}/meeting/${id}/observation`, this.header);
+  }
+
+  getAdvisoryList(): Observable<any> {
+    return this.http.get(`${this.API_URL}/advisory`, this.header);
+  }
 
 }

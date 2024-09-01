@@ -1,15 +1,18 @@
 <div class="grid p-fluid">
     <div class="col-12">
-        <div class="card card-w-title flex flex-wrap">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+        <div class="card card-w-title  flex-wrap">
             <div class="col-12 h-full">
                 <h5>Inscripción de Tesis</h5>
-                <p-steps [model]="routeItems" [readonly]="true" styleClass="mt-5"></p-steps>
+                <p-steps
+                    [model]="routeItems"
+                    [readonly]="true"
+                    styleClass="mt-5"
+                ></p-steps>
             </div>
             <div class="col-12">
                 <router-outlet></router-outlet>
             </div>
         </div>
-        
     </div>
-    
 </div>

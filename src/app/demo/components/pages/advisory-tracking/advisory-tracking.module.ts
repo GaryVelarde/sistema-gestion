@@ -31,6 +31,7 @@ import { AdvisoryTrackingRoutingModule } from './advisory-tracking-routing.modul
 import { AdvisoryTrackingComponent } from './advisory-tracking.component';
 import { AvatarModule } from 'primeng/avatar';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 
 @NgModule({
     imports: [
@@ -63,7 +64,8 @@ import { CrossComponentsModule } from '../../cross-components/Cross.module';
         AutoCompleteModule,
         MessagesModule,
         AvatarModule,
-        CrossComponentsModule
+        CrossComponentsModule,
+        BreadcrumbModule
     ],
     declarations: [AdvisoryTrackingComponent],
     providers: [

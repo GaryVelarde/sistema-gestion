@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit } from '@angular/core';
 import { Product } from 'src/app/demo/api/product';
-import { ConfirmationService, Message, MessageService, PrimeNGConfig } from 'primeng/api';
+import { ConfirmationService, MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import {
     FormBuilder,
@@ -212,21 +212,6 @@ export class InscriptionTrackingComponent implements OnInit {
     graduatesList: [] = [];
     reviewerList: [] = [];
 
-    comments = [
-        {
-            name: 'John Doe',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-            isComment: true,
-        },
-        {
-            name: 'Alice Smith',
-            content:
-                'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            isComment: true,
-        },
-        // Agrega más elementos según sea necesario
-    ];
-
     showDialogCancel = false;
     showSelectNewReviwer = false;
     showSelectNewStudent = false;
@@ -259,6 +244,17 @@ export class InscriptionTrackingComponent implements OnInit {
     getStudentListProcess = '';
     studentsList = [];
     alertForCancelation: Message[] | undefined;
+    items: MenuItem[] = [
+        { icon: 'pi pi-home', route: '/' },
+        { label: 'Proceso de titulación' }, 
+        { label: 'Proyecto de tesis', visible: true},
+    ];
+    itemsDetails: MenuItem[] = [
+        { icon: 'pi pi-home', route: '/' },
+        { label: 'Proceso de titulación' }, 
+        { label: 'Proyecto de tesis',},
+        { label: 'Detalle de proyecto de tesis', visible: true},
+    ];
     commentsForm: FormGroup;
     tasksForm: FormGroup;
     cancelattionForm: FormGroup;
@@ -286,9 +282,6 @@ export class InscriptionTrackingComponent implements OnInit {
         return this._taskDescription;
     }
 
-    get reversedComments() {
-        return this.comments.slice().reverse();
-    }
     get students() {
         return this._students;
     }
@@ -441,16 +434,16 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     goToReview() {
-        this.addNotificationForChangeState(
-            'La inscripción del proyecto de Tesis pasó a Revisión por Cesar Jauregui Saavedra'
-        );
+        // this.addNotificationForChangeState(
+        //     'La inscripción del proyecto de Tesis pasó a Revisión por Cesar Jauregui Saavedra'
+        // );
         this.inscriptionState = 'En revisión';
     }
 
     goToObserved() {
-        this.addNotificationForChangeState(
-            'La inscripción del proyecto de Tesis pasó a Observado por Cesar Jauregui Saavedra'
-        );
+        // this.addNotificationForChangeState(
+        //     'La inscripción del proyecto de Tesis pasó a Observado por Cesar Jauregui Saavedra'
+        // );
         this.inscriptionState = 'Observado';
     }
 
@@ -489,9 +482,9 @@ export class InscriptionTrackingComponent implements OnInit {
             acceptButtonStyleClass: 'p-button-outlined p-button-sm',
             accept: () => {
                 this.inscriptionState = 'Aprobado';
-                this.addNotificationForChangeState(
-                    'La inscripción del proyecto de Tesis pasó a Aprobado por Cesar Jauregui Saavedra'
-                );
+                // this.addNotificationForChangeState(
+                //     'La inscripción del proyecto de Tesis pasó a Aprobado por Cesar Jauregui Saavedra'
+                // );
                 this.messageService.add({
                     key: 'tst',
                     severity: 'info',
@@ -539,29 +532,6 @@ export class InscriptionTrackingComponent implements OnInit {
                 this.totalTaskIncomplete++;
             }
             this.totalTask++;
-        });
-    }
-
-    addComment(event: KeyboardEvent): void {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            if (this.comment.value) {
-                this.comments.push({
-                    name: 'Gary Velarde',
-                    content: this.comment.value,
-                    isComment: true,
-                });
-                this.comment.setValue('');
-                this.comment.reset();
-            }
-        }
-    }
-
-    addNotificationForChangeState(comment: string) {
-        this.comments.push({
-            name: 'Cesar Jauregui',
-            content: comment,
-            isComment: false,
         });
     }
 

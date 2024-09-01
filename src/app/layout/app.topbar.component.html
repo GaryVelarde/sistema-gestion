@@ -14,9 +14,17 @@
     </button>
 
     <div #topbarmenu class="layout-topbar-menu" [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
-        <button class="p-link layout-topbar-button">
-            <i class="pi pi-calendar"></i>
-            <span>Calendar</span>
+        <button style="color: var(--text-color-secondary); border-radius: 50%;
+        width: 3rem;
+        height: 3rem;
+        cursor: pointer;
+    transition: background-color 0.2s;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    " class="p-link mt-2 mr-2">
+            <i class="pi pi-bell text-3xl" pBadge value="2"></i>
         </button>
         <p-avatar 
             label="G" 

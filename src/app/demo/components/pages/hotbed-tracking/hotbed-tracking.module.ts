@@ -14,6 +14,8 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
 import { TimelineModule } from 'primeng/timeline';
 import { CardModule } from 'primeng/card';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   imports: [

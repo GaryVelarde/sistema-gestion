@@ -31,6 +31,8 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { MessagesModule } from 'primeng/messages';
 import { AvatarModule } from 'primeng/avatar';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
+import { RouterModule } from '@angular/router';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
 
 @NgModule({
     imports: [

@@ -1,6 +1,7 @@
 <p-toast key="tst"></p-toast>
 <div *ngIf="!viewDetail" class="grid">
     <div class="col-12">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
         <div class="card px-6 py-6">
             <p-toolbar styleClass="mb-4">
                 <ng-template pTemplate="left">
@@ -10,94 +11,133 @@
                             pRipple
                             label="Registrar un nuevo artículo"
                             icon="pi pi-plus"
-                            class="p-button-success mr-2"
-                            (click)="goToRegisterHotbed()"></button>
-                            <button (click)="test()">aaaaaaaa</button>
+                            class="mr-2"
+                            (click)="goToRegisterHotbed()"
+                        ></button>
+                        <button (click)="test()">aaaaaaaa</button>
                     </div>
                 </ng-template>
             </p-toolbar>
             <div [ngSwitch]="getArticleListProcess">
                 <ng-template [ngSwitchCase]="'charging'">
-                  <ng-container *ngTemplateOutlet="skeletonArticleList"></ng-container>
+                    <ng-container
+                        *ngTemplateOutlet="skeletonArticleList"
+                    ></ng-container>
                 </ng-template>
                 <ng-template [ngSwitchCase]="'error'">
-                  <ng-container *ngTemplateOutlet="articleListError"></ng-container>
+                    <ng-container
+                        *ngTemplateOutlet="articleListError"
+                    ></ng-container>
                 </ng-template>
                 <ng-template [ngSwitchCase]="'complete'">
-                  <ng-container *ngTemplateOutlet="articleList"></ng-container>
+                    <ng-container
+                        *ngTemplateOutlet="articleList"
+                    ></ng-container>
                 </ng-template>
                 <ng-template ngSwitchDefault>
-                  <p>Invalid state</p>
+                    <p>Invalid state</p>
                 </ng-template>
-              </div>
+            </div>
 
-              <ng-template #articleListError>
-                <app-card-error [message]="messageError" (reload)="handleReload($event)"></app-card-error>
-              </ng-template>
-              <ng-template #articleList>
+            <ng-template #articleListError>
+                <app-card-error
+                    [message]="messageError"
+                    (reload)="handleReload($event)"
+                ></app-card-error>
+            </ng-template>
+            <ng-template #articleList>
                 <div class="card">
-                    <p-table #dt [value]="registros" responsiveLayout="scroll"
+                    <p-table
+                        #dt
+                        [value]="registros"
+                        responsiveLayout="scroll"
                         [rows]="10"
-                        [globalFilterFields]="['title','name']"
-                        [paginator]="true" [rowsPerPageOptions]="[10,20,30]"
+                        [globalFilterFields]="['title', 'name']"
+                        [paginator]="true"
+                        [rowsPerPageOptions]="[10, 20, 30]"
                         [showCurrentPageReport]="true"
                         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                         [(selection)]="selectedProducts"
-                        [rowHover]="true" dataKey="id">
+                        [rowHover]="true"
+                        dataKey="id"
+                    >
                         <ng-template pTemplate="caption">
                             <div
-                                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+                                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+                            >
                                 <h5 class="m-0">Seguimiento de asesorías</h5>
-                                <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                <span
+                                    class="block mt-2 md:mt-0 p-input-icon-left"
+                                >
                                     <i class="pi pi-search"></i>
-                                    <input pInputText type="text"
+                                    <input
+                                        pInputText
+                                        type="text"
                                         (input)="onGlobalFilter(dt, $event)"
                                         placeholder="Buscar por título..."
-                                        class="w-full sm:w-auto" />
+                                        class="w-full sm:w-auto"
+                                    />
                                 </span>
                             </div>
                         </ng-template>
                         <ng-template pTemplate="header">
                             <tr>
-                                <th pSortableColumn="titulo_proyecto_tesis"
-                                    style="width:60%">Título del
-                                    artículo <p-sortIcon
-                                        field="title"></p-sortIcon></th>
-                                <th pSortableColumn="nombre"
-                                    style="width:20%">Estudiante(s)
-                                    <p-sortIcon
-                                        field="nombre"></p-sortIcon></th>
-                                <th style="width:10%">Estado</th>
-                                <th style="width:10%"></th>
+                                <th
+                                    pSortableColumn="titulo_proyecto_tesis"
+                                    style="width: 60%"
+                                >
+                                    Título del artículo
+                                    <p-sortIcon field="title"></p-sortIcon>
+                                </th>
+                                <th pSortableColumn="nombre" style="width: 20%">
+                                    Estudiante(s)
+                                    <p-sortIcon field="nombre"></p-sortIcon>
+                                </th>
+                                <th style="width: 10%">Estado</th>
+                                <th style="width: 10%"></th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-data>
                             <tr>
-                                <td style="width:14%; min-width:10rem;"><span
-                                        class="p-column-title">Título de
-                                        tesis</span>
-                                    {{data.title}}
+                                <td style="width: 14%; min-width: 10rem">
+                                    <span class="p-column-title"
+                                        >Título de tesis</span
+                                    >
+                                    {{ data.title }}
                                 </td>
-                                <td style="width:20%; min-width:8rem;">
+                                <td style="width: 20%; min-width: 8rem">
                                     <div *ngIf="data.seedbeds.length < 2">
-                                        <span>{{data.seedbeds[0].name}}</span>
+                                        <span>{{ data.seedbeds[0].name }}</span>
                                     </div>
                                     <div *ngIf="data.seedbeds.length > 1">
-                                        <span>{{data.seedbeds[0].name + ' y ' + data.seedbeds[1].name}}</span>
+                                        <span>{{
+                                            data.seedbeds[0].name +
+                                                " y " +
+                                                data.seedbeds[1].name
+                                        }}</span>
                                     </div>
                                 </td>
-                                <td style="width:20%; min-width: 10rem;"><span
-                                        class="p-column-title">estado</span>
+                                <td style="width: 20%; min-width: 10rem">
+                                    <span class="p-column-title">estado</span>
                                     <span
-                                        [class]="'product-badge status-' + (data.status ? data.status.toLowerCase() : '')">{{data.status}}</span>
+                                        [class]="
+                                            'product-badge status-' +
+                                            (data.status
+                                                ? data.status.toLowerCase()
+                                                : '')
+                                        "
+                                        >{{ data.status }}</span
+                                    >
                                 </td>
                                 <td>
                                     <div class="flex">
-                                        <p-button label="Ver detalle"
+                                        <p-button
+                                            label="Ver detalle"
                                             [outlined]="true"
                                             severity="contrast"
-                                            (click)="viewDetailsHotbed(data)" />
-    
+                                            (click)="viewDetailsHotbed(data)"
+                                        />
+
                                         <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
                                     <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteProduct(product)"></button> -->
                                     </div>
@@ -106,136 +146,199 @@
                         </ng-template>
                     </p-table>
                 </div>
-              </ng-template>
-            
+            </ng-template>
+
             <ng-template #skeletonArticleList>
-                <div class="card">
-                    <p-table [value]="skeletonRows" responsiveLayout="scroll">
-                        <ng-template pTemplate="header">
-                            <tr>
-                                <th style="width:60%">Título del artículo</th>
-                                <th style="width:20%">Estudiante(s)</th>
-                                <th style="width:10%">Estado</th>
-                                <th style="width:10%"></th>
-                            </tr>
-                        </ng-template>
-                        <ng-template pTemplate="body" let-product>
-                            <tr>
-                                <td><p-skeleton /></td>
-                                <td><p-skeleton /></td>
-                                <td><p-skeleton /></td>
-                                <td><p-skeleton /></td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
-                </div>
+                <app-skeleton-table [columnTitles]="columnTitles" [skeletonCount]="skeletonRows"></app-skeleton-table>
             </ng-template>
         </div>
-
     </div>
 </div>
 
 <div *ngIf="viewDetail && !viewHistory" class="grid">
     <div class="col-12">
+        <app-breadcrumb [items]="detailsBreadcrumbItems"></app-breadcrumb>
         <div class="card">
             <div class="grid d-flex col-12">
                 <div class="mr-auto p-2">
-                    <p-button (click)="backList()" label="Regresar"
+                    <p-button
+                        (click)="backList()"
+                        label="Regresar"
                         [outlined]="true"
-                        icon="pi pi-angle-left" iconPos="left" />
-                    <p-button *ngIf="!showEdit && inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="ml-3"
+                        icon="pi pi-angle-left"
+                        iconPos="left"
+                    />
+                    <p-button
+                        *ngIf="
+                            !showEdit &&
+                            inscriptionState !== 'Cancelado' &&
+                            inscriptionState !== 'Aprobado'
+                        "
+                        class="ml-3"
                         (click)="showEdition()"
                         label="Editar"
-                        icon="pi pi-pencil" iconPos="left" />
-                    <p-button *ngIf="showEdit && inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="ml-3"
+                        icon="pi pi-pencil"
+                        iconPos="left"
+                    />
+                    <p-button
+                        *ngIf="
+                            showEdit &&
+                            inscriptionState !== 'Cancelado' &&
+                            inscriptionState !== 'Aprobado'
+                        "
+                        class="ml-3"
                         (click)="cancelEdition()"
                         label="Cancelar edición"
-                        icon="pi pi-times" iconPos="right" />
-                    <p-button *ngIf="showEdit && inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'" class="ml-3"
+                        icon="pi pi-times"
+                        iconPos="right"
+                    />
+                    <p-button
+                        *ngIf="
+                            showEdit &&
+                            inscriptionState !== 'Cancelado' &&
+                            inscriptionState !== 'Aprobado'
+                        "
+                        class="ml-3"
                         (click)="saveEdition()"
                         label="Guardar cambios"
-                        icon="pi pi-save" iconPos="left" />
+                        icon="pi pi-save"
+                        iconPos="left"
+                    />
                 </div>
                 <div class="p-2">
                     <p-button
-                        *ngIf="inscriptionState !== 'Cancelado' && inscriptionState !== 'Aprobado'"
+                        *ngIf="
+                            inscriptionState !== 'Cancelado' &&
+                            inscriptionState !== 'Aprobado'
+                        "
                         label="Cancelar inscripción"
                         [outlined]="true"
                         class="mr-3"
-                        icon="pi pi-times" iconPos="left"
-                        severity="danger" (click)="goToCancelation()" />
+                        icon="pi pi-times"
+                        iconPos="left"
+                        severity="danger"
+                        (click)="goToCancelation()"
+                    />
                     <p-button
-                        *ngIf="inscriptionState === 'Inscrito' || inscriptionState === 'Observado'"
-                        label="Pasar a revisión" [outlined]="true"
-                        icon="pi pi-angle-right" iconPos="right"
-                        severity="info" (click)="goToReview()" />
-                    <p-button *ngIf="inscriptionState === 'En revisión'"
-                        label="Observado" [outlined]="true"
-                        icon="pi pi-exclamation-circle" iconPos="left"
-                        severity="warning" (click)="goToObserved()" />
+                        *ngIf="
+                            inscriptionState === 'Inscrito' ||
+                            inscriptionState === 'Observado'
+                        "
+                        label="Pasar a revisión"
+                        [outlined]="true"
+                        icon="pi pi-angle-right"
+                        iconPos="right"
+                        severity="info"
+                        (click)="goToReview()"
+                    />
+                    <p-button
+                        *ngIf="inscriptionState === 'En revisión'"
+                        label="Observado"
+                        [outlined]="true"
+                        icon="pi pi-exclamation-circle"
+                        iconPos="left"
+                        severity="warning"
+                        (click)="goToObserved()"
+                    />
                     <p-button
                         *ngIf="inscriptionState === 'En revisión'"
                         class="ml-3"
-                        label="Aprobado" [outlined]="true"
-                        icon="pi pi-angle-right" iconPos="right"
-                        severity="success" (click)="goToApprove()" />
+                        label="Aprobado"
+                        [outlined]="true"
+                        icon="pi pi-angle-right"
+                        iconPos="right"
+                        severity="success"
+                        (click)="goToApprove()"
+                    />
                 </div>
             </div>
             <div class="card flex justify-content-center col-12">
-                <h4 class="font-bold">Título:
-                    {{articleSelected.title}}
+                <h4 class="font-bold">
+                    Título:
+                    {{ articleSelected.title }}
                 </h4>
             </div>
             <div *ngIf="!showEdit" class="grid col-12">
                 <div class="col-12">
-                    <p-button (click)="viewHistory=true" label="Ver línea de trabajo"
-                    icon="pi pi-clock" iconPos="left" />
+                    <p-button
+                        (click)="goToHistory()"
+                        label="Ver línea de trabajo"
+                        icon="pi pi-clock"
+                        iconPos="left"
+                    />
                 </div>
-                <div class="col-3"><p class="font-bold">Escuala
-                        profesional:</p><p>{{articleSelected.title}}</p></div>
-                <div class="col-3"><p class="font-bold">Nro de
-                        oficio:</p><p>{{articleSelected.title}}</p></div>
-                <div class="col-3"><p class="font-bold">Nro de
-                        resolución:</p><p>{{articleSelected.title}}</p></div>
+                <div class="col-3">
+                    <p class="font-bold">Escuala profesional:</p>
+                    <p>{{ articleSelected.title }}</p>
+                </div>
+                <div class="col-3">
+                    <p class="font-bold">Nro de oficio:</p>
+                    <p>{{ articleSelected.title }}</p>
+                </div>
+                <div class="col-3">
+                    <p class="font-bold">Nro de resolución:</p>
+                    <p>{{ articleSelected.title }}</p>
+                </div>
             </div>
             <div class="ml-2 mr-2 separator"></div>
-            <app-comments class="w-full"></app-comments>
-            
+            <app-comments class="w-full" module="semilleros" [id]="articleSelected.id"></app-comments>
         </div>
     </div>
 </div>
 
-<div *ngIf="viewHistory" class="card">
-    <div class="grid d-flex col-12">
-        <div class="mr-auto p-2">
-    <p-button (click)="viewHistory=false" label="Regresar"
+<div *ngIf="viewHistory" class="grid">
+    <div class="col-12">
+        <app-breadcrumb [items]="timeLineBreadcrumbItems"></app-breadcrumb>
+        <div class="card">
+            <div class="grid d-flex col-12">
+                <div class="mr-auto p-2">
+                    <p-button
+                        (click)="backToDetail()"
+                        label="Regresar"
                         [outlined]="true"
-                        icon="pi pi-angle-left" iconPos="left" />
+                        icon="pi pi-angle-left"
+                        iconPos="left"
+                    />
+                </div>
+            </div>
+            <p class="font-bold">Línea de trabajo del artículo: "{{ articleSelected.title }}"</p>
+            <p-timeline
+                [value]="events"
+                align="alternate"
+                styleClass="customized-timeline"
+            >
+                <ng-template pTemplate="marker" let-event>
+                    <span
+                        class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"
+                        [style]="{ 'background-color': event.color }"
+                    >
+                        <i [class]="event.icon"></i>
+                    </span>
+                </ng-template>
+                <ng-template pTemplate="content" let-event>
+                    <p-card>
+                        <h5 class="font-bold">{{ event.status }}</h5>
+                        <p>
+                            {{
+                                event.date === "00-00-0000 00:00"
+                                    ? "--/--/--- ----"
+                                    : event.date
+                            }}
+                        </p>
+                        <p *ngIf="event.date !== '00-00-0000 00:00'">
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                            Inventore sed consequuntur error repudiandae numquam
+                            deserunt quisquam repellat libero asperiores earum nam
+                            nobis, culpa ratione quam perferendis esse, cupiditate neque
+                            quas!
+                        </p>
+                        <p *ngIf="event.date === '00-00-0000 00:00'">
+                            Aún no pasa a {{ event.status }}
+                        </p>
+                    </p-card>
+                </ng-template>
+            </p-timeline>
         </div>
     </div>
-    <p class="font-bold">Línea de trabajo de 
-        "{{articleSelected.title}}"
-    </p>
-    <p-timeline [value]="events" align="alternate" styleClass="customized-timeline">
-        <ng-template pTemplate="marker" let-event>
-            <span 
-                class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1" 
-                [style]="{ 'background-color': event.color }">
-                    <i [class]="event.icon"></i>
-            </span>
-        </ng-template>
-        <ng-template pTemplate="content" let-event>
-            <p-card>
-                <h5 class="font-bold">{{event.status}}</h5>
-                <p>{{event.date === '00-00-0000 00:00' ? '--/--/--- ----' : event.date}}</p>
-                <p *ngIf="event.date !== '00-00-0000 00:00'">
-                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditate
-                    neque quas!
-                </p>
-                <p *ngIf="event.date === '00-00-0000 00:00'">
-                    Aún no pasa a {{event.status}}
-                </p>
-            </p-card>
-        </ng-template>
-    </p-timeline>
 </div>
+
