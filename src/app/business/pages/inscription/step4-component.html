@@ -1,0 +1,152 @@
+<div class="card">
+    <p>
+        Complete todos los campos para continuar.
+    </p>
+    <p-toast key="tst"></p-toast>
+    <form [formGroup]="presenter.formStep4">
+        <div class="grid p-fluid mt-3">
+            <div class="field col-12 md:col-12">
+                <span class="p-float-label">
+                    <textarea
+                        formControlName="title"
+                        inputId="textarea"
+                        rows="4"
+                        cols="30"
+                        pInputTextarea></textarea>
+                    <label for="textarea">Título del proyecto de tesis</label>
+                </span>
+            </div>
+        </div>
+        <div class="grid p-fluid">
+            <div class="field col-12 md:col-4">
+                <span class="p-float-label">
+                    <p-calendar
+                        inputId="approvalDate"
+                        formControlName="approveDate"></p-calendar>
+                    <label for="approvalDate">Fecha de
+                        aprobación UDI</label>
+                </span>
+            </div>
+            <div class="field col-12 md:col-4">
+                <span class="p-float-label">
+                    <input
+                        formControlName="jobNumber"
+                        type="text"
+                        id="jobNumber"
+                        pInputText />
+                    <label for="jobNumber">Número de oficio</label>
+                </span>
+            </div>
+            <div class="field col-12 md:col-4">
+                <span class="p-float-label">
+                    <input
+                        formControlName="resolutionNumber"
+                        type="text"
+                        id="resolutionNumber"
+                        pInputText />
+                    <label for="resolutionNumber">Número de resolución</label>
+                </span>
+            </div>
+        </div>
+        <div class="grid p-fluid">
+            <div class="field col-12 md:col-12">
+                <span class="p-float-label">
+                    <textarea
+                        formControlName="comments"
+                        inputId="textarea"
+                        rows="4"
+                        cols="30"
+                        pInputTextarea></textarea>
+                    <label for="textarea">Comentarios u observaciones de la
+                        inscripción</label>
+                </span>
+            </div>
+        </div>
+        <div class="grid p-fluid">
+            <div class="col-12">
+                <div style="display: flex">
+                    <input
+                        #fileInput
+                        type="file"
+                        name="archives[]"
+                        class="mt-2 custom-file-input mr-auto"
+                        multiple
+                        (change)="onFileChange($event)"
+                        accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.zip,.xls,.xlsx"
+                    />
+                    <p-button
+                        icon="pi pi-trash"
+                        [rounded]="true"
+                        [text]="true"
+                        severity="danger"
+                        [disabled]="filesSelected.length < 1"
+                        (click)="clearFile()"
+                    />
+                </div>
+
+                <div class="flex flex-column mt-2">
+                    <div
+                        class="border-2 border-dashed surface-border border-round surface-ground flex-auto flex justify-content-center align-items-center font-medium"
+                    >
+                        <span
+                            *ngIf="filesSelected.length < 1"
+                            class="p-3"
+                            >No se ha seleccionado ningún archivo</span
+                        >
+                        <div
+                            *ngIf="filesSelected.length > 0"
+                            class="p-3"
+                        >
+                            <div *ngFor="let file of filesSelected">
+                                <i
+                                    *ngIf="
+                                        file.type === 'docx' ||
+                                        file.type === 'doc'
+                                    "
+                                    class="pi pi-file-word"
+                                    style="font-size: 1.5rem"
+                                ></i>
+                                <i
+                                    *ngIf="file.type === 'pdf'"
+                                    class="pi pi-file-pdf"
+                                    style="font-size: 1.5rem"
+                                ></i>
+                                <i
+                                    *ngIf="
+                                        file.type === 'xls' ||
+                                        file.type === 'xlsx'
+                                    "
+                                    class="pi pi-file-excel"
+                                    style="font-size: 1.5rem"
+                                ></i>
+                                <i
+                                    *ngIf="
+                                        file.type === 'jpg' ||
+                                        file.type === 'jpeg' ||
+                                        file.type === 'png'
+                                    "
+                                    class="pi pi-image"
+                                    style="font-size: 1.5rem"
+                                ></i>
+                                <i
+                                    *ngIf="file.type === 'zip'"
+                                    class="pi pi-folder"
+                                    style="font-size: 1.5rem"
+                                ></i>
+                                <span class="pl-3">{{
+                                    file.name
+                                }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-3 mt-1">
+            <p-button (click)="backStep()" label="Regresar" [outlined]="true"
+                icon="pi pi-angle-left" iconPos="left" />
+            <p-button (click)="finalize()" label="Finalizar" icon="pi pi-check"
+                iconPos="right" [disabled]="presenter.formStep4.invalid" />
+        </div>
+    </form>
+</div>

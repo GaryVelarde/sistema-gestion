@@ -35,8 +35,8 @@ export class AppTopBarComponent {
     constructor(public layoutService: LayoutService, private router: Router, private service: AuthService) { }
 
     getInitialName(): string {
-        const userName = JSON.parse(localStorage.getItem('dr2lp2'));
-        return this.getFirstLetter(userName.user.name);
+        const userName = JSON.parse(localStorage.getItem('dr2lp2'));        
+        return userName === null ? '-' : this.getFirstLetter(userName.user.name);
     }
 
     getFirstLetter(str: string): string {

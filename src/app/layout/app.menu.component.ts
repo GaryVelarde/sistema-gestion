@@ -54,12 +54,12 @@ export class AppMenuComponent implements OnInit {
 
     getUserFullName(): string {
         const userName = JSON.parse(localStorage.getItem('dr2lp2'));
-        return userName.user.name + ' ' + userName.user.surnames
+        return userName === null ? '-' : userName.user.name + ' ' + userName.user.surnames
     }
 
     getInitialName(): string {
         const userName = JSON.parse(localStorage.getItem('dr2lp2'));
-        return this.getFirstLetter(userName.user.name);
+        return userName === null ? '-' : this.getFirstLetter(userName.user.name);
     }
 
     getFirstLetter(str: string): string {
