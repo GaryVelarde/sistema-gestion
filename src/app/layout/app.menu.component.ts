@@ -51,4 +51,24 @@ export class AppMenuComponent implements OnInit {
             }
         ];
     }
+
+    getUserFullName(): string {
+        const userName = JSON.parse(localStorage.getItem('dr2lp2'));
+        return userName.user.name + ' ' + userName.user.surnames
+    }
+
+    getInitialName(): string {
+        const userName = JSON.parse(localStorage.getItem('dr2lp2'));
+        return this.getFirstLetter(userName.user.name);
+    }
+
+    getFirstLetter(str: string): string {
+        if (!str) {
+            console.error('The string is empty');
+            return '';
+        }
+        const firstLetter = str.charAt(0);
+        const firstLetterUpper = firstLetter.toUpperCase();
+        return firstLetterUpper;
+    }
 }

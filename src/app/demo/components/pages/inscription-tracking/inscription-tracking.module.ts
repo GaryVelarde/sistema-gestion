@@ -33,6 +33,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
 import { RouterModule } from '@angular/router';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { SidebarModule } from 'primeng/sidebar';
 
 @NgModule({
     imports: [
@@ -66,6 +67,7 @@ import { BreadcrumbModule } from 'primeng/breadcrumb';
         MessagesModule,
         AvatarModule,
         CrossComponentsModule,
+        SidebarModule,
     ],
     declarations: [InscriptionTrackingComponent],
     providers: [

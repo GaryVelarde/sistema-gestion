@@ -18,6 +18,8 @@ import { AppConfigModule } from './config/config.module';
 import { AppSidebarComponent } from "./app.sidebar.component";
 import { AppLayoutComponent } from "./app.layout.component";
 import { AvatarModule } from 'primeng/avatar';
+import { MenuModule } from 'primeng/menu';
+import { ButtonModule } from 'primeng/button';
 
 @NgModule({
     declarations: [
@@ -40,6 +42,8 @@ import { AvatarModule } from 'primeng/avatar';
         RippleModule,
         RouterModule,
         AvatarModule,
+        MenuModule,
+        ButtonModule,
         AppConfigModule], providers: [provideHttpClient(withInterceptorsFromDi())]
 })
 export class AppLayoutModule { }

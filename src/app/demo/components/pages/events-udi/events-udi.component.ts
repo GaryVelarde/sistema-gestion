@@ -29,7 +29,11 @@ interface Task {
     title: string;
     description: string;
     dateEnd: string;
-    user_name: string;
+    user: {
+        id: number,
+        name: string,
+        surnames: string,
+    };
 }
 
 interface Usuario {
@@ -594,7 +598,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.removeTask(task);
     }
 
-    editTask(task: Task) {
+    editTask(task: any) {
+        console.log(task)
         this.taskForm.reset();
         this.titleTask.setValue(task.title);
         this.descriptionTask.setValue(task.description);
@@ -619,14 +624,31 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     addTask(id: number) {
+        console.log('this.assignedUser.value', this.assignedUser.value);
+        const request = {
+            "title": this.titleTask.value,
+            "description": this.descriptionTask.value,
+            "commitment_date": this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
+            "user_id": this.assignedUser.value.id
+        }
         if (id > 0) {
+            this.service.updateTaskDetail(this.eventSelected.event._def.extendedProps.event_udi.id, id.toString(), request).pipe()
+                .subscribe((res: any) => {
+                    console.log(res);
+                }, (error) => {
+
+                })
             const taskIndex = this.pendingTasks.findIndex(task => task.id === id);
             const updateTask: Task = {
                 id: this.getMaxId() + 1,
                 title: this.titleTask.value,
                 description: this.descriptionTask.value,
                 dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
-                user_name: ''
+                user: {
+                    id: this.assignedUser.value.id,
+                    name: this.assignedUser.value.nombre,
+                    surnames: this.assignedUser.value.apellidos
+                }
             };
             if (taskIndex !== -1) {
                 this.pendingTasks[taskIndex] = { ...this.pendingTasks[taskIndex], ...updateTask };
@@ -637,30 +659,30 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             this.taskForm.reset();
             return;
         }
-        const request = {
-            "title": this.titleTask.value,
-            "description": this.descriptionTask.value,
-            "commitment_date": this.dateFormatService.formatDateYYYYMMDD(this.endTask.value),
-            "user_id": this.assignedUser.value.id
-        }
-        this.service.addTask(this.eventSelected.event._def.extendedProps.event_udi.id, request).pipe().subscribe((res: any) => {
-            if (res.status) {
-                const newTask: Task = {
-                    id: this.getMaxId() + 1,
-                    title: this.titleTask.value,
-                    description: this.descriptionTask.value,
-                    dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
-                    user_name: this.assignedUser.value.fullName
-                };
-                if (!this.isTaskInPending(this.getMaxId() + 1)) {
-                    this.pendingTasks = [...this.pendingTasks, newTask];
-                    this.newTaskDialog = false;
-                    this.taskForm.reset();
-                } else {
-                    console.log('Task with this ID already exists.');
+        this.service.addTask(this.eventSelected.event._def.extendedProps.event_udi.id, request).pipe()
+            .subscribe((res: any) => {
+                if (res.status) {
+                    const newTask: Task = {
+                        id: this.getMaxId() + 1,
+                        title: this.titleTask.value,
+                        description: this.descriptionTask.value,
+                        dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
+                        user: {
+                            id: this.assignedUser.value.id,
+                            name: this.assignedUser.value.nombre,
+                            surnames: this.assignedUser.value.apellidos
+                        }
+                        //user_name: this.assignedUser.value.fullName
+                    };
+                    if (!this.isTaskInPending(this.getMaxId() + 1)) {
+                        this.pendingTasks = [...this.pendingTasks, newTask];
+                        this.newTaskDialog = false;
+                        this.taskForm.reset();
+                    } else {
+                        console.log('Task with this ID already exists.');
+                    }
                 }
-            }
-        })
+            })
 
     }
 
@@ -748,7 +770,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
                             title: task.title,
                             description: task.description,
                             dateEnd: task.commitment_date,
-                            user_name: task.user.name + ' ' + task.user.surnames
+                            user: task.user
                         }
                     )
                 }
@@ -759,7 +781,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
                             title: task.title,
                             description: task.description,
                             dateEnd: task.commitment_date,
-                            user_name: task.user.name + ' ' + task.user.surnames
+                            user: task.user
                         }
                     )
                 }
@@ -770,7 +792,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
                             title: task.title,
                             description: task.description,
                             dateEnd: task.commitment_date,
-                            user_name: task.user.name + ' ' + task.user.surnames
+                            user: task.user
                         }
                     )
                 }
@@ -781,7 +803,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     getTeachersList() {
         this.service.getTeachersList().pipe().subscribe((res: any) => {
             if (res) {
-                for (let teachers of res.teachers)
+                for (let teachers of res.data)
                     this.usuarios.push(
                         { id: teachers.id, nombre: teachers.name, apellidos: teachers.surnames },
                     )

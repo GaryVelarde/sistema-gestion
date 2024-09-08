@@ -2,8 +2,8 @@
     <h5>Comentarios</h5>
 </div>
 <div class="col-12 grid">
-    <div class="mb-4 w-full flex align-items-center ml-3">
-        <p-avatar label="G" size="large" />
+    <div *ngIf="visible" class="mb-4 w-full flex align-items-center ml-3">
+        <p-avatar [label]="getInitialName()" size="large" />
         <div class="ml-3 w-full">
             <form [formGroup]="commentsForm" style="width: inherit">
                 <span class="p-float-label">

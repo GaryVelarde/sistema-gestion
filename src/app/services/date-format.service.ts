@@ -301,4 +301,39 @@ export class DateFormatService {
     }
   }
 
+  formatCustomDateByFrontComment(date: Date | string): string {
+    let dateObj: Date;
+
+    // Si el parámetro es un string, lo parseamos al formato adecuado
+    if (typeof date === 'string') {
+      const parts = date.split(/[- :]/); // Divide por guión, espacio y dos puntos
+      dateObj = new Date(
+        +parts[2],          // Año
+        +parts[1] - 1,      // Mes (0 indexado en JS)
+        +parts[0],          // Día
+        +parts[3],          // Hora
+        +parts[4],          // Minutos
+        +parts[5]           // Segundos
+      );
+    } else {
+      dateObj = date;
+    }
+
+    const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+    const day = dateObj.getDate();
+    const month = months[dateObj.getMonth()];
+    const year = dateObj.getFullYear();
+    let hour = dateObj.getHours();
+    const minutes = dateObj.getMinutes().toString().padStart(2, '0');
+
+    // Determinar si es AM o PM
+    const period = hour >= 12 ? 'p.m.' : 'a.m.';
+    if (hour > 12) hour -= 12;
+    if (hour === 0) hour = 12;
+
+    // Formatear la fecha
+    return `${day} de ${month} del ${year} a las ${hour}:${minutes} ${period}`;
+  }
+
 }

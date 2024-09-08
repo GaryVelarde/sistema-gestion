@@ -9,8 +9,9 @@ import {
     FormGroup,
     Validators,
 } from '@angular/forms';
-import { IUsuario } from 'src/app/demo/api/user';
 import { AuthService } from 'src/app/services/auth.service';
+import { LoaderService } from 'src/app/layout/service/loader.service';
+import { finalize } from 'rxjs';
 
 @Component({
     templateUrl: './users.component.html',
@@ -40,8 +41,6 @@ export class UsersComponent implements OnInit {
         { field: 'estado', header: 'Estado' },
     ];
 
-    statuses: any[] = [];
-
     rowsPerPageOptions = [5, 10, 20];
 
     userData = [];
@@ -69,8 +68,8 @@ export class UsersComponent implements OnInit {
     ];
     breadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
-        { label: 'Gestión de usuarios' }, 
-        { label: 'Usuarios', visible: true},
+        { label: 'Gestión de usuarios' },
+        { label: 'Usuarios', visible: true },
     ];
     columnTitles: string[] = [
         'Código',
@@ -79,9 +78,9 @@ export class UsersComponent implements OnInit {
         'Celular',
         'Estado',
         ''
-      ];
+    ];
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
-    userDetailSelected: IUsuario;
+    userDetailSelected: any;
     titleModalDetailIserSelected: string = '';
     getUserProcess = '';
     messageError = 'No se ha podido cargar la lista de usuarios. Por favor vuelva a intentarlo más tarde.'
@@ -147,10 +146,10 @@ export class UsersComponent implements OnInit {
     }
 
     constructor(
-        private productService: ProductService,
         private messageService: MessageService,
         private fb: FormBuilder,
-        private service: AuthService
+        private service: AuthService,
+        private loaderService: LoaderService,
     ) {
         this.userForm = this.fb.group({
             role: this.role,
@@ -165,15 +164,6 @@ export class UsersComponent implements OnInit {
     ngOnInit() {
         this.callGetUserList();
         this.watchRoleSelected();
-        this.productService
-            .getProducts()
-            .then((data) => (this.products = data));
-
-        this.statuses = [
-            { label: 'INSTOCK', value: 'instock' },
-            { label: 'LOWSTOCK', value: 'lowstock' },
-            { label: 'OUTOFSTOCK', value: 'outofstock' },
-        ];
     }
 
     watchRoleSelected() {
@@ -207,7 +197,6 @@ export class UsersComponent implements OnInit {
                         this.removeControlForEstudiante();
                         break;
                 }
-                console.log(role);
             }
         });
     }
@@ -374,10 +363,57 @@ export class UsersComponent implements OnInit {
         );
     }
 
-    openModalUserDetail(user: IUsuario) {
+    openModalUserDetail(user: any) {
         this.titleModalDetailIserSelected = 'Detalle de ' + user.nombre;
         this.userDetailSelected = user;
-        this.modalUserDetail = true;
+        this.modalNewUser = true;
+        this.setUserDataDetails(user);
+    }
+
+    setUserDataDetails(user: any) {
+        console.log(this.adviser.value);
+        console.log(user)
+        if (user.role) {
+            this.role.patchValue({ name: user.role, code: user.role })
+            this.name.setValue(user.name);
+            this.lastName.setValue(user.surnames);
+            this.code.setValue(user.code);
+            this.number.setValue(user.phone);
+            this.email.setValue(user.email);
+
+            switch (user.role) {
+                case 'UDI':
+                    this.removeControlForDocente();
+                    this.removeCareerControl();
+                    this.removeControlForEgresado();
+                    this.removeControlForEstudiante();
+                    break;
+                case 'Docente':
+                    this.addControlForDocente();
+                    this.removeControlForEstudiante();
+                    this.removeControlForEgresado();
+                    this.line.setValue(user.line);
+                    this.subLine.setValue(user.sublines);
+                    break;
+                case 'Egresado':
+                    this.addControlForEgresado();
+                    this.removeControlForDocente();
+                    this.removeControlForEstudiante();
+                    break;
+                case 'Estudiante':
+                    this.addControlForEstudiante();
+                    this.removeControlForDocente();
+                    this.removeControlForEgresado();
+                    this.cycle.setValue({ name: user.cycle, code: user.cycle },)
+                    this.career.setValue(user.career);
+                    break;
+                case 'Semillero':
+                    this.removeControlForDocente();
+                    this.removeControlForEgresado();
+                    this.removeControlForEstudiante();
+                    break;
+            }
+        }
     }
 
     callGetUserList() {
@@ -385,7 +421,7 @@ export class UsersComponent implements OnInit {
         this.service.getUserList().subscribe(
             (res) => {
                 this.getUserProcess = 'complete';
-                this.userData = res.data;
+                this.userData = res;
                 console.log(res);
             },
             (error) => {
@@ -396,7 +432,38 @@ export class UsersComponent implements OnInit {
         );
     }
 
+    hableInsertOrUpdateUser() {
+        this.userDetailSelected.id ? this.callPutUser()
+            : this.callPostNewUser()
+    }
+
     callPostNewUser() {
+        this.loaderService.show();
+        let rq = this.createRequest();
+        console.log(rq);
+        this.service.postCreateNewUser(rq).pipe(
+            finalize(() => {
+                setTimeout(() => {
+                    this.loaderService.hide(); // Ocultar el loader después de 800ms
+                }, 800);
+            })
+        ).subscribe(
+            (res) => {
+                if (res.status) {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Mensaje',
+                        detail: 'El usuario se ha creado!',
+                        life: 3000,
+                    });
+                }
+                console.log(res);
+            }, (error) => {
+
+            });
+    }
+
+    createRequest() {
         let rq = {};
         switch (this.role.value.code) {
             case 'Docente':
@@ -416,7 +483,6 @@ export class UsersComponent implements OnInit {
                 };
                 break;
             case 'UDI':
-                console.log('entra');
                 rq = {
                     role: this.role.value.code,
                     name: this.name.value,
@@ -424,7 +490,6 @@ export class UsersComponent implements OnInit {
                     email: this.email.value,
                     phone: this.number.value,
                     code: this.code.value,
-                    career: this.career.value,
                 };
                 break;
             case 'Egresado':
@@ -463,23 +528,37 @@ export class UsersComponent implements OnInit {
                 };
                 break;
         }
-        console.log(rq);
-        this.service.postCreateNewUser(rq).subscribe((res) => {
-            if (res.status) {
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Mensaje',
-                    detail: 'El usuario se ha creado!',
-                    life: 3000,
-                });
-            }
-            console.log(res);
-        });
+        return rq;
     }
 
     handleReload(reload: boolean) {
         if (reload) {
             this.callGetUserList();
         }
+    }
+
+    callPutUser() {
+        this.modalNewUser = false;
+        this.loaderService.show();
+        let rq = this.createRequest();
+        this.service.putUser(this.userDetailSelected.id, rq).pipe(
+            finalize(() => {
+                setTimeout(() => {
+                    this.loaderService.hide(); // Ocultar el loader después de 800ms
+                }, 800);
+            })
+        ).subscribe(
+            (res: any) => {
+                if(res.status){
+                    this.callGetUserList();
+                }
+                console.log(res);
+            }, (error) => {
+                console.error(error);
+            })
+    }
+
+    clearValues() {
+
     }
 }

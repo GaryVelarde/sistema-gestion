@@ -14,25 +14,17 @@
     </button>
 
     <div #topbarmenu class="layout-topbar-menu" [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
-        <button style="color: var(--text-color-secondary); border-radius: 50%;
-        width: 3rem;
-        height: 3rem;
-        cursor: pointer;
-    transition: background-color 0.2s;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    " class="p-link mt-2 mr-2">
-            <i class="pi pi-bell text-3xl" pBadge value="2"></i>
-        </button>
         <p-avatar 
-            label="G" 
+            [label]="getInitialName()" 
             styleClass="ml-3" 
             size="large" />
         <!--<button class="p-link layout-topbar-button" [routerLink]="'/documentation'">
             <i class="pi pi-cog"></i>
             <span>Settings</span>
         </button>-->
+        <div class="flex justify-content-center">
+            <p-menu #menu [model]="items" [popup]="true" />
+            <p-button [text]="true" severity="secondary" (onClick)="menu.toggle($event)" icon="pi pi-chevron-down"/>
+        </div>
     </div>
 </div>

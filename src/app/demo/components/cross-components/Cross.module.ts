@@ -17,6 +17,7 @@ import { RouterModule } from '@angular/router';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { TableModule } from 'primeng/table';
 import { SkeletonTableComponent } from './skeleton-table/skeleton-table.component';
+import { DialogModule } from 'primeng/dialog';
 
 
 @NgModule({
@@ -35,6 +36,7 @@ import { SkeletonTableComponent } from './skeleton-table/skeleton-table.componen
     RouterModule,
     TableModule,
     SkeletonModule,
+    DialogModule,
   ],
   declarations: [CommentsComponent, UserSelectionComponent, LoaderComponent, CardErrorComponent, BreadcrumbComponent, SkeletonTableComponent],
   exports: [CommentsComponent, UserSelectionComponent, LoaderComponent, CardErrorComponent, BreadcrumbComponent, SkeletonTableComponent]

@@ -104,7 +104,7 @@
                                 <th pSortableColumn="phone">Celular <p-sortIcon
                                         field="phone"></p-sortIcon></th>
                                 <th>Estado</th>
-                                <th></th>
+                                <th style="width: 10%"></th>
                             </tr>
                         </ng-template>
                         <ng-template pTemplate="body" let-data>
@@ -147,18 +147,6 @@
             </ng-template>
             
         </div>
-
-        <p-dialog
-            [(visible)]="modalUserDetail"
-            [style]="{ width: '60rem' }"
-            [header]="titleModalDetailIserSelected"
-            [modal]="true"
-            class="p-fluid"
-            [maximizable]="true">
-            <div *ngIf="modalUserDetail" class="content">
-                {{ userDetailSelected.name }}
-            </div>
-        </p-dialog>
     </div>
 </div>
 <p-sidebar [(visible)]="modalNewUser" [style]="{'width': '40%'}" position="right">
@@ -182,79 +170,6 @@
                     class="pl-2 text-error"
                     *ngIf="role.dirty && role.errors">El rol es
                     requerido.</small>
-            </div>
-            <div *ngIf="role.value.code === 'Estudiante'">
-                <div class="formgrid grid mt-5">
-                    <div class="field col">
-                        <span class="p-float-label">
-                            <input
-                                type="text"
-                                id="career"
-                                class="w-full"
-                                pInputText
-                                formControlName="career" />
-                            <label for="career">Carrera</label>
-                        </span>
-                        <small
-                            class="pl-2 text-error"
-                            *ngIf="career.dirty && career.errors">La
-                            carrera es requerida.</small>
-                    </div>
-                    <div class="field col">
-                        <span class="p-float-label">
-                            <p-dropdown
-                                formControlName="cycle"
-                                inputId="cycle"
-                                class="w-full"
-                                [autoDisplayFirst]="false"
-                                [options]="cycles"
-                                optionLabel="name"></p-dropdown>
-                            <label for="cycle">Seleccione el
-                                ciclo</label>
-                        </span>
-                        <small
-                            class="pl-2 text-error"
-                            *ngIf="cycle.dirty && cycle.errors">El ciclo
-                            es requerido.</small>
-                    </div>
-                </div>
-            </div>
-            <div *ngIf="role.value.code === 'Egresado'">
-                <div class="formgrid grid mt-5">
-                    <div class="field col">
-                        <span class="p-float-label">
-                            <input
-                                type="text"
-                                id="career"
-                                class="w-full"
-                                pInputText
-                                formControlName="career" />
-                            <label for="career">Carrera</label>
-                        </span>
-                        <small
-                            class="pl-2 text-error"
-                            *ngIf="career.dirty && career.errors">La
-                            carrera es requerida.</small>
-                    </div>
-                    <div class="field col">
-                        <span class="p-float-label">
-                            <p-calendar
-                                inputId="egressDate"
-                                [iconDisplay]="'input'"
-                                formControlName="egressDate"
-                                class="w-full"
-                                [showIcon]="true"
-                                dateFormat="yy-mm-dd"></p-calendar>
-                            <label for="egressDate">Fecha de
-                                egreso</label>
-                        </span>
-                        <small
-                            class="pl-2 text-error"
-                            *ngIf="
-                                egressDate.dirty && egressDate.errors
-                            ">La fecha de egreso es requerida.</small>
-                    </div>
-                </div>
             </div>
             <div class="field mt-4">
                 <span class="p-float-label">
@@ -335,6 +250,79 @@
                         class="pl-2 text-error"
                         *ngIf="email.dirty && email.errors">El nombre es
                         requerido.</small>
+                </div>
+            </div>
+            <div *ngIf="role.value.code === 'Estudiante'">
+                <div class="formgrid grid mt-5">
+                    <div class="field col">
+                        <span class="p-float-label">
+                            <input
+                                type="text"
+                                id="career"
+                                class="w-full"
+                                pInputText
+                                formControlName="career" />
+                            <label for="career">Carrera</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="career.dirty && career.errors">La
+                            carrera es requerida.</small>
+                    </div>
+                    <div class="field col">
+                        <span class="p-float-label">
+                            <p-dropdown
+                                formControlName="cycle"
+                                inputId="cycle"
+                                class="w-full"
+                                [autoDisplayFirst]="false"
+                                [options]="cycles"
+                                optionLabel="name"></p-dropdown>
+                            <label for="cycle">Seleccione el
+                                ciclo</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="cycle.dirty && cycle.errors">El ciclo
+                            es requerido.</small>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="role.value.code === 'Egresado'">
+                <div class="formgrid grid mt-5">
+                    <div class="field col">
+                        <span class="p-float-label">
+                            <input
+                                type="text"
+                                id="career"
+                                class="w-full"
+                                pInputText
+                                formControlName="career" />
+                            <label for="career">Carrera</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="career.dirty && career.errors">La
+                            carrera es requerida.</small>
+                    </div>
+                    <div class="field col">
+                        <span class="p-float-label">
+                            <p-calendar
+                                inputId="egressDate"
+                                [iconDisplay]="'input'"
+                                formControlName="egressDate"
+                                class="w-full"
+                                [showIcon]="true"
+                                dateFormat="yy-mm-dd"></p-calendar>
+                            <label for="egressDate">Fecha de
+                                egreso</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="
+                                egressDate.dirty && egressDate.errors
+                            ">La fecha de egreso es requerida.</small>
+                    </div>
                 </div>
             </div>
             <div *ngIf="role.value.code === 'Docente'">
@@ -435,7 +423,7 @@
                     icon="pi pi-check"
                     iconPos="right"
                     [disabled]="!userForm.valid"
-                    (click)="callPostNewUser()"></button>
+                    (click)="hableInsertOrUpdateUser()"></button>
               </div>
         </form>
     </div>

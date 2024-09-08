@@ -18,7 +18,7 @@ export class AuthService {
   constructor(private http: HttpClient) { }
 
   login(credentials: AuthCredentials): Observable<any> {
-    return this.http.post(`${this.API_URL}/login`, credentials);
+    return this.http.post(`${this.API_URL}/auth/login`, credentials, this.header);
   }
 
   postInscription(rq: any): Observable<any> {
@@ -26,7 +26,7 @@ export class AuthService {
   }
 
   getInscription(): Observable<any> {
-    return this.http.get(`${this.API_URL}/inscription`);
+    return this.http.get(`${this.API_URL}/inscription`, this.header);
   }
 
   logout(): Observable<any> {
@@ -85,6 +85,10 @@ export class AuthService {
     return this.http.delete(`${this.API_URL}/meeting/${reunionId}/task/${taskId}`, this.header);
   }
 
+  updateTaskDetail(reunionId: string, taskId: string, request: any){
+    return this.http.put(`${this.API_URL}/meeting/${reunionId}/task/${taskId}`, request, this.header);
+  }
+
   addTask(reunionId: string, request: any) {
     return this.http.post(`${this.API_URL}/meeting/${reunionId}/task`, request, this.header);
   }
@@ -115,6 +119,26 @@ export class AuthService {
 
   getAdvisoryList(): Observable<any> {
     return this.http.get(`${this.API_URL}/advisory`, this.header);
+  }
+
+  putUser(id: number, request: any) {
+    return this.http.put(`${this.API_URL}/users/${id}`, request, this.header);
+  }
+
+  putInscriptionStatusUpdate(id: number, request: any) {
+    return this.http.put(`${this.API_URL}/inscription/${id}/status`, request, this.header);
+  }
+
+  postAddInscriptionComment(id: any, request: any) {
+    return this.http.post(`${this.API_URL}/inscription/${id}/observations`, request, this.header);
+  }
+
+  postAddEventsUdiComment(id: any, request: any) {
+    return this.http.post(`${this.API_URL}/meeting/${id}/observation`, request, this.header);
+  }
+
+  closeSession() {
+    return this.http.delete(`${this.API_URL}/logout`, this.header);
   }
 
 }
