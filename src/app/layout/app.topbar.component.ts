@@ -3,6 +3,7 @@ import { MenuItem } from 'primeng/api';
 import { LayoutService } from "./service/app.layout.service";
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { TokenService } from '../services/token.service';
 
 @Component({
     selector: 'app-topbar',
@@ -18,7 +19,7 @@ export class AppTopBarComponent {
                     label: 'Cerrar sesión',
                     icon: 'pi pi-sign-out',
                     command: () => {
-                        this.closeSession();
+                        this.logOut();
                     }
 
                 },
@@ -32,10 +33,12 @@ export class AppTopBarComponent {
 
     @ViewChild('topbarmenu') menu!: ElementRef;
 
-    constructor(public layoutService: LayoutService, private router: Router, private service: AuthService) { }
+    constructor(public layoutService: LayoutService, private router: Router, private service: AuthService,
+        private tokenService: TokenService,
+    ) { }
 
     getInitialName(): string {
-        const userName = JSON.parse(localStorage.getItem('dr2lp2'));        
+        const userName = this.tokenService.getDR2LP2();
         return userName === null ? '-' : this.getFirstLetter(userName.user.name);
     }
 
@@ -49,16 +52,16 @@ export class AppTopBarComponent {
         return firstLetterUpper;
     }
 
-    closeSession() {
-        localStorage.removeItem('dr2lp2');
+    logOut() {
         this.service.closeSession().pipe().subscribe(
             (res) => {
-
+                this.tokenService.revokeDR2LP2();
+                this.tokenService.revokeToken();
             }, (error) => {
-                console.log(error);
+                this.tokenService.revokeDR2LP2();
+                this.tokenService.revokeToken();
             });
         this.router.navigate(['/auth/login']);
-        console.log('funciona')
     }
 
 }

@@ -15,6 +15,12 @@ export class AppMenuComponent implements OnInit {
     ngOnInit() {
         this.model = [
             {
+                label: 'Home',
+                items: [
+                    { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/pages/'] }
+                ]
+            },
+            {
                 label: 'Gestión de usuarios',
                 items: [
                     { label: 'Usuarios', icon: 'pi pi-fw pi-user', routerLink: ['/pages/users'] }
@@ -25,9 +31,9 @@ export class AppMenuComponent implements OnInit {
                 items: [
                     { label: 'Proyecto de Tesis', icon: 'pi pi-fw pi-file', routerLink: ['/pages/inscription-tracking'] },
                     { label: 'Asesorías', icon: 'pi pi-fw pi-file-import', routerLink: ['/pages/asesorias'] },
-                    { label: 'Revisión de tesis', icon: 'pi pi-fw pi-file-export', routerLink: ['/pages/'] },
-                    { label: 'Sustentación', icon: 'pi pi-fw pi-copy', routerLink: ['/pages/'] },
-                    { label: 'Obervaciones', icon: 'pi pi-fw pi-list', routerLink: ['/pages/'] },
+                    { label: 'Revisión de tesis', icon: 'pi pi-fw pi-file-export', routerLink: ['/pages/a'] },
+                    { label: 'Sustentación', icon: 'pi pi-fw pi-copy', routerLink: ['/pages/a'] },
+                    { label: 'Obervaciones', icon: 'pi pi-fw pi-list', routerLink: ['/pages/a'] },
                 ]
             },
             {
@@ -43,12 +49,6 @@ export class AppMenuComponent implements OnInit {
                     { label: 'Reuniones UDI', icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/pages/events-udi'] },
                 ]
             },
-            {
-                label: 'Home',
-                items: [
-                    { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }
-                ]
-            }
         ];
     }
 

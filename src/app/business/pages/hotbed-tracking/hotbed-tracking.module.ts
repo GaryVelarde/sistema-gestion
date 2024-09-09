@@ -16,6 +16,7 @@ import { TimelineModule } from 'primeng/timeline';
 import { CardModule } from 'primeng/card';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { RouterModule } from '@angular/router';
+import { TagModule } from 'primeng/tag';
 
 @NgModule({
   imports: [
@@ -34,6 +35,7 @@ import { RouterModule } from '@angular/router';
     CrossComponentsModule,
     TimelineModule,
     CardModule,
+    TagModule,
   ],
   declarations: [HotbedTrackingComponent]
 })

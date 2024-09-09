@@ -65,7 +65,7 @@ export class LoginComponent implements OnInit {
                 if (res) {
                     this.tokenService.handleToken(res.token);
                     localStorage.setItem('dr2lp2', JSON.stringify(res));
-                    this.router.navigate(['/']);
+                    this.router.navigate(['/pages/']);
                 }
                 console.log(res);
             }, (error) => {

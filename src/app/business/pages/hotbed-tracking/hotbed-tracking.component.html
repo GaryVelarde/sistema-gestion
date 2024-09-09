@@ -149,7 +149,10 @@
             </ng-template>
 
             <ng-template #skeletonArticleList>
-                <app-skeleton-table [columnTitles]="columnTitles" [skeletonCount]="skeletonRows"></app-skeleton-table>
+                <app-skeleton-table
+                    [columnTitles]="columnTitles"
+                    [skeletonCount]="skeletonRows"
+                ></app-skeleton-table>
             </ng-template>
         </div>
     </div>
@@ -170,7 +173,7 @@
                     />
                     <p-button
                         *ngIf="
-                            !showEdit &&
+                            !edition &&
                             inscriptionState !== 'Cancelado' &&
                             inscriptionState !== 'Aprobado'
                         "
@@ -182,7 +185,7 @@
                     />
                     <p-button
                         *ngIf="
-                            showEdit &&
+                            edition &&
                             inscriptionState !== 'Cancelado' &&
                             inscriptionState !== 'Aprobado'
                         "
@@ -194,7 +197,7 @@
                     />
                     <p-button
                         *ngIf="
-                            showEdit &&
+                            edition &&
                             inscriptionState !== 'Cancelado' &&
                             inscriptionState !== 'Aprobado'
                         "
@@ -253,11 +256,14 @@
                 </div>
             </div>
             <div class="card flex justify-content-center col-12">
-                <h5 class="font-bold" style="font-family: revert; text-align: center;">
+                <h5
+                    class="font-bold"
+                    style="font-family: revert; text-align: center"
+                >
                     {{ articleSelected.title }}
                 </h5>
             </div>
-            <div *ngIf="!showEdit" class="grid col-12">
+            <div *ngIf="!edition" class="grid col-12">
                 <div class="col-12">
                     <p-button
                         (click)="goToHistory()"
@@ -267,20 +273,64 @@
                     />
                 </div>
                 <div class="col-3">
-                    <p class="font-bold">Escuala profesional:</p>
-                    <p>{{ articleSelected.title }}</p>
+                    <p class="font-bold">Grupo:</p>
+                    <p>Nro. {{ articleSelected.group }}</p>
                 </div>
                 <div class="col-3">
-                    <p class="font-bold">Nro de oficio:</p>
-                    <p>{{ articleSelected.title }}</p>
+                   
                 </div>
                 <div class="col-3">
-                    <p class="font-bold">Nro de resolución:</p>
-                    <p>{{ articleSelected.title }}</p>
+                </div>
+                <div class="card col-3" style="max-height: 100px">
+                    <p class="font-bold">Estado:</p>
+                    <p-tag
+                        *ngIf="articleState === 'En desarrollo'"
+                        value="En desarrollo"
+                    />
+                    <p-tag
+                        *ngIf="articleState === 'Revisado'"
+                        severity="info"
+                        value="Revisado"
+                    />
+                    <p-tag
+                        *ngIf="articleState === 'Envió a revista'"
+                        severity="warning"
+                        value="Envió a revista"
+                    />
+                    <p-tag
+                        *ngIf="articleState === 'Cancelado'"
+                        severity="danger"
+                        value="Cancelado"
+                    />
+                    <p-tag
+                        *ngIf="articleState === 'Aprobado'"
+                        severity="success"
+                        value="Aprobado"
+                    />
                 </div>
             </div>
             <div class="ml-2 mr-2 separator"></div>
-            <app-comments class="w-full" module="semilleros" [id]="articleSelected.id"></app-comments>
+            <div class="grid col-12">
+                <div class="col-12">
+                    <h5>Semilleros</h5>
+                    <app-user-selection
+                        class="w-full"
+                        #userSelection
+                        typeUserList="semilleros"
+                        maxUsersAllow="2"
+                        (userSelected)="getUserSelected($event)"
+                        [usersPreSelected]="studentsList"
+                        [disabled]="!edition"
+                    >
+                    </app-user-selection>
+                </div>
+            </div>
+            <div class="ml-2 mr-2 separator"></div>
+            <app-comments
+                class="w-full"
+                module="semilleros"
+                [id]="articleSelected.id"
+            ></app-comments>
         </div>
     </div>
 </div>
@@ -300,7 +350,9 @@
                     />
                 </div>
             </div>
-            <p class="font-bold">Línea de trabajo del artículo: "{{ articleSelected.title }}"</p>
+            <p class="font-bold">
+                Línea de trabajo del artículo: "{{ articleSelected.title }}"
+            </p>
             <p-timeline
                 [value]="events"
                 align="alternate"
@@ -325,11 +377,11 @@
                             }}
                         </p>
                         <p *ngIf="event.date !== '00-00-0000 00:00'">
-                            Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                            Inventore sed consequuntur error repudiandae numquam
-                            deserunt quisquam repellat libero asperiores earum nam
-                            nobis, culpa ratione quam perferendis esse, cupiditate neque
-                            quas!
+                            Lorem ipsum dolor sit amet, consectetur adipisicing
+                            elit. Inventore sed consequuntur error repudiandae
+                            numquam deserunt quisquam repellat libero asperiores
+                            earum nam nobis, culpa ratione quam perferendis
+                            esse, cupiditate neque quas!
                         </p>
                         <p *ngIf="event.date === '00-00-0000 00:00'">
                             Aún no pasa a {{ event.status }}
@@ -340,4 +392,3 @@
         </div>
     </div>
 </div>
-

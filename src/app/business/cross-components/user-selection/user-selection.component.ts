@@ -9,9 +9,17 @@ import { AuthService } from 'src/app/services/auth.service';
   styleUrls: ['./user-selection.component.scss']
 })
 export class UserSelectionComponent implements OnInit {
+  private _disabled: boolean = false;
+
   @Input() typeUserList: string;
   @Input() maxUsersAllow: number;
   @Input() usersPreSelected: any[] = [];
+  @Input()
+  set disabled(value: boolean) {
+    this._disabled = value;
+    this.disabledSelecion();
+
+  }
   @Output() userSelected: EventEmitter<any[]> = new EventEmitter<any[]>();
 
 
@@ -30,7 +38,7 @@ export class UserSelectionComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.watchUser()
+    this.watchUser();
     switch (this.typeUserList) {
       case 'estudiantes':
         this.callGetStudentList();
@@ -44,6 +52,10 @@ export class UserSelectionComponent implements OnInit {
     }
     console.log('this.usersPreSelected', this.usersPreSelected)
     this.userFormControl.setValue(this.addFullNameProperty(this.usersPreSelected));
+  }
+
+  disabledSelecion(): void{
+    this._disabled ? this.userFormControl.disable() : this.userFormControl.enable()
   }
 
   search(event: AutoCompleteCompleteEvent) {

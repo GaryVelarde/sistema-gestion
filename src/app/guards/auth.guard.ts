@@ -8,7 +8,7 @@ export const isUserAuthenticatedGuard: CanActivateFn = (route, state) => {
   if (isAuthenticated)
     return true;
 
-  inject(Router).navigateByUrl('/login');
+  inject(Router).navigateByUrl('/');
   return false;
 };
 
@@ -18,6 +18,6 @@ export const isGuestGuard: CanActivateFn = (route, state) => {
   if (!isAuthenticated)
     return true;
 
-  inject(Router).navigateByUrl('/dashboard');
+  inject(Router).navigateByUrl('/pages');
   return false;
 };

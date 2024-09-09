@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { IStudent } from '../../cross-interfaces/comments-interfaces';
 
 @Component({
   selector: 'app-hotbed-tracking',
@@ -13,51 +15,7 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class HotbedTrackingComponent implements OnInit {
 
-  registros = [];/*[
-    {
-      "id": 1,
-      "title": "Titulo de prueba",
-      "group": 3,
-      "created_at": "27-08-2024 21:07:11",
-      "seedbeds": [
-        {
-          "id": 6,
-          "name": "Rodrigo Cepeda",
-          "surnames": "Lovato",
-          "email": "mgranados@example.com",
-          "phone": 399570148,
-          "code": 28681077,
-          "cycle": "X"
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "title": "Titulo de prueba 2",
-      "group": 3,
-      "created_at": "27-08-2024 21:07:11",
-      "seedbeds": [
-        {
-          "id": 6,
-          "name": "Cesar Antonio",
-          "surnames": "Jauregui Saavedra",
-          "email": "mgranados@example.com",
-          "phone": 399570148,
-          "code": 28681077,
-          "cycle": "X"
-        },
-        {
-          "id": 6,
-          "name": "Gary Isaac",
-          "surnames": "Velarde Rios",
-          "email": "mgranados@example.com",
-          "phone": 399570148,
-          "code": 28681077,
-          "cycle": "X"
-        }
-      ]
-    }
-  ];*/
+  registros = [];
   events = [
     { status: 'En desarrollo', date: '15-10-2020 10:30', icon: 'pi pi-pencil', color: '#6366f1', message: 'El artículo pasó a desarrollo el día ' },
     { status: 'Revisado', date: '15-10-2020 14:00', icon: 'pi pi-check', color: '#6366f1' },
@@ -97,8 +55,22 @@ export class HotbedTrackingComponent implements OnInit {
     ''
   ];
   messageError: string = 'Se produjo un error al cargar la lista de artículos. Por favor, inténtelo de nuevo más tarde';
+  edition = false;
+  articleState: string;
+  studentsForm: FormGroup;
+  studentsList = [];
+  private _students = new FormControl([] as IStudent[], [Validators.required])
+  get students() {
+    return this._students;
+  }
 
-  constructor(private router: Router, private service: AuthService, private loaderService: LoaderService) { }
+  constructor(private router: Router, private service: AuthService, private loaderService: LoaderService,
+    private fb: FormBuilder,
+  ) {
+    this.studentsForm = this.fb.group({
+      students: this.students,
+    });
+  }
 
   ngOnInit() {
     this.getArticleList();
@@ -112,6 +84,8 @@ export class HotbedTrackingComponent implements OnInit {
     this.loaderService.show();
     this.viewDetail = true;
     this.articleSelected = data;
+    this.studentsList = data.seedbeds;
+    this.articleState = data.status;
     console.log(this.articleSelected);
     setTimeout(() => {
       this.loaderService.hide();
@@ -128,7 +102,6 @@ export class HotbedTrackingComponent implements OnInit {
       }
     },
       (error) => {
-        // Handle the error in the subscription if necessary
         this.getArticleListProcess = 'error';
         console.log('Error in subscription:', error);
       })
@@ -205,7 +178,7 @@ export class HotbedTrackingComponent implements OnInit {
     }, 800);
   }
 
-  backToDetail(){
+  backToDetail() {
     this.loaderService.show();
     this.viewDetail = true;
     this.viewHistory = false;
@@ -220,5 +193,18 @@ export class HotbedTrackingComponent implements OnInit {
     setTimeout(() => {
       this.loaderService.hide();
     }, 800);
+  }
+
+  getUserSelected(userSelected: any) {
+    console.log('userSelected', userSelected)
+    this.students.setValue(userSelected);
+  }
+
+  showEdition() {
+    this.edition = true;
+  }
+
+  cancelEdition() {
+    this.edition = false;
   }
 }

@@ -23,7 +23,7 @@
             <span>Settings</span>
         </button>-->
         <div class="flex justify-content-center">
-            <p-menu #menu [model]="items" [popup]="true" />
+            <p-menu #menu class="test" [model]="items" [popup]="true" />
             <p-button [text]="true" severity="secondary" (onClick)="menu.toggle($event)" icon="pi pi-chevron-down"/>
         </div>
     </div>
