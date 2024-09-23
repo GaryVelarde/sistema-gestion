@@ -21,6 +21,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { SkeletonModule } from 'primeng/skeleton';
 import { SidebarModule } from 'primeng/sidebar';
 import { CrossComponentsModule } from "../../cross-components/Cross.module";
+import { KeyFilterModule } from 'primeng/keyfilter';
 
 @NgModule({
     imports: [
@@ -46,6 +47,7 @@ import { CrossComponentsModule } from "../../cross-components/Cross.module";
     SkeletonModule,
     SidebarModule,
     CrossComponentsModule,
+    KeyFilterModule,
 ],
     declarations: [UsersComponent]
 })

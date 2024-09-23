@@ -32,6 +32,11 @@ import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessagesModule } from 'primeng/messages';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { DialogModule } from 'primeng/dialog';
+import { KnobModule } from 'primeng/knob';
+import { KeyFilterModule } from 'primeng/keyfilter';
 
 @NgModule({
     declarations: [
@@ -67,6 +72,11 @@ import { CrossComponentsModule } from '../../cross-components/Cross.module';
         BadgeModule,
         ProgressBarModule,
         CrossComponentsModule,
+        TableModule,
+        TagModule,
+        DialogModule,
+        KnobModule,
+        KeyFilterModule,
         RouterModule.forChild([
             {
                 path: '',

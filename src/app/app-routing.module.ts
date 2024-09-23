@@ -14,6 +14,7 @@ import { isUserAuthenticatedGuard } from './guards/auth.guard';
                 ]
             },
             { path: 'auth', loadChildren: () => import('./business/auth/auth.module').then(m => m.AuthModule) },
+            { path: 'api', loadChildren: () => import('./business/auth/reset-password/reset-password.module').then(m => m.ResetPasswordModule) },
             { path: '', loadChildren: () => import('./business/auth/auth.module').then(m => m.AuthModule) },
             { path: 'notfound', component: NotfoundComponent, canActivate: [isUserAuthenticatedGuard] },
             { path: '**', redirectTo: '/notfound' },

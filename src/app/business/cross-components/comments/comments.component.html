@@ -2,7 +2,7 @@
     <h5>Comentarios</h5>
 </div>
 <div class="col-12 grid">
-    <div *ngIf="visible" class="mb-4 w-full flex align-items-center ml-3">
+    <div *ngIf="visible && registerState === 'complete'" class="mb-4 w-full flex align-items-center ml-3">
         <p-avatar [label]="getInitialName()" size="large" />
         <div class="ml-3 w-full">
             <form [formGroup]="commentsForm" style="width: inherit">
@@ -18,6 +18,14 @@
                     <label for="textarea">Escribe tu comentario aquí...</label>
                 </span>
             </form>
+        </div>
+    </div>
+    <div *ngIf="registerState === 'charging'" class="mb-4 w-full flex align-items-center ml-3 ng-star-inserted">
+        <div>
+            <p-skeleton size="41px" class="ml-3"></p-skeleton>
+        </div>
+        <div class="ml-3 w-full">
+            <p-skeleton height="70px" width="100%" class="ml-3"></p-skeleton>
         </div>
     </div>
     <div class="col-12 content-comments">
@@ -38,13 +46,10 @@
             </ng-template>
         </div>
         <ng-template #commentsList>
-            <div *ngIf="comments.length > 0">
-                <ng-container *ngTemplateOutlet="commentsList"></ng-container>
-            </div>
             <div *ngIf="comments.length < 1">
                 <span class="ml-3">Sé el primero en dejar un comentario</span>
             </div>
-            <ng-template #commentsList>
+            <div *ngIf="comments.length > 0">
                 <div
                     *ngFor="let comment of visibleComments"
                     class="mb-4 flex align-items-center"
@@ -71,7 +76,7 @@
                         </span>
                     </div>
                 </div>
-            </ng-template>
+            </div>
         </ng-template>
         <ng-template #commentsSkeleton>
             <div

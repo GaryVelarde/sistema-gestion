@@ -14,3 +14,13 @@
     font-size: 1.5rem;
     color: #dc3545;
 }
+
+::ng-deep {
+    .p-tooltip .p-tooltip-content {
+      width: 400px !important; // Ajusta el ancho según tus necesidades
+    }
+  
+    .p-tooltip {
+      max-width: none !important; // Asegúrate de que no haya un máximo ancho que lo restrinja
+    }
+  }

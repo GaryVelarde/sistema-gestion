@@ -18,6 +18,12 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { TableModule } from 'primeng/table';
 import { SkeletonTableComponent } from './skeleton-table/skeleton-table.component';
 import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
+import { TaskListComponent } from './task-list/task-list.component';
+import { BadgeModule } from 'primeng/badge';
+import { CardModule } from 'primeng/card';
+import { DividerModule } from 'primeng/divider';
+import { CheckboxModule } from 'primeng/checkbox';
 
 
 @NgModule({
@@ -37,8 +43,29 @@ import { DialogModule } from 'primeng/dialog';
     TableModule,
     SkeletonModule,
     DialogModule,
+    TooltipModule,
+    BadgeModule,
+    CardModule,
+    DividerModule,
+    CheckboxModule,
   ],
-  declarations: [CommentsComponent, UserSelectionComponent, LoaderComponent, CardErrorComponent, BreadcrumbComponent, SkeletonTableComponent],
-  exports: [CommentsComponent, UserSelectionComponent, LoaderComponent, CardErrorComponent, BreadcrumbComponent, SkeletonTableComponent]
+  declarations: [
+    CommentsComponent,
+    UserSelectionComponent,
+    LoaderComponent,
+    CardErrorComponent,
+    BreadcrumbComponent,
+    SkeletonTableComponent,
+    TaskListComponent,
+  ],
+  exports: [
+    CommentsComponent,
+    UserSelectionComponent,
+    LoaderComponent,
+    CardErrorComponent,
+    BreadcrumbComponent,
+    SkeletonTableComponent,
+    TaskListComponent,
+  ]
 })
 export class CrossComponentsModule { }

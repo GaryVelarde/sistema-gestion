@@ -39,6 +39,8 @@
                 <form [formGroup]="userForm">
                     <span class="p-fluid">
                         <p-autoComplete
+                            [pTooltip]="tooltipContent" 
+                            tooltipPosition="bottom" 
                             formControlName="userFormControl"
                             [suggestions]="filteredItems"
                             (completeMethod)="search($event)"
@@ -52,5 +54,44 @@
                   estudiante</label>-->
             </span>
         </div>
+    </div>
+</ng-template>
+<ng-template #tooltipContent>
+    <div class="flex align-items-center">
+        <div *ngIf="userFormControl.value.length">
+            <style>
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;
+                }
+            </style>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombres</th>
+                        <th>Celular</th>
+                        <th>Correo</th>
+                        <th>Código</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of userFormControl.value">
+                        <td>{{user.name + ' ' + user.surnames}}</td>
+                        <td>{{user.phone}}</td>
+                        <td>{{user.email}}</td>
+                        <td>{{user.code}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div *ngIf="!userFormControl.value.length">
+            <p>Aún no se han seleccionado usuarios</p>
+        </div>
+        
     </div>
 </ng-template>

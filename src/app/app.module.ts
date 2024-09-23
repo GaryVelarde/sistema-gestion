@@ -14,10 +14,12 @@ import { NotfoundComponent } from './business/notfound/notfound.component';
 import { CrossComponentsModule } from './business/cross-components/Cross.module';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { DialogModule } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
 
 @NgModule({
     declarations: [AppComponent, NotfoundComponent],
-    imports: [AppRoutingModule, AppLayoutModule, CrossComponentsModule],
+    imports: [AppRoutingModule, AppLayoutModule, CrossComponentsModule, DialogModule, ButtonModule],
     providers: [
         { provide: LocationStrategy, useClass: PathLocationStrategy },
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

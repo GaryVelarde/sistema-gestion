@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { userType } from 'src/app/commons/enums/app,enum';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -11,7 +12,7 @@ import { AuthService } from 'src/app/services/auth.service';
 export class UserSelectionComponent implements OnInit {
   private _disabled: boolean = false;
 
-  @Input() typeUserList: string;
+  @Input() typeUserList: userType;
   @Input() maxUsersAllow: number;
   @Input() usersPreSelected: any[] = [];
   @Input()
@@ -40,13 +41,13 @@ export class UserSelectionComponent implements OnInit {
   ngOnInit() {
     this.watchUser();
     switch (this.typeUserList) {
-      case 'estudiantes':
+      case userType.student:
         this.callGetStudentList();
         break;
-      case 'semilleros':
+      case userType.hotbed:
         this.callGetSeedBedsList();
         break;
-      case 'docentes':
+      case userType.teacher:
         this.callTeachersList();
         break;
     }
@@ -113,12 +114,9 @@ export class UserSelectionComponent implements OnInit {
 
   watchUser() {
     this.userFormControl.valueChanges.pipe().subscribe((res: any) => {
-      console.log(this.maxUsersAllow)
-      console.log(res)
       if (res.length > this.maxUsersAllow) {
         const users = [...res];
         users.splice(this.maxUsersAllow, 1);
-        console.log('users', users)
         this.userFormControl.setValue(users);
       }
       this.userSelected.emit(this.userFormControl.value);
@@ -136,4 +134,25 @@ export class UserSelectionComponent implements OnInit {
       fullName: `${item.name} ${item.surnames}`
     }));
   }
+
+  transformData(data: any[]): any[] {
+    return data.map(item => ({
+      correo: item.email,
+      celular: item.phone,
+      codigo: item.code,
+      nombres: item.fullName
+    }));
+  }
+
+  async copyText() {
+    try {
+      const data = this.transformData(this.userFormControl.value);
+      const text = JSON.stringify(data, null, 2);
+      await navigator.clipboard.writeText(text);
+      alert('Texto copiado al portapapeles');
+    } catch (err) {
+      console.error('Error al copiar al portapapeles', err);
+    }
+  }
+
 }

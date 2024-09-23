@@ -412,242 +412,49 @@
                 </div>
             </div>
             <div class="ml-2 mr-2 separator"></div>
-            <div *ngIf="!showEdit" class="grid col-12">
+            <div class="grid col-12">
                 <div class="col-6">
-                    <p-table [value]="reviewerList">
-                        <ng-template pTemplate="header">
-                            <tr>
-                                <th colspan="3">Datalle del revisor</th>
-                            </tr>
-                        </ng-template>
-                        <ng-template pTemplate="body" let-product>
-                            <tr>
-                                <td>
-                                    {{ product.name + " " + product.surnames }}
-                                </td>
-                                <td>
-                                    {{ product.email }}
-                                </td>
-                                <td>
-                                    {{ product.phone }}
-                                </td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
+                    <p>Revisor</p>
+                    <app-user-selection
+                        class="w-full"
+                        #userSelection1
+                        [typeUserList]="teacherL"
+                        maxUsersAllow="1"
+                        (userSelected)="getTeacherSelected($event)"
+                        [usersPreSelected]="teacher.value"
+                        [disabled]="!showEdit"
+                    >
+                    </app-user-selection>
                 </div>
                 <div class="col-6">
-                    <p-table [value]="graduatesList">
-                        <ng-template pTemplate="header">
-                            <tr>
-                                <th colspan="3">
-                                    {{
-                                        graduatesList.length > 1
-                                            ? "Detalle de los estudiantes"
-                                            : "Detalle del estudiante"
-                                    }}
-                                </th>
-                            </tr>
-                        </ng-template>
-                        <ng-template pTemplate="body" let-product>
-                            <tr>
-                                <td>
-                                    {{ product.name + " " + product.surnames }}
-                                </td>
-                                <td>{{ product.email }}</td>
-                                <td>
-                                    {{ product.phone }}
-                                </td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
-                </div>
-            </div>
-
-            <div *ngIf="showEdit" class="grid col-12">
-                <div class="col-6">
-                    <form [formGroup]="teacherForm">
-                        <b class="mb-2">Revisor</b>
-                        <span class="p-fluid">
-                            <p-autoComplete
-                                formControlName="teacher"
-                                [suggestions]="filteredItems"
-                                (completeMethod)="searchTeachers($event)"
-                                field="fullName"
-                                [multiple]="true"
-                            />
-                        </span>
-                    </form>
-                </div>
-                <div class="col-6">
-                    <form [formGroup]="studentsForm">
-                        <b class="mb-2">Estudiantes</b>
-                        <span class="p-fluid">
-                            <p-autoComplete
-                                formControlName="students"
-                                [suggestions]="filteredItems"
-                                (completeMethod)="search($event)"
-                                field="fullName"
-                                [multiple]="true"
-                            />
-                        </span>
-                    </form>
+                    <p>Estudiante(s)</p>
+                    <app-user-selection
+                        class="w-full"
+                        #userSelection
+                        [typeUserList]="studentL"
+                        maxUsersAllow="2"
+                        (userSelected)="getStudentSelected($event)"
+                        [usersPreSelected]="students.value"
+                        [disabled]="!showEdit"
+                    >
+                    </app-user-selection>
                 </div>
             </div>
 
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
-                <div class="col-12">
-                    <h5>Lista de tareas</h5>
-                </div>
-                <div class="col-4 text-align-center">
-                    <p-card>
-                        <p>
-                            Tareas incompletas
-                            <p-badge
-                                [value]="totalTaskIncomplete"
-                                severity="warning"
-                            />
-                        </p>
-                    </p-card>
-                </div>
-                <div class="col-4 text-align-center">
-                    <p-card>
-                        <p>
-                            Tareas terminadas
-                            <p-badge
-                                [value]="totalTaskComplete"
-                                severity="success"
-                            />
-                        </p>
-                    </p-card>
-                </div>
-                <div class="col-4 text-align-center">
-                    <p-card>
-                        <p>
-                            Total de tareas
-                            <p-badge [value]="totalTask" severity="info" />
-                        </p>
-                    </p-card>
-                </div>
-                <div
-                    *ngIf="
-                        inscriptionState !== 'Renuncia' &&
-                        inscriptionState !== 'Aprobado'
-                    "
-                    class="col-12"
-                >
-                    <form [formGroup]="tasksForm">
-                        <span class="p-float-label">
-                            <textarea
-                                inputId="taskDescription"
-                                rows="1"
-                                style="width: 100%; resize: none"
-                                formControlName="taskDescription"
-                                pInputTextarea
-                                (keydown.enter)="addTask($event)"
-                            ></textarea>
-                            <label for="taskDescription"
-                                >Escribe la tarea aquí...</label
-                            >
-                        </span>
-                    </form>
-                </div>
-
-                <div class="col-12">
-                    <div *ngFor="let task of tasks" class="grid d-flex ml-1">
-                        <div
-                            class="mr-auto p-2 col-11"
-                            style="align-content: center"
-                        >
-                            <p-checkbox
-                                [inputId]="task.id"
-                                [(ngModel)]="task.checked"
-                                [binary]="true"
-                                #checkbox
-                                [disabled]="
-                                    inscriptionState === 'Renuncia' ||
-                                    inscriptionState === 'Aprobado'
-                                "
-                                (onChange)="taskDone(task.id, checkbox)"
-                            ></p-checkbox>
-                            <label
-                                class="ml-3"
-                                [for]="task.id"
-                                [ngClass]="isTaskDone(task)"
-                                >{{ task.description }}</label
-                            >
-                        </div>
-                        <div class="p-2 col-1">
-                            <p-button
-                                icon="pi pi-trash"
-                                [rounded]="true"
-                                [text]="true"
-                                severity="danger"
-                                [disabled]="
-                                    task.checked ||
-                                    inscriptionState === 'Renuncia' ||
-                                    inscriptionState === 'Aprobado'
-                                "
-                                (click)="removeTask(task.id)"
-                            />
-                        </div>
-                        <p-divider
-                            class="col-12 divider-aditional-class"
-                        ></p-divider>
-                    </div>
-                </div>
+                <app-task-list
+                    class="full-width"
+                    [idModule]="inscriptionSelected.inscriptions[0].id"
+                    [module]="module"
+                    [visible]="true"
+                    [chbDisable]="false"
+                ></app-task-list>
                 <div class="ml-2 mr-2 separator"></div>
-
-                <!--<div class=" col-12">
-                    <h5>Comentarios</h5>
-                </div>
-               <div class="col-12 grid">
-                    <div class="mb-4 w-full flex align-items-center">
-                      <p-avatar 
-                          label="G" 
-                          size="large" />
-                      <div class="ml-3 w-full">
-                        <form [formGroup]="commentsForm" style="width: inherit;">
-                          <span class="p-float-label">
-                              <textarea
-                                  inputId="textarea"
-                                  rows="3"
-                                  style="width: 100%; resize: none;"
-                                  formControlName="comment"
-                                  pInputTextarea 
-                                  (keydown.enter)="addComment($event)"></textarea>
-                              <label for="textarea">Escribe tu comentario
-                                  aquí...</label>
-                          </span>
-                      </form>
-                    </div>
-                   
-                    
-                </div>
-                <div class=" col-12">
-                  <div *ngFor="let comment of reversedComments" class="mb-4 flex align-items-center">
-                    <p-avatar 
-                      [label]="getFirstLetter(comment.name)" 
-                      styleClass="ml-3" 
-                      size="large" />
-                    <div class="ml-3 w-full">
-                      <div
-                        class="flex justify-content-between mb-2">
-                        <span class="block text-900">
-                          {{comment.name}}</span>
-                        <span class="block text-700">1 Jun 17:58 pm</span>
-                      </div>
-                      <span
-                        class="block text-900 border-1 surface-ground surface-border p-2 border-round"
-                        style="word-break: break-all;">{{comment.content}}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>-->
                 <app-comments
                     class="w-full"
-                    module="inscripciones"
-                    [id]="inscriptionSelected.id"
+                    [module]="module"
+                    [id]="inscriptionSelected.inscriptions[0].id"
                     [visible]="commentsVisible"
                 ></app-comments>
             </div>

@@ -1,9 +1,10 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { InscriptionPresenter } from './insctiption-presenter';
 import { MessageService } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth.service';
+import { ThesisSimilarityService } from 'src/app/services/thesis-similarity.service';
 
 interface UploadEvent {
   originalEvent: Event;
@@ -13,24 +14,31 @@ interface UploadEvent {
 @Component({
   templateUrl: './step4-component.html',
   styleUrls: ['./insctiption.component.scss'],
-  providers: [MessageService],
+  providers: [MessageService, ThesisSimilarityService],
 })
 export class Step4Component implements OnInit {
   @ViewChild('fileInput') fileInput: ElementRef;
 
+  thesisTitles = [];
+  results: Array<{ title: string, similarity: number }> = [];
   reader = new FileReader();
+  minimumPercentage: number = 60;
+  lastMinimumPercentage: number = 60;
   filesSelected = [];
+  configCompareTitle: boolean = false;
   formData = new FormData();
   approvalDate: FormControl = new FormControl('');
   jobNumber: FormControl = new FormControl('');
 
   constructor(private router: Router, public presenter: InscriptionPresenter, private service: MessageService,
-    private authService: AuthService, private cd: ChangeDetectorRef) { }
+    private authService: AuthService, private cd: ChangeDetectorRef, private thesisSimilarity: ThesisSimilarityService) { }
 
   ngOnInit(): void {
+    this.callGetTitlesList();
     setTimeout(() => {
       this.addImageEmptyFiles();
     }, 200);
+    this.watchTitle();
   }
 
   finalize() {
@@ -156,4 +164,53 @@ export class Step4Component implements OnInit {
     const fileType = fileName.substring(lastDotIndex + 1).toLowerCase();
     return fileType;
   }
+
+  watchTitle(): void {
+    this.presenter.title.valueChanges.pipe().subscribe((value) => {
+      if (value) {
+        this.results = this.thesisSimilarity.compareWithThesisTitles(value, this.thesisTitles, this.minimumPercentage)
+          .sort((a, b) => b.similarity - a.similarity);
+      }
+    });
+  }
+
+  getSeverity(status: number): string {
+    if (status < 60) {
+      return 'info';
+    }
+    if (status > 70 && status < 90) {
+      return 'warning';
+    }
+    if (status > 90) {
+      return 'danger';
+    }
+    return '';
+  }
+
+  showConfigCompareTitle() {
+    this.lastMinimumPercentage = this.minimumPercentage;
+    this.configCompareTitle = true;
+  }
+
+  cancelConfigCompareTitle() {
+    this.minimumPercentage = this.lastMinimumPercentage;
+    this.configCompareTitle = false;
+  }
+
+  saveConfigCompareTitle() {
+    this.results = this.thesisSimilarity.compareWithThesisTitles(this.presenter.title.value, this.thesisTitles, this.minimumPercentage)
+      .sort((a, b) => b.similarity - a.similarity);
+    this.configCompareTitle = false;
+  }
+
+  callGetTitlesList() {
+    this.authService.getTitlesList().pipe().subscribe(
+      (res: any) => {
+        if(res.data) {
+          this.thesisTitles = res.data;
+        }
+      console.log(res);
+    })
+  }
+
 }

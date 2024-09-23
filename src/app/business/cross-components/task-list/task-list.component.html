@@ -1,0 +1,160 @@
+<div>
+    <div class="col-12">
+        <h5>
+            Lista de tareas
+            <i
+                class="pi pi-info-circle"
+                style="font-size: 1rem; cursor: pointer;"
+                pTooltip="Una vez que marques una tarea como completada, no podrás desmarcarla. Por favor, asegúrate de que la tarea está realmente finalizada antes de marcarla."
+                ></i>
+        </h5>
+    </div>
+    <div [ngSwitch]="statusCallService" class="grid col-12">
+        <ng-template [ngSwitchCase]="'charging'">
+            <ng-container *ngTemplateOutlet="skeleton"></ng-container>
+        </ng-template>
+        <ng-template [ngSwitchCase]="'error'">
+            <ng-container *ngTemplateOutlet="error"></ng-container>
+        </ng-template>
+        <ng-template [ngSwitchCase]="'complete'">
+            <ng-container *ngTemplateOutlet="list"></ng-container>
+        </ng-template>
+        <ng-template ngSwitchDefault>
+            <p>Invalid state</p>
+        </ng-template>
+    </div>
+
+    <ng-template #skeleton>
+        <div class="col-4 text-align-center">
+            <p-skeleton width="full-width" height="92px" />
+        </div>
+        <div class="col-4 text-align-center">
+            <p-skeleton width="full-width" height="92px" />
+        </div>
+        <div class="col-4 text-align-center">
+            <p-skeleton width="full-width" height="92px" />
+        </div>
+        <div class="col-12">
+            <p-skeleton height="3rem" styleClass="mb-2" />
+        </div>
+
+        <div class="col-12">
+            <div
+                *ngFor="let rows of skeletonRows"
+                class="grid d-flex ml-1 mb-3"
+            >
+                <div class="mr-auto p-2 col-10 ml-3" style="display: flex">
+                    <div style="width: 30px">
+                        <p-skeleton size="1.5rem" />
+                    </div>
+                    <div style="width: 90%">
+                        <p-skeleton
+                            height="1.5rem"
+                            width="10rem"
+                            styleClass="mb-2 ml-3"
+                        />
+                    </div>
+                </div>
+                <div class="p-2 col-1">
+                    <p-skeleton size="1.5rem" styleClass="mb-2" />
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #list>
+        <div class="col-4 text-align-center">
+            <p-card>
+                <p>
+                    Tareas incompletas
+                    <p-badge [value]="totalTaskIncomplete" severity="warning" />
+                </p>
+            </p-card>
+        </div>
+        <div class="col-4 text-align-center">
+            <p-card>
+                <p>
+                    Tareas terminadas
+                    <p-badge [value]="totalTaskComplete" severity="success" />
+                </p>
+            </p-card>
+        </div>
+        <div class="col-4 text-align-center">
+            <p-card>
+                <p>
+                    Total de tareas
+                    <p-badge [value]="totalTask" severity="info" />
+                </p>
+            </p-card>
+        </div>
+        <div *ngIf="_visible" class="col-12">
+            <form [formGroup]="tasksForm">
+                <span class="p-float-label">
+                    <textarea
+                        inputId="taskDescription"
+                        rows="1"
+                        style="width: 100%; resize: none"
+                        formControlName="taskDescription"
+                        pInputTextarea
+                        (keydown.enter)="addTask($event)"
+                    ></textarea>
+                    <label for="taskDescription"
+                        >Escribe la tarea aquí...</label
+                    >
+                </span>
+            </form>
+        </div>
+
+        <div class="col-12">
+            <div *ngIf="tasks.length < 1">
+                <p class="ml-4">Aún no hay actividades registradas</p>
+            </div>
+            <div *ngIf="tasks.length > 0">
+                <div *ngFor="let task of tasks" class="grid d-flex ml-1">
+                    <div
+                        class="mr-auto p-2 col-11"
+                        style="align-content: center"
+                    >
+                        <p-checkbox
+                            [inputId]="task.id"
+                            [(ngModel)]="task.checked"
+                            [binary]="true"
+                            #checkbox
+                            [disabled]="_chbDisable"
+                            (onChange)="taskDone(task.id, checkbox)"
+                        ></p-checkbox>
+                        <label
+                            class="ml-3"
+                            [for]="task.id"
+                            [ngClass]="isTaskDone(task)"
+                            >{{ task.description }}</label
+                        >
+                    </div>
+                    <div class="p-2 col-1">
+                        <p-button
+                            icon="pi pi-trash"
+                            [rounded]="true"
+                            [text]="true"
+                            severity="danger"
+                            [disabled]="task.checked || _chbDisable"
+                            (click)="removeTask(task.id)"
+                        />
+                    </div>
+                    <p-divider
+                        class="col-12 divider-aditional-class"
+                    ></p-divider>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #error>
+        <div style="justify-content: center; display: flex; width: 100%">
+            <app-card-error
+                [message]="messageError"
+                (reload)="handleReload($event)"
+            >
+            </app-card-error>
+        </div>
+    </ng-template>
+</div>

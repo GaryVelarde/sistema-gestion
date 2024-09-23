@@ -1,2 +1,29 @@
 <app-loader></app-loader>
+<p-dialog
+    header="Hola, ¿sigues ahí?"
+    [(visible)]="displayModal"
+    modal="true"
+    [closable]="false"
+    [dismissableMask]="false"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '40vw' }"
+>
+    <p>
+        <i class="pi pi-exclamation-circle" style="font-size: 1rem"></i>
+        Por seguridad, hemos detectado que has estado inactivo durante un
+        tiempo. Si no realizas ninguna acción en los próximos
+        <b>{{ remainingTime }}</b> segundos, tu sesión se
+        <b>cerrará automáticamente</b>.
+    </p>
+    <p-footer>
+        <button
+            type="button"
+            pButton
+            label="Seguir conectado"
+            icon="pi pi-check"
+            (click)="keepConnected()"
+        ></button>
+    </p-footer>
+</p-dialog>
 <router-outlet></router-outlet>

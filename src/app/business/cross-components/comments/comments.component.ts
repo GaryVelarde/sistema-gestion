@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { eModule } from 'src/app/commons/enums/app,enum';
 import { AuthService } from 'src/app/services/auth.service';
 import { DateFormatService } from 'src/app/services/date-format.service';
 
@@ -9,8 +10,8 @@ import { DateFormatService } from 'src/app/services/date-format.service';
   styleUrls: ['./comments.component.scss']
 })
 export class CommentsComponent implements OnInit {
-  @Input() module: string;
-  @Input() id: number;
+  @Input() module: eModule;
+  @Input() id: string;
   @Input() disabled: boolean = false;
   @Input() visible: boolean = true;
 
@@ -22,6 +23,7 @@ export class CommentsComponent implements OnInit {
   visibleComments = [];
   showAllComments = false;
   state = '';
+  registerState = '';
 
   get comment() {
     return this._comment;
@@ -44,15 +46,15 @@ export class CommentsComponent implements OnInit {
     this.getCommentsList();
   }
 
-  getCommentsList(){
+  getCommentsList() {
     switch (this.module) {
-      case 'reuniones-udi':
+      case eModule.eventUdi:
         this.getCommentsByEventsUDI();
         break;
-      case 'asesorias':
+      case eModule.advisory:
         this.getCommentsByAdvisory();
         break;
-      case 'inscripciones':
+      case eModule.inscription:
         this.getCommentsByInscription();
         break;
     }
@@ -96,34 +98,51 @@ export class CommentsComponent implements OnInit {
         const rq = {
           description: this.comment.value
         }
-        switch (this.module) {
-          case 'reuniones-udi':
-            this.service.postAddEventsUdiComment(this.id, rq).pipe().subscribe(
-              (res: any) => {
-                if(res.status) {
-                  this.confirmAddEvent(res.id);
-                }
-
-                console.log(res);
-              }, (error) => {
-                console.log(error);
-              });
-            break;
-          case 'asesorias':
-            this.getCommentsByAdvisory();
-            break;
-          case 'inscripciones':
-            this.getCommentsByInscription();
-            break;
-        }
-
-
+        this.registerComment(rq);
       }
     }
   }
 
+  registerComment(rq: any) {
+    this.registerState = 'charging';
+    switch (this.module) {
+      case eModule.eventUdi:
+        this.service.postAddEventsUdiComment(this.id, rq).pipe().subscribe(
+          (res: any) => {
+            if (res.status) {
+              this.registerState = 'complete';
+              this.confirmAddEvent(res.id);
+            }
+
+            console.log(res);
+          }, (error) => {
+            this.registerState = 'complete';
+            console.log(error);
+          });
+        break;
+      case 'asesorias':
+        this.getCommentsByAdvisory();
+        break;
+      case eModule.inscription:
+        this.service.postAddInscriptionComment(this.id, rq).pipe().subscribe(
+          (res: any) => {
+            if (res.status) {
+              this.registerState = 'complete';
+              this.confirmAddEvent(res.id);
+            }
+
+            console.log(res);
+          }, (error) => {
+            this.registerState = 'complete';
+            console.log(error);
+          });
+        break;
+    }
+  }
+
   confirmAddEvent(idComment: number) {
-    this.comments.push({
+    const userName = JSON.parse(localStorage.getItem('dr2lp2'));
+    this.comments.unshift({
       id: idComment,
       description: this.comment.value,
       status: "",
@@ -131,11 +150,10 @@ export class CommentsComponent implements OnInit {
       created_at: this.dateFormatService.formatCustomDateByFrontComment(new Date()),
       user: {
         "id": 1,
-        "name": "Cesar",
-        "surnames": "Jauregui"
+        "name": userName.user.name,
+        "surnames": userName.user.surnames
       }
     });
-    this.getCommentsList();
     this.comment.setValue('');
     this.comment.reset();
     this.updateVisibleComments();
@@ -143,32 +161,45 @@ export class CommentsComponent implements OnInit {
 
   getCommentsByInscription() {
     this.state = 'charging';
+    this.registerState = 'charging';
     this.service.getCommentsByInscription(this.id).pipe().subscribe(
       (res: any) => {
+        res.data.forEach(item => {
+          item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
+        });
         this.comments = res.data;
         this.updateVisibleComments();
         this.state = 'complete';
+        this.registerState = 'complete';
       },
       (error) => {
         this.state = 'error';
+        this.registerState = 'complete';
       })
   }
 
   getCommentsByAdvisory() {
     this.state = 'charging';
+    this.registerState = 'charging';
     this.service.getCommentsByAdvisory(this.id).pipe().subscribe(
       (res: any) => {
+        res.data.forEach(item => {
+          item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
+        });
         this.comments = res.data;
         this.updateVisibleComments();
         this.state = 'complete';
+        this.registerState = 'complete';
       },
       (error) => {
         this.state = 'error';
+        this.registerState = 'complete';
       })
   }
 
   getCommentsByEventsUDI() {
     this.state = 'charging';
+    this.registerState = 'charging';
     this.service.getCommentsByEventsUDI(this.id).pipe().subscribe((res: any) => {
       res.data.forEach(item => {
         item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
@@ -177,9 +208,11 @@ export class CommentsComponent implements OnInit {
       console.log('this.comments', this.comments)
       this.updateVisibleComments();
       this.state = 'complete';
+      this.registerState = 'complete';
     },
       (error) => {
         this.state = 'error';
+        this.registerState = 'complete';
       })
   }
 }

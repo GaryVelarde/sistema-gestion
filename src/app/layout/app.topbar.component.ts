@@ -7,7 +7,8 @@ import { TokenService } from '../services/token.service';
 
 @Component({
     selector: 'app-topbar',
-    templateUrl: './app.topbar.component.html'
+    templateUrl: './app.topbar.component.html',
+    styleUrls: ['./app.topbar.component.scss']
 })
 export class AppTopBarComponent {
 

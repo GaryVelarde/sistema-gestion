@@ -1,0 +1,11 @@
+:host {
+    ::ng-deep {
+      .p-menu {
+        top: 60px !important;       // Ajustar la posición en el eje Y
+      }
+  
+      .p-menu-overlay {
+        margin-top: 0 !important; // Elimina cualquier margen que pueda empujar el menú hacia abajo
+      }
+    }
+  }

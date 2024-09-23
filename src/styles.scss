@@ -16,3 +16,47 @@ $gutter: 1rem; //for primeflex grid system
 .text-error {
     color: #e24c4c;
 }
+
+// Breakpoints según Bootstrap
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+
+// Mixin para crear las columnas responsivas
+@mixin make-col($columns) {
+  width: percentage($columns / 12);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+[class*='col-'] {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+// Columnas para pantallas pequeñas (col-sm)
+.col-sm-12 { @include make-col(12); }
+.col-sm-6  { @include make-col(6); }
+.col-sm-4  { @include make-col(4); }
+.col-sm-3  { @include make-col(3); } // Agregada
+
+// Para pantallas medianas (col-md)
+@media (min-width: $breakpoint-md) {
+  .col-md-12 { @include make-col(12); }
+  .col-md-6  { @include make-col(6); }
+  .col-md-4  { @include make-col(4); }
+  .col-md-3  { @include make-col(3); } // Agregada
+}
+
+// Para pantallas grandes (col-lg)
+@media (min-width: $breakpoint-lg) {
+  .col-lg-12 { @include make-col(12); }
+  .col-lg-6  { @include make-col(6); }
+  .col-lg-4  { @include make-col(4); }
+  .col-lg-3  { @include make-col(3); } // Agregada
+}

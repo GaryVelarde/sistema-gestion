@@ -39,6 +39,7 @@ export class AuthInterceptor implements HttpInterceptor {
         // Si el status es 401 y el mensaje es "Unauthenticated."
         if (error.status === 401 && error.error.message === 'Unauthenticated.') {
           // Redirige al login
+          console.log('aaaaaaaaaaaa')
           this.router.navigate(['./auth/log-out']);
         }
         // Retorna el error para manejarlo más adelante si es necesario

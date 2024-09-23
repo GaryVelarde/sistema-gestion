@@ -97,81 +97,87 @@ export class DateFormatService {
   formatDateCalendar(date: string): string {
     let dateObj: Date;
 
-    // Analizar la fecha y la hora en los formatos 'dd-mm-yyyy hh:mm' y 'dd/mm/yyyy hh:mm'
+    // Analizar la fecha y la hora en los formatos 'dd-mm-yyyy hh:mm:ss', 'dd-mm-yyyy hh:mm', 'dd/mm/yyyy hh:mm:ss' y 'dd/mm/yyyy hh:mm'
     const dateTimeParts = date.split(' ');
     if (dateTimeParts.length === 2) {
-        const datePart = dateTimeParts[0];
-        const timePart = dateTimeParts[1];
-        
-        let day, month, year, hours, minutes;
-        
-        if (datePart.includes('-')) {
-            // Formato 'dd-mm-yyyy'
-            const dateParts = datePart.split('-');
-            if (dateParts.length === 3) {
-                day = parseInt(dateParts[0], 10);
-                month = parseInt(dateParts[1], 10) - 1; // Los meses en JavaScript son 0-indexados
-                year = parseInt(dateParts[2], 10);
-            } else {
-                console.error('Invalid date format');
-                return '';
-            }
-        } else if (datePart.includes('/')) {
-            // Formato 'dd/mm/yyyy'
-            const dateParts = datePart.split('/');
-            if (dateParts.length === 3) {
-                day = parseInt(dateParts[0], 10);
-                month = parseInt(dateParts[1], 10) - 1; // Los meses en JavaScript son 0-indexados
-                year = parseInt(dateParts[2], 10);
-            } else {
-                console.error('Invalid date format');
-                return '';
-            }
-        } else {
-            console.error('Invalid date format');
-            return '';
-        }
+      const datePart = dateTimeParts[0];
+      const timePart = dateTimeParts[1];
 
-        const timeParts = timePart.split(':');
-        if (timeParts.length === 2) {
-            hours = parseInt(timeParts[0], 10);
-            minutes = parseInt(timeParts[1], 10);
-            dateObj = new Date(year, month, day, hours, minutes);
+      let day, month, year, hours, minutes, seconds = 0;
+
+      // Procesar la parte de la fecha
+      if (datePart.includes('-')) {
+        // Formato 'dd-mm-yyyy'
+        const dateParts = datePart.split('-');
+        if (dateParts.length === 3) {
+          day = parseInt(dateParts[0], 10);
+          month = parseInt(dateParts[1], 10) - 1; // Los meses en JavaScript son 0-indexados
+          year = parseInt(dateParts[2], 10);
         } else {
-            console.error('Invalid time format');
-            return '';
+          console.error('Invalid date format');
+          return '';
         }
-    } else {
+      } else if (datePart.includes('/')) {
+        // Formato 'dd/mm/yyyy'
+        const dateParts = datePart.split('/');
+        if (dateParts.length === 3) {
+          day = parseInt(dateParts[0], 10);
+          month = parseInt(dateParts[1], 10) - 1;
+          year = parseInt(dateParts[2], 10);
+        } else {
+          console.error('Invalid date format');
+          return '';
+        }
+      } else {
         console.error('Invalid date format');
         return '';
+      }
+
+      // Procesar la parte de la hora
+      const timeParts = timePart.split(':');
+      if (timeParts.length >= 2) {
+        hours = parseInt(timeParts[0], 10);
+        minutes = parseInt(timeParts[1], 10);
+        if (timeParts.length === 3) {
+          // Procesar segundos si están presentes
+          seconds = parseInt(timeParts[2], 10);
+        }
+        dateObj = new Date(year, month, day, hours, minutes, seconds);
+      } else {
+        console.error('Invalid time format');
+        return '';
+      }
+    } else {
+      console.error('Invalid date format');
+      return '';
     }
 
     // Asegurarse de que dateObj sea un objeto Date válido
     if (isNaN(dateObj.getTime())) {
-        console.error('Invalid date');
-        return '';
+      console.error('Invalid date');
+      return '';
     }
 
-    const year = dateObj.getFullYear();
-    const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
-    const day = ('0' + dateObj.getDate()).slice(-2);
-    const hours = ('0' + dateObj.getHours()).slice(-2);
-    const minutes = ('0' + dateObj.getMinutes()).slice(-2);
-    const seconds = '00'; // Asumimos segundos en '00'
+    const yearStr = dateObj.getFullYear();
+    const monthStr = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+    const dayStr = ('0' + dateObj.getDate()).slice(-2);
+    const hoursStr = ('0' + dateObj.getHours()).slice(-2);
+    const minutesStr = ('0' + dateObj.getMinutes()).slice(-2);
+    const secondsStr = ('0' + dateObj.getSeconds()).slice(-2);
 
-    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-}
+    return `${yearStr}-${monthStr}-${dayStr}T${hoursStr}:${minutesStr}:${secondsStr}`;
+  }
 
   formatDateToISO(date: string): string {
     let dateObj: Date;
-  
+
     // Verificar si la cadena está en el formato 'dd-mm-yyyy hh:mm AM/PM'
     const regexDDMMYYYYAMPM = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2} (AM|PM)$/;
     if (regexDDMMYYYYAMPM.test(date)) {
       const [datePart, timePart, period] = date.split(' ');
       const [day, month, year] = datePart.split('-').map(Number);
       const [hours, minutes] = timePart.split(':').map(Number);
-  
+
       let adjustedHours = hours;
       if (period === 'PM' && hours !== 12) {
         adjustedHours += 12;
@@ -179,26 +185,26 @@ export class DateFormatService {
       if (period === 'AM' && hours === 12) {
         adjustedHours = 0;
       }
-  
+
       dateObj = new Date(year, month - 1, day, adjustedHours, minutes);
     } else {
       // Intentar crear un objeto Date a partir de la cadena de entrada
       dateObj = new Date(date);
     }
-  
+
     // Asegurarse de que dateObj sea un objeto Date válido
     if (isNaN(dateObj.getTime())) {
       console.error('Invalid date');
       return '';
     }
-  
+
     const year = dateObj.getFullYear();
     const month = ('0' + (dateObj.getMonth() + 1)).slice(-2); // Los meses en JavaScript son 0-indexados
     const day = ('0' + dateObj.getDate()).slice(-2);
     const hours = ('0' + dateObj.getHours()).slice(-2);
     const minutes = ('0' + dateObj.getMinutes()).slice(-2);
     const seconds = ('0' + dateObj.getSeconds()).slice(-2);
-  
+
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
   }
 
@@ -266,11 +272,11 @@ export class DateFormatService {
       hour12: true,
     };
     const formattedDate = new Intl.DateTimeFormat('es-PE', options).format(date);
-    
+
     // Modificar el formato de la hora
     let [datePart, timePart] = formattedDate.split(', ');
     timePart = timePart.replace(' p. m.', ' pm').replace(' a. m.', ' am');
-    
+
     return `${datePart.replace(/de /g, '')} - ${timePart}`;
   }
 
@@ -335,5 +341,17 @@ export class DateFormatService {
     // Formatear la fecha
     return `${day} de ${month} del ${year} a las ${hour}:${minutes} ${period}`;
   }
+
+  transformDDMMYYYY(value: string): string {
+    if (!value) return '';
+    
+    const date = new Date(value);
+    const day = ('0' + date.getDate()).slice(-2);
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const year = date.getFullYear();
+
+    return `${day}-${month}-${year}`;
+  }
+
 
 }

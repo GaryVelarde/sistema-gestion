@@ -9,8 +9,10 @@ import {
 } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
-import { InscriptionPresenter } from '../inscription/insctiption-presenter';
 import { LoaderService } from 'src/app/layout/service/loader.service';
+import { finalize } from 'rxjs';
+import { DateFormatService } from 'src/app/services/date-format.service';
+import { eModule } from 'src/app/commons/enums/app,enum';
 
 @Component({
     templateUrl: './advisory-tracking.component.html',
@@ -33,41 +35,6 @@ export class AdvisoryTrackingComponent implements OnInit {
     rowsPerPageOptions = [5, 10, 20];
     registros = [];
     getStatusList = '';
-    //[
-    //     {
-    //         "id": 1,
-    //         "degree_processes_id": 1,
-    //         "inscription_id": 1,
-    //         "reception_date_faculty": "0000-00-00",
-    //         "payment_date": "0000-00-00",
-    //         "approval_date_udi": "0000-00-00",
-    //         "shipment_date_secretary": "0000-00-00",
-    //         "report": 0,
-    //         "resolution_date": "0000-00-00",
-    //         "status": "En Asesoría",
-    //         "reviewer": [],
-    //         "degree_processes": {
-    //             "id": 1,
-    //             "file": 1222,
-    //             "professional_school": "IET",
-    //             "thesis_project_title": "Ingeniería de SISTEMAS 2024",
-    //             "office_number": "123-113",
-    //             "resolution_number": "112-113",
-    //             "general_status": "Asesoría",
-    //             "graduates": [
-    //                 {
-    //                     "id": 13,
-    //                     "name": "Ana",
-    //                     "surnames": "Benavidez Ayala",
-    //                     "email": "anas@test.com",
-    //                     "phone": 987145312,
-    //                     "code": 15467824
-    //                 },
-    //             ]
-    //         }
-    //     },
-    // ];
-
     comments = [
         {
             name: 'John Doe',
@@ -87,6 +54,7 @@ export class AdvisoryTrackingComponent implements OnInit {
     showSelectNewReviwer = false;
     showSelectNewStudent = false;
     showEditSudents = false;
+    module = eModule.advisory;
     advisoryState = '';
     totalTask = 0;
     totalTaskIncomplete = 0;
@@ -113,7 +81,7 @@ export class AdvisoryTrackingComponent implements OnInit {
         'Revisor',
         'Estado',
         ''
-      ];
+    ];
     advisorySelected: any;
     showEdit = false;
     titleModalDetailIserSelected: string = '';
@@ -122,11 +90,15 @@ export class AdvisoryTrackingComponent implements OnInit {
     getStudentListProcess = '';
     studentsList = [];
     alertForCancelation: Message[] | undefined;
+    messageError: string = 'Lo sentimos, hubo un problema al intentar cargar la lista de asesorías. Por favor, inténtelo de nuevo más tarde. Si el inconveniente persiste, contacte al soporte técnico.';
+    messageMoreInfo = [{ severity: 'info', detail: 'Es necesario completar todos los campos faltantes para continuar con la asesoría.' }];
+    requiereMoreInfo: boolean = false;
     public tasksForm: FormGroup;
     public cancelattionForm: FormGroup;
     public advisoryForm: FormGroup;
     public studentForm: FormGroup;
     public dataForm: FormGroup;
+    public moreInfoForm: FormGroup;
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
     private _taskDescription: FormControl = new FormControl('', [
@@ -134,6 +106,14 @@ export class AdvisoryTrackingComponent implements OnInit {
     ]);
     private _advisory: FormControl = new FormControl([], [Validators.required]);
     private _students: FormControl = new FormControl([], [Validators.required]);
+    private _advisoryReceptionDateToFacultyMI: FormControl = new FormControl('', [Validators.required]);
+    private _advisoryApprovalDateUDIMI: FormControl = new FormControl('', [Validators.required]);
+    private _paymentDateMI: FormControl = new FormControl('', [Validators.required]);
+    private _submissionDateToSecretariatMI: FormControl = new FormControl('', [Validators.required]);
+    private _reportNumberMI: FormControl = new FormControl('', [Validators.required]);
+    private _resolutionDateMI: FormControl = new FormControl('', [Validators.required]);
+    private _advisoryStartDate: FormControl = new FormControl('', [Validators.required]);
+    private _advisoryEndDate: FormControl = new FormControl('', [Validators.required]);
 
     get cancelationComment() {
         return this._cancelationComment;
@@ -153,6 +133,30 @@ export class AdvisoryTrackingComponent implements OnInit {
     get students() {
         return this._students;
     }
+    get advisoryReceptionDateToFacultyMI() {
+        return this._advisoryReceptionDateToFacultyMI;
+    }
+    get advisoryApprovalDateUDIMI() {
+        return this._advisoryApprovalDateUDIMI;
+    }
+    get paymentDateMI() {
+        return this._paymentDateMI;
+    }
+    get submissionDateToSecretariatMI() {
+        return this._submissionDateToSecretariatMI;
+    }
+    get reportNumberMI() {
+        return this._reportNumberMI;
+    }
+    get resolutionDateMI() {
+        return this._resolutionDateMI;
+    }
+    get advisoryStartDate() {
+        return this._advisoryStartDate;
+    }
+    get advisoryEndDate() {
+        return this._advisoryEndDate;
+    }
 
     constructor(
         private messageService: MessageService,
@@ -163,7 +167,18 @@ export class AdvisoryTrackingComponent implements OnInit {
         private router: Router,
         private config: PrimeNGConfig,
         private loaderService: LoaderService,
+        private dateFormatService: DateFormatService
     ) {
+        this.moreInfoForm = this.fb.group({
+            advisoryReceptionDateToFacultyMI: this.advisoryReceptionDateToFacultyMI,
+            advisoryApprovalDateUDIMI: this.advisoryApprovalDateUDIMI,
+            paymentDateMI: this.paymentDateMI,
+            submissionDateToSecretariatMI: this.submissionDateToSecretariatMI,
+            reportNumberMI: this.reportNumberMI,
+            resolutionDateMI: this.resolutionDateMI,
+            advisoryStartDate: this.advisoryStartDate,
+            advisoryEndDate: this.advisoryEndDate,
+        });
         this.tasksForm = this.fb.group({
             taskDescription: this.taskDescription,
         });
@@ -233,8 +248,12 @@ export class AdvisoryTrackingComponent implements OnInit {
     viewDetailsInscription(data: any) {
         this.loaderService.show();
         if (data) {
+            data.approval_date_udi === '00-00-0000'
+                ? this.requiereMoreInfo = true
+                : this.requiereMoreInfo = false;
             this.advisorySelected = data;
-            this.reviewersList = data.reviewer[0];
+            console.log('this.advisorySelected', this.advisorySelected)
+            this.reviewersList = data.reviewer;
             this.graduatesList = data.degree_processes.graduates;
             this.advisoryState = this.advisorySelected.status;
             this.countTask();
@@ -470,5 +489,46 @@ export class AdvisoryTrackingComponent implements OnInit {
     getStudentSelected(userSelected: any) {
         console.log('students', userSelected)
         this.students.setValue(userSelected);
+    }
+
+    handleReload(reload: boolean) {
+        if (reload) {
+            this.getAdvisoryList();
+        }
+    }
+
+    saveMoreInfo() {
+        this.loaderService.show();
+        //this.requiereMoreInfo = false;
+        const rq = {
+            user_id: this.advisory.value[0].id,
+            reception_date_faculty: this.dateFormatService.transformDDMMYYYY(this.advisoryReceptionDateToFacultyMI.value),
+            payment_date: this.dateFormatService.transformDDMMYYYY(this.paymentDateMI.value),
+            approval_date_udi: this.dateFormatService.transformDDMMYYYY(this.advisoryApprovalDateUDIMI.value),
+            shipment_date_secretary: this.dateFormatService.transformDDMMYYYY(this.submissionDateToSecretariatMI.value),
+            report: this.reportNumberMI.value,
+            resolution_date: this.dateFormatService.transformDDMMYYYY(this.resolutionDateMI.value),
+            start_date_advisory: this.dateFormatService.transformDDMMYYYY(this.advisoryStartDate.value),
+            end_date_advisory: this.dateFormatService.transformDDMMYYYY(this.advisoryEndDate.value),
+        }
+        this.service.putAdvisoryUpdate(this.advisorySelected.id, rq).pipe(
+            finalize(() => {
+                this.loaderService.hide();
+            })
+        ).subscribe(
+            (res: any) => {
+                if(res.status) {
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Confirmado',
+                        detail: 'Lo datos han sido guardados.',
+                        life: 3000,
+                    });
+                }
+                console.log(res);
+            }, (error) => {
+                console.log(error);
+            })
     }
 }

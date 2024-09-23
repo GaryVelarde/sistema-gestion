@@ -21,6 +21,14 @@ export class AuthService {
     return this.http.post(`${this.API_URL}/auth/login`, credentials, this.header);
   }
 
+  forgotPassword(request: any): Observable<any> {
+    return this.http.post(`${this.API_URL}/auth/reset-password`, request, this.header);
+  }
+
+  resetPassword(request: any, token: string): Observable<any> {
+    return this.http.post(`${this.API_URL}/auth/reset-password/${token}`, request, this.header);
+  }
+
   postInscription(rq: any): Observable<any> {
     return this.http.post(`${this.API_URL}/inscription`, rq);
   }
@@ -105,15 +113,15 @@ export class AuthService {
     return this.http.get(`${this.API_URL}/article`, this.header);
   }
 
-  getCommentsByInscription(id: number): Observable<any> {
+  getCommentsByInscription(id: string): Observable<any> {
     return this.http.get(`${this.API_URL}/inscription/${id}/observations`, this.header);
   }
 
-  getCommentsByAdvisory(id: number): Observable<any> {
+  getCommentsByAdvisory(id: string): Observable<any> {
     return this.http.get(`${this.API_URL}/advisory/${id}/observations`, this.header);
   }
 
-  getCommentsByEventsUDI(id: number): Observable<any> {
+  getCommentsByEventsUDI(id: string): Observable<any> {
     return this.http.get(`${this.API_URL}/meeting/${id}/observation`, this.header);
   }
 
@@ -139,6 +147,30 @@ export class AuthService {
 
   closeSession() {
     return this.http.delete(`${this.API_URL}/logout`, this.header);
+  }
+
+  getEventsUdiList() {
+    return this.http.get(`${this.API_URL}/meeting`, this.header);
+  }
+
+  putAdvisoryUpdate(id: number, request: any) {
+    return this.http.put(`${this.API_URL}/advisory/${id}`, request, this.header);
+  }
+
+  getAdvisoryTasks(id: string) {
+    return this.http.get(`${this.API_URL}/advisory/${id}/tasks`, this.header);
+  }
+
+  getInscriptionTasks(id: string) {
+    return this.http.get(`${this.API_URL}/inscription/${id}/tasks`, this.header);
+  }
+
+  postAddInscriptionTask(id: string, request: any) {
+    return this.http.post(`${this.API_URL}/inscription/${id}/tasks`, request, this.header);
+  }
+
+  getTitlesList() {
+    return this.http.get(`${this.API_URL}/titles`, this.header);
   }
 
 }

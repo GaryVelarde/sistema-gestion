@@ -13,6 +13,7 @@ import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { finalize } from 'rxjs';
 import { IStudent, ITeacher } from '../../cross-interfaces/comments-interfaces';
+import { eModule, userType } from 'src/app/commons/enums/app,enum';
 
 @Component({
     templateUrl: './inscription-tracking.component.html',
@@ -25,6 +26,8 @@ export class InscriptionTrackingComponent implements OnInit {
     rowsPerPageOptions = [5, 10, 20];
 
     registros = [];
+    teacherL = userType.teacher;
+    studentL = userType.student;
 
     usuarios: IStudent[] = [
         {
@@ -117,6 +120,7 @@ export class InscriptionTrackingComponent implements OnInit {
             "cip": 68751388
         }
     ]
+    module = eModule.inscription;
     getInscriptionListProcess: string;
     filteredItems: any[] | undefined;
 
@@ -296,6 +300,8 @@ export class InscriptionTrackingComponent implements OnInit {
             this.inscriptionSelected = data;
             this.graduatesList = data.graduates;
             this.reviewerList = data.inscriptions[0].teachers;
+            this.teacher.setValue(data.inscriptions[0].teachers);
+            this.students.setValue(data.graduates);
             this.inscriptionState = data.inscriptions[0].status;
             this.inscriptionState === 'Aprobado' || this.inscriptionState === 'Renuncia'
                 ? this.commentsVisible = false
@@ -378,7 +384,7 @@ export class InscriptionTrackingComponent implements OnInit {
         const rq = {
             status: 'En revisión'
         }
-        this.service.putInscriptionStatusUpdate(this.inscriptionSelected.id, rq).pipe(
+        this.service.putInscriptionStatusUpdate(this.inscriptionSelected.inscriptions[0].id, rq).pipe(
             finalize(() => {
                 this.loaderService.hide();
             })
@@ -407,7 +413,7 @@ export class InscriptionTrackingComponent implements OnInit {
         const rq = {
             status: 'Observado'
         }
-        this.service.putInscriptionStatusUpdate(this.inscriptionSelected.id, rq).pipe(
+        this.service.putInscriptionStatusUpdate(this.inscriptionSelected.inscriptions[0].id, rq).pipe(
             finalize(() => {
                 this.loaderService.hide();
             })
@@ -441,10 +447,10 @@ export class InscriptionTrackingComponent implements OnInit {
         console.log('dateCancelationReception', this.dateCancelationReception.value)
         const rq = {
             status: 'Renuncia',
-            description : this.cancelationComment.value,
-            shipment_date_secretary : "05-05-2024",
+            description: this.cancelationComment.value,
+            shipment_date_secretary: "05-05-2024",
         }
-        this.service.putInscriptionStatusUpdate(this.inscriptionSelected.id, rq).pipe(
+        this.service.putInscriptionStatusUpdate(this.inscriptionSelected.inscriptions[0].id, rq).pipe(
             finalize(() => {
                 this.loaderService.hide();
             })
@@ -485,7 +491,7 @@ export class InscriptionTrackingComponent implements OnInit {
                 const rq = {
                     status: 'Aprobado'
                 }
-                this.service.putInscriptionStatusUpdate(this.inscriptionSelected.id, rq).pipe(
+                this.service.putInscriptionStatusUpdate(this.inscriptionSelected.inscriptions[0].id, rq).pipe(
                     finalize(() => {
                         this.loaderService.hide();
                     })
@@ -695,5 +701,15 @@ export class InscriptionTrackingComponent implements OnInit {
         if (reload) {
             this.callGetInscriptions();
         }
+    }
+
+    getTeacherSelected(userSelected: any) {
+        console.log('teacher', userSelected)
+        this.teacher.setValue(userSelected);
+    }
+
+    getStudentSelected(userSelected: any) {
+        console.log('students', userSelected)
+        this.students.setValue(userSelected);
     }
 }

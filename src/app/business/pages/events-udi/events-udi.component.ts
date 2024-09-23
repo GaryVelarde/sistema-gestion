@@ -24,6 +24,7 @@ import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { LoaderService } from 'src/app/layout/service/loader.service';
+import { eModule } from 'src/app/commons/enums/app,enum';
 interface Task {
     id: number;
     title: string;
@@ -200,7 +201,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     };
 
     eventSelected: any;
-
+    module = eModule.eventUdi;
     public eventForm: FormGroup;
     public slotDurationForm: FormGroup;
     public taskForm: FormGroup;
@@ -330,48 +331,10 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.commentsForm = this.fb.group({
             comment: this.comment,
         });
-        /*this.pendingTasks = [
-            {
-                id: 1,
-                title: 'Tarea 1',
-                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
-                dateEnd: '26-07-2024'
-            },
-            {
-                id: 2,
-                title: 'Tarea 2',
-                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
-                dateEnd: '23-07-2024'
-            }
-        ];
-
-        this.inProgressTasks = [
-            {
-                id: 3,
-                title: 'Tarea 3',
-                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
-                dateEnd: '23-07-2024'
-            },
-            {
-                id: 4,
-                title: 'Tarea 4',
-                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
-                dateEnd: '23-07-2024'
-            },
-            {
-                id: 5,
-                title: 'Tarea 5',
-                description: 'Esta es una tarea de prueba, bla bla bla bla bla bla bla bla',
-                dateEnd: '23-07-2024'
-            }
-        ];
-
-        this.completedTasks = [
-
-        ];*/
     }
 
     ngOnInit() {
+        this.callGetEventsUdi();
         this.watchUsersManager();
         this.getTeachersList();
         this.slotDuration.setValue(this.timeslots[this.timeslots.length - 1]);
@@ -389,7 +352,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             dateFormat: 'dd/mm/yy',
             weekHeader: 'Sm'
         });
-        this.callGetEventsUdi();
+        
     }
 
     ngAfterViewInit(): void {
@@ -403,21 +366,33 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         }
     }
 
-    callGetEventsUdi() {
-        for (let event of this.data) {
-            const ev: EventInput = {
-                title: event.title,
-                start: this.dateFormatService.formatDateCalendar(event.start_date),
-                end: this.dateFormatService.formatDateCalendar(event.due_date),
-                backgroundColor: event.color,
-                borderColor: event.color,
-                editable: true,
-                startResizable: true,
-                durationEditable: true,
-                event_udi: event
+    async callGetEventsUdi() {
+        await this.service.getEventsUdiList().pipe().subscribe(
+            (res: any) => {
+            console.log('eventos:', res);
+            for (let event of res.data) {
+                const ev: EventInput = {
+                    title: event.title,
+                    start: this.dateFormatService.formatDateCalendar(event.start_date),
+                    end: this.dateFormatService.formatDateCalendar(event.due_date),
+                    backgroundColor: event.color,
+                    borderColor: event.color,
+                    editable: true,
+                    startResizable: true,
+                    durationEditable: true,
+                    event_udi: event
+                }
+                console.log(event.title, event.start_date, event.due_date)
+                console.log(this.dateFormatService.formatDateCalendar(event.start_date))
+                this.events = [...this.events, ev];
             }
-            this.events.push(ev);
-        }
+            this.calendarOptions = {
+                ...this.calendarOptions,
+                events: this.events
+            };
+        
+        })
+        console.log('aaaaaaaaaaaaaaaaaaaaaaa', this.events)
     }
 
     watchSlotDuration() {
@@ -430,6 +405,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             }
         });
     }
+    
     updateCalendarOptions(duration: string, interval: string) {
         const calendarApi = this.calendarComponent.getApi();
         calendarApi.setOption('slotDuration', duration);
