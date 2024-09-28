@@ -25,13 +25,13 @@
     </div>
 
     <ng-template #skeleton>
-        <div class="col-4 text-align-center">
+        <div class="col-12 col-md-4 text-align-center">
             <p-skeleton width="full-width" height="92px" />
         </div>
-        <div class="col-4 text-align-center">
+        <div class="col-12 col-md-4 text-align-center">
             <p-skeleton width="full-width" height="92px" />
         </div>
-        <div class="col-4 text-align-center">
+        <div class="col-12 col-md-4 text-align-center">
             <p-skeleton width="full-width" height="92px" />
         </div>
         <div class="col-12">
@@ -63,7 +63,7 @@
     </ng-template>
 
     <ng-template #list>
-        <div class="col-4 text-align-center">
+        <div class="col-12 col-md-4 text-align-center">
             <p-card>
                 <p>
                     Tareas incompletas
@@ -71,7 +71,7 @@
                 </p>
             </p-card>
         </div>
-        <div class="col-4 text-align-center">
+        <div class="col-12 col-md-4 text-align-center">
             <p-card>
                 <p>
                     Tareas terminadas
@@ -79,7 +79,7 @@
                 </p>
             </p-card>
         </div>
-        <div class="col-4 text-align-center">
+        <div class="col-12 col-md-4 text-align-center">
             <p-card>
                 <p>
                     Total de tareas
@@ -87,7 +87,7 @@
                 </p>
             </p-card>
         </div>
-        <div *ngIf="_visible" class="col-12">
+        <div *ngIf="_visible && statusRegister !== 'charging'" class="col-12">
             <form [formGroup]="tasksForm">
                 <span class="p-float-label">
                     <textarea
@@ -104,10 +104,12 @@
                 </span>
             </form>
         </div>
-
+        <div *ngIf="_visible && statusRegister === 'charging'" class="col-12">
+            <p-skeleton height="3rem" styleClass="mb-2" />
+        </div>
         <div class="col-12">
             <div *ngIf="tasks.length < 1">
-                <p class="ml-4">Aún no hay actividades registradas</p>
+                <p class="ml-4">Aún no hay tareas registradas</p>
             </div>
             <div *ngIf="tasks.length > 0">
                 <div *ngFor="let task of tasks" class="grid d-flex ml-1">
@@ -147,7 +149,6 @@
             </div>
         </div>
     </ng-template>
-
     <ng-template #error>
         <div style="justify-content: center; display: flex; width: 100%">
             <app-card-error

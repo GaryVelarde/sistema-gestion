@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
 import { eModule } from 'src/app/commons/enums/app,enum';
 import { AuthService } from 'src/app/services/auth.service';
 import { DateFormatService } from 'src/app/services/date-format.service';
@@ -9,12 +10,13 @@ import { DateFormatService } from 'src/app/services/date-format.service';
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.scss']
 })
-export class CommentsComponent implements OnInit {
+export class CommentsComponent implements OnInit, OnDestroy {
   @Input() module: eModule;
   @Input() id: string;
   @Input() disabled: boolean = false;
   @Input() visible: boolean = true;
 
+  private destroy$ = new Subject<void>();
   comments = [];
   skeletonLength = [1, 2, 3];
   commentsForm: FormGroup;
@@ -44,6 +46,11 @@ export class CommentsComponent implements OnInit {
       this.comment.disable();
     }
     this.getCommentsList();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   getCommentsList() {
@@ -107,7 +114,7 @@ export class CommentsComponent implements OnInit {
     this.registerState = 'charging';
     switch (this.module) {
       case eModule.eventUdi:
-        this.service.postAddEventsUdiComment(this.id, rq).pipe().subscribe(
+        this.service.postAddEventsUdiComment(this.id, rq).pipe(takeUntil(this.destroy$)).subscribe(
           (res: any) => {
             if (res.status) {
               this.registerState = 'complete';
@@ -120,11 +127,22 @@ export class CommentsComponent implements OnInit {
             console.log(error);
           });
         break;
-      case 'asesorias':
-        this.getCommentsByAdvisory();
-        break;
       case eModule.inscription:
-        this.service.postAddInscriptionComment(this.id, rq).pipe().subscribe(
+        this.service.postAddInscriptionComment(this.id, rq).pipe(takeUntil(this.destroy$)).subscribe(
+          (res: any) => {
+            if (res.status) {
+              this.registerState = 'complete';
+              this.confirmAddEvent(res.id);
+            }
+
+            console.log(res);
+          }, (error) => {
+            this.registerState = 'complete';
+            console.log(error);
+          });
+        break;
+      case eModule.advisory:
+        this.service.postAddAdvisoryComment(this.id, rq).pipe(takeUntil(this.destroy$)).subscribe(
           (res: any) => {
             if (res.status) {
               this.registerState = 'complete';
@@ -162,7 +180,7 @@ export class CommentsComponent implements OnInit {
   getCommentsByInscription() {
     this.state = 'charging';
     this.registerState = 'charging';
-    this.service.getCommentsByInscription(this.id).pipe().subscribe(
+    this.service.getCommentsByInscription(this.id).pipe(takeUntil(this.destroy$)).subscribe(
       (res: any) => {
         res.data.forEach(item => {
           item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
@@ -181,7 +199,7 @@ export class CommentsComponent implements OnInit {
   getCommentsByAdvisory() {
     this.state = 'charging';
     this.registerState = 'charging';
-    this.service.getCommentsByAdvisory(this.id).pipe().subscribe(
+    this.service.getCommentsByAdvisory(this.id).pipe(takeUntil(this.destroy$)).subscribe(
       (res: any) => {
         res.data.forEach(item => {
           item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
@@ -200,12 +218,11 @@ export class CommentsComponent implements OnInit {
   getCommentsByEventsUDI() {
     this.state = 'charging';
     this.registerState = 'charging';
-    this.service.getCommentsByEventsUDI(this.id).pipe().subscribe((res: any) => {
+    this.service.getCommentsByEventsUDI(this.id).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       res.data.forEach(item => {
         item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
       });
       this.comments = res.data;
-      console.log('this.comments', this.comments)
       this.updateVisibleComments();
       this.state = 'complete';
       this.registerState = 'complete';

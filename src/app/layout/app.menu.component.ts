@@ -33,7 +33,6 @@ export class AppMenuComponent implements OnInit {
                     { label: 'Asesorías', icon: 'pi pi-fw pi-file-import', routerLink: ['/pages/asesorias'] },
                     { label: 'Revisión de tesis', icon: 'pi pi-fw pi-file-export', routerLink: ['/pages/a'] },
                     { label: 'Sustentación', icon: 'pi pi-fw pi-copy', routerLink: ['/pages/a'] },
-                    { label: 'Obervaciones', icon: 'pi pi-fw pi-list', routerLink: ['/pages/a'] },
                 ]
             },
             {
@@ -43,10 +42,22 @@ export class AppMenuComponent implements OnInit {
                 ]
             },
             {
+                label: 'Programa 3',
+                items: [
+                    { label: 'Planes', icon: 'pi pi-fw pi-list-check', routerLink: ['/pages/plans'] },
+                    { label: 'Presupuestos', icon: 'pi pi-fw pi-calculator', routerLink: ['/#'] },
+                ]
+            },
+            {
                 label: 'Eventos',
                 items: [
                     { label: 'Calendario', icon: 'pi pi-fw pi-calendar', routerLink: ['/pages/events'] },
-                    { label: 'Reuniones UDI', icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/pages/events-udi'] },
+                ]
+            },
+            {
+                label: 'Reuniones UDI',
+                items: [
+                    { label: 'Agenda UDI', icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/pages/events-udi'] },
                 ]
             },
         ];

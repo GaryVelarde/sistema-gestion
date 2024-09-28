@@ -1,0 +1,144 @@
+<p-toast key="tst"></p-toast>
+<div class="grid">
+    <div class="col-12">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+        <div class="card px-6 py-6">
+            <div class="">
+                <form [formGroup]="actividadForm" (ngSubmit)="onSubmit()">
+                    <!-- Actividades -->
+                    <div formArrayName="actividades">
+                        <div
+                            *ngFor="let actividad of actividades.controls; let i = index"
+                            [formGroupName]="i"
+                            class="mb-4"
+                            style="border: 1px dashed #d1d5db; border-radius: 5px; padding: 15px;"
+                        >
+                            <div class="flex">
+                                <div class="mr-auto">
+                                    <h5>{{ i + 1 + ". Actividad Funcional" }}</h5>
+                                </div>
+                                <button
+                                    pButton
+                                    type="button"
+                                    icon="pi pi-times"
+                                    class="p-button-danger"
+                                    [rounded]="true"
+                                    [text]="true"
+                                    (click)="removeActividad(i)"
+                                ></button>
+                            </div>
+                            
+                            <!-- Descripción de la Actividad -->
+                            <div class="p-field p-grid">
+                                <div class="col-12">
+                                    <input
+                                        pInputText
+                                        id="descripcion"
+                                        style="width: 100%"
+                                        formControlName="descripcion"
+                                        placeholder="Descripción de la actividad"
+                                        class="p-inputtext-sm"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Panel de Tareas -->
+                            <p-panel header="Tareas" [toggleable]="true" class="mb-3">
+                                <div formArrayName="tareas">
+                                    <div *ngFor="let tarea of tareas(i).controls; let j = index" [formGroupName]="j" class="mb-2">
+                                        <!-- Descripción de la Tarea -->
+                                        <div class="flex mb-2">
+                                            <label for="tarea-descripcion" class="m-auto mr-2">
+                                                {{ i + 1 + "." + (j + 1) }}</label>
+                                            <div class="w-full">
+                                                <input
+                                                    pInputText
+                                                    id="tarea-descripcion"
+                                                    style="width: 100%"
+                                                    formControlName="descripcion"
+                                                    placeholder="Descripción de la tarea"
+                                                    class="p-inputtext-sm"
+                                                />
+                                            </div>
+                                            <div>
+                                                <button
+                                                    pButton
+                                                    type="button"
+                                                    icon="pi pi-trash"
+                                                    [rounded]="true"
+                                                    [text]="true"
+                                                    class="p-button-danger ml-2"
+                                                    (click)="removeTarea(i, j)"
+                                                ></button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Meses -->
+                                        <div class="p-field p-grid">
+                                            <label class="p-col-12 p-md-2">Meses:</label>
+                                            <div class="p-col-12 p-md-10">
+                                                <div formArrayName="meses" class="p-grid p-align-center p-justify-center flex">
+                                                    <div *ngFor="let mes of tarea.get('meses').controls; let k = index" class="col-1">
+                                                        <p-checkbox
+                                                            formControlName="{{k}}"
+                                                            binary="true"
+                                                            label="{{getMesNombre(k)}}"
+                                                            class="p-mr-2"
+                                                        ></p-checkbox>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Comentario -->
+                                        <div class="p-field p-grid">
+                                            <div class="p-col-12 p-md-10">
+                                                <textarea
+                                                    pInputTextarea
+                                                    formControlName="comentario"
+                                                    placeholder="Comentario opcional"
+                                                    rows="3"
+                                                    autoResize="true"
+                                                    style="width: 100%"
+                                                ></textarea>
+                                            </div>
+                                        </div>
+
+                                        <p-divider></p-divider>
+                                    </div>
+                                </div>
+                                
+                                <button
+                                    pButton
+                                    type="button"
+                                    label="Añadir Tarea"
+                                    icon="pi pi-plus"
+                                    class="p-button-sm p-button-success"
+                                    (click)="addTarea(i)"
+                                ></button>
+                            </p-panel>
+                        </div>
+                    </div>
+
+                    <div class="flex">
+                        <button
+                            pButton
+                            type="button"
+                            label="Añadir Actividad"
+                            icon="pi pi-plus"
+                            class="p-button p-button-success mr-auto"
+                            (click)="addActividad()"
+                        ></button>
+                        <button
+                            pButton
+                            type="submit"
+                            label="Guardar"
+                            icon="pi pi-save"
+                            class="p-button-primary"
+                        ></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

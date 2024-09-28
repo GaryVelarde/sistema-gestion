@@ -21,7 +21,6 @@ import { InscriptionTrackingRoutingModule } from './inscription-tracking-routing
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { FieldsetModule } from 'primeng/fieldset';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DividerModule } from 'primeng/divider';
 import { BadgeModule } from 'primeng/badge';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -31,8 +30,6 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { MessagesModule } from 'primeng/messages';
 import { AvatarModule } from 'primeng/avatar';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
-import { RouterModule } from '@angular/router';
-import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { SidebarModule } from 'primeng/sidebar';
 
 @NgModule({
@@ -59,7 +56,6 @@ import { SidebarModule } from 'primeng/sidebar';
         CardModule,
         TagModule,
         FieldsetModule,
-        ConfirmDialogModule,
         DividerModule,
         BadgeModule,
         SkeletonModule,

@@ -1,39 +1,56 @@
 <div class="card">
     <h5>Asignación de revisor</h5>
-    <p>
-        Complete todos los campos para continuar.
-    </p>
+    <p>Complete todos los campos para continuar.</p>
     <form [formGroup]="presenter.formStep3">
         <div class="grid p-fluid mt-3">
             <div class="field col-12 md:col-12">
                 <span class="p-float-label">
-                    <p-autoComplete 
-                    id="inputtext"
-            formControlName="reviewer"
-            [suggestions]="filteredCountries" 
-            (completeMethod)="filterCountry($event)" 
-            field="name" />
-                    <label for="inputtext">Ingrese el nombre del
-                        revisor</label>
+                    <p-autoComplete
+                        id="inputtext"
+                        formControlName="reviewer"
+                        [suggestions]="filteredCountries"
+                        (completeMethod)="filterCountry($event)"
+                        field="name"
+                    />
+                    <label for="inputtext">Ingrese el nombre del revisor</label>
                 </span>
             </div>
         </div>
         <div class="grid p-fluid">
             <div class="col-12 md:col-12">
-                <p-card *ngIf="presenter.reviewerIsValid" header="Datos del revisor">
+                <p-card *ngIf="presenter.reviewerIsValid">
+                    <div class="flex w-full mb-2">
+                        <p-avatar
+                            [label]="presenter.reviewerSelected.name[0]"
+                            size="large"
+                        />
+                        <p class="my-auto ml-4">
+                            {{presenter.reviewerSelected.name + ' ' +
+                            presenter.reviewerSelected.surnames}}
+                        </p>
+                    </div>
                     <p>Código: {{presenter.reviewerSelected.code}}</p>
-                    <p>Nombres: {{presenter.reviewerSelected.name + ' ' + presenter.reviewerSelected.surnames}}</p>
                     <p>Correo: {{presenter.reviewerSelected.email}}</p>
                     <p>Celular: {{presenter.reviewerSelected.phone}}</p>
                 </p-card>
             </div>
         </div>
         <div class="flex gap-3 mt-1">
-            <p-button (click)="backStep()" label="Regresar" [outlined]="true"
-                icon="pi pi-angle-left" iconPos="left" />
-            <p-button (click)="nextStep()" label="Siguiente"
-                icon="pi pi-angle-right" iconPos="right" [disabled]="false"
-                [disabled]="!presenter.reviewerIsValid" />
+            <p-button
+                (click)="backStep()"
+                label="Regresar"
+                [outlined]="true"
+                icon="pi pi-angle-left"
+                iconPos="left"
+            />
+            <p-button
+                (click)="nextStep()"
+                label="Siguiente"
+                icon="pi pi-angle-right"
+                iconPos="right"
+                [disabled]="false"
+                [disabled]="!presenter.reviewerIsValid"
+            />
         </div>
     </form>
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
@@ -6,6 +6,8 @@ import { Table } from 'primeng/table';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { IStudent } from '../../cross-interfaces/comments-interfaces';
+import { finalize, Subject, takeUntil } from 'rxjs';
+import { eModule } from 'src/app/commons/enums/app,enum';
 
 @Component({
   selector: 'app-hotbed-tracking',
@@ -13,7 +15,7 @@ import { IStudent } from '../../cross-interfaces/comments-interfaces';
   styleUrls: ['./hotbed-tracking.component.scss'],
   providers: [MessageService],
 })
-export class HotbedTrackingComponent implements OnInit {
+export class HotbedTrackingComponent implements OnInit, OnDestroy {
 
   registros = [];
   events = [
@@ -42,9 +44,12 @@ export class HotbedTrackingComponent implements OnInit {
     { label: 'Detalle del artículo' },
     { label: 'Línea de tiempo', visible: true },
   ];
-
+  private destroy$ = new Subject<void>();
   viewDetail = false;
   viewHistory = false;
+  showDialogAddFiles = false;
+  reloadFiles = false;
+  module = eModule.hotbed;
   articleSelected: any;
   getArticleListProcess = '';
   skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
@@ -54,6 +59,7 @@ export class HotbedTrackingComponent implements OnInit {
     'Estado',
     ''
   ];
+  formData = new FormData();
   messageError: string = 'Se produjo un error al cargar la lista de artículos. Por favor, inténtelo de nuevo más tarde';
   edition = false;
   articleState: string;
@@ -65,7 +71,7 @@ export class HotbedTrackingComponent implements OnInit {
   }
 
   constructor(private router: Router, private service: AuthService, private loaderService: LoaderService,
-    private fb: FormBuilder,
+    private fb: FormBuilder, private messageService: MessageService,
   ) {
     this.studentsForm = this.fb.group({
       students: this.students,
@@ -74,6 +80,11 @@ export class HotbedTrackingComponent implements OnInit {
 
   ngOnInit() {
     this.getArticleList();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   goToRegisterHotbed() {
@@ -95,7 +106,7 @@ export class HotbedTrackingComponent implements OnInit {
   getArticleList() {
 
     this.getArticleListProcess = 'charging';
-    this.service.getArticleList().pipe().subscribe((res: any) => {
+    this.service.getArticleList().pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res) {
         this.registros = res.data;
         this.getArticleListProcess = 'complete';
@@ -103,7 +114,6 @@ export class HotbedTrackingComponent implements OnInit {
     },
       (error) => {
         this.getArticleListProcess = 'error';
-        console.log('Error in subscription:', error);
       })
   }
 
@@ -207,4 +217,52 @@ export class HotbedTrackingComponent implements OnInit {
   cancelEdition() {
     this.edition = false;
   }
+
+  onFileChange(files: any) {
+    this.formData = files;
+}
+
+clearFile() {
+    this.formData = new FormData();
+}
+
+hideAddFilesDialog() {
+    this.clearFile();
+    this.showDialogAddFiles = false;
+}
+
+saveFiles() {
+    this.loaderService.show();
+    this.showDialogAddFiles = false;
+    this.service.postRegisterHotbedFile(this.formData, this.articleSelected.id).pipe(
+        finalize(() => {
+            this.loaderService.hide();
+        })
+    ).subscribe(
+        (res: any) => {
+            if (res.status) {
+                this.reloadFiles = true;
+                this.hideAddFilesDialog();
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'info',
+                    summary: 'Confirmación',
+                    detail: 'Los archivos han sido guardados.',
+                    life: 3000,
+                });
+            }
+        }, (error) => {
+            this.messageService.add({
+                key: 'tst',
+                severity: 'error',
+                summary: 'Error',
+                detail: 'Se ha producido un error al guardar los archivos.',
+                life: 3000,
+            });
+        });
+}
+
+isFormDataEmpty(formData: FormData): boolean {
+    return !(formData as any).entries().next().done;
+}
 }

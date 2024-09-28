@@ -24,7 +24,11 @@ import { BadgeModule } from 'primeng/badge';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
 import { CheckboxModule } from 'primeng/checkbox';
-
+import { UploadArchivesComponent } from './upload-archives/upload-archives.component';
+import { FileListComponent } from './file-list/file-list.component';
+import { ImageModule } from 'primeng/image';
+import { CarouselModule } from 'primeng/carousel';
+import { MessagesModule } from 'primeng/messages';
 
 @NgModule({
   imports: [
@@ -48,6 +52,9 @@ import { CheckboxModule } from 'primeng/checkbox';
     CardModule,
     DividerModule,
     CheckboxModule,
+    ImageModule,
+    CarouselModule,
+    MessagesModule,
   ],
   declarations: [
     CommentsComponent,
@@ -57,6 +64,8 @@ import { CheckboxModule } from 'primeng/checkbox';
     BreadcrumbComponent,
     SkeletonTableComponent,
     TaskListComponent,
+    UploadArchivesComponent,
+    FileListComponent,
   ],
   exports: [
     CommentsComponent,
@@ -66,6 +75,8 @@ import { CheckboxModule } from 'primeng/checkbox';
     BreadcrumbComponent,
     SkeletonTableComponent,
     TaskListComponent,
+    UploadArchivesComponent,
+    FileListComponent,
   ]
 })
 export class CrossComponentsModule { }

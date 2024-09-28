@@ -19,7 +19,6 @@ import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { FieldsetModule } from 'primeng/fieldset';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DividerModule } from 'primeng/divider';
 import { BadgeModule } from 'primeng/badge';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -27,17 +26,18 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { InscriptionPresenter } from '../inscription/insctiption-presenter';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { MessagesModule } from 'primeng/messages';
-import { AdvisoryTrackingRoutingModule } from './advisory-tracking-routing.module';
-import { AdvisoryTrackingComponent } from './advisory-tracking.component';
 import { AvatarModule } from 'primeng/avatar';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { SidebarModule } from 'primeng/sidebar';
+import { PlansRoutingModule } from './plans-routing.module';
+import { PlansComponent } from './plans.component';
+import { PanelModule } from 'primeng/panel';
 
 @NgModule({
     imports: [
         CommonModule,
-        AdvisoryTrackingRoutingModule,
+        PlansRoutingModule,
         TableModule,
         FileUploadModule,
         ReactiveFormsModule,
@@ -58,7 +58,6 @@ import { SidebarModule } from 'primeng/sidebar';
         CardModule,
         TagModule,
         FieldsetModule,
-        ConfirmDialogModule,
         DividerModule,
         BadgeModule,
         SkeletonModule,
@@ -68,8 +67,9 @@ import { SidebarModule } from 'primeng/sidebar';
         CrossComponentsModule,
         BreadcrumbModule,
         SidebarModule,
+        PanelModule,
     ],
-    declarations: [AdvisoryTrackingComponent],
+    declarations: [PlansComponent],
     providers: [
         InscriptionPresenter,
         provideHttpClient(withInterceptorsFromDi()),

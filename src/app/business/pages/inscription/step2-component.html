@@ -1,49 +1,55 @@
 <div class="card">
     <h5>Asignación de estudiantes</h5>
-    <p>
-        Complete todos los campos para continuar.
-    </p>
+    <p>Complete todos los campos para continuar.</p>
     <p-messages [(value)]="presenter.messages" [enableService]="false" />
     <form [formGroup]="presenter.formStep2">
         <style>
             .p-field {
                 margin-bottom: 1rem;
             }
-            
+
             .p-error-message {
                 display: flex;
                 align-items: center;
                 margin-top: 0.5rem;
                 color: #dc3545;
             }
-            
+
             .error-icon {
                 margin-right: 0.5rem;
                 font-size: 1.5rem;
                 color: #dc3545;
             }
-            
         </style>
         <div [ngSwitch]="getStudentListProcess">
             <ng-template [ngSwitchCase]="'charging'">
-              <ng-container *ngTemplateOutlet="studentListSkeleton"></ng-container>
+                <ng-container
+                    *ngTemplateOutlet="studentListSkeleton"
+                ></ng-container>
             </ng-template>
             <ng-template [ngSwitchCase]="'error'">
-              <ng-container *ngTemplateOutlet="studentListError"></ng-container>
+                <ng-container
+                    *ngTemplateOutlet="studentListError"
+                ></ng-container>
             </ng-template>
             <ng-template [ngSwitchCase]="'complete'">
-              <ng-container *ngTemplateOutlet="studentList"></ng-container>
+                <ng-container *ngTemplateOutlet="studentList"></ng-container>
             </ng-template>
             <ng-template ngSwitchDefault>
-              <p>Invalid state</p>
+                <p>Invalid state</p>
             </ng-template>
         </div>
         <ng-template #studentListError>
             <div class="p-error-message">
                 <i class="pi pi-times-circle error-icon"></i>
                 <span>Ha ocurrido un error al traer la información.</span>
-                <button pButton type="button" icon="pi pi-refresh"
-                    class="p-button-text p-button-danger" (click)="callGetStudentList()"></button>
+                <button
+                    pButton
+                    type="button"
+                    icon="pi pi-refresh"
+                    class="p-button-text p-button-danger"
+                    (click)="callGetStudentList()"
+                ></button>
             </div>
         </ng-template>
         <ng-template #studentListSkeleton>
@@ -65,86 +71,129 @@
                             formControlName="student"
                             [suggestions]="filteredStudents"
                             (completeMethod)="filterStudents($event)"
-                            field="name">
+                            field="name"
+                        >
                             <ng-template let-student pTemplate="item">
                                 <div class="flex align-items-center gap-2">
-    
-                                    <div>{{ student.name + ' ' +
-                                        student.surnames}}</div>
+                                    <div>
+                                        {{ student.name + ' ' +
+                                        student.surnames}}
+                                    </div>
                                 </div>
                             </ng-template>
                         </p-autoComplete>
-                        <label for="studentOne">Ingrese el nombre del
-                            estudiante</label>
+                        <label for="studentOne"
+                            >Ingrese el nombre del estudiante</label
+                        >
                     </span>
-    
                 </div>
-                <div *ngIf="!presenter.studentTwoRequired"
-                    class="col-12 md:col-1">
-                    <p-button icon="pi pi-user-plus" [rounded]="true"
+                <div
+                    *ngIf="!presenter.studentTwoRequired"
+                    class="col-12 md:col-1"
+                >
+                    <p-button
+                        icon="pi pi-user-plus"
+                        [rounded]="true"
                         [outlined]="true"
                         pTooltip="Agregar un segundo estudiante"
                         tooltipPosition="bottom"
-                        (click)="presenter.showStudentTwo()" />
+                        (click)="presenter.showStudentTwo()"
+                    />
                 </div>
-                <div *ngIf="presenter.studentTwoRequired" class="col-12 md:col-5">
+                <div
+                    *ngIf="presenter.studentTwoRequired"
+                    class="col-12 md:col-5"
+                >
                     <span class="p-float-label">
                         <p-autoComplete
                             id="studentTwo"
                             formControlName="studentTwo"
                             [suggestions]="filteredSecondStudents"
                             (completeMethod)="filterSecondStudents($event)"
-                            field="name">
+                            field="name"
+                        >
                             <ng-template let-student pTemplate="item">
                                 <div class="flex align-items-center gap-2">
-    
-                                    <div>{{ student.name + ' ' +
-                                        student.surnames}}</div>
+                                    <div>
+                                        {{ student.name + ' ' +
+                                        student.surnames}}
+                                    </div>
                                 </div>
                             </ng-template>
                         </p-autoComplete>
-                        <label for="studentTwo">Ingrese el nombre del
-                            segundo estudiante</label>
+                        <label for="studentTwo"
+                            >Ingrese el nombre del segundo estudiante</label
+                        >
                     </span>
                 </div>
-                <div *ngIf="presenter.studentTwoRequired" class="col-12 md:col-1">
-                    <p-button icon="pi pi-times" [rounded]="true" severity="danger"
+                <div
+                    *ngIf="presenter.studentTwoRequired"
+                    class="col-12 md:col-1"
+                >
+                    <p-button
+                        icon="pi pi-times"
+                        [rounded]="true"
+                        severity="danger"
                         [outlined]="true"
                         pTooltip="Eliminar el segundo estudiante"
                         tooltipPosition="bottom"
-                        (click)="presenter.hideStudentTwo()" />
+                        (click)="presenter.hideStudentTwo()"
+                    />
                 </div>
             </div>
         </ng-template>
-        
+
         <div class="grid p-fluid">
             <div class="col-12 md:col-6">
-                <p-card *ngIf="presenter.studentOneIsValid"
-                    header="Datos del estudiante">
+                <p-card *ngIf="presenter.studentOneIsValid">
+                    <div class="flex w-full mb-2">
+                        <p-avatar
+                            [label]="presenter.dataStudentOneSelected.name[0]"
+                            size="large"
+                        />
+                        <p class="my-auto ml-4">
+                            {{presenter.dataStudentOneSelected.name + ' ' +
+                            presenter.dataStudentOneSelected.surnames}}
+                        </p>
+                    </div>
                     <p>Código: {{presenter.dataStudentOneSelected.code}}</p>
-                    <p>Nombres: {{presenter.dataStudentOneSelected.name + ' ' +
-                        presenter.dataStudentOneSelected.surnames}}</p>
                     <p>Correo: {{presenter.dataStudentOneSelected.email}}</p>
                     <p>Celular: {{presenter.dataStudentOneSelected.phone}}</p>
                 </p-card>
             </div>
             <div class="col-12 md:col-6">
-                <p-card *ngIf="presenter.studentTwoIsValid"
-                    header="Datos del segundo estudiante">
+                <p-card *ngIf="presenter.studentTwoIsValid">
+                    <div class="flex w-full mb-2">
+                        <p-avatar
+                            [label]="presenter.dataStudentTwoSelected.name[0]"
+                            size="large"
+                        />
+                        <p class="my-auto ml-4">
+                            {{presenter.dataStudentTwoSelected.name + ' ' +
+                            presenter.dataStudentTwoSelected.surnames}}
+                        </p>
+                    </div>
                     <p>Código: {{presenter.dataStudentTwoSelected.code}}</p>
-                    <p>Nombres: {{presenter.dataStudentTwoSelected.name + ' ' +
-                        presenter.dataStudentTwoSelected.surnames}}</p>
                     <p>Correo: {{presenter.dataStudentTwoSelected.email}}</p>
                     <p>Celular: {{presenter.dataStudentTwoSelected.phone}}</p>
                 </p-card>
             </div>
         </div>
         <div class="flex gap-3 mt-1">
-            <p-button (click)="backStep()" label="Regresar" [outlined]="true"
-                icon="pi pi-angle-left" iconPos="left" />
-            <p-button (click)="nextStep()" label="Siguiente"
-                icon="pi pi-angle-right" iconPos="right"
-                [disabled]="!presenter.studentOneIsValid || presenter.validatonForStudentTwo()" />
+            <p-button
+                (click)="backStep()"
+                label="Regresar"
+                [outlined]="true"
+                icon="pi pi-angle-left"
+                iconPos="left"
+            />
+            <p-button
+                (click)="nextStep()"
+                label="Siguiente"
+                icon="pi pi-angle-right"
+                iconPos="right"
+                [disabled]="!presenter.studentOneIsValid || presenter.validatonForStudentTwo()"
+            />
         </div>
     </form>
 </div>

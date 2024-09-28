@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { ProductService } from 'src/app/demo/service/product.service';
@@ -10,28 +10,22 @@ import {
 } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { LoaderService } from 'src/app/layout/service/loader.service';
-import { finalize } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 
 @Component({
     templateUrl: './users.component.html',
     styleUrls: ['./users.component.scss'],
     providers: [MessageService],
 })
-export class UsersComponent implements OnInit {
+export class UsersComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
     modalNewUser: boolean = false;
-
     deleteProductDialog: boolean = false;
-
     deleteProductsDialog: boolean = false;
-
     products: any[] = [];
-
     product: any = {};
-
     selectedProducts: any[] = [];
-
     submitted: boolean = false;
-
     cols = [
         { field: 'codigo', header: 'Código' },
         { field: 'nombre', header: 'Nombres completos' },
@@ -39,13 +33,9 @@ export class UsersComponent implements OnInit {
         { field: 'rol', header: 'Rol' },
         { field: 'estado', header: 'Estado' },
     ];
-
     rowsPerPageOptions = [5, 10, 20];
-
     userData = [];
-
     modalUserDetail = false;
-
     roles: any[] = [
         { name: 'UDI', code: 'UDI' },
         { name: 'Docente', code: 'Docente' },
@@ -165,8 +155,13 @@ export class UsersComponent implements OnInit {
         this.watchRoleSelected();
     }
 
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
     watchRoleSelected() {
-        this.role.valueChanges.pipe().subscribe((role: any) => {
+        this.role.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((role: any) => {
             if (role) {
                 switch (role.code) {
                     case 'UDI':
@@ -417,16 +412,14 @@ export class UsersComponent implements OnInit {
 
     callGetUserList() {
         this.getUserProcess = 'charging';
-        this.service.getUserList().subscribe(
+        this.service.getUserList().pipe(takeUntil(this.destroy$)).subscribe(
             (res) => {
                 this.getUserProcess = 'complete';
                 this.userData = res;
                 console.log(res);
             },
             (error) => {
-                // Handle the error in the subscription if necessary
                 this.getUserProcess = 'error';
-                console.log('Error in subscription:', error);
             }
         );
     }
@@ -445,7 +438,7 @@ export class UsersComponent implements OnInit {
                 setTimeout(() => {
                     this.loaderService.hide(); // Ocultar el loader después de 800ms
                 }, 800);
-            })
+            }), takeUntil(this.destroy$)
         ).subscribe(
             (res) => {
                 if (res.status) {
@@ -545,10 +538,10 @@ export class UsersComponent implements OnInit {
                 setTimeout(() => {
                     this.loaderService.hide(); // Ocultar el loader después de 800ms
                 }, 800);
-            })
+            }), takeUntil(this.destroy$)
         ).subscribe(
             (res: any) => {
-                if(res.status){
+                if (res.status) {
                     this.callGetUserList();
                 }
                 console.log(res);

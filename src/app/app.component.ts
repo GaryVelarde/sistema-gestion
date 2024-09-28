@@ -77,6 +77,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.loaderService.show();
       } else if (event instanceof NavigationEnd || event instanceof NavigationCancel || event instanceof NavigationError) {
         setTimeout(() => {
+          this.secondValidatonByDataLocalStorage()
           this.loaderService.hide();
         }, 800);
       }

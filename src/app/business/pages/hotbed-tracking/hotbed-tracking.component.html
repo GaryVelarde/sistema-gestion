@@ -106,13 +106,21 @@
                                 </td>
                                 <td style="width: 20%; min-width: 8rem">
                                     <div *ngIf="data.seedbeds.length < 2">
-                                        <span>{{ data.seedbeds[0].name }}</span>
+                                        <span>{{
+                                            data.seedbeds[0].name +
+                                                " " +
+                                                data.seedbeds[0].surnames
+                                        }}</span>
                                     </div>
                                     <div *ngIf="data.seedbeds.length > 1">
                                         <span>{{
                                             data.seedbeds[0].name +
+                                                " " +
+                                                data.seedbeds[0].surnames +
                                                 " y " +
-                                                data.seedbeds[1].name
+                                                data.seedbeds[1].name +
+                                                " " +
+                                                data.seedbeds[1].surnames
                                         }}</span>
                                     </div>
                                 </td>
@@ -275,11 +283,8 @@
                     <p class="font-bold">Grupo:</p>
                     <p>Nro. {{ articleSelected.group }}</p>
                 </div>
-                <div class="col-3">
-                   
-                </div>
-                <div class="col-3">
-                </div>
+                <div class="col-3"></div>
+                <div class="col-3"></div>
                 <div class="card col-3" style="max-height: 100px">
                     <p class="font-bold">Estado:</p>
                     <p-tag
@@ -324,6 +329,15 @@
                     </app-user-selection>
                 </div>
             </div>
+            <div class="ml-2 mr-2 separator"></div>
+                <app-file-list
+                    class="w-full"
+                    [module]="module"
+                    [id]="articleSelected.id"
+                    (addArchiveClicked)="showDialogAddFiles = true"
+                    [reload]="reloadFiles"
+                >
+                </app-file-list>
             <div class="ml-2 mr-2 separator"></div>
             <app-comments
                 class="w-full"
@@ -391,3 +405,41 @@
         </div>
     </div>
 </div>
+<p-sidebar
+    [(visible)]="showDialogAddFiles"
+    [style]="{ width: '40%' }"
+    position="right"
+>
+    <ng-template pTemplate="header">
+        <span class="font-semibold text-xl">Agregar archivos adjuntos</span>
+    </ng-template>
+    <div class="content">
+        <div class="grid" style="height: 100%">
+            <div class="col-12">
+                <app-upload-archives
+                    (onFileChangeEmitter)="onFileChange($event)"
+                    (clearFilesEmitter)="clearFile()"
+                >
+                </app-upload-archives>
+            </div>
+            <div class="footer mt-5">
+                <button
+                    pButton
+                    pRipple
+                    label="Regresar"
+                    icon="pi pi-angle-left"
+                    class="p-button-text"
+                    iconPos="left"
+                    (click)="hideAddFilesDialog()"
+                ></button>
+                <p-button
+                    label="Guardar archivos"
+                    iconPos="right"
+                    icon="pi pi-check"
+                    (click)="saveFiles()"
+                    [disabled]="!isFormDataEmpty(formData)"
+                />
+            </div>
+        </div>
+    </div>
+</p-sidebar>

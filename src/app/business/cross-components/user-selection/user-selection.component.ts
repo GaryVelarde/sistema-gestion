@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
+import { Subject, takeUntil } from 'rxjs';
 import { userType } from 'src/app/commons/enums/app,enum';
 import { AuthService } from 'src/app/services/auth.service';
 
@@ -9,7 +10,7 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './user-selection.component.html',
   styleUrls: ['./user-selection.component.scss']
 })
-export class UserSelectionComponent implements OnInit {
+export class UserSelectionComponent implements OnInit, OnDestroy {
   private _disabled: boolean = false;
 
   @Input() typeUserList: userType;
@@ -23,7 +24,7 @@ export class UserSelectionComponent implements OnInit {
   }
   @Output() userSelected: EventEmitter<any[]> = new EventEmitter<any[]>();
 
-
+  private destroy$ = new Subject<void>();
   getStudentListProcess = '';
   filteredStudents: any[];
   studentsList = [];
@@ -39,7 +40,6 @@ export class UserSelectionComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.watchUser();
     switch (this.typeUserList) {
       case userType.student:
         this.callGetStudentList();
@@ -51,11 +51,16 @@ export class UserSelectionComponent implements OnInit {
         this.callTeachersList();
         break;
     }
-    console.log('this.usersPreSelected', this.usersPreSelected)
+    this.watchUser();
     this.userFormControl.setValue(this.addFullNameProperty(this.usersPreSelected));
   }
 
-  disabledSelecion(): void{
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  disabledSelecion(): void {
     this._disabled ? this.userFormControl.disable() : this.userFormControl.enable()
   }
 
@@ -75,7 +80,7 @@ export class UserSelectionComponent implements OnInit {
 
   callGetStudentList() {
     this.getStudentListProcess = 'charging';
-    this.service.getStudentsList().subscribe((res) => {
+    this.service.getStudentsList().pipe(takeUntil(this.destroy$)).subscribe((res) => {
       if (res.data) {
         this.getStudentListProcess = 'complete';
         this.studentsList = res.data;
@@ -88,7 +93,7 @@ export class UserSelectionComponent implements OnInit {
 
   callGetSeedBedsList() {
     this.getStudentListProcess = 'charging';
-    this.service.getSeedBeds().subscribe((res) => {
+    this.service.getSeedBeds().pipe(takeUntil(this.destroy$)).subscribe((res) => {
       if (res.data) {
         this.getStudentListProcess = 'complete';
         this.studentsList = res.data;
@@ -101,7 +106,7 @@ export class UserSelectionComponent implements OnInit {
 
   callTeachersList() {
     this.getStudentListProcess = 'charging';
-    this.service.getTeachersList().subscribe((res) => {
+    this.service.getTeachersList().pipe(takeUntil(this.destroy$)).subscribe((res) => {
       if (res.data) {
         this.getStudentListProcess = 'complete';
         this.studentsList = res.data;
@@ -112,8 +117,12 @@ export class UserSelectionComponent implements OnInit {
     });
   }
 
+  callEmpty() {
+    this.getStudentListProcess = 'complete';
+  }
+
   watchUser() {
-    this.userFormControl.valueChanges.pipe().subscribe((res: any) => {
+    this.userFormControl.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res.length > this.maxUsersAllow) {
         const users = [...res];
         users.splice(this.maxUsersAllow, 1);

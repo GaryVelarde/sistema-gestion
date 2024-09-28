@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { ConfirmationService, MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import {
@@ -11,16 +11,17 @@ import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { LoaderService } from 'src/app/layout/service/loader.service';
-import { finalize } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import { IStudent, ITeacher } from '../../cross-interfaces/comments-interfaces';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
+import { DateFormatService } from 'src/app/services/date-format.service';
 
 @Component({
     templateUrl: './inscription-tracking.component.html',
     styleUrls: ['./inscription-tracking.component.scss'],
-    providers: [MessageService, ConfirmationService],
+    providers: [MessageService],
 })
-export class InscriptionTrackingComponent implements OnInit {
+export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     products: any[] = [];
 
     rowsPerPageOptions = [5, 10, 20];
@@ -29,108 +30,19 @@ export class InscriptionTrackingComponent implements OnInit {
     teacherL = userType.teacher;
     studentL = userType.student;
 
-    usuarios: IStudent[] = [
-        {
-            "id": 4,
-            "name": "Mario",
-            "surnames": "Ayala Sanchez",
-            "email": "mario@testt.com",
-            "phone": '987145312',
-            "code": '15467824'
-        },
-        {
-            "id": 5,
-            "name": "Daniel",
-            "surnames": "Minaya Alvarez",
-            "email": "daniel@testt.com",
-            "phone": '987145312',
-            "code": '15467824'
-        },
-        {
-            "id": 6,
-            "name": "Lucía",
-            "surnames": "Martinez Herrera",
-            "email": "lucia@testt.com",
-            "phone": '981245312',
-            "code": '12547896'
-        },
-        {
-            "id": 7,
-            "name": "Javier",
-            "surnames": "Lopez Diaz",
-            "email": "javier@testt.com",
-            "phone": '987654321',
-            "code": '11457832'
-        },
-        {
-            "id": 8,
-            "name": "Ana",
-            "surnames": "Perez Morales",
-            "email": "ana@testt.com",
-            "phone": '986532147',
-            "code": '11326745'
-        },
-        {
-            "id": 9,
-            "name": "Carlos",
-            "surnames": "Ramirez Soto",
-            "email": "carlos@testt.com",
-            "phone": '985641237',
-            "code": '15478965'
-        },
-        {
-            "id": 10,
-            "name": "Valeria",
-            "surnames": "Rojas Gutierrez",
-            "email": "valeria@testt.com",
-            "phone": '984512376',
-            "code": '12547896'
-        }
-    ];
-
-    teachers: ITeacher[] = [
-        {
-            "id": 3,
-            "name": "Nadia Daniela Vallejo Rodríguez",
-            "surnames": "Gil",
-            "code": 45778452,
-            "email": "joshua65@example.net",
-            "phone": 297546617,
-            "orcid": "esse",
-            "cip": 38344486
-        },
-        {
-            "id": 7,
-            "name": "Ashley Esquibel Hijo",
-            "surnames": "Brito",
-            "code": 56427284,
-            "email": "kochoa@example.org",
-            "phone": 177932979,
-            "orcid": "possimus",
-            "cip": 47213143
-        },
-        {
-            "id": 9,
-            "name": "Daniela Agustina Leal Nieves Hijo",
-            "surnames": "Carbajal",
-            "code": 37726580,
-            "email": "wrobles@example.com",
-            "phone": 951812965,
-            "orcid": "voluptatem",
-            "cip": 68751388
-        }
-    ]
     module = eModule.inscription;
     getInscriptionListProcess: string;
     filteredItems: any[] | undefined;
-
+    private destroy$ = new Subject<void>();
     graduatesList: [] = [];
     reviewerList: [] = [];
     commentsVisible = true;
     showDialogCancel = false;
+    showDialogAprobation = false;
     showSelectNewReviwer = false;
     showSelectNewStudent = false;
     showEditSudents = false;
+    showDialogAddFiles = false;
     inscriptionState = '';
     totalTask = 0;
     totalTaskIncomplete = 0;
@@ -163,7 +75,12 @@ export class InscriptionTrackingComponent implements OnInit {
     filteredSecondStudents: any[];
     getStudentListProcess = '';
     studentsList = [];
-    alertForCancelation: Message[] | undefined;
+    alertForCancelation: Message[] = [
+        { severity: 'warn', detail: 'Recuerda que una vez cancelada la inscripción no se podrá reabrir.' },
+    ];
+    alertForAprobation: Message[] = [
+        { severity: 'info', detail: 'Luego de aprobar el proyecto de tesis pasará automáticamente a la sección de Asesorías.' },
+    ];
     items: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
         { label: 'Proceso de titulación' },
@@ -175,15 +92,19 @@ export class InscriptionTrackingComponent implements OnInit {
         { label: 'Proyecto de tesis', },
         { label: 'Detalle de proyecto de tesis', visible: true },
     ];
+    formData = new FormData();
+    reloadFiles = false;
     messageError: string = 'Se produjo un error al cargar la lista de proyectos de tesis. Por favor, inténtelo de nuevo más tarde';
     commentsForm: FormGroup;
     tasksForm: FormGroup;
     cancelattionForm: FormGroup;
+    aprobationForm: FormGroup;
     studentsForm: FormGroup;
     teacherForm: FormGroup;
     private _comment: FormControl = new FormControl('', [Validators.required]);
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
+    private _sentToSecretaryDate: FormControl = new FormControl('', [Validators.required]);
     private _taskDescription: FormControl = new FormControl('', [
         Validators.required,
     ]);
@@ -209,16 +130,19 @@ export class InscriptionTrackingComponent implements OnInit {
     get teacher() {
         return this._teacher;
     }
+    get sentToSecretaryDate() {
+        return this._sentToSecretaryDate;
+    }
 
     constructor(
         private messageService: MessageService,
         private fb: FormBuilder,
-        private confirmationService: ConfirmationService,
         private service: AuthService,
         private elRef: ElementRef,
         private router: Router,
         private config: PrimeNGConfig,
         private loaderService: LoaderService,
+        private dateFormat: DateFormatService,
     ) {
         this.commentsForm = this.fb.group({
             comment: this.comment,
@@ -235,6 +159,9 @@ export class InscriptionTrackingComponent implements OnInit {
         });
         this.teacherForm = this.fb.group({
             teacher: this.teacher,
+        });
+        this.aprobationForm = this.fb.group({
+            sentToSecretaryDate: this.sentToSecretaryDate,
         });
     }
 
@@ -256,10 +183,15 @@ export class InscriptionTrackingComponent implements OnInit {
         this.watchTeacher();
     }
 
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
     callGetInscriptions() {
         this.getInscriptionListProcess = 'charging';
         this.registros = [];
-        this.service.getInscription().pipe().subscribe(
+        this.service.getInscription().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 if (res.data) {
                     this.registros = res.data;
@@ -382,12 +314,12 @@ export class InscriptionTrackingComponent implements OnInit {
         // );
         this.loaderService.show();
         const rq = {
-            status: 'En revisión'
+            status: 'En Revisión'
         }
         this.service.putInscriptionStatusUpdate(this.inscriptionSelected.inscriptions[0].id, rq).pipe(
             finalize(() => {
                 this.loaderService.hide();
-            })
+            }), takeUntil(this.destroy$)
         ).subscribe(
             (res: any) => {
                 if (res.status) {
@@ -398,9 +330,16 @@ export class InscriptionTrackingComponent implements OnInit {
                         detail: 'La inscripción pasó a Revisión.',
                         life: 3000,
                     });
-                    this.inscriptionState = 'En revisión';
+                    this.inscriptionState = 'En Revisión';
                 }
             }, (error) => {
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al actualizar el estado.',
+                    life: 3000,
+                });
                 console.log(error)
             });
     }
@@ -416,7 +355,7 @@ export class InscriptionTrackingComponent implements OnInit {
         this.service.putInscriptionStatusUpdate(this.inscriptionSelected.inscriptions[0].id, rq).pipe(
             finalize(() => {
                 this.loaderService.hide();
-            })
+            }), takeUntil(this.destroy$)
         ).subscribe(
             (res: any) => {
                 if (res.status) {
@@ -430,15 +369,22 @@ export class InscriptionTrackingComponent implements OnInit {
                     this.inscriptionState = 'Observado';
                 }
             }, (error) => {
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al actualizar el estado.',
+                    life: 3000,
+                });
                 console.log(error)
             });
     }
 
     goToCancelation() {
-        this.showDialogCancel = true;
         this.alertForCancelation = [
             { severity: 'warn', detail: 'Recuerda que una vez cancelada la inscripción no se podrá reabrir.' },
         ];
+        this.showDialogCancel = true;
     }
 
     confirmCancelation() {
@@ -453,7 +399,7 @@ export class InscriptionTrackingComponent implements OnInit {
         this.service.putInscriptionStatusUpdate(this.inscriptionSelected.inscriptions[0].id, rq).pipe(
             finalize(() => {
                 this.loaderService.hide();
-            })
+            }), takeUntil(this.destroy$)
         ).subscribe(
             (res: any) => {
                 if (res.status) {
@@ -469,6 +415,13 @@ export class InscriptionTrackingComponent implements OnInit {
                     this.commentsVisible = false
                 }
             }, (error) => {
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al actualizar el estado.',
+                    life: 3000,
+                });
                 console.log(error)
             });
     }
@@ -478,46 +431,10 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     goToApprove() {
-        this.confirmationService.confirm({
-            header: 'Confirmación',
-            message:
-                'Estás a punto de aprobar esta inscripción, ¿estás seguro(a)?.',
-            acceptIcon: 'pi pi-check mr-2',
-            rejectIcon: 'pi pi-times mr-2',
-            rejectButtonStyleClass: 'p-button-sm',
-            acceptButtonStyleClass: 'p-button-outlined p-button-sm',
-            accept: () => {
-                this.loaderService.show();
-                const rq = {
-                    status: 'Aprobado'
-                }
-                this.service.putInscriptionStatusUpdate(this.inscriptionSelected.inscriptions[0].id, rq).pipe(
-                    finalize(() => {
-                        this.loaderService.hide();
-                    })
-                ).subscribe(
-                    (res: any) => {
-                        console.log(res)
-                        if (res.status) {
-                            this.commentsVisible = false
-                            this.inscriptionState = 'Aprobado';
-                            this.messageService.add({
-                                key: 'tst',
-                                severity: 'info',
-                                summary: 'Confirmación',
-                                detail: 'Se ha realizado la aprobación de la inscripción.',
-                                life: 3000,
-                            });
-                        }
-                    }, (error) => {
-                        console.log(error)
-                    })
-                // this.addNotificationForChangeState(
-                //     'La inscripción del proyecto de Tesis pasó a Aprobado por Cesar Jauregui Saavedra'
-                // );
-            },
-            reject: () => { },
-        });
+        this.alertForAprobation = [
+            { severity: 'info', detail: 'Luego de aprobar el proyecto de tesis pasará automáticamente a la sección de Asesorías.' },
+        ];
+        this.showDialogAprobation = true;
     }
 
     taskDone(inputId: string): void {
@@ -585,7 +502,7 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     callGetTeachersList() {
-        this.service.getTeachersList().subscribe((res) => {
+        this.service.getTeachersList().pipe(takeUntil(this.destroy$)).subscribe((res) => {
             this.reviewersList = res.teachers;
             console.log(res);
         });
@@ -623,7 +540,7 @@ export class InscriptionTrackingComponent implements OnInit {
 
     callGetStudentList() {
         this.getStudentListProcess = 'charging';
-        this.service.getStudentsList().subscribe((res) => {
+        this.service.getStudentsList().pipe(takeUntil(this.destroy$)).subscribe((res) => {
             this.getStudentListProcess = 'complete';
             this.studentsList = res.graduates_students;
         }, (error) => {
@@ -641,36 +558,8 @@ export class InscriptionTrackingComponent implements OnInit {
         return firstLetterUpper;
     }
 
-    search(event: AutoCompleteCompleteEvent) {
-        const query = event.query.toLowerCase();
-        this.filteredItems = this.usuarios
-            .filter(
-                (usuario) =>
-                    usuario.name.toLowerCase().includes(query) ||
-                    usuario.surnames.toLowerCase().includes(query)
-            )
-            .map((usuario) => ({
-                ...usuario,
-                fullName: `${usuario.name} ${usuario.surnames}`,
-            }));
-    }
-
-    searchTeachers(event: AutoCompleteCompleteEvent) {
-        const query = event.query.toLowerCase();
-        this.filteredItems = this.teachers
-            .filter(
-                (usuario) =>
-                    usuario.name.toLowerCase().includes(query) ||
-                    usuario.surnames.toLowerCase().includes(query)
-            )
-            .map((usuario) => ({
-                ...usuario,
-                fullName: `${usuario.name} ${usuario.surnames}`,
-            }));
-    }
-
     watchStudents() {
-        this.students.valueChanges.pipe().subscribe((res: IStudent[]) => {
+        this.students.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((res: IStudent[]) => {
             console.log(res);
             if (res.length > 2) {
                 const students = [...res];
@@ -681,7 +570,7 @@ export class InscriptionTrackingComponent implements OnInit {
     }
 
     watchTeacher() {
-        this.teacher.valueChanges.pipe().subscribe((res: ITeacher[]) => {
+        this.teacher.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((res: ITeacher[]) => {
             if (res.length > 1) {
                 const teacher = [...res];
                 teacher.splice(1, 1);
@@ -711,5 +600,98 @@ export class InscriptionTrackingComponent implements OnInit {
     getStudentSelected(userSelected: any) {
         console.log('students', userSelected)
         this.students.setValue(userSelected);
+    }
+
+    hideAprobationDialog() {
+        this.showDialogAprobation = false;
+    }
+
+    confirmAprobation() {
+        this.loaderService.show();
+        this.showDialogAprobation = false;
+        const rq = {
+            status: 'Aprobado',
+            shipment_date_secretary: this.dateFormat.transformDDMMYYYY(this.sentToSecretaryDate.value)
+        }
+        this.service.putInscriptionStatusUpdate(this.inscriptionSelected.inscriptions[0].id, rq).pipe(
+            finalize(() => {
+                this.loaderService.hide();
+            }), takeUntil(this.destroy$)
+        ).subscribe(
+            (res: any) => {
+                console.log(res)
+                if (res.status) {
+                    this.commentsVisible = false
+                    this.inscriptionState = 'Aprobado';
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Confirmación',
+                        detail: 'Se ha realizado la aprobación de la inscripción.',
+                        life: 3000,
+                    });
+                }
+            }, (error) => {
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al actualizar el estado.',
+                    life: 3000,
+                });
+                console.log(error)
+            })
+        // this.addNotificationForChangeState(
+        //     'La inscripción del proyecto de Tesis pasó a Aprobado por Cesar Jauregui Saavedra'
+        // );
+    }
+
+    onFileChange(files: any) {
+        this.formData = files;
+    }
+
+    clearFile() {
+        this.formData = new FormData();
+    }
+
+    hideAddFilesDialog() {
+        this.clearFile();
+        this.showDialogAddFiles = false;
+    }
+
+    saveFiles() {
+        this.loaderService.show();
+        this.showDialogAddFiles = false;
+        this.service.postRegisterIncriptionFile(this.formData, this.inscriptionSelected.inscriptions[0].id).pipe(
+            finalize(() => {
+                this.loaderService.hide();
+            })
+        ).subscribe(
+            (res: any) => {
+                if (res.status) {
+                    this.reloadFiles = true;
+                    this.hideAddFilesDialog();
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Confirmación',
+                        detail: 'Los archivos han sido guardados.',
+                        life: 3000,
+                    });
+                }
+            }, (error) => {
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al guardar los archivos.',
+                    life: 3000,
+                });
+            });
+    }
+
+    isFormDataEmpty(formData: FormData): boolean {
+        // Realiza el casting a `any` para evitar el error de TypeScript
+        return !(formData as any).entries().next().done;
     }
 }

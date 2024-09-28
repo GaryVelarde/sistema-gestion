@@ -6,7 +6,7 @@ import {
     Validators,
 } from '@angular/forms';
 import { Message } from 'primeng/api';
-import { BehaviorSubject } from 'rxjs';
+import { DateFormatService } from 'src/app/services/date-format.service';
 
 @Injectable({
     providedIn: 'root',
@@ -41,7 +41,6 @@ export class InscriptionPresenter {
         Validators.required
     );
     private _comments: FormControl = new FormControl('', Validators.required);
-    private _file = new FormControl(File || null);
 
     studentTwoRequired = false;
     studentOneIsValid = false;
@@ -85,11 +84,8 @@ export class InscriptionPresenter {
     get comments() {
         return this._comments;
     }
-    get file() {
-        return this._file;
-    }
 
-    constructor(private fb: FormBuilder) {
+    constructor(private fb: FormBuilder, private dateFormatService: DateFormatService) {
         this.formStep1 = this.fb.group({
             receptionDate: this.receptionDate,
             fileNumber: this.fileNumber,
@@ -110,7 +106,6 @@ export class InscriptionPresenter {
             jobNumber: this.jobNumber,
             resolutionNumber: this.resolutionNumber,
             comments: this.comments,
-            file: this.file,
         });
     }
 
@@ -183,16 +178,10 @@ export class InscriptionPresenter {
         });
     }
 
-    callExecute(): any {
+    generateRequest(): any {
         let studentsArray = [this.student.value.id];
         if (this.studentTwo.value) {
             studentsArray.push(this.studentTwo.value.id);
-        }
-        console.log(this.uploadedFiles);
-        let files: string[] = [];
-        for (let file of this.uploadedFiles) {
-            console.log('arch', file.name);
-            files.push(file.name);
         }
         const request = {
             file: this.fileNumber.value,
@@ -200,11 +189,10 @@ export class InscriptionPresenter {
             thesis_project_title: this.title.value,
             office_number: this.jobNumber.value,
             resolution_number: this.resolutionNumber.value,
-            reception_date_faculty: this.receptionDate.value,
-            approval_date_udi: this.approveDate.value,
+            reception_date_faculty: this.dateFormatService.formatDateDDMMYYYY(this.receptionDate.value),
+            approval_date_udi: this.dateFormatService.formatDateDDMMYYYY(this.approveDate.value),
             user_id: this.reviewer.value.id,
             user_ids: studentsArray,
-            archives: this.uploadedFiles,
             description: this.comments.value,
         };
         console.log(request);

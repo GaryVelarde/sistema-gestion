@@ -5,6 +5,8 @@ import { InscriptionPresenter } from './insctiption-presenter';
 import { MessageService } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth.service';
 import { ThesisSimilarityService } from 'src/app/services/thesis-similarity.service';
+import { LoaderService } from 'src/app/layout/service/loader.service';
+import { finalize } from 'rxjs';
 
 interface UploadEvent {
   originalEvent: Event;
@@ -17,55 +19,58 @@ interface UploadEvent {
   providers: [MessageService, ThesisSimilarityService],
 })
 export class Step4Component implements OnInit {
-  @ViewChild('fileInput') fileInput: ElementRef;
-
   thesisTitles = [];
   results: Array<{ title: string, similarity: number }> = [];
   reader = new FileReader();
   minimumPercentage: number = 60;
   lastMinimumPercentage: number = 60;
-  filesSelected = [];
   configCompareTitle: boolean = false;
   formData = new FormData();
   approvalDate: FormControl = new FormControl('');
   jobNumber: FormControl = new FormControl('');
 
-  constructor(private router: Router, public presenter: InscriptionPresenter, private service: MessageService,
-    private authService: AuthService, private cd: ChangeDetectorRef, private thesisSimilarity: ThesisSimilarityService) { }
+  constructor(
+    private router: Router,
+    public presenter: InscriptionPresenter,
+    private service: MessageService,
+    private authService: AuthService,
+    private cd: ChangeDetectorRef,
+    private thesisSimilarity: ThesisSimilarityService,
+    private loaderService: LoaderService) { }
 
   ngOnInit(): void {
     this.callGetTitlesList();
-    setTimeout(() => {
-      this.addImageEmptyFiles();
-    }, 200);
     this.watchTitle();
   }
 
   finalize() {
-    this.authService.postInscription(this.presenter.callExecute()).subscribe((res) => console.log(res));
-
-    this.showSuccessViaToast();
+    this.loaderService.show();
+    this.authService.postInscription(this.presenter.generateRequest()).pipe(
+    ).subscribe(
+      (res) => {
+        if (res.status) {
+          this.authService.postRegisterIncriptionFile(this.formData, res.id).pipe(
+            finalize(() => {
+              this.loaderService.hide();
+            })
+          ).subscribe(
+            (res: any) => {
+              if (res.status) {
+                this.service.add({ severity: 'success', summary: 'Success', detail: 'El proyecto de tesis se ha registrado de manera correcta.' });
+              }
+            }, (error) => {
+              this.service.add({ severity: 'error', summary: 'Error', detail: 'Ha ocurrido un error al guardar los archivos.' });
+            })
+        }
+      },
+      (error) => {
+        this.loaderService.hide();
+        this.service.add({ key: 'tst', severity: 'error', summary: 'Error', detail: 'Se produjo un error al registrar la inscripción' });
+      });
   }
 
   backStep() {
     void this.router.navigate(['pages/new-titulation-process/step3']);
-  }
-
-  showSuccessViaToast() {
-    this.service.add({ key: 'tst', severity: 'success', summary: 'Success Message', detail: 'Message sent' });
-  }
-
-  upload(event: UploadEvent) {
-    for (let file of event.files) {
-      console.log('asasasasa', file)
-      this.presenter.uploadedFiles.push(file);
-    }
-    console.log('final', this.presenter.uploadedFiles)
-    this.service.add({ key: 'tst', severity: 'success', summary: 'Success Message', detail: 'Archivos subidos con éxito' });
-  }
-
-  test() {
-    this.service.add({ severity: 'info', summary: 'File Uploaded', detail: '' });
   }
 
   addWordIcon(event: any) {
@@ -77,7 +82,6 @@ export class Step4Component implements OnInit {
         const fileName = event.currentFiles[position].name;
         const parts = fileName.split('.');
         const extension = parts[parts.length - 1];
-        console.log(extension)
         let image = '';
         switch (extension) {
           case 'doc':
@@ -102,58 +106,8 @@ export class Step4Component implements OnInit {
     });
   }
 
-  addImageEmptyFiles() {
-    const fileUploadRows = document.querySelectorAll<HTMLDivElement>('.p-fileupload-content');
-    // Itera sobre cada uno de los divs seleccionados
-    fileUploadRows.forEach(row => {
-      // Agrega una clase con los estilos que deseas aplicar al div
-      const textNode = document.createTextNode('Arrastra y suelta los archivos a subir aquí');
-      row.style.textAlign = 'center'
-      row.style.color = '#d1d5db'
-      row.style.border = '2px dashed #d1d5db'
-
-      // Agrega el nodo de texto como hijo del div
-      row.appendChild(textNode);
-    });
-  }
-
-  onSelectedFiles(event) {
-    setTimeout(() => {
-      this.addWordIcon(event);
-    }, 200);
-  }
-
-  onFileChange(event) {
-    if (event.target.files && event.target.files.length) {
-      const files: FileList = event.target.files;
-      for (let i = 0; i < files.length; i++) {
-        this.formData.append('archives[]', files[i], files[i].name);
-      }
-
-      console.log(event.target.files)
-      const [file] = event.target.files;
-      this.reader.readAsDataURL(file);
-      this.reader.onload = () => {
-        this.presenter.formStep4.patchValue({
-          file: this.reader.result
-        });
-        for (let file of event.target.files) {
-          const fileType = this.getFileType(file.name);
-          this.filesSelected.push({
-            name: file.name,
-            type: fileType,
-          });
-        }
-        this.cd.markForCheck();
-      };
-    }
-  }
-
   clearFile() {
-    this.filesSelected = [];
     this.formData = new FormData();
-    this.presenter.file.setValue(null);
-    this.fileInput.nativeElement.value = '';
   }
 
   getFileType(fileName: string): string | null {
@@ -206,11 +160,13 @@ export class Step4Component implements OnInit {
   callGetTitlesList() {
     this.authService.getTitlesList().pipe().subscribe(
       (res: any) => {
-        if(res.data) {
+        if (res.data) {
           this.thesisTitles = res.data;
         }
-      console.log(res);
-    })
+      })
   }
 
+  onFileChange(files: any) {
+    this.formData = files;
+  }
 }

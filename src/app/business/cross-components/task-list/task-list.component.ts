@@ -1,6 +1,7 @@
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Message } from 'primeng/api';
+import { Subject, takeUntil } from 'rxjs';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { AuthService } from 'src/app/services/auth.service';
 
@@ -9,7 +10,7 @@ import { AuthService } from 'src/app/services/auth.service';
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.scss']
 })
-export class TaskListComponent implements OnInit {
+export class TaskListComponent implements OnInit, OnDestroy {
   _visible: boolean;
   _chbDisable: boolean
   @Input() module: eModule;
@@ -22,9 +23,11 @@ export class TaskListComponent implements OnInit {
   set chbDisable(value: boolean) {
     this._chbDisable = value;
   }
+  private destroy$ = new Subject<void>();
   skeletonRows = ['1', '2', '2', '4'];
   tasks: any[] = []
   statusCallService = '';
+  statusRegister = '';
   messages: Message[] = [
     { severity: 'info', detail: 'Una vez que marques una tarea como completada, no podrás desmarcarla. Por favor, asegúrate de que la tarea está realmente finalizada antes de marcarla.' },
   ];
@@ -54,12 +57,18 @@ export class TaskListComponent implements OnInit {
     this.callTaskList();
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   callGetAdvisoryTaskList() {
     this.statusCallService = 'charging';
-    this.service.getAdvisoryTasks(this.idModule).subscribe((res: any) => {
+    this.service.getAdvisoryTasks(this.idModule).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res.data) {
         this.statusCallService = 'complete';
         this.tasks = res.data;
+        this.countTask();
       }
 
     }, (error) => {
@@ -69,10 +78,11 @@ export class TaskListComponent implements OnInit {
 
   callGetInscriptionTaskList() {
     this.statusCallService = 'charging';
-    this.service.getInscriptionTasks(this.idModule).subscribe((res: any) => {
+    this.service.getInscriptionTasks(this.idModule).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res.data) {
         this.statusCallService = 'complete';
         this.tasks = res.data;
+        this.countTask();
       }
 
     }, (error) => {
@@ -85,6 +95,7 @@ export class TaskListComponent implements OnInit {
       event.preventDefault();
       console.log(this.taskDescription.value); // Asegúrate de que esto no sea null
       if (this.taskDescription.value) {
+        this.statusRegister = 'charging';
         const rq = {
           description: this.taskDescription.value
         }
@@ -97,44 +108,59 @@ export class TaskListComponent implements OnInit {
   registerTask(rq: any) {
     switch (this.module) {
       case eModule.advisory:
-        break;
-      case eModule.eventUdi:
-        break;
-      case eModule.inscription:
-        this.service.postAddInscriptionTask(this.idModule, rq).pipe().subscribe(
+        this.service.postAddAdvisoryTask(this.idModule, rq).pipe(takeUntil(this.destroy$)).subscribe(
           (res: any) => {
             if (res.status) {
+              this.statusRegister = 'complete';
               this.confirmRegister(res.id);
             }
             console.log(res);
           }, (error) => {
-
+            this.statusRegister = 'complete';
+          })
+        break;
+      case eModule.eventUdi:
+        break;
+      case eModule.inscription:
+        this.service.postAddInscriptionTask(this.idModule, rq).pipe(takeUntil(this.destroy$)).subscribe(
+          (res: any) => {
+            if (res.status) {
+              this.statusRegister = 'complete';
+              this.confirmRegister(res.id);
+            }
+            console.log(res);
+          }, (error) => {
+            this.statusRegister = 'complete';
           })
         break;
     }
   }
 
   confirmRegister(id: string) {
-    this.tasks.push({
+    this.tasks.unshift({
       id: id,
       description: this.taskDescription.value,
       checked: false,
     });
     this.taskDescription.reset();
+    this.countTask();
   }
 
   taskDone(inputId: string, checkbox: any): void {
-    const labelElement = this.elRef.nativeElement.querySelector(
-      `label[for="${inputId}"]`
-    );
-    if (labelElement) {
-      labelElement.classList.add('task-done');
-    }
-    if (checkbox) {
-      checkbox.disabled = true;
+    if (!this._chbDisable) {
+      const labelElement = this.elRef.nativeElement.querySelector(
+        `label[for="${inputId}"]`
+      );
+      if (labelElement) {
+        labelElement.classList.add('task-done');
+      }
+      if (checkbox) {
+        checkbox.disabled = true;
+      }
+
+      this.countTask();
     }
 
-    this.countTask();
   }
 
   isTaskDone(task: any): any {
@@ -144,6 +170,7 @@ export class TaskListComponent implements OnInit {
   }
 
   removeTask(taskId: string) {
+    console.log('taskId', taskId)
     const index = this.tasks.findIndex((task) => task.id === taskId);
     if (index !== -1) {
       this.tasks.splice(index, 1);
@@ -163,6 +190,7 @@ export class TaskListComponent implements OnInit {
       }
       this.totalTask++;
     });
+    console.log('this.totalTask', this.totalTask)
   }
 
   callTaskList() {

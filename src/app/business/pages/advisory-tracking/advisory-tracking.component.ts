@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import {
@@ -10,9 +10,10 @@ import {
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { LoaderService } from 'src/app/layout/service/loader.service';
-import { finalize } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import { DateFormatService } from 'src/app/services/date-format.service';
-import { eModule } from 'src/app/commons/enums/app,enum';
+import { eModule, userType } from 'src/app/commons/enums/app,enum';
+import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
 
 @Component({
     templateUrl: './advisory-tracking.component.html',
@@ -20,6 +21,8 @@ import { eModule } from 'src/app/commons/enums/app,enum';
     providers: [MessageService, ConfirmationService],
 })
 export class AdvisoryTrackingComponent implements OnInit {
+    @ViewChild('upload') upload: UploadArchivesComponent;
+    private destroy$ = new Subject<void>();
     products: any[] = [];
     breadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
@@ -48,32 +51,17 @@ export class AdvisoryTrackingComponent implements OnInit {
             isComment: true,
         },
     ];
-
-    egressList = [];
+    reviewerType = userType.teacher;
+    studentType = userType.student;
     showDialogCancel = false;
+    showDialogAddFiles = false;
+    reloadFiles = false;
     showSelectNewReviwer = false;
     showSelectNewStudent = false;
     showEditSudents = false;
+    commentsVisible = true;
     module = eModule.advisory;
     advisoryState = '';
-    totalTask = 0;
-    totalTaskIncomplete = 0;
-    totalTaskComplete = 0;
-
-    tasks = [
-        {
-            id: '1',
-            description: 'Description 1',
-            checked: false,
-        },
-        {
-            id: '2',
-            description: 'Description 2',
-            checked: false,
-        },
-    ];
-    reviewersList = [];
-    graduatesList = []
     filteredReviewers: any;
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     columnTitles: string[] = [
@@ -82,6 +70,7 @@ export class AdvisoryTrackingComponent implements OnInit {
         'Estado',
         ''
     ];
+    formData = new FormData();
     advisorySelected: any;
     showEdit = false;
     titleModalDetailIserSelected: string = '';
@@ -97,7 +86,7 @@ export class AdvisoryTrackingComponent implements OnInit {
     public cancelattionForm: FormGroup;
     public advisoryForm: FormGroup;
     public studentForm: FormGroup;
-    public dataForm: FormGroup;
+    public editForm: FormGroup;
     public moreInfoForm: FormGroup;
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
@@ -179,12 +168,21 @@ export class AdvisoryTrackingComponent implements OnInit {
             advisoryStartDate: this.advisoryStartDate,
             advisoryEndDate: this.advisoryEndDate,
         });
+        this.editForm = this.fb.group({
+            advisoryReceptionDateToFacultyMI: this.advisoryReceptionDateToFacultyMI,
+            advisoryApprovalDateUDIMI: this.advisoryApprovalDateUDIMI,
+            paymentDateMI: this.paymentDateMI,
+            submissionDateToSecretariatMI: this.submissionDateToSecretariatMI,
+            reportNumberMI: this.reportNumberMI,
+            resolutionDateMI: this.resolutionDateMI,
+            advisoryStartDate: this.advisoryStartDate,
+            advisoryEndDate: this.advisoryEndDate,
+        });
         this.tasksForm = this.fb.group({
             taskDescription: this.taskDescription,
         });
         this.cancelattionForm = this.fb.group({
             cancelationComment: this.cancelationComment,
-            dateCancelationReception: this.dateCancelationReception
         });
         this.advisoryForm = this.fb.group({
             advisory: this.advisory,
@@ -216,7 +214,6 @@ export class AdvisoryTrackingComponent implements OnInit {
             (res: any) => {
                 this.registros = res.data;
                 this.getStatusList = 'complete';
-                console.log(res.data)
             }, (error) => {
                 this.getStatusList = 'error';
             });
@@ -252,11 +249,15 @@ export class AdvisoryTrackingComponent implements OnInit {
                 ? this.requiereMoreInfo = true
                 : this.requiereMoreInfo = false;
             this.advisorySelected = data;
+
             console.log('this.advisorySelected', this.advisorySelected)
-            this.reviewersList = data.reviewer;
-            this.graduatesList = data.degree_processes.graduates;
             this.advisoryState = this.advisorySelected.status;
-            this.countTask();
+            this.advisoryState === 'Aprobado' || this.advisoryState === 'Renuncia'
+                ? this.commentsVisible = false
+                : this.commentsVisible = true
+            this.students.setValue(data.degree_processes.graduates);
+            this.advisory.setValue(data.reviewer);
+            this.fillDataInEditForm();
         }
         setTimeout(() => {
             this.loaderService.hide();
@@ -265,15 +266,19 @@ export class AdvisoryTrackingComponent implements OnInit {
 
     backList() {
         this.loaderService.show();
+        this.getAdvisoryList();
         this.advisorySelected = null;
-        this.reviewersList = [];
-        this.graduatesList = [];
+        this.students.setValue([]);
+        this.advisory.setValue([]);
+        this.moreInfoForm.reset();
+        this.editForm.reset();
         setTimeout(() => {
             this.loaderService.hide();
         }, 800);
     }
 
     showEdition() {
+        this.fillDataInEditForm();
         this.showEdit = true;
     }
 
@@ -281,225 +286,8 @@ export class AdvisoryTrackingComponent implements OnInit {
         this.showEdit = false;
     }
 
-    saveEdition() { }
-
-    goToReview() {
-        this.addNotificationForChangeState(
-            'La inscripción del proyecto de Tesis pasó a Revisión por Cesar Jauregui Saavedra'
-        );
-        this.advisoryState = 'En revisión';
-    }
-
-    goToObserved() {
-        this.addNotificationForChangeState(
-            'La inscripción del proyecto de Tesis pasó a Observado por Cesar Jauregui Saavedra'
-        );
-        this.advisoryState = 'Observado';
-    }
-
-    goToCancelation() {
-        this.showDialogCancel = true;
-        this.alertForCancelation = [
-            { severity: 'warn', detail: 'Recuerda que una vez cancelada la inscripción no se podrá reabrir.' },
-        ];
-    }
-
-    confirmCancelation() {
-        this.cancelEdition();
-        this.showDialogCancel = false;
-        this.advisoryState = 'Cancelado';
-        this.messageService.add({
-            key: 'tst',
-            severity: 'info',
-            summary: 'Confirmado',
-            detail: 'Se ha realizado la cencelación de la inscripción.',
-            life: 3000,
-        });
-    }
-
-    hideCancelDialog() {
-        this.showDialogCancel = false;
-    }
-
-    goToApprove() {
-        this.confirmationService.confirm({
-            header: 'Confirmación',
-            message:
-                'Estás a punto de aprobar esta inscripción, ¿estás seguro(a)?.',
-            acceptIcon: 'pi pi-check mr-2',
-            rejectIcon: 'pi pi-times mr-2',
-            rejectButtonStyleClass: 'p-button-sm',
-            acceptButtonStyleClass: 'p-button-outlined p-button-sm',
-            accept: () => {
-                this.advisoryState = 'Aprobado';
-                this.addNotificationForChangeState(
-                    'La inscripción del proyecto de Tesis pasó a Aprobado por Cesar Jauregui Saavedra'
-                );
-                this.messageService.add({
-                    key: 'tst',
-                    severity: 'info',
-                    summary: 'Confirmado',
-                    detail: 'Se ha realizado la aprobación de la inscripción.',
-                    life: 3000,
-                });
-            },
-            reject: () => { },
-        });
-    }
-
-    taskDone(inputId: string, checkbox: any): void {
-        const labelElement = this.elRef.nativeElement.querySelector(
-            `label[for="${inputId}"]`
-        );
-        if (labelElement) {
-            labelElement.classList.add('task-done');
-        }
-        if (checkbox) {
-            checkbox.disabled = true;
-        }
-
-        this.countTask();
-    }
-
-    isTaskDone(task: any): any {
-        return {
-            'task-done': task.checked,
-        };
-    }
-
-    removeTask(taskId: string) {
-        const index = this.tasks.findIndex((task) => task.id === taskId);
-        if (index !== -1) {
-            this.tasks.splice(index, 1);
-        }
-        this.countTask();
-    }
-
-    countTask(): void {
-        this.totalTask = 0;
-        this.totalTaskIncomplete = 0;
-        this.totalTaskComplete = 0;
-        this.tasks.forEach((task) => {
-            if (task.checked) {
-                this.totalTaskComplete++;
-            } else {
-                this.totalTaskIncomplete++;
-            }
-            this.totalTask++;
-            // Aquí puedes realizar la acción que necesites para cada tarea
-        });
-    }
-
-    addNotificationForChangeState(comment: string) {
-        this.comments.push({
-            name: 'Cesar Jauregui',
-            content: comment,
-            isComment: false,
-        });
-    }
-
-    addTask(event: KeyboardEvent): void {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            if (this.taskDescription.value) {
-                this.tasks.push({
-                    id: '11',
-                    description: this.taskDescription.value,
-                    checked: false,
-                });
-                this.taskDescription.reset();
-            }
-        }
-    }
-
-    formatText(text: string): string {
-        return text.replace(/\n/g, '<br>');
-    }
-
-    scrollDown(): void {
-        window.scroll({
-            top: document.body.scrollHeight,
-            left: 0,
-            behavior: 'smooth',
-        });
-    }
-
-    callGetTeachersList() {
-        this.service.getTeachersList().subscribe((res) => {
-            this.reviewersList = res.teachers;
-            console.log(res);
-        });
-    }
-
-    filterReviewers(event: any) {
-        const query = event.query.toLowerCase();
-        this.filteredReviewers = this.reviewersList.filter(
-            (student) =>
-                student.name.toLowerCase().includes(query) ||
-                student.surnames.toLowerCase().includes(query)
-        );
-    }
-
-
-    filterStudents(event: { query: string }) {
-        const query = event.query.toLowerCase();
-        this.filteredStudents = this.studentsList.filter(
-            (student) =>
-                student.name.toLowerCase().includes(query) ||
-                student.surnames.toLowerCase().includes(query)
-        );
-        console.log('filteredCountries', this.filteredStudents);
-    }
-
-    filterSecondStudents(event: { query: string }) {
-        const query = event.query.toLowerCase();
-        this.filteredSecondStudents = this.studentsList.filter(
-            (student) =>
-                student.name.toLowerCase().includes(query) ||
-                student.surnames.toLowerCase().includes(query)
-        );
-        console.log('filteredCountries', this.filteredSecondStudents);
-    }
-
-    callGetStudentList() {
-        this.getStudentListProcess = 'charging';
-        this.service.getStudentsList().subscribe((res) => {
-            this.getStudentListProcess = 'complete';
-            this.studentsList = res.graduates_students;
-        }, (error) => {
-            this.getStudentListProcess = 'error';
-        });
-    }
-
-    getFirstLetter(str: string): string {
-        if (!str) {
-            console.error('The string is empty');
-            return '';
-        }
-        const firstLetter = str.charAt(0);
-        const firstLetterUpper = firstLetter.toUpperCase();
-        return firstLetterUpper;
-    }
-
-    getUserSelected(userSelected: any) {
-        console.log('userSelected', userSelected)
-        this.advisory.setValue(userSelected);
-    }
-
-    getStudentSelected(userSelected: any) {
-        console.log('students', userSelected)
-        this.students.setValue(userSelected);
-    }
-
-    handleReload(reload: boolean) {
-        if (reload) {
-            this.getAdvisoryList();
-        }
-    }
-
-    saveMoreInfo() {
+    saveEdition() {
         this.loaderService.show();
-        //this.requiereMoreInfo = false;
         const rq = {
             user_id: this.advisory.value[0].id,
             reception_date_faculty: this.dateFormatService.transformDDMMYYYY(this.advisoryReceptionDateToFacultyMI.value),
@@ -517,7 +305,9 @@ export class AdvisoryTrackingComponent implements OnInit {
             })
         ).subscribe(
             (res: any) => {
-                if(res.status) {
+                if (res.status) {
+                    this.advisorySelectedUpdate();
+                    this.showEdit = false;
                     this.messageService.add({
                         key: 'tst',
                         severity: 'info',
@@ -526,9 +316,338 @@ export class AdvisoryTrackingComponent implements OnInit {
                         life: 3000,
                     });
                 }
-                console.log(res);
             }, (error) => {
-                console.log(error);
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al guardar la información.',
+                    life: 3000,
+                });
             })
+    }
+
+    goToReview() {
+        this.loaderService.show();
+        const rq = {
+            status: 'En Revisión'
+        }
+        this.service.putAdvisoryStatusUpdate(this.advisorySelected.id, rq).pipe(
+            finalize(() => {
+                this.loaderService.hide();
+            }), takeUntil(this.destroy$)
+        ).subscribe(
+            (res: any) => {
+                if (res.status) {
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Confirmación',
+                        detail: 'La asesoría pasó a Revisión.',
+                        life: 3000,
+                    });
+                    this.advisoryState = 'En Revisión';
+                }
+            }, (error) => {
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al actualizar el estado.',
+                    life: 3000,
+                });
+            });
+    }
+
+    goToObserved() {
+        this.loaderService.show();
+        const rq = {
+            status: 'Observado'
+        }
+        this.service.putAdvisoryStatusUpdate(this.advisorySelected.id, rq).pipe(
+            finalize(() => {
+                this.loaderService.hide();
+            }), takeUntil(this.destroy$)
+        ).subscribe(
+            (res: any) => {
+                if (res.status) {
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Confirmación',
+                        detail: 'La asesoría pasó a Revisión.',
+                        life: 3000,
+                    });
+                    this.advisoryState = 'Observado';
+                }
+            }, (error) => {
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al actualizar el estado.',
+                    life: 3000,
+                });
+            });
+    }
+
+    goToCancelation() {
+        this.showDialogCancel = true;
+        this.alertForCancelation = [
+            { severity: 'warn', detail: 'Recuerda que una vez cancelada la asesoría no se podrá reabrir.' },
+        ];
+    }
+
+    confirmCancelation() {
+        this.showDialogCancel = false;
+        this.loaderService.show();
+        const rq = {
+            status: 'Renuncia',
+            description: this.cancelationComment.value,
+        }
+        this.service.putAdvisoryStatusUpdate(this.advisorySelected.id, rq).pipe(
+            finalize(() => {
+                this.loaderService.hide();
+            }), takeUntil(this.destroy$)
+        ).subscribe(
+            (res: any) => {
+                if (res.status) {
+                    this.cancelEdition();
+                    this.advisoryState = 'Renuncia';
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Conformación',
+                        detail: 'Se ha realizado la cencelación de la asesoría.',
+                        life: 3000,
+                    });
+                    this.commentsVisible = false
+                }
+            }, (error) => {
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al actualizar el estado.',
+                    life: 3000,
+                });
+            });
+    }
+
+    hideCancelDialog() {
+        this.showDialogCancel = false;
+    }
+
+    goToApprove() {
+        this.confirmationService.confirm({
+            header: 'Confirmación',
+            message:
+                'Estás a punto de aprobar esta inscripción, ¿estás seguro(a)?.',
+            acceptIcon: 'pi pi-check mr-2',
+            rejectIcon: 'pi pi-times mr-2',
+            rejectButtonStyleClass: 'p-button-sm',
+            acceptButtonStyleClass: 'p-button-outlined p-button-sm',
+            accept: () => {
+                this.loaderService.show();
+                const rq = {
+                    status: 'Aprobado',
+                }
+                this.service.putAdvisoryStatusUpdate(this.advisorySelected.id, rq).pipe(
+                    finalize(() => {
+                        this.loaderService.hide();
+                    }), takeUntil(this.destroy$)
+                ).subscribe(
+                    (res: any) => {
+                        if (res.status) {
+                            this.cancelEdition();
+                            this.advisoryState = 'Aprobado';
+                            this.messageService.add({
+                                key: 'tst',
+                                severity: 'info',
+                                summary: 'Conformación',
+                                detail: 'Se ha realizado la aprobación de la asesoría.',
+                                life: 3000,
+                            });
+                            this.commentsVisible = false
+                        }
+                    }, (error) => {
+                        this.messageService.add({
+                            key: 'tst',
+                            severity: 'error',
+                            summary: 'Error',
+                            detail: 'Se ha producido un error al actualizar el estado.',
+                            life: 3000,
+                        });
+                    });
+            },
+            reject: () => { },
+        });
+    }
+
+    addNotificationForChangeState(comment: string) {
+        this.comments.push({
+            name: 'Cesar Jauregui',
+            content: comment,
+            isComment: false,
+        });
+    }
+
+    formatText(text: string): string {
+        return text.replace(/\n/g, '<br>');
+    }
+
+    scrollDown(): void {
+        window.scroll({
+            top: document.body.scrollHeight,
+            left: 0,
+            behavior: 'smooth',
+        });
+    }
+
+    getFirstLetter(str: string): string {
+        if (!str) {
+            console.error('The string is empty');
+            return '';
+        }
+        const firstLetter = str.charAt(0);
+        const firstLetterUpper = firstLetter.toUpperCase();
+        return firstLetterUpper;
+    }
+
+    getTeacherSelected(userSelected: any) {
+        this.advisory.setValue(userSelected);
+    }
+
+    getStudentSelected(userSelected: any) {
+        this.students.setValue(userSelected);
+    }
+
+    handleReload(reload: boolean) {
+        if (reload) {
+            this.getAdvisoryList();
+        }
+    }
+
+    saveMoreInfo() {
+        this.loaderService.show();
+        const rq = {
+            user_id: this.advisory.value[0].id,
+            reception_date_faculty: this.dateFormatService.transformDDMMYYYY(this.advisoryReceptionDateToFacultyMI.value),
+            payment_date: this.dateFormatService.transformDDMMYYYY(this.paymentDateMI.value),
+            approval_date_udi: this.dateFormatService.transformDDMMYYYY(this.advisoryApprovalDateUDIMI.value),
+            shipment_date_secretary: this.dateFormatService.transformDDMMYYYY(this.submissionDateToSecretariatMI.value),
+            report: this.reportNumberMI.value,
+            resolution_date: this.dateFormatService.transformDDMMYYYY(this.resolutionDateMI.value),
+            start_date_advisory: this.dateFormatService.transformDDMMYYYY(this.advisoryStartDate.value),
+            end_date_advisory: this.dateFormatService.transformDDMMYYYY(this.advisoryEndDate.value),
+        }
+        this.service.putAdvisoryUpdate(this.advisorySelected.id, rq).pipe(
+            finalize(() => {
+                this.loaderService.hide();
+            })
+        ).subscribe(
+            (res: any) => {
+                if (res.status) {
+                    this.advisorySelectedUpdate();
+                    this.requiereMoreInfo = false;
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Confirmado',
+                        detail: 'Lo datos han sido guardados.',
+                        life: 3000,
+                    });
+                    this.moreInfoForm.reset();
+                }
+            }, (error) => {
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al guardar la información.',
+                    life: 3000,
+                });
+            })
+    }
+
+    fillDataInEditForm(): void {
+        this.advisoryReceptionDateToFacultyMI.setValue(this.advisorySelected.reception_date_faculty);
+        this.advisoryApprovalDateUDIMI.setValue(this.advisorySelected.approval_date_udi);
+        this.paymentDateMI.setValue(this.advisorySelected.payment_date);
+        this.submissionDateToSecretariatMI.setValue(this.advisorySelected.shipment_date_secretary);
+        this.reportNumberMI.setValue(this.advisorySelected.report);
+        this.resolutionDateMI.setValue(this.advisorySelected.resolution_date);
+        this.advisoryStartDate.setValue(this.advisorySelected.start_date_advisory);
+        this.advisoryEndDate.setValue(this.advisorySelected.end_date_advisory);
+
+    }
+
+    advisorySelectedUpdate(): void {
+        this.advisorySelected.reviewer = this.dateFormatService.transformDDMMYYYY(this.advisory.value);
+        this.advisorySelected.approval_date_udi = this.dateFormatService.transformDDMMYYYY(this.advisoryApprovalDateUDIMI.value);
+        this.advisorySelected.reception_date_faculty = this.dateFormatService.transformDDMMYYYY(this.advisoryReceptionDateToFacultyMI.value);
+        this.advisorySelected.payment_date = this.dateFormatService.transformDDMMYYYY(this.paymentDateMI.value);
+        this.advisorySelected.shipment_date_secretary = this.dateFormatService.transformDDMMYYYY(this.submissionDateToSecretariatMI.value);
+        this.advisorySelected.report = this.reportNumberMI.value;
+        this.advisorySelected.resolution_date = this.dateFormatService.transformDDMMYYYY(this.resolutionDateMI.value);
+        this.advisorySelected.start_date_advisory = this.dateFormatService.transformDDMMYYYY(this.advisoryStartDate.value);
+        this.advisorySelected.end_date_advisory = this.dateFormatService.transformDDMMYYYY(this.advisoryEndDate.value);
+        this.advisorySelected.degree_processes.graduates = this.dateFormatService.transformDDMMYYYY(this.students.value);
+    }
+
+    onFileChange(files: any) {
+        this.formData = files;
+    }
+
+    clearFile() {
+        this.formData = new FormData();
+    }
+
+    hideAddFilesDialog() {
+        this.clearFile();
+        this.showDialogAddFiles = false;
+    }
+
+    showDialogAddFile() {
+        this.clearFile();
+        this.upload.clearFile();
+        this.showDialogAddFiles = true;
+    }
+
+    saveFiles() {
+        this.loaderService.show();
+        this.showDialogAddFiles = false;
+        this.service.postRegisterAdvisoryFile(this.formData, this.advisorySelected.id).pipe(
+            finalize(() => {
+                this.loaderService.hide();
+            })
+        ).subscribe(
+            (res: any) => {
+                if (res.status) {
+                    this.reloadFiles = true;
+                    this.clearFile();
+                    this.hideAddFilesDialog();
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Confirmación',
+                        detail: 'Los archivos han sido guardados.',
+                        life: 3000,
+                    });
+                }
+            }, (error) => {
+                this.clearFile();
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al guardar los archivos.',
+                    life: 3000,
+                });
+            });
+    }
+
+    isFormDataEmpty(formData: FormData): boolean {
+        return !(formData as any).entries().next().done;
     }
 }

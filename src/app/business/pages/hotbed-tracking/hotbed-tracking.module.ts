@@ -14,9 +14,8 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
 import { TimelineModule } from 'primeng/timeline';
 import { CardModule } from 'primeng/card';
-import { BreadcrumbModule } from 'primeng/breadcrumb';
-import { RouterModule } from '@angular/router';
 import { TagModule } from 'primeng/tag';
+import { SidebarModule } from 'primeng/sidebar';
 
 @NgModule({
   imports: [
@@ -36,6 +35,7 @@ import { TagModule } from 'primeng/tag';
     TimelineModule,
     CardModule,
     TagModule,
+    SidebarModule,
   ],
   declarations: [HotbedTrackingComponent]
 })

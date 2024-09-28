@@ -344,7 +344,12 @@ export class DateFormatService {
 
   transformDDMMYYYY(value: string): string {
     if (!value) return '';
-    
+
+    const ddmmyyyyRegex = /^\d{2}-\d{2}-\d{4}$/;
+    if (ddmmyyyyRegex.test(value)) {
+      return value; 
+    }
+
     const date = new Date(value);
     const day = ('0' + date.getDate()).slice(-2);
     const month = ('0' + (date.getMonth() + 1)).slice(-2);

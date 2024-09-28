@@ -17,7 +17,11 @@
                             <label for="title">Título del artículo</label>
                         </p-floatLabel>
                     </div>
-                    <div class="col-12">
+                    <app-upload-archives
+                        (onFileChangeEmitter)="onFileChange($event)"
+                        (clearFilesEmitter)="clearFile()"
+                    ></app-upload-archives>
+                    <!-- <div class="col-12">
                         <div style="display: flex">
                             <input
                                 #fileInput
@@ -94,7 +98,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                     <div style="display: flex">
                         <div class="col-8">
                             <p>Semilleros</p>

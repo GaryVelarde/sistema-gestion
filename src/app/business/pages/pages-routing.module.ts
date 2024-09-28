@@ -13,6 +13,7 @@ import { isUserAuthenticatedGuard } from 'src/app/guards/auth.guard';
         { path: 'asesorias', loadChildren: () => import('./advisory-tracking/advisory-tracking.module').then(m => m.AdvisoryTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'articulos-semilleros', loadChildren: () => import('./hotbed-tracking/hotbed-tracking.module').then(m => m.HotbedTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'registrar-semilleros', loadChildren: () => import('./hotbed-register/hotbed-register.module').then(m => m.HotbedRegisterModule), canActivate: [isUserAuthenticatedGuard] },
+        { path: 'plans', loadChildren: () => import('./plans/plans.module').then(m => m.AdvisoryTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: '**', redirectTo: '/notfound' }
     ])],
     exports: [RouterModule]

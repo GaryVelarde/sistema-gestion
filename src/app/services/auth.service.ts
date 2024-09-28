@@ -133,7 +133,7 @@ export class AuthService {
     return this.http.put(`${this.API_URL}/users/${id}`, request, this.header);
   }
 
-  putInscriptionStatusUpdate(id: number, request: any) {
+  putInscriptionStatusUpdate(id: string, request: any) {
     return this.http.put(`${this.API_URL}/inscription/${id}/status`, request, this.header);
   }
 
@@ -143,6 +143,10 @@ export class AuthService {
 
   postAddEventsUdiComment(id: any, request: any) {
     return this.http.post(`${this.API_URL}/meeting/${id}/observation`, request, this.header);
+  }
+
+  postAddAdvisoryComment(id: any, request: any) {
+    return this.http.post(`${this.API_URL}/advisory/${id}/observations`, request, this.header);
   }
 
   closeSession() {
@@ -169,8 +173,43 @@ export class AuthService {
     return this.http.post(`${this.API_URL}/inscription/${id}/tasks`, request, this.header);
   }
 
+  postAddAdvisoryTask(id: string, request: any) {
+    return this.http.post(`${this.API_URL}/advisory/${id}/tasks`, request, this.header);
+  }
+
   getTitlesList() {
     return this.http.get(`${this.API_URL}/titles`, this.header);
   }
 
+  postRegisterIncriptionFile(request: any, id: string) {
+    return this.http.post(`${this.API_URL}/inscription/${id}/archive`, request, this.header);
+  }
+
+  putAdvisoryStatusUpdate(id: string, request: any) {
+    return this.http.put(`${this.API_URL}/advisory/${id}/status`, request, this.header);
+  }
+
+  getAdvisoryFiles(id: string) {
+    return this.http.get(`${this.API_URL}/advisory/${id}/archive`, this.header);
+  }
+
+  putAdvisoryTaskStatusUpdate(request: any, idAdvisory: string, idTask: string) {
+    return this.http.put(`${this.API_URL}/advisory/${idAdvisory}/tasks/${idTask}`, request, this.header);
+  }
+
+  getInscriptionFiles(id: string) {
+    return this.http.get(`${this.API_URL}/inscription/${id}/archive`, this.header);
+  }
+
+  postRegisterAdvisoryFile(request: any, id: string) {
+    return this.http.post(`${this.API_URL}/advisory/${id}/archive`, request, this.header);
+  }
+
+  getHotbedFiles(id: string) {
+    return this.http.get(`${this.API_URL}/article/${id}/archive`, this.header);
+  }
+
+  postRegisterHotbedFile(request: any, id: string) {
+    return this.http.post(`${this.API_URL}/article/${id}/archive`, request, this.header);
+  }
 }

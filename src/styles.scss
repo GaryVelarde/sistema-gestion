@@ -43,14 +43,15 @@ $breakpoint-lg: 992px;
 .col-sm-12 { @include make-col(12); }
 .col-sm-6  { @include make-col(6); }
 .col-sm-4  { @include make-col(4); }
-.col-sm-3  { @include make-col(3); } // Agregada
+.col-sm-3  { @include make-col(3); }
 
 // Para pantallas medianas (col-md)
 @media (min-width: $breakpoint-md) {
   .col-md-12 { @include make-col(12); }
   .col-md-6  { @include make-col(6); }
   .col-md-4  { @include make-col(4); }
-  .col-md-3  { @include make-col(3); } // Agregada
+  .col-md-3  { @include make-col(3); }
+  .col-md-2  { @include make-col(2); }
 }
 
 // Para pantallas grandes (col-lg)
@@ -58,5 +59,6 @@ $breakpoint-lg: 992px;
   .col-lg-12 { @include make-col(12); }
   .col-lg-6  { @include make-col(6); }
   .col-lg-4  { @include make-col(4); }
-  .col-lg-3  { @include make-col(3); } // Agregada
+  .col-lg-3  { @include make-col(3); }
+  .col-lg-2  { @include make-col(2); }
 }

@@ -1,0 +1,26 @@
+.card-file {
+  min-height: 135px;
+}
+
+.content-file {
+  height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+// :host ::ng-deep .p-carousel-item {
+//   max-width: 210px;
+// }
+
+:host ::ng-deep .p-message-wrapper {
+ background-color: #f1f5f9;
+}
+:host ::ng-deep .p-message-info {
+  border: solid #d7d7d7;
+  border-width: 0 0 0 6px;
+  color: #4b5563;
+}
+:host ::ng-deep .p-icon-wrapper {
+  color: #4b5563;
+}

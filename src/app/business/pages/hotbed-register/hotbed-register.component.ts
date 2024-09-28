@@ -22,9 +22,7 @@ import { IStudent } from '../../cross-interfaces/comments-interfaces';
 
 })
 export class HotbedRegisterComponent implements OnInit {
-  @ViewChild('fileInput') fileInput: ElementRef;
   @ViewChild('userSelection') userSelection: UserSelectionComponent;
-
 
   usuarios: IStudent[] = [
     {
@@ -88,15 +86,11 @@ export class HotbedRegisterComponent implements OnInit {
   articleForm: FormGroup;
   studentsForm: FormGroup;
   private _title = new FormControl('', [Validators.required]);
-  private _file = new FormControl(File || null);
   private _group = new FormControl('', [Validators.required]);
   private _students = new FormControl([] as IStudent[], [Validators.required])
 
   get title() {
     return this._title;
-  }
-  get file() {
-    return this._file;
   }
   get group() {
     return this._group;
@@ -115,7 +109,6 @@ export class HotbedRegisterComponent implements OnInit {
   ) {
     this.articleForm = this.fb.group({
       title: this.title,
-      file: this.file,
       group: this.group
     });
     this.studentsForm = this.fb.group({
@@ -127,41 +120,10 @@ export class HotbedRegisterComponent implements OnInit {
     this.watchStudents();
   }
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    console.log(file)
-    this.file.setValue(file)
-    this.articleForm.patchValue({
-      file: file
-    });
+
+  onFileChange(files: any) {
+    this.formData = files;
   }
-
-  onFileChange(event) {
-    if (event.target.files && event.target.files.length) {
-      const files: FileList = event.target.files;
-      for (let i = 0; i < files.length; i++) {
-        this.formData.append('archives[]', files[i], files[i].name);
-      }
-
-      console.log(event.target.files)
-      const [file] = event.target.files;
-      this.reader.readAsDataURL(file);
-      this.reader.onload = () => {
-        this.articleForm.patchValue({
-          file: this.reader.result
-        });
-        for (let file of event.target.files) {
-          const fileType = this.getFileType(file.name);
-          this.filesSelected.push({
-            name: file.name,
-            type: fileType,
-          });
-        }
-        this.cd.markForCheck();
-      };
-    }
-  }
-
 
   backToList() {
     this.router.navigate(['pages/articulos-semilleros']);
@@ -213,22 +175,6 @@ export class HotbedRegisterComponent implements OnInit {
   clearFile() {
     this.filesSelected = [];
     this.formData = new FormData();
-    this.file.setValue(null);
-    this.fileInput.nativeElement.value = '';
-  }
-
-  search(event: AutoCompleteCompleteEvent) {
-    const query = event.query.toLowerCase();
-    this.filteredItems = this.usuarios
-      .filter(
-        (usuario) =>
-          usuario.name.toLowerCase().includes(query) ||
-          usuario.surnames.toLowerCase().includes(query)
-      )
-      .map((usuario) => ({
-        ...usuario,
-        fullName: `${usuario.name} ${usuario.surnames}`,
-      }));
   }
 
   watchStudents() {

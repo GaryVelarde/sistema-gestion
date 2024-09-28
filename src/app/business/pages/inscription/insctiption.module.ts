@@ -35,8 +35,9 @@ import { CrossComponentsModule } from '../../cross-components/Cross.module';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { DialogModule } from 'primeng/dialog';
-import { KnobModule } from 'primeng/knob';
 import { KeyFilterModule } from 'primeng/keyfilter';
+import { AvatarModule } from 'primeng/avatar';
+import { SliderModule } from 'primeng/slider';
 
 @NgModule({
     declarations: [
@@ -75,8 +76,9 @@ import { KeyFilterModule } from 'primeng/keyfilter';
         TableModule,
         TagModule,
         DialogModule,
-        KnobModule,
         KeyFilterModule,
+        AvatarModule,
+        SliderModule,
         RouterModule.forChild([
             {
                 path: '',

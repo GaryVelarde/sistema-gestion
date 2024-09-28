@@ -3,7 +3,6 @@
     <div class="col-12">
         <app-breadcrumb [items]="items"></app-breadcrumb>
         <div class="card px-6 py-6">
-            
             <p-toolbar styleClass="mb-4">
                 <ng-template pTemplate="left">
                     <div class="my-2">
@@ -45,11 +44,14 @@
                         [value]="registros"
                         responsiveLayout="scroll"
                         [rows]="10"
-                        [globalFilterFields]="['thesis_project_title', 'nombre']"
+                        [globalFilterFields]="[
+                            'thesis_project_title',
+                            'nombre'
+                        ]"
                         [paginator]="true"
                         [rowsPerPageOptions]="[10, 20, 30]"
                         [showCurrentPageReport]="true"
-                        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
                         [(selection)]="selectedProducts"
                         selectionMode="multiple"
                         [rowHover]="true"
@@ -59,8 +61,12 @@
                             <div
                                 class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
                             >
-                                <h5 class="m-0">Seguimiento de inscripciones</h5>
-                                <span class="block mt-2 md:mt-0 p-input-icon-left">
+                                <h5 class="m-0">
+                                    Seguimiento de inscripciones
+                                </h5>
+                                <span
+                                    class="block mt-2 md:mt-0 p-input-icon-left"
+                                >
                                     <i class="pi pi-search"></i>
                                     <input
                                         pInputText
@@ -84,7 +90,8 @@
                                     ></p-sortIcon>
                                 </th>
                                 <th pSortableColumn="name" style="width: 20%">
-                                    Revisor <p-sortIcon field="status"></p-sortIcon>
+                                    Revisor
+                                    <p-sortIcon field="status"></p-sortIcon>
                                 </th>
                                 <th style="width: 10%">Estado</th>
                                 <th style="width: 10%"></th>
@@ -109,7 +116,9 @@
                                 </td>
                                 <td style="width: 14%; min-width: 10rem">
                                     <span class="p-column-title">estado</span>
-                                    <span>{{ data.inscriptions[0].status }}</span>
+                                    <span>{{
+                                        data.inscriptions[0].status
+                                    }}</span>
                                 </td>
                                 <td>
                                     <div class="flex">
@@ -117,9 +126,11 @@
                                             label="Ver detalle"
                                             [outlined]="true"
                                             severity="contrast"
-                                            (click)="viewDetailsInscription(data)"
+                                            (click)="
+                                                viewDetailsInscription(data)
+                                            "
                                         />
-    
+
                                         <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
                                     <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteProduct(product)"></button> -->
                                     </div>
@@ -136,7 +147,10 @@
                 ></app-card-error>
             </ng-template>
             <ng-template #skeletonInscriptionList>
-                <app-skeleton-table [columnTitles]="columnTitles" [skeletonCount]="skeletonRows"></app-skeleton-table>
+                <app-skeleton-table
+                    [columnTitles]="columnTitles"
+                    [skeletonCount]="skeletonRows"
+                ></app-skeleton-table>
             </ng-template>
             <div *ngIf="false" class="card">
                 <p-table [value]="skeletonRows" responsiveLayout="scroll">
@@ -161,16 +175,6 @@
         </div>
     </div>
 </div>
-<p-confirmDialog>
-    <ng-template pTemplate="message" let-message>
-        <div
-            class="flex flex-column align-items-center w-full gap-3 border-bottom-1 surface-border"
-        >
-            <i class="pi pi-exclamation-circle text-6xl text-primary-500"></i>
-            <p>{{ message.message }}</p>
-        </div>
-    </ng-template>
-</p-confirmDialog>
 <div *ngIf="inscriptionSelected" class="grid">
     <div class="col-12">
         <app-breadcrumb [items]="itemsDetails"></app-breadcrumb>
@@ -248,7 +252,7 @@
                         (click)="goToReview()"
                     />
                     <p-button
-                        *ngIf="inscriptionState === 'En revisión'"
+                        *ngIf="inscriptionState === 'En Revisión'"
                         label="Observado"
                         [outlined]="true"
                         icon="pi pi-exclamation-circle"
@@ -257,7 +261,7 @@
                         (click)="goToObserved()"
                     />
                     <p-button
-                        *ngIf="inscriptionState === 'En revisión'"
+                        *ngIf="inscriptionState === 'En Revisión'"
                         class="ml-3"
                         label="Aprobado"
                         [outlined]="true"
@@ -269,24 +273,27 @@
                 </div>
             </div>
             <div class="card flex justify-content-center col-12">
-                <h5 class="font-bold" style="font-family: revert; text-align: center;">
+                <h5
+                    class="font-bold"
+                    style="font-family: revert; text-align: center"
+                >
                     {{ inscriptionSelected.thesis_project_title }}
                 </h5>
             </div>
             <div *ngIf="!showEdit" class="grid col-12">
-                <div class="col-3">
+                <div class="col-12 col-md-3">
                     <p class="font-bold">Nro de expediente:</p>
                     <p>{{ inscriptionSelected.file }}</p>
                 </div>
-                <div class="col-3">
+                <div class="col-12 col-md-3">
                     <p class="font-bold">Escuala profesional:</p>
                     <p>{{ inscriptionSelected.professional_school }}</p>
                 </div>
-                <div class="col-3">
+                <div class="col-12 col-md-3">
                     <p class="font-bold">Nro de oficio:</p>
                     <p>{{ inscriptionSelected.office_number }}</p>
                 </div>
-                <div class="col-3">
+                <div class="col-12 col-md-3">
                     <p class="font-bold">Nro de resolución:</p>
                     <p>{{ inscriptionSelected.resolution_number }}</p>
                 </div>
@@ -390,7 +397,7 @@
                         value="Inscrito"
                     />
                     <p-tag
-                        *ngIf="inscriptionState === 'En revisión'"
+                        *ngIf="inscriptionState === 'En Revisión'"
                         severity="info"
                         value="En revisión"
                     />
@@ -447,9 +454,23 @@
                     class="full-width"
                     [idModule]="inscriptionSelected.inscriptions[0].id"
                     [module]="module"
-                    [visible]="true"
+                    [visible]="
+                        inscriptionState !== 'Renuncia' &&
+                        inscriptionState !== 'Aprobado'
+                            ? true
+                            : false
+                    "
                     [chbDisable]="false"
                 ></app-task-list>
+                <div class="ml-2 mr-2 separator"></div>
+                <app-file-list
+                    class="w-full"
+                    [module]="module"
+                    [id]="inscriptionSelected.inscriptions[0].id"
+                    (addArchiveClicked)="showDialogAddFiles = true"
+                    [reload]="reloadFiles"
+                >
+                </app-file-list>
                 <div class="ml-2 mr-2 separator"></div>
                 <app-comments
                     class="w-full"
@@ -461,7 +482,11 @@
         </div>
     </div>
 </div>
-<p-sidebar [(visible)]="showDialogCancel" [style]="{'width': '40%'}" position="right">
+<p-sidebar
+    [(visible)]="showDialogCancel"
+    [style]="{ width: '40%' }"
+    position="right"
+>
     <ng-template pTemplate="header">
         <span class="font-semibold text-xl">Confirmación de cancelación</span>
     </ng-template>
@@ -480,12 +505,12 @@
                         formControlName="dateCancelationReception"
                     />
                 </div>
-    
+
                 <div class="col-12">
                     <p class="font-bold">
                         Por favor digite el motivo de la cancelación:
                     </p>
-    
+
                     <textarea
                         inputId="textarea"
                         rows="5"
@@ -509,7 +534,7 @@
                         iconPos="left"
                         (click)="hideCancelDialog()"
                     ></button>
-    
+
                     <p-button
                         label="Confirmar cancelación"
                         iconPos="right"
@@ -522,4 +547,93 @@
             </form>
         </div>
     </div>
-  </p-sidebar>
+</p-sidebar>
+<p-sidebar
+    [(visible)]="showDialogAprobation"
+    [style]="{ width: '40%' }"
+    position="right"
+>
+    <ng-template pTemplate="header">
+        <span class="font-semibold text-xl">Confirmación de aprobación</span>
+    </ng-template>
+    <div class="content">
+        <div class="grid" style="height: 100%">
+            <form [formGroup]="aprobationForm" class="col-12">
+                <div class="p-fluid col-12">
+                    <p class="font-bold">
+                        Por favor seleccione la fecha de envío a secretaria:
+                    </p>
+                    <p-calendar
+                        [iconDisplay]="'input'"
+                        class="full-width"
+                        [showIcon]="true"
+                        dateFormat="dd-mm-yy"
+                        formControlName="sentToSecretaryDate"
+                    />
+                </div>
+                <p-messages
+                    [(value)]="alertForAprobation"
+                    [enableService]="false"
+                    [closable]="false"
+                />
+                <div class="footer mt-5">
+                    <button
+                        pButton
+                        pRipple
+                        label="Regresar"
+                        icon="pi pi-angle-left"
+                        class="p-button-text"
+                        iconPos="left"
+                        (click)="hideAprobationDialog()"
+                    ></button>
+
+                    <p-button
+                        label="Confirmar aprobación"
+                        iconPos="right"
+                        icon="pi pi-check"
+                        (click)="confirmAprobation()"
+                        [disabled]="!aprobationForm.valid"
+                    />
+                </div>
+            </form>
+        </div>
+    </div>
+</p-sidebar>
+<p-sidebar
+    [(visible)]="showDialogAddFiles"
+    [style]="{ width: '40%' }"
+    position="right"
+>
+    <ng-template pTemplate="header">
+        <span class="font-semibold text-xl">Agregar archivos adjuntos</span>
+    </ng-template>
+    <div class="content">
+        <div class="grid" style="height: 100%">
+            <div class="col-12">
+                <app-upload-archives
+                    (onFileChangeEmitter)="onFileChange($event)"
+                    (clearFilesEmitter)="clearFile()"
+                >
+                </app-upload-archives>
+            </div>
+            <div class="footer mt-5">
+                <button
+                    pButton
+                    pRipple
+                    label="Regresar"
+                    icon="pi pi-angle-left"
+                    class="p-button-text"
+                    iconPos="left"
+                    (click)="hideAddFilesDialog()"
+                ></button>
+                <p-button
+                    label="Guardar archivos"
+                    iconPos="right"
+                    icon="pi pi-check"
+                    (click)="saveFiles()"
+                    [disabled]="!isFormDataEmpty(formData)"
+                />
+            </div>
+        </div>
+    </div>
+</p-sidebar>
