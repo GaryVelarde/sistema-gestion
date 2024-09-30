@@ -26,6 +26,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
   showAllComments = false;
   state = '';
   registerState = '';
+  messageError = 'Ha ocurrido un error al cargar los comentarios. Por favor, inténtalo de nuevo más tarde.';
 
   get comment() {
     return this._comment;
@@ -63,6 +64,12 @@ export class CommentsComponent implements OnInit, OnDestroy {
         break;
       case eModule.inscription:
         this.getCommentsByInscription();
+        break;
+      case eModule.hotbed:
+        this.getCommentsByHotbed();
+        break;
+      case eModule.review:
+        this.getCommentsByThesisReview();
         break;
     }
   }
@@ -120,7 +127,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
               this.registerState = 'complete';
               this.confirmAddEvent(res.id);
             }
-
             console.log(res);
           }, (error) => {
             this.registerState = 'complete';
@@ -134,7 +140,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
               this.registerState = 'complete';
               this.confirmAddEvent(res.id);
             }
-
             console.log(res);
           }, (error) => {
             this.registerState = 'complete';
@@ -148,7 +153,32 @@ export class CommentsComponent implements OnInit, OnDestroy {
               this.registerState = 'complete';
               this.confirmAddEvent(res.id);
             }
-
+            console.log(res);
+          }, (error) => {
+            this.registerState = 'complete';
+            console.log(error);
+          });
+        break;
+      case eModule.hotbed:
+        this.service.postAddHotbedComment(this.id, rq).pipe(takeUntil(this.destroy$)).subscribe(
+          (res: any) => {
+            if (res.status) {
+              this.registerState = 'complete';
+              this.confirmAddEvent(res.id);
+            }
+            console.log(res);
+          }, (error) => {
+            this.registerState = 'complete';
+            console.log(error);
+          });
+        break;
+      case eModule.hotbed:
+        this.service.postAddThesisReviewComment(this.id, rq).pipe(takeUntil(this.destroy$)).subscribe(
+          (res: any) => {
+            if (res.status) {
+              this.registerState = 'complete';
+              this.confirmAddEvent(res.id);
+            }
             console.log(res);
           }, (error) => {
             this.registerState = 'complete';
@@ -181,6 +211,44 @@ export class CommentsComponent implements OnInit, OnDestroy {
     this.state = 'charging';
     this.registerState = 'charging';
     this.service.getCommentsByInscription(this.id).pipe(takeUntil(this.destroy$)).subscribe(
+      (res: any) => {
+        res.data.forEach(item => {
+          item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
+        });
+        this.comments = res.data;
+        this.updateVisibleComments();
+        this.state = 'complete';
+        this.registerState = 'complete';
+      },
+      (error) => {
+        this.state = 'error';
+        this.registerState = 'complete';
+      })
+  }
+
+  getCommentsByHotbed() {
+    this.state = 'charging';
+    this.registerState = 'charging';
+    this.service.getCommentsByHotbed(this.id).pipe(takeUntil(this.destroy$)).subscribe(
+      (res: any) => {
+        res.data.forEach(item => {
+          item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
+        });
+        this.comments = res.data;
+        this.updateVisibleComments();
+        this.state = 'complete';
+        this.registerState = 'complete';
+      },
+      (error) => {
+        this.state = 'error';
+        this.registerState = 'complete';
+      })
+  }
+
+  getCommentsByThesisReview() {
+    this.state = 'charging';
+    this.registerState = 'charging';
+    this.service.getCommentsByThesisReview(this.id).pipe(takeUntil(this.destroy$)).subscribe(
       (res: any) => {
         res.data.forEach(item => {
           item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
@@ -231,5 +299,22 @@ export class CommentsComponent implements OnInit, OnDestroy {
         this.state = 'error';
         this.registerState = 'complete';
       })
+  }
+
+  handleReload() {
+    switch (this.module) {
+      case eModule.eventUdi:
+        this.getCommentsByEventsUDI();
+        break;
+      case eModule.advisory:
+        this.getCommentsByAdvisory();
+        break;
+      case eModule.inscription:
+        this.getCommentsByInscription();
+        break;
+      case eModule.hotbed:
+        this.getCommentsByHotbed();
+        break;
+    }
   }
 }

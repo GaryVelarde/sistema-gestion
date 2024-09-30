@@ -125,6 +125,10 @@ export class AuthService {
     return this.http.get(`${this.API_URL}/meeting/${id}/observation`, this.header);
   }
 
+  getCommentsByHotbed(id: string): Observable<any> {
+    return this.http.get(`${this.API_URL}/article/${id}/observations`, this.header);
+  }
+
   getAdvisoryList(): Observable<any> {
     return this.http.get(`${this.API_URL}/advisory`, this.header);
   }
@@ -147,6 +151,10 @@ export class AuthService {
 
   postAddAdvisoryComment(id: any, request: any) {
     return this.http.post(`${this.API_URL}/advisory/${id}/observations`, request, this.header);
+  }
+
+  postAddHotbedComment(id: any, request: any) {
+    return this.http.post(`${this.API_URL}/article/${id}/observations`, request, this.header);
   }
 
   closeSession() {
@@ -212,4 +220,29 @@ export class AuthService {
   postRegisterHotbedFile(request: any, id: string) {
     return this.http.post(`${this.API_URL}/article/${id}/archive`, request, this.header);
   }
+
+  getThesisReviewList() {
+    return this.http.get(`${this.API_URL}/review`, this.header);
+  }
+
+  getCommentsByThesisReview(id: string): Observable<any> {
+    return this.http.get(`${this.API_URL}/review/${id}/observations`, this.header);
+  }
+
+  postRegisterThesisReviewFile(request: any, id: string) {
+    return this.http.post(`${this.API_URL}/review/${id}/archive`, request, this.header);
+  }
+
+  getThesisReviewFiles(id: string) {
+    return this.http.get(`${this.API_URL}/review/${id}/archive`, this.header);
+  }
+
+  postAddThesisReviewComment(id: any, request: any) {
+    return this.http.post(`${this.API_URL}/review/${id}/observations`, request, this.header);
+  }
+
+  getNotificationReport() {
+    return this.http.get(`${this.API_URL}/notification-report`, this.header);
+  }
+
 }

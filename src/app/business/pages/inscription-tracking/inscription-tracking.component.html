@@ -9,7 +9,7 @@
                         <button
                             pButton
                             pRipple
-                            label="Inscribir un nuevo protecto de tesis"
+                            label="nuevo proyecto de tesis"
                             icon="pi pi-plus"
                             class="mr-2"
                             (click)="goToInscription()"
@@ -229,7 +229,8 @@
                     <p-button
                         *ngIf="
                             inscriptionState !== 'Renuncia' &&
-                            inscriptionState !== 'Aprobado'
+                            inscriptionState !== 'Aprobado' &&
+                            !showEdit
                         "
                         label="Cancelar inscripción"
                         [outlined]="true"
@@ -241,8 +242,9 @@
                     />
                     <p-button
                         *ngIf="
-                            inscriptionState === 'Inscrito' ||
-                            inscriptionState === 'Observado'
+                            (inscriptionState === 'Inscrito' ||
+                                inscriptionState === 'Observado') &&
+                            !showEdit
                         "
                         label="Pasar a revisión"
                         [outlined]="true"
@@ -252,7 +254,7 @@
                         (click)="goToReview()"
                     />
                     <p-button
-                        *ngIf="inscriptionState === 'En Revisión'"
+                        *ngIf="inscriptionState === 'En Revisión' && !showEdit"
                         label="Observado"
                         [outlined]="true"
                         icon="pi pi-exclamation-circle"
@@ -261,7 +263,7 @@
                         (click)="goToObserved()"
                     />
                     <p-button
-                        *ngIf="inscriptionState === 'En Revisión'"
+                        *ngIf="inscriptionState === 'En Revisión' && !showEdit"
                         class="ml-3"
                         label="Aprobado"
                         [outlined]="true"
@@ -272,155 +274,236 @@
                     />
                 </div>
             </div>
-            <div class="card flex justify-content-center col-12">
+            <div *ngIf="!showEdit" class="card flex justify-content-center col-12">
                 <h5
-                    class="font-bold"
+                    
+                    class="font-bold text-color"
                     style="font-family: revert; text-align: center"
                 >
                     {{ inscriptionSelected.thesis_project_title }}
                 </h5>
             </div>
-            <div *ngIf="!showEdit" class="grid col-12">
-                <div class="col-12 col-md-3">
-                    <p class="font-bold">Nro de expediente:</p>
-                    <p>{{ inscriptionSelected.file }}</p>
-                </div>
-                <div class="col-12 col-md-3">
-                    <p class="font-bold">Escuala profesional:</p>
-                    <p>{{ inscriptionSelected.professional_school }}</p>
-                </div>
-                <div class="col-12 col-md-3">
-                    <p class="font-bold">Nro de oficio:</p>
-                    <p>{{ inscriptionSelected.office_number }}</p>
-                </div>
-                <div class="col-12 col-md-3">
-                    <p class="font-bold">Nro de resolución:</p>
-                    <p>{{ inscriptionSelected.resolution_number }}</p>
-                </div>
-            </div>
-            <div *ngIf="showEdit" class="grid col-12">
-                <div class="col-3">
-                    <p class="font-bold">Nro de expediente:</p>
-                    <input
-                        type="text"
-                        pInputText
-                        class="full-width"
-                        [value]="inscriptionSelected.file"
-                    />
-                </div>
-                <div class="col-3">
-                    <p class="font-bold">Escuala profesional:</p>
-                    <input
-                        type="text"
-                        pInputText
-                        class="full-width"
-                        [value]="inscriptionSelected.professional_school"
-                    />
-                </div>
-                <div class="col-3">
-                    <p class="font-bold">Nro de oficio:</p>
-                    <input
-                        type="text"
-                        pInputText
-                        class="full-width"
-                        [value]="inscriptionSelected.office_number"
-                    />
-                </div>
-                <div class="col-3">
-                    <p class="font-bold">Nro de resolución:</p>
-                    <input
-                        type="text"
-                        pInputText
-                        class="full-width"
-                        [value]="inscriptionSelected.resolution_number"
-                    />
-                </div>
-            </div>
-            <div class="grid col-12">
-                <div class="col-3">
-                    <p class="font-bold">Fecha de recepción a Facultad:</p>
-                    <p *ngIf="!showEdit">
-                        <i class="pi pi-calendar"></i>
-                        {{
-                            inscriptionSelected.inscriptions[0]
-                                .reception_date_faculty
-                        }}
-                    </p>
-                    <div *ngIf="showEdit" class="grid p-fluid">
-                        <div class="field col-12 md:col-12">
-                            <p-calendar
-                                *ngIf="showEdit"
-                                [(ngModel)]="
-                                    inscriptionSelected.inscriptions[0]
-                                        .reception_date_faculty
-                                "
-                                [iconDisplay]="'input'"
-                                class="full-width"
-                                [showIcon]="true"
-                                dateFormat="yy-mm-dd"
-                                inputId="icondisplay"
-                            />
-                        </div>
+            <textarea
+                    *ngIf="showEdit"
+                    rows="3"
+                    cols="30"
+                    pInputTextarea
+                    class="w-full font-bold text-color"
+                    style="
+                        font-family: revert;
+                        text-align: center;
+                        font-size: 17.5px;
+                    "
+                    [(ngModel)]="inscriptionSelected.thesis_project_title"
+                >
+                </textarea>
+            <div *ngIf="!showEdit">
+                <div class="grid col-12">
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Nro de expediente:</p>
+                        <p>{{ inscriptionSelected.file }}</p>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Escuala profesional:</p>
+                        <p>{{ inscriptionSelected.professional_school }}</p>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Nro de oficio:</p>
+                        <p>{{ inscriptionSelected.office_number }}</p>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Nro de resolución:</p>
+                        <p>{{ inscriptionSelected.resolution_number }}</p>
                     </div>
                 </div>
-                <div class="col-3">
-                    <p class="font-bold">Fecha de aprobación UDI:</p>
-                    <p *ngIf="!showEdit">
-                        <i class="pi pi-calendar"></i>
-                        {{
-                            inscriptionSelected.inscriptions[0]
-                                .approval_date_udi
-                        }}
-                    </p>
-                    <div *ngIf="showEdit" class="grid p-fluid">
-                        <div class="field col-12 md:col-12">
-                            <p-calendar
-                                *ngIf="showEdit"
-                                [(ngModel)]="
-                                    inscriptionSelected.inscriptions[0]
-                                        .approval_date_udi
-                                "
-                                [iconDisplay]="'input'"
-                                class="full-width"
-                                [showIcon]="true"
-                                dateFormat="yy-mm-dd"
-                                inputId="icondisplay"
-                            />
+
+                <div class="grid col-12">
+                    <div class="col-3">
+                        <p class="font-bold">Fecha de recepción a Facultad:</p>
+                        <p *ngIf="!showEdit">
+                            <i class="pi pi-calendar"></i>
+                            {{
+                                inscriptionSelected.inscriptions[0]
+                                    .reception_date_faculty
+                            }}
+                        </p>
+                        <div *ngIf="showEdit" class="grid p-fluid">
+                            <div class="field col-12 md:col-12">
+                                <p-calendar
+                                    *ngIf="showEdit"
+                                    [(ngModel)]="
+                                        inscriptionSelected.inscriptions[0]
+                                            .reception_date_faculty
+                                    "
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="yy-mm-dd"
+                                    inputId="icondisplay"
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-3"></div>
-                <div class="card col-3">
-                    <p class="font-bold">Estado:</p>
-                    <p-tag
-                        *ngIf="inscriptionState === 'Inscrito'"
-                        value="Inscrito"
-                    />
-                    <p-tag
-                        *ngIf="inscriptionState === 'En Revisión'"
-                        severity="info"
-                        value="En revisión"
-                    />
-                    <p-tag
-                        *ngIf="inscriptionState === 'Observado'"
-                        severity="warning"
-                        value="Observado"
-                    />
-                    <p-tag
-                        *ngIf="inscriptionState === 'Renuncia'"
-                        severity="danger"
-                        value="Renuncia"
-                    />
-                    <p-tag
-                        *ngIf="inscriptionState === 'Aprobado'"
-                        severity="success"
-                        value="Aprobado"
-                    />
+                    <div class="col-3">
+                        <p class="font-bold">Fecha de aprobación UDI:</p>
+                        <p *ngIf="!showEdit">
+                            <i class="pi pi-calendar"></i>
+                            {{
+                                inscriptionSelected.inscriptions[0]
+                                    .approval_date_udi
+                            }}
+                        </p>
+                        <div *ngIf="showEdit" class="grid p-fluid">
+                            <div class="field col-12 md:col-12">
+                                <p-calendar
+                                    *ngIf="showEdit"
+                                    [(ngModel)]="
+                                        inscriptionSelected.inscriptions[0]
+                                            .approval_date_udi
+                                    "
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="yy-mm-dd"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3"></div>
+                    <div class="card col-3" style="max-height: 100px">
+                        <p class="font-bold">Estado:</p>
+                        <p-tag
+                            *ngIf="inscriptionState === 'Inscrito'"
+                            value="Inscrito"
+                        />
+                        <p-tag
+                            *ngIf="inscriptionState === 'En Revisión'"
+                            severity="info"
+                            value="En revisión"
+                        />
+                        <p-tag
+                            *ngIf="inscriptionState === 'Observado'"
+                            severity="warning"
+                            value="Observado"
+                        />
+                        <p-tag
+                            *ngIf="inscriptionState === 'Renuncia'"
+                            severity="danger"
+                            value="Renuncia"
+                        />
+                        <p-tag
+                            *ngIf="inscriptionState === 'Aprobado'"
+                            severity="success"
+                            value="Aprobado"
+                        />
+                    </div>
                 </div>
             </div>
+            <form *ngIf="showEdit" [formGroup]="editForm">
+                <div class="grid col-12">
+                    <div class="col-3">
+                        <p class="font-bold">Nro de expediente:</p>
+                        <input
+                            type="text"
+                            pInputText
+                            class="full-width"
+                            formControlName="caseNumber"
+                        />
+                    </div>
+                    <div class="col-3">
+                        <p class="font-bold">Escuala profesional:</p>
+                        <input
+                            type="text"
+                            pInputText
+                            class="full-width"
+                            formControlName="professionalSchool"
+                        />
+                    </div>
+                    <div class="col-3">
+                        <p class="font-bold">Nro de oficio:</p>
+                        <input
+                            type="text"
+                            pInputText
+                            class="full-width"
+                            formControlName="officialDocumentNumber"
+                        />
+                    </div>
+                    <div class="col-3">
+                        <p class="font-bold">Nro de resolución:</p>
+                        <input
+                            type="text"
+                            pInputText
+                            class="full-width"
+                            formControlName="resolutionNumber"
+                        />
+                    </div>
+                </div>
+                <div class="grid col-12">
+                    <div class="col-3">
+                        <p class="font-bold">Fecha de recepción a Facultad:</p>
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <p-calendar
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                    formControlName="facultyReceptionDate"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <p class="font-bold">Fecha de aprobación UDI:</p>
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <p-calendar
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                    formControlName="udiApprovalDate"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3"></div>
+                    <div class="card col-3" style="max-height: 100px">
+                        <p class="font-bold">Estado:</p>
+                        <p-tag
+                            *ngIf="inscriptionState === 'Inscrito'"
+                            value="Inscrito"
+                        />
+                        <p-tag
+                            *ngIf="inscriptionState === 'En Revisión'"
+                            severity="info"
+                            value="En revisión"
+                        />
+                        <p-tag
+                            *ngIf="inscriptionState === 'Observado'"
+                            severity="warning"
+                            value="Observado"
+                        />
+                        <p-tag
+                            *ngIf="inscriptionState === 'Renuncia'"
+                            severity="danger"
+                            value="Renuncia"
+                        />
+                        <p-tag
+                            *ngIf="inscriptionState === 'Aprobado'"
+                            severity="success"
+                            value="Aprobado"
+                        />
+                    </div>
+                </div>
+            </form>
+
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
-                <div class="col-6">
+                <div class="col-12 col-md-6">
                     <p>Revisor</p>
                     <app-user-selection
                         class="w-full"
@@ -433,7 +516,7 @@
                     >
                     </app-user-selection>
                 </div>
-                <div class="col-6">
+                <div class="col-12 col-md-6">
                     <p>Estudiante(s)</p>
                     <app-user-selection
                         class="w-full"

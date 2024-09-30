@@ -13,7 +13,9 @@ import { isUserAuthenticatedGuard } from 'src/app/guards/auth.guard';
         { path: 'asesorias', loadChildren: () => import('./advisory-tracking/advisory-tracking.module').then(m => m.AdvisoryTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'articulos-semilleros', loadChildren: () => import('./hotbed-tracking/hotbed-tracking.module').then(m => m.HotbedTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'registrar-semilleros', loadChildren: () => import('./hotbed-register/hotbed-register.module').then(m => m.HotbedRegisterModule), canActivate: [isUserAuthenticatedGuard] },
-        { path: 'plans', loadChildren: () => import('./plans/plans.module').then(m => m.AdvisoryTrackingModule), canActivate: [isUserAuthenticatedGuard] },
+        { path: 'plans', loadChildren: () => import('./plans/plans.module').then(m => m.PlansModule), canActivate: [isUserAuthenticatedGuard] },
+        { path: 'budget', loadChildren: () => import('./budget/budget.module').then(m => m.BudgetModule), canActivate: [isUserAuthenticatedGuard] },
+        { path: 'thesis-review-tracking', loadChildren: () => import('./thesis-review-tracking/thesis-review-tracking.module').then(m => m.ThesisReviewTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: '**', redirectTo: '/notfound' }
     ])],
     exports: [RouterModule]

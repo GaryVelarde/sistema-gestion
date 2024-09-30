@@ -2,7 +2,10 @@
     <h5>Comentarios</h5>
 </div>
 <div class="col-12 grid">
-    <div *ngIf="visible && registerState === 'complete'" class="mb-4 w-full flex align-items-center ml-3">
+    <div
+        *ngIf="visible && registerState === 'complete'"
+        class="mb-4 w-full flex align-items-center ml-3"
+    >
         <p-avatar [label]="getInitialName()" size="large" />
         <div class="ml-3 w-full">
             <form [formGroup]="commentsForm" style="width: inherit">
@@ -20,7 +23,10 @@
             </form>
         </div>
     </div>
-    <div *ngIf="registerState === 'charging'" class="mb-4 w-full flex align-items-center ml-3 ng-star-inserted">
+    <div
+        *ngIf="registerState === 'charging'"
+        class="mb-4 w-full flex align-items-center ml-3 ng-star-inserted"
+    >
         <div>
             <p-skeleton size="41px" class="ml-3"></p-skeleton>
         </div>
@@ -92,6 +98,9 @@
                     <p-skeleton width="100%" height="32px"></p-skeleton>
                 </div>
             </div>
+        </ng-template>
+        <ng-template #commentsError>
+            <app-label-error [message]="messageError" (reload)="handleReload()"> </app-label-error>
         </ng-template>
     </div>
     <ng-container *ngIf="comments.length > 5">

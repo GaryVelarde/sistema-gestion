@@ -29,6 +29,7 @@ import { FileListComponent } from './file-list/file-list.component';
 import { ImageModule } from 'primeng/image';
 import { CarouselModule } from 'primeng/carousel';
 import { MessagesModule } from 'primeng/messages';
+import { LabelErrorComponent } from './label-error/label-error.component';
 
 @NgModule({
   imports: [
@@ -66,6 +67,7 @@ import { MessagesModule } from 'primeng/messages';
     TaskListComponent,
     UploadArchivesComponent,
     FileListComponent,
+    LabelErrorComponent,
   ],
   exports: [
     CommentsComponent,
@@ -77,6 +79,7 @@ import { MessagesModule } from 'primeng/messages';
     TaskListComponent,
     UploadArchivesComponent,
     FileListComponent,
+    LabelErrorComponent,
   ]
 })
 export class CrossComponentsModule { }

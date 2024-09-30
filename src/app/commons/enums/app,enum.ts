@@ -9,4 +9,5 @@ export enum eModule {
   eventUdi = 'reunionesUdi',
   inscription = 'inscripcion',
   hotbed = 'semilleros',
+  review = 'review',
 }

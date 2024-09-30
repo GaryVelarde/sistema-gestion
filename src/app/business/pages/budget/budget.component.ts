@@ -4,32 +4,38 @@ import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 
 @Component({
-    templateUrl: './plans.component.html',
-    styleUrls: ['./plans.component.scss'],
+    templateUrl: './budget.component.html',
+    styleUrls: ['./budget.component.scss'],
     providers: [MessageService, ConfirmationService],
 })
-export class PlansComponent implements OnInit {
-    actividadForm: FormGroup;
-    previewData: any[] = [];
-    rowspanData: any;
+export class BudgetComponent implements OnInit {
     breadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/pages' },
         { label: 'Programa 3' },
-        { label: 'Planes', visible: true },
+        { label: 'Presupuesto', visible: true },
     ];
+    actividadForm: FormGroup;
+    previewDataMontos: any[] = [];
+    rowspanData: any = {};
 
-    constructor(
-        private loaderService: LoaderService,
-        private fb: FormBuilder
-    ) {
+    constructor(private fb: FormBuilder) {
         this.actividadForm = this.fb.group({
-            actividades: this.fb.array([]) // Un array para múltiples actividades
+            actividades: this.fb.array([])  // Un array para múltiples actividades
         });
     }
 
     ngOnInit() {
         this.addActividad();
         this.watchActivities();
+    }
+
+    onSubmit() {
+        if (this.actividadForm.valid) {
+            this.showPreviewWithMontos();
+            // Lógica adicional si es necesario
+        } else {
+            // Manejo de formulario inválido
+        }
     }
 
     // Obtener el FormArray de actividades
@@ -40,19 +46,14 @@ export class PlansComponent implements OnInit {
     // Crear una nueva actividad
     newActividad(): FormGroup {
         return this.fb.group({
-            descripcion: ['', Validators.required], // Descripción de la actividad
-            tareas: this.fb.array([]) // Cada actividad puede tener múltiples tareas
+            descripcion: ['', Validators.required],  // Descripción de la actividad
+            tareas: this.fb.array([])  // Cada actividad puede tener múltiples tareas
         });
     }
 
     // Añadir actividad
     addActividad() {
         this.actividades.push(this.newActividad());
-    }
-
-    // Eliminar actividad
-    removeActividad(index: number) {
-        this.actividades.removeAt(index);
     }
 
     // Obtener el FormArray de tareas de una actividad específica
@@ -63,9 +64,9 @@ export class PlansComponent implements OnInit {
     // Crear una nueva tarea
     newTarea(): FormGroup {
         return this.fb.group({
-            descripcion: ['', Validators.required], // Descripción de la tarea
-            meses: this.fb.array(Array(12).fill(false)), // Arreglo para los 12 meses
-            comentario: [''] // Comentario opcional
+            descripcion: ['', Validators.required],  // Descripción de la tarea
+            montos: this.fb.array(Array(12).fill(null)),  // Arreglo para los 12 meses con montos opcionales
+            comentario: ['']  // Comentario opcional
         });
     }
 
@@ -74,39 +75,24 @@ export class PlansComponent implements OnInit {
         this.tareas(indexActividad).push(this.newTarea());
     }
 
-    // Eliminar tarea de una actividad específica
-    removeTarea(indexActividad: number, indexTarea: number) {
-        this.tareas(indexActividad).removeAt(indexTarea);
-    }
-
-    // Guardar el formulario
-    onSubmit() {
-        console.log(this.actividadForm.value);
-    }
-
-    getMesNombre(index: number): string {
-        const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-        return meses[index];
-    }
-
-    showPreview() {
+    // Guardar el formulario y generar la vista previa
+    showPreviewWithMontos() {
         const formValue = this.actividadForm.value;
-        this.previewData = formValue.actividades.map((actividad: any, i: number) => {
+        this.previewDataMontos = formValue.actividades.map((actividad: any, i: number) => {
             return actividad.tareas.map((tarea: any, j: number) => {
-                const meses = tarea.meses.map((mes: boolean) => (mes ? '<i class="pi pi-times"></i>' : ''));
                 return {
                     codAct: i + 1,
                     actividadFuncional: actividad.descripcion,
                     codTarea: `${i + 1}.${j + 1}`,
                     tarea: tarea.descripcion,
                     avances: tarea.comentario || '',
-                    meses: meses
+                    montos: tarea.montos  // Aquí agregamos los montos por mes
                 };
             });
         }).flat();
 
         // Cálculo de rowspan por actividad
-        this.rowspanData = this.previewData.reduce((acc: any, curr: any) => {
+        this.rowspanData = this.previewDataMontos.reduce((acc: any, curr: any) => {
             const codAct = curr.codAct;
             if (!acc[codAct]) {
                 acc[codAct] = 1;
@@ -120,8 +106,8 @@ export class PlansComponent implements OnInit {
     // Función para determinar si mostrar rowspan en la actividad funcional
     shouldShowRowspan(rowIndex: number): boolean {
         if (rowIndex === 0) return true; // Siempre mostrar en la primera fila
-        const currentCodAct = this.previewData[rowIndex].codAct;
-        const previousCodAct = this.previewData[rowIndex - 1].codAct;
+        const currentCodAct = this.previewDataMontos[rowIndex].codAct;
+        const previousCodAct = this.previewDataMontos[rowIndex - 1].codAct;
         return currentCodAct !== previousCodAct;
     }
 
@@ -130,10 +116,16 @@ export class PlansComponent implements OnInit {
         return this.rowspanData[codAct] || 1;
     }
 
+    getMesNombre(index: number): string {
+        const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+        return meses[index];
+    }
+
     watchActivities(): void {
         this.actividadForm.valueChanges.pipe().subscribe(
             () => {
-                this.showPreview();
+                this.showPreviewWithMontos();
             })
     }
+
 }

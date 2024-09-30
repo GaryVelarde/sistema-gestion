@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import {
@@ -16,41 +16,28 @@ import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
 
 @Component({
-    templateUrl: './advisory-tracking.component.html',
-    styleUrls: ['./advisory-tracking.component.scss'],
+    templateUrl: './thesis-review-tracking.component.html',
+    styleUrls: ['./thesis-review-tracking.component.scss'],
     providers: [MessageService, ConfirmationService],
 })
-export class AdvisoryTrackingComponent implements OnInit {
+export class ThesisReviewTrackingComponent implements OnInit {
     @ViewChild('upload') upload: UploadArchivesComponent;
     private destroy$ = new Subject<void>();
     products: any[] = [];
     breadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
         { label: 'Proceso de titulación' },
-        { label: 'Asesorías', visible: true },
+        { label: 'Revisión de tesis', visible: true },
     ];
     detailBreadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
         { label: 'Proceso de titulación' },
-        { label: 'Asesorías', },
-        { label: 'Detalle de asesoría', visible: true },
+        { label: 'Revisión de tesis', },
+        { label: 'Detalle de revisión', visible: true },
     ];
     rowsPerPageOptions = [5, 10, 20];
     registros = [];
     getStatusList = '';
-    comments = [
-        {
-            name: 'John Doe',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-            isComment: true,
-        },
-        {
-            name: 'Alice Smith',
-            content:
-                'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            isComment: true,
-        },
-    ];
     reviewerType = userType.teacher;
     studentType = userType.student;
     showDialogCancel = false;
@@ -60,7 +47,7 @@ export class AdvisoryTrackingComponent implements OnInit {
     showSelectNewStudent = false;
     showEditSudents = false;
     commentsVisible = true;
-    module = eModule.advisory;
+    module = eModule.review;
     advisoryState = '';
     filteredReviewers: any;
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
@@ -70,6 +57,7 @@ export class AdvisoryTrackingComponent implements OnInit {
         'Estado',
         ''
     ];
+    selectedProducts: any[] = [];
     formData = new FormData();
     advisorySelected: any;
     showEdit = false;
@@ -113,9 +101,6 @@ export class AdvisoryTrackingComponent implements OnInit {
     get taskDescription() {
         return this._taskDescription;
     }
-    get reversedComments() {
-        return this.comments.slice().reverse();
-    }
     get advisory() {
         return this._advisory;
     }
@@ -152,7 +137,6 @@ export class AdvisoryTrackingComponent implements OnInit {
         private fb: FormBuilder,
         private confirmationService: ConfirmationService,
         private service: AuthService,
-        private elRef: ElementRef,
         private router: Router,
         private config: PrimeNGConfig,
         private loaderService: LoaderService,
@@ -193,7 +177,7 @@ export class AdvisoryTrackingComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.getAdvisoryList();
+        this.getThesisReviewList();
         this.config.setTranslation({
             firstDayOfWeek: 1,
             dayNames: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
@@ -208,15 +192,16 @@ export class AdvisoryTrackingComponent implements OnInit {
         });
     }
 
-    getAdvisoryList() {
+    getThesisReviewList() {
         this.getStatusList = 'charging';
-        this.service.getAdvisoryList().pipe().subscribe(
+        this.service.getThesisReviewList().pipe().subscribe(
             (res: any) => {
+                console.log(res);
                 this.registros = res.data;
-                this.getStatusList = 'complete';
-            }, (error) => {
-                this.getStatusList = 'error';
-            });
+                this.getStatusList = 'complete'
+        }, (error) => {
+            this.getStatusList = 'error';
+        })
     }
 
     goToInscription() {
@@ -240,12 +225,14 @@ export class AdvisoryTrackingComponent implements OnInit {
             (event.target as HTMLInputElement).value,
             'contains'
         );
+        console.log(table.filterGlobal)
     }
+
 
     viewDetailsInscription(data: any) {
         this.loaderService.show();
         if (data) {
-            data.approval_date_udi === '00-00-0000'
+            data.reviewer.length < 1
                 ? this.requiereMoreInfo = true
                 : this.requiereMoreInfo = false;
             this.advisorySelected = data;
@@ -266,7 +253,7 @@ export class AdvisoryTrackingComponent implements OnInit {
 
     backList() {
         this.loaderService.show();
-        this.getAdvisoryList();
+        this.getThesisReviewList();
         this.advisorySelected = null;
         this.students.setValue([]);
         this.advisory.setValue([]);
@@ -484,14 +471,6 @@ export class AdvisoryTrackingComponent implements OnInit {
         });
     }
 
-    addNotificationForChangeState(comment: string) {
-        this.comments.push({
-            name: 'Cesar Jauregui',
-            content: comment,
-            isComment: false,
-        });
-    }
-
     formatText(text: string): string {
         return text.replace(/\n/g, '<br>');
     }
@@ -524,7 +503,7 @@ export class AdvisoryTrackingComponent implements OnInit {
 
     handleReload(reload: boolean) {
         if (reload) {
-            this.getAdvisoryList();
+            this.getThesisReviewList();
         }
     }
 
@@ -579,6 +558,7 @@ export class AdvisoryTrackingComponent implements OnInit {
         this.resolutionDateMI.setValue(this.advisorySelected.resolution_date);
         this.advisoryStartDate.setValue(this.advisorySelected.start_date_advisory);
         this.advisoryEndDate.setValue(this.advisorySelected.end_date_advisory);
+
     }
 
     advisorySelectedUpdate(): void {
@@ -649,4 +629,5 @@ export class AdvisoryTrackingComponent implements OnInit {
     isFormDataEmpty(formData: FormData): boolean {
         return !(formData as any).entries().next().done;
     }
+
 }

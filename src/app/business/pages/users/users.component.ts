@@ -22,8 +22,6 @@ export class UsersComponent implements OnInit, OnDestroy {
     modalNewUser: boolean = false;
     deleteProductDialog: boolean = false;
     deleteProductsDialog: boolean = false;
-    products: any[] = [];
-    product: any = {};
     selectedProducts: any[] = [];
     submitted: boolean = false;
     cols = [
@@ -90,6 +88,8 @@ export class UsersComponent implements OnInit, OnDestroy {
     private _reviewer: FormControl = new FormControl(false);
     private _adviser: FormControl = new FormControl(false);
     private _jury: FormControl = new FormControl(false);
+    private _cip: FormControl = new FormControl('', [Validators.required]);
+    private _orcid: FormControl = new FormControl('', [Validators.required]);
 
     get role() {
         return this._role;
@@ -132,6 +132,12 @@ export class UsersComponent implements OnInit, OnDestroy {
     }
     get jury() {
         return this._jury;
+    }
+    get cip() {
+        return this._cip;
+    }
+    get orcid() {
+        return this._orcid;
     }
 
     constructor(
@@ -181,14 +187,10 @@ export class UsersComponent implements OnInit, OnDestroy {
                         this.removeControlForEstudiante();
                         break;
                     case 'Estudiante':
+                    case 'Semillero':
                         this.addControlForEstudiante();
                         this.removeControlForDocente();
                         this.removeControlForEgresado();
-                        break;
-                    case 'Semillero':
-                        this.removeControlForDocente();
-                        this.removeControlForEgresado();
-                        this.removeControlForEstudiante();
                         break;
                 }
             }
@@ -202,6 +204,8 @@ export class UsersComponent implements OnInit, OnDestroy {
         this.userForm.addControl('reviewer', this.reviewer);
         this.userForm.addControl('adviser', this.adviser);
         this.userForm.addControl('jury', this.jury);
+        this.userForm.addControl('cip', this.cip);
+        this.userForm.addControl('orcid', this.orcid);
     }
 
     addControlForEstudiante() {
@@ -220,6 +224,8 @@ export class UsersComponent implements OnInit, OnDestroy {
         this.userForm.removeControl('reviewer');
         this.userForm.removeControl('adviser');
         this.userForm.removeControl('jury');
+        this.userForm.removeControl('cip');
+        this.userForm.removeControl('orcid');
     }
 
     removeControlForEstudiante() {
@@ -235,119 +241,28 @@ export class UsersComponent implements OnInit, OnDestroy {
     }
 
     openNew() {
-        this.product = {};
+        this.name.reset();
+        this.lastName.reset();
+        this.email.reset();
+        this.number.reset();
+        this.code.reset();
+        this.egressDate.reset();
+        this.cycle.reset();
+        this.career.reset();
+        this.line.reset();
+        this.subLine.reset();
+        this.reviewer.reset();
+        this.adviser.reset();
+        this.jury.reset();
+        this.cip.reset();
+        this.orcid.reset(); 
         this.submitted = false;
         this.modalNewUser = true;
-    }
-
-    deleteSelectedProducts() {
-        this.deleteProductsDialog = true;
-    }
-
-    editProduct(product: any) {
-        this.product = { ...product };
-        this.modalNewUser = true;
-    }
-
-    deleteProduct(product: any) {
-        this.deleteProductDialog = true;
-        this.product = { ...product };
-    }
-
-    confirmDeleteSelected() {
-        this.deleteProductsDialog = false;
-        this.products = this.products.filter(
-            (val) => !this.selectedProducts.includes(val)
-        );
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Successful',
-            detail: 'Products Deleted',
-            life: 3000,
-        });
-        this.selectedProducts = [];
-    }
-
-    confirmDelete() {
-        this.deleteProductDialog = false;
-        this.products = this.products.filter(
-            (val) => val.id !== this.product.id
-        );
-        this.messageService.add({
-            severity: 'success',
-            summary: 'Successful',
-            detail: 'Product Deleted',
-            life: 3000,
-        });
-        this.product = {};
     }
 
     hideDialog() {
         this.modalNewUser = false;
         this.submitted = false;
-    }
-
-    saveProduct() {
-        this.submitted = true;
-
-        if (this.product.name?.trim()) {
-            if (this.product.id) {
-                // @ts-ignore
-                this.product.inventoryStatus = this.product.inventoryStatus
-                    .value
-                    ? this.product.inventoryStatus.value
-                    : this.product.inventoryStatus;
-                this.products[this.findIndexById(this.product.id)] =
-                    this.product;
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Updated',
-                    life: 3000,
-                });
-            } else {
-                this.product.id = this.createId();
-                this.product.code = this.createId();
-                this.product.image = 'product-placeholder.svg';
-                // @ts-ignore
-                this.product.inventoryStatus = this.product.inventoryStatus
-                    ? this.product.inventoryStatus.value
-                    : 'INSTOCK';
-                this.products.push(this.product);
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Created',
-                    life: 3000,
-                });
-            }
-
-            this.products = [...this.products];
-            this.modalNewUser = false;
-            this.product = {};
-        }
-    }
-
-    findIndexById(id: string): number {
-        let index = -1;
-        for (let i = 0; i < this.products.length; i++) {
-            if (this.products[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    }
-
-    createId(): string {
-        let id = '';
-        const chars =
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
     }
 
     onGlobalFilter(table: Table, event: Event) {
@@ -395,17 +310,14 @@ export class UsersComponent implements OnInit, OnDestroy {
                     this.removeControlForEstudiante();
                     break;
                 case 'Estudiante':
+                case 'Semillero':
                     this.addControlForEstudiante();
                     this.removeControlForDocente();
                     this.removeControlForEgresado();
                     this.cycle.setValue({ name: user.cycle, code: user.cycle },)
                     this.career.setValue(user.career);
                     break;
-                case 'Semillero':
-                    this.removeControlForDocente();
-                    this.removeControlForEgresado();
-                    this.removeControlForEstudiante();
-                    break;
+
             }
         }
     }
@@ -424,7 +336,7 @@ export class UsersComponent implements OnInit, OnDestroy {
         );
     }
 
-    hableInsertOrUpdateUser() {
+    handleInsertOrUpdateUser() {
         this.userDetailSelected.id ? this.callPutUser()
             : this.callPostNewUser()
     }
@@ -445,13 +357,18 @@ export class UsersComponent implements OnInit, OnDestroy {
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Mensaje',
-                        detail: 'El usuario se ha creado!',
+                        detail: 'El usuario se ha creado.',
                         life: 3000,
                     });
                 }
                 console.log(res);
             }, (error) => {
-
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al guardar la información.',
+                    life: 3000,
+                });
             });
     }
 
@@ -472,6 +389,8 @@ export class UsersComponent implements OnInit, OnDestroy {
                     is_reviewer: this.reviewer.value ? true : false,
                     is_advisor: this.adviser.value ? true : false,
                     is_jury: this.jury.value ? true : false,
+                    cip: this.cip.value,
+                    orcid: this.orcid.value,
                 };
                 break;
             case 'UDI':
@@ -535,18 +454,27 @@ export class UsersComponent implements OnInit, OnDestroy {
         let rq = this.createRequest();
         this.service.putUser(this.userDetailSelected.id, rq).pipe(
             finalize(() => {
-                setTimeout(() => {
-                    this.loaderService.hide(); // Ocultar el loader después de 800ms
-                }, 800);
+                this.loaderService.hide();
             }), takeUntil(this.destroy$)
         ).subscribe(
             (res: any) => {
                 if (res.status) {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Mensaje',
+                        detail: 'Se actualizó la información del usuario.',
+                        life: 3000,
+                    });
                     this.callGetUserList();
                 }
                 console.log(res);
             }, (error) => {
-                console.error(error);
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al guardar la información.',
+                    life: 3000,
+                });
             })
     }
 

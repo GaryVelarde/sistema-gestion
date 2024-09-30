@@ -31,7 +31,7 @@ export class AppMenuComponent implements OnInit {
                 items: [
                     { label: 'Proyecto de Tesis', icon: 'pi pi-fw pi-file', routerLink: ['/pages/inscription-tracking'] },
                     { label: 'Asesorías', icon: 'pi pi-fw pi-file-import', routerLink: ['/pages/asesorias'] },
-                    { label: 'Revisión de tesis', icon: 'pi pi-fw pi-file-export', routerLink: ['/pages/a'] },
+                    { label: 'Revisión de tesis', icon: 'pi pi-fw pi-file-export', routerLink: ['/pages/thesis-review-tracking'] },
                     { label: 'Sustentación', icon: 'pi pi-fw pi-copy', routerLink: ['/pages/a'] },
                 ]
             },
@@ -45,7 +45,7 @@ export class AppMenuComponent implements OnInit {
                 label: 'Programa 3',
                 items: [
                     { label: 'Planes', icon: 'pi pi-fw pi-list-check', routerLink: ['/pages/plans'] },
-                    { label: 'Presupuestos', icon: 'pi pi-fw pi-calculator', routerLink: ['/#'] },
+                    { label: 'Presupuestos', icon: 'pi pi-fw pi-calculator', routerLink: ['/pages/budget'] },
                 ]
             },
             {

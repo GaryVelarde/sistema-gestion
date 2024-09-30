@@ -19,6 +19,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { FieldsetModule } from 'primeng/fieldset';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DividerModule } from 'primeng/divider';
 import { BadgeModule } from 'primeng/badge';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -30,14 +31,13 @@ import { AvatarModule } from 'primeng/avatar';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { SidebarModule } from 'primeng/sidebar';
-import { PlansRoutingModule } from './plans-routing.module';
-import { PlansComponent } from './plans.component';
-import { PanelModule } from 'primeng/panel';
+import { ThesisReviewTrackingComponent } from './thesis-review-tracking.component';
+import { ThesisReviewTrackingRoutingModule } from './thesis-review-tracking-routing.module';
 
 @NgModule({
     imports: [
         CommonModule,
-        PlansRoutingModule,
+        ThesisReviewTrackingRoutingModule,
         TableModule,
         FileUploadModule,
         ReactiveFormsModule,
@@ -58,6 +58,7 @@ import { PanelModule } from 'primeng/panel';
         CardModule,
         TagModule,
         FieldsetModule,
+        ConfirmDialogModule,
         DividerModule,
         BadgeModule,
         SkeletonModule,
@@ -67,12 +68,11 @@ import { PanelModule } from 'primeng/panel';
         CrossComponentsModule,
         BreadcrumbModule,
         SidebarModule,
-        PanelModule,
     ],
-    declarations: [PlansComponent],
+    declarations: [ThesisReviewTrackingComponent],
     providers: [
         InscriptionPresenter,
         provideHttpClient(withInterceptorsFromDi()),
     ],
 })
-export class PlansModule {}
+export class ThesisReviewTrackingModule {}

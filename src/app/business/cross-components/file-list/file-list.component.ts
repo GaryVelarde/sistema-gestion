@@ -24,6 +24,7 @@ export class FileListComponent implements OnInit {
     }
   }
   status = '';
+  messageError: string = 'Se produjo un error al cargar los archivos adjuntos. Por favor, inténtelo de nuevo más tarde';
   skeletonRows = ['1', '2', '3', '4', '5', '6'];
   files: FileData[] = [];
   private destroy$ = new Subject<void>();
@@ -92,8 +93,17 @@ export class FileListComponent implements OnInit {
             this.status = 'error';
           })
         break;
-        case eModule.hotbed:
+      case eModule.hotbed:
         this.service.getHotbedFiles(this.id).pipe(takeUntil(this.destroy$)).subscribe(
+          (res: any) => {
+            this.files = res.data;
+            this.status = 'complete';
+          }, (error) => {
+            this.status = 'error';
+          })
+        break;
+        case eModule.review:
+        this.service.getThesisReviewFiles(this.id).pipe(takeUntil(this.destroy$)).subscribe(
           (res: any) => {
             this.files = res.data;
             this.status = 'complete';
@@ -172,5 +182,9 @@ export class FileListComponent implements OnInit {
   }
   addArchives() {
     this.addArchiveClicked.emit(true);
+  }
+
+  handleReload() {
+    this.callGetFileList();
   }
 }

@@ -30,14 +30,14 @@ import { AvatarModule } from 'primeng/avatar';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { SidebarModule } from 'primeng/sidebar';
-import { PlansRoutingModule } from './plans-routing.module';
-import { PlansComponent } from './plans.component';
 import { PanelModule } from 'primeng/panel';
+import { BudgetComponent } from './budget.component';
+import { BudgetRoutingModule } from './budget-routing.module';
 
 @NgModule({
     imports: [
         CommonModule,
-        PlansRoutingModule,
+        BudgetRoutingModule,
         TableModule,
         FileUploadModule,
         ReactiveFormsModule,
@@ -69,10 +69,10 @@ import { PanelModule } from 'primeng/panel';
         SidebarModule,
         PanelModule,
     ],
-    declarations: [PlansComponent],
+    declarations: [BudgetComponent],
     providers: [
         InscriptionPresenter,
         provideHttpClient(withInterceptorsFromDi()),
     ],
 })
-export class PlansModule {}
+export class BudgetModule {}

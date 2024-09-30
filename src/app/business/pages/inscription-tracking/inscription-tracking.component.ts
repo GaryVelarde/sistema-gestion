@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
-import { ConfirmationService, MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
+import { MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import {
     FormBuilder,
@@ -9,10 +9,8 @@ import {
 } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
-import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { finalize, Subject, takeUntil } from 'rxjs';
-import { IStudent, ITeacher } from '../../cross-interfaces/comments-interfaces';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { DateFormatService } from 'src/app/services/date-format.service';
 
@@ -47,18 +45,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     totalTask = 0;
     totalTaskIncomplete = 0;
     totalTaskComplete = 0;
-    tasks = [
-        {
-            id: '1',
-            description: 'Description 1',
-            checked: false,
-        },
-        {
-            id: '2',
-            description: 'Description 2',
-            checked: false,
-        },
-    ];
+
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     columnTitles: string[] = [
         'Título de tesis',
@@ -95,35 +82,29 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     formData = new FormData();
     reloadFiles = false;
     messageError: string = 'Se produjo un error al cargar la lista de proyectos de tesis. Por favor, inténtelo de nuevo más tarde';
-    commentsForm: FormGroup;
-    tasksForm: FormGroup;
     cancelattionForm: FormGroup;
     aprobationForm: FormGroup;
     studentsForm: FormGroup;
     teacherForm: FormGroup;
-    private _comment: FormControl = new FormControl('', [Validators.required]);
+    editForm: FormGroup;
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
     private _sentToSecretaryDate: FormControl = new FormControl('', [Validators.required]);
-    private _taskDescription: FormControl = new FormControl('', [
-        Validators.required,
-    ]);
-    private _students: FormControl = new FormControl([] as IStudent[], [Validators.required]);
-    private _teacher: FormControl = new FormControl([] as ITeacher[], [Validators.required]);
+    private _students: FormControl = new FormControl([] as any[], [Validators.required]);
+    private _teacher: FormControl = new FormControl([] as any[], [Validators.required]);
+    private _caseNumber: FormControl = new FormControl('', [Validators.required]);
+    private _professionalSchool: FormControl = new FormControl('', [Validators.required]);
+    private _officialDocumentNumber: FormControl = new FormControl('', [Validators.required]);
+    private _resolutionNumber: FormControl = new FormControl('', [Validators.required]);
+    private _facultyReceptionDate: FormControl = new FormControl('', [Validators.required]);
+    private _udiApprovalDate: FormControl = new FormControl('', [Validators.required]);
 
-    get comment() {
-        return this._comment;
-    }
     get cancelationComment() {
         return this._cancelationComment;
     }
     get dateCancelationReception() {
         return this._dateCancelationReception;
     }
-    get taskDescription() {
-        return this._taskDescription;
-    }
-
     get students() {
         return this._students;
     }
@@ -132,6 +113,24 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     }
     get sentToSecretaryDate() {
         return this._sentToSecretaryDate;
+    }
+    get caseNumber() {
+        return this._caseNumber;
+    }
+    get professionalSchool() {
+        return this._professionalSchool;
+    }
+    get officialDocumentNumber() {
+        return this._officialDocumentNumber;
+    }
+    get resolutionNumber() {
+        return this._resolutionNumber;
+    }
+    get facultyReceptionDate() {
+        return this._facultyReceptionDate;
+    }
+    get udiApprovalDate() {
+        return this._udiApprovalDate;
     }
 
     constructor(
@@ -144,12 +143,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         private loaderService: LoaderService,
         private dateFormat: DateFormatService,
     ) {
-        this.commentsForm = this.fb.group({
-            comment: this.comment,
-        });
-        this.tasksForm = this.fb.group({
-            taskDescription: this.taskDescription,
-        });
         this.cancelattionForm = this.fb.group({
             cancelationComment: this.cancelationComment,
             dateCancelationReception: this.dateCancelationReception
@@ -162,6 +155,17 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         });
         this.aprobationForm = this.fb.group({
             sentToSecretaryDate: this.sentToSecretaryDate,
+        });
+        this.aprobationForm = this.fb.group({
+            sentToSecretaryDate: this.sentToSecretaryDate,
+        });
+        this.editForm = this.fb.group({
+            caseNumber: this.caseNumber,
+            professionalSchool: this.professionalSchool,
+            officialDocumentNumber: this.officialDocumentNumber,
+            resolutionNumber: this.resolutionNumber,
+            facultyReceptionDate: this.facultyReceptionDate,
+            udiApprovalDate: this.udiApprovalDate,
         });
     }
 
@@ -179,8 +183,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
             dateFormat: 'dd/mm/yy',
             weekHeader: 'Sm'
         });
-        this.watchStudents();
-        this.watchTeacher();
     }
 
     ngOnDestroy() {
@@ -224,12 +226,14 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
             (event.target as HTMLInputElement).value,
             'contains'
         );
+        console.log(table.filterGlobal)
     }
 
     viewDetailsInscription(data: any) {
         this.loaderService.show();
         if (data) {
             this.inscriptionSelected = data;
+            console.log('this.inscriptionSelected', this.inscriptionSelected)
             this.graduatesList = data.graduates;
             this.reviewerList = data.inscriptions[0].teachers;
             this.teacher.setValue(data.inscriptions[0].teachers);
@@ -238,7 +242,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
             this.inscriptionState === 'Aprobado' || this.inscriptionState === 'Renuncia'
                 ? this.commentsVisible = false
                 : this.commentsVisible = true
-            this.countTask();
+            this.fillDataInEditForm();
         }
         setTimeout(() => {
             this.loaderService.hide();
@@ -437,62 +441,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         this.showDialogAprobation = true;
     }
 
-    taskDone(inputId: string): void {
-        const labelElement = this.elRef.nativeElement.querySelector(
-            `label[for="${inputId}"]`
-        );
-        if (labelElement) {
-            labelElement.classList.add('task-done');
-        }
-        this.countTask();
-    }
-
-    isTaskDone(task: any): any {
-        return {
-            'task-done': task.checked,
-        };
-    }
-
-    removeTask(taskId: string) {
-        const index = this.tasks.findIndex((task) => task.id === taskId);
-        if (index !== -1) {
-            this.tasks.splice(index, 1);
-        }
-        this.countTask();
-    }
-
-    countTask(): void {
-        this.totalTask = 0;
-        this.totalTaskIncomplete = 0;
-        this.totalTaskComplete = 0;
-        this.tasks.forEach((task) => {
-            if (task.checked) {
-                this.totalTaskComplete++;
-            } else {
-                this.totalTaskIncomplete++;
-            }
-            this.totalTask++;
-        });
-    }
-
-    addTask(event: KeyboardEvent): void {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            if (this.taskDescription.value) {
-                this.tasks.push({
-                    id: '11',
-                    description: this.taskDescription.value,
-                    checked: false,
-                });
-                this.taskDescription.reset();
-            }
-        }
-    }
-
-    formatText(text: string): string {
-        return text.replace(/\n/g, '<br>');
-    }
-
     scrollDown(): void {
         window.scroll({
             top: document.body.scrollHeight,
@@ -556,27 +504,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         const firstLetter = str.charAt(0);
         const firstLetterUpper = firstLetter.toUpperCase();
         return firstLetterUpper;
-    }
-
-    watchStudents() {
-        this.students.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((res: IStudent[]) => {
-            console.log(res);
-            if (res.length > 2) {
-                const students = [...res];
-                students.splice(2, 1);
-                this.students.setValue(students);
-            }
-        })
-    }
-
-    watchTeacher() {
-        this.teacher.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((res: ITeacher[]) => {
-            if (res.length > 1) {
-                const teacher = [...res];
-                teacher.splice(1, 1);
-                this.teacher.setValue(teacher);
-            }
-        })
     }
 
     addFullNameProperty(data: any[]): any[] {
@@ -693,5 +620,14 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     isFormDataEmpty(formData: FormData): boolean {
         // Realiza el casting a `any` para evitar el error de TypeScript
         return !(formData as any).entries().next().done;
+    }
+
+    fillDataInEditForm(): void {
+        this.caseNumber.setValue(this.inscriptionSelected.file);
+        this.professionalSchool.setValue(this.inscriptionSelected.professional_school);
+        this.officialDocumentNumber.setValue(this.inscriptionSelected.office_number);
+        this.resolutionNumber.setValue(this.inscriptionSelected.resolution_number);
+        this.facultyReceptionDate.setValue(this.inscriptionSelected.inscriptions[0].reception_date_faculty);
+        this.udiApprovalDate.setValue(this.inscriptionSelected.inscriptions[0].approval_date_udi);
     }
 }

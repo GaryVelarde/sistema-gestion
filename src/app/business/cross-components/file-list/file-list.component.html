@@ -261,3 +261,6 @@
         </div>
     </div>
 </ng-template>
+<ng-template #error>
+    <app-label-error class="col-12" [message]="messageError" (reload)="handleReload()"> </app-label-error>
+</ng-template>

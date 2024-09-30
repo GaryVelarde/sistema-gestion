@@ -135,9 +135,6 @@
                                         <p-button label="Ver detalle"
                                             [outlined]="true" severity="contrast"
                                             (click)="openModalUserDetail(data)" />
-    
-                                        <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
-                                    <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteProduct(product)"></button> -->
                                     </div>
                                 </td>
                             </tr>
@@ -155,7 +152,7 @@
     </ng-template>
     <div class="content">
         <form [formGroup]="userForm">
-            <div class="field mt-4">
+            <div class="field mt-5">
                 <span class="p-float-label">
                     <p-dropdown
                         formControlName="role"
@@ -171,7 +168,7 @@
                     *ngIf="role.dirty && role.errors">El rol es
                     requerido.</small>
             </div>
-            <div class="field mt-4">
+            <div class="field mt-5">
                 <span class="p-float-label">
                     <input
                         type="text"
@@ -186,7 +183,7 @@
                     *ngIf="name.dirty && name.errors">El nombre es
                     requerido.</small>
             </div>
-            <div class="field mt-4">
+            <div class="field mt-5">
                 <span class="p-float-label">
                     <input
                         type="text"
@@ -202,7 +199,7 @@
                     apellido es requerido.</small>
             </div>
 
-            <div class="formgrid grid mt-4">
+            <div class="formgrid grid mt-5">
                 <div class="field col">
                     <span class="p-float-label">
                         <input
@@ -237,7 +234,7 @@
                         es requerido.</small>
                 </div>
             </div>
-            <div class="formgrid grid mt-4">
+            <div class="formgrid grid mt-5">
                 <div class="field col">
                     <span class="p-float-label">
                         <input
@@ -254,7 +251,7 @@
                         requerido.</small>
                 </div>
             </div>
-            <div *ngIf="role.value.code === 'Estudiante'">
+            <div *ngIf="role.value.code === 'Estudiante' || role.value.code === 'Semillero'">
                 <div class="formgrid grid mt-5">
                     <div class="field col">
                         <span class="p-float-label">
@@ -365,6 +362,36 @@
                         <span class="p-float-label">
                             <input
                                 type="text"
+                                id="cip"
+                                class="w-full"
+                                pInputText
+                                formControlName="cip" />
+                            <label for="cip">Cip</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="cip.dirty && cip.errors">El Cip es requerido.</small>
+                    </div>
+                    <div class="field col">
+                        <span class="p-float-label">
+                            <input
+                                type="text"
+                                id="orcid"
+                                class="w-full"
+                                pInputText
+                                formControlName="orcid" />
+                            <label for="orcid">Orcid</label>
+                        </span>
+                        <small
+                            class="pl-2 text-error"
+                            *ngIf="orcid.dirty && orcid.errors">El Orcid es requerido.</small>
+                    </div>
+                </div>
+                <div class="formgrid grid mt-5">
+                    <div class="field col">
+                        <span class="p-float-label">
+                            <input
+                                type="text"
                                 id="career"
                                 class="w-full"
                                 pInputText
@@ -425,7 +452,7 @@
                     icon="pi pi-check"
                     iconPos="right"
                     [disabled]="!userForm.valid"
-                    (click)="hableInsertOrUpdateUser()"></button>
+                    (click)="handleInsertOrUpdateUser()"></button>
               </div>
         </form>
     </div>

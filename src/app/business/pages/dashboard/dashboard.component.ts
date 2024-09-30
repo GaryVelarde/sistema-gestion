@@ -3,6 +3,7 @@ import { MenuItem } from 'primeng/api';
 import { Subscription, debounceTime } from 'rxjs';
 import { ProductService } from 'src/app/demo/service/product.service';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
     templateUrl: './dashboard.component.html',
@@ -19,15 +20,26 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     subscription!: Subscription;
 
-    constructor(private productService: ProductService, public layoutService: LayoutService) {
+    stateCallNotifications = '';
+    skeletonNotificationBodyRows = ['1', '2', '3'];
+    skeletonNotificationsRows = ['1', '2'];
+    notifications: any[] = [];
+    notificationsToday = [];
+    notificationsYesterday = [];
+    notificationsDaysAgo = {};
+
+    messageError = 'Ha ocurrido un error al cargar las notificaciones. Por favor, inténtalo de nuevo más tarde.'
+
+    constructor(private productService: ProductService, public layoutService: LayoutService, private service: AuthService) {
         this.subscription = this.layoutService.configUpdate$
-        .pipe(debounceTime(25))
-        .subscribe((config) => {
-            this.initChart();
-        });
+            .pipe(debounceTime(25))
+            .subscribe((config) => {
+                this.initChart();
+            });
     }
 
     ngOnInit() {
+        this.callGetNotificationReport();
         this.initChart();
         this.productService.getProductsSmall().then(data => this.products = data);
 
@@ -35,6 +47,92 @@ export class DashboardComponent implements OnInit, OnDestroy {
             { label: 'Add New', icon: 'pi pi-fw pi-plus' },
             { label: 'Remove', icon: 'pi pi-fw pi-minus' }
         ];
+    }
+
+    callGetNotificationReport() {
+        this.stateCallNotifications = 'charging';
+        this.service.getNotificationReport().pipe().subscribe(
+            (res: any) => {
+                this.notifications = [
+                    ...res.data.comments.map(comment => ({ ...comment, type: 'comment', icon: this.getNotificationIcon(comment.comment) })),
+                    ...res.data.tasks.map(task => ({ ...task, type: 'task', icon: this.getNotificationIcon(task.task) }))
+                ];
+                this.categorizeNotifications();
+            }, (error) => {
+                this.stateCallNotifications = 'error';
+            });
+    }
+
+    refreshNotificactions() {
+        this.notifications = [];
+        this.notificationsToday = [];
+        this.notificationsYesterday = [];
+        this.notificationsDaysAgo = {};
+        this.callGetNotificationReport();
+    }
+
+    categorizeNotifications() {
+        const today = this.normalizeDate(new Date());
+
+        this.notifications.forEach(notification => {
+            const notificationDate = this.normalizeDate(this.parseDate(notification.created_at));
+            const diffDays = this.calculateDiffDays(notificationDate, today);
+
+            if (diffDays === 0) {
+                this.notificationsToday.push(notification);
+            } else if (diffDays === 1) {
+                this.notificationsYesterday.push(notification);
+            } else {
+                if (!this.notificationsDaysAgo[diffDays]) {
+                    this.notificationsDaysAgo[diffDays] = [];
+                }
+                this.notificationsDaysAgo[diffDays].push(notification);
+            }
+        });
+        this.stateCallNotifications = 'complete';
+    }
+
+    parseDate(dateString: string): Date {
+        const parts = dateString.split(' ');
+        const dateParts = parts[0].split('-');
+        const timeParts = parts[1].split(':');
+
+        return new Date(
+            parseInt(dateParts[2], 10),  // Año
+            parseInt(dateParts[1], 10) - 1,  // Mes (0-indexado)
+            parseInt(dateParts[0], 10),  // Día
+            parseInt(timeParts[0], 10),  // Horas
+            parseInt(timeParts[1], 10),  // Minutos
+            parseInt(timeParts[2], 10)   // Segundos
+        );
+    }
+
+    calculateDiffDays(date1: Date, date2: Date): number {
+        const oneDay = 24 * 60 * 60 * 1000; // Milisegundos en un día
+        const diffTime = date2.getTime() - date1.getTime(); // Diferencia en milisegundos
+        return Math.floor(diffTime / oneDay); // Convertimos a días completos
+    }
+
+    normalizeDate(date: Date): Date {
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    getNotificationIcon(text: string): string {
+        if (text.includes("en la reunión")) {
+            return "pi pi-fw pi-calendar-plus";
+        } else if (text.includes("en el artículo")) {
+            return "pi pi-fw pi-book";
+        } else if (text.includes("en la sustentación")) {
+            return "pi pi-fw pi-copy";
+        } else if (text.includes("en la revisión de tesis")) {
+            return "pi pi-fw pi-file-export";
+        } else if (text.includes("en la asesoría")) {
+            return "pi pi-fw pi-file-import";
+        } else if (text.includes("en la inscripción")) {
+            return "pi pi-fw pi-file";
+        }
+        // Ícono por defecto
+        return "pi pi-comment";
     }
 
     initChart() {
