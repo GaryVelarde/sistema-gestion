@@ -5,6 +5,22 @@
         <div class="card px-6 py-6">
             <div class="">
                 <form [formGroup]="actividadForm" (ngSubmit)="onSubmit()">
+                    <!-- Campo para el Título General -->
+                    <div class="p-field p-grid">
+                        <label for="tituloGeneral" class="col-12"
+                            >Título General</label
+                        >
+                        <div class="col-12">
+                            <input
+                                pInputText
+                                id="tituloGeneral"
+                                style="width: 100%"
+                                formControlName="tituloGeneral"
+                                placeholder="Ingrese el título general"
+                                class="p-inputtext-sm"
+                            />
+                        </div>
+                    </div>
                     <!-- Actividades -->
                     <div formArrayName="actividades">
                         <div
@@ -22,9 +38,9 @@
                         >
                             <div class="flex">
                                 <div class="mr-auto">
-                                    <h5>
-                                        {{ i + 1 + ". Actividad Funcional" }}
-                                    </h5>
+                                    <label for="tituloGeneral" class="col-12"
+                                    > {{ i + 1 + ". Actividad Funcional" }}</label
+                                >
                                 </div>
                                 <button
                                     pButton

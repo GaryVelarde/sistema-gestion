@@ -23,8 +23,10 @@ export class PlansComponent implements OnInit {
         private fb: FormBuilder
     ) {
         this.actividadForm = this.fb.group({
+            tituloGeneral: ['', Validators.required], // Título general del formulario
             actividades: this.fb.array([]) // Un array para múltiples actividades
         });
+        
     }
 
     ngOnInit() {
@@ -81,8 +83,13 @@ export class PlansComponent implements OnInit {
 
     // Guardar el formulario
     onSubmit() {
-        console.log(this.actividadForm.value);
+        if (this.actividadForm.valid) {
+            const formData = this.actividadForm.value;
+            console.log('Título General:', formData.tituloGeneral);
+            console.log('Actividades:', formData.actividades);
+        }
     }
+    
 
     getMesNombre(index: number): string {
         const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
@@ -104,7 +111,10 @@ export class PlansComponent implements OnInit {
                 };
             });
         }).flat();
-
+    
+        // Añadir el título general al preview
+        console.log('Título General:', formValue.tituloGeneral);
+    
         // Cálculo de rowspan por actividad
         this.rowspanData = this.previewData.reduce((acc: any, curr: any) => {
             const codAct = curr.codAct;

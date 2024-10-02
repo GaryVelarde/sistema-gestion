@@ -1,3 +1,3 @@
 export const environment = {
-  apiURL: 'https://e70d-181-67-176-39.ngrok-free.app/api'
+  apiURL: 'https://5f48-181-67-176-39.ngrok-free.app/api'
 };

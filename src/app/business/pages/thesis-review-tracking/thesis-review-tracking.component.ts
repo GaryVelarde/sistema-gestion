@@ -67,7 +67,7 @@ export class ThesisReviewTrackingComponent implements OnInit {
     getStudentListProcess = '';
     studentsList = [];
     alertForCancelation: Message[] | undefined;
-    messageError: string = 'Lo sentimos, hubo un problema al intentar cargar la lista de asesorías. Por favor, inténtelo de nuevo más tarde. Si el inconveniente persiste, contacte al soporte técnico.';
+    messageError: string = 'Lo sentimos, hubo un problema al intentar cargar la lista de revisiones de tesis. Por favor, inténtelo de nuevo más tarde. Si el inconveniente persiste, contacte al soporte técnico.';
     messageMoreInfo = [{ severity: 'info', detail: 'Es necesario completar todos los campos faltantes para continuar con la asesoría.' }];
     requiereMoreInfo: boolean = false;
     public tasksForm: FormGroup;

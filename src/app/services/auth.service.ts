@@ -122,7 +122,7 @@ export class AuthService {
   }
 
   getCommentsByEventsUDI(id: string): Observable<any> {
-    return this.http.get(`${this.API_URL}/meeting/${id}/observation`, this.header);
+    return this.http.get(`${this.API_URL}/meeting/${id}/observations`, this.header);
   }
 
   getCommentsByHotbed(id: string): Observable<any> {
@@ -146,7 +146,7 @@ export class AuthService {
   }
 
   postAddEventsUdiComment(id: any, request: any) {
-    return this.http.post(`${this.API_URL}/meeting/${id}/observation`, request, this.header);
+    return this.http.post(`${this.API_URL}/meeting/${id}/observations`, request, this.header);
   }
 
   postAddAdvisoryComment(id: any, request: any) {

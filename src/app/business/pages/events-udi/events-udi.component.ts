@@ -24,16 +24,21 @@ import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { LoaderService } from 'src/app/layout/service/loader.service';
-import { eModule } from 'src/app/commons/enums/app,enum';
+import { eModule, userType } from 'src/app/commons/enums/app,enum';
 interface Task {
-    id: number;
+    id: string;
     title: string;
     description: string;
     dateEnd: string;
     user: {
-        id: number,
+        id: string,
         name: string,
         surnames: string,
+        code: number,
+        email: string,
+        phone: number,
+        orcid: string,
+        cip: number,
     };
 }
 
@@ -59,7 +64,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     showEventDetail = false;
     newEventDialog = false;
     newTaskDialog = false;
-    taskSelectedId: number;
+    taskSelectedId: string;
     breadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
         { label: 'Eventos' },
@@ -78,22 +83,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         { name: '30 minutos', code: '00:30:00' },
     ];
 
-    comments = [
-        {
-            name: 'John Doe',
-            content: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-            isComment: true,
-            date: 'Tue Aug 01 2024 13:54:47 GMT-0500 (hora estándar de Perú)'
-        },
-        {
-            name: 'Alice Smith',
-            content:
-                'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            isComment: true,
-            date: 'Tue Aug 01 2024 13:54:47 GMT-0500 (hora estándar de Perú)'
-        },
-    ];
-
+    rowsSkeletonTask = ['1', '2', '3'];
+    statusTask = 'charging';
     data = [
         {
             "id": 1,
@@ -199,7 +190,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         }
 
     };
-
+    teacherL = userType.teacher;
     eventSelected: any;
     module = eModule.eventUdi;
     public eventForm: FormGroup;
@@ -207,7 +198,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     public taskForm: FormGroup;
     public managerForm: FormGroup;
     public participantsForm: FormGroup;
-    public commentsForm: FormGroup;
     private _slotDuration: FormControl = new FormControl('', [
         Validators.required,
     ]);
@@ -222,7 +212,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     private _start: FormControl = new FormControl('', [Validators.required]);
     private _end: FormControl = new FormControl('', [Validators.required]);
     private _endTask: FormControl = new FormControl('', [Validators.required]);
-    private _assignedUser: FormControl = new FormControl([] as Usuario[], [Validators.required]);
+    private _assignedUser: FormControl = new FormControl({}, [Validators.required]);
     private _descriptionTask: FormControl = new FormControl('', [
         Validators.required,
     ]);
@@ -235,7 +225,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     private _usersParticipants: FormControl = new FormControl([] as Usuario[], [
         Validators.required,
     ]);
-    private _comment: FormControl = new FormControl('', [Validators.required]);
 
     get slotDuration() {
         return this._slotDuration;
@@ -276,24 +265,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     get assignedUser() {
         return this._assignedUser;
     }
-    get comment() {
-        return this._comment;
-    }
-
-    get reversedComments() {
-        return this.comments.slice().reverse();
-    }
     selectedItems: Usuario[] | undefined;
 
-    usuarios: Usuario[] = [];/*[
-        { id: 1, nombre: 'Cesar', apellidos: 'Jauregui' },
-        { id: 2, nombre: 'Gary', apellidos: 'Gomez Bazalar' },
-        { id: 3, nombre: 'María', apellidos: 'Villanueva Alarcón' },
-        { id: 4, nombre: 'Carlos', apellidos: 'Ramirez Perez' },
-        { id: 5, nombre: 'Ana', apellidos: 'Benavide' },
-        { id: 6, nombre: 'Luis', apellidos: 'Benavidez Ayala' },
-        // Agrega más usuarios según sea necesario
-    ];*/
+    usuarios: any[] = [];
 
     filteredItems: Usuario[] | undefined;
 
@@ -328,9 +302,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.participantsForm = this.fb.group({
             usersParticipants: this.usersParticipants,
         });
-        this.commentsForm = this.fb.group({
-            comment: this.comment,
-        });
     }
 
     ngOnInit() {
@@ -352,7 +323,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             dateFormat: 'dd/mm/yy',
             weekHeader: 'Sm'
         });
-        
+        this.watchassignedUser()
     }
 
     ngAfterViewInit(): void {
@@ -369,30 +340,26 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     async callGetEventsUdi() {
         await this.service.getEventsUdiList().pipe().subscribe(
             (res: any) => {
-            console.log('eventos:', res);
-            for (let event of res.data) {
-                const ev: EventInput = {
-                    title: event.title,
-                    start: this.dateFormatService.formatDateCalendar(event.start_date),
-                    end: this.dateFormatService.formatDateCalendar(event.due_date),
-                    backgroundColor: event.color,
-                    borderColor: event.color,
-                    editable: true,
-                    startResizable: true,
-                    durationEditable: true,
-                    event_udi: event
+                for (let event of res.data) {
+                    const ev: EventInput = {
+                        title: event.title,
+                        start: this.dateFormatService.formatDateCalendar(event.start_date),
+                        end: this.dateFormatService.formatDateCalendar(event.due_date),
+                        backgroundColor: event.color,
+                        borderColor: event.color,
+                        editable: true,
+                        startResizable: true,
+                        durationEditable: true,
+                        event_udi: event
+                    }
+                    this.events = [...this.events, ev];
                 }
-                console.log(event.title, event.start_date, event.due_date)
-                console.log(this.dateFormatService.formatDateCalendar(event.start_date))
-                this.events = [...this.events, ev];
-            }
-            this.calendarOptions = {
-                ...this.calendarOptions,
-                events: this.events
-            };
-        
-        })
-        console.log('aaaaaaaaaaaaaaaaaaaaaaa', this.events)
+                this.calendarOptions = {
+                    ...this.calendarOptions,
+                    events: this.events
+                };
+
+            })
     }
 
     watchSlotDuration() {
@@ -405,7 +372,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             }
         });
     }
-    
+
     updateCalendarOptions(duration: string, interval: string) {
         const calendarApi = this.calendarComponent.getApi();
         calendarApi.setOption('slotDuration', duration);
@@ -430,7 +397,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     handleEventClick(arg) {
         this.loaderService.show();
         this.eventSelected = arg;
-        console.log('eventSelected 2', this.eventSelected.event._def.extendedProps.event_udi);
         const usersManager: Usuario[] = [];
         const usersParticipants: Usuario[] = [];
         for (let user of this.eventSelected.event._def.extendedProps.event_udi.managers) {
@@ -507,39 +473,40 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
     drop(event: any, column: 'pending' | 'inProgress' | 'completed') {
         if (this.draggedTask) {
-            console.log('draggedTask', this.draggedTask)
-            console.log('draggedTask.id', this.draggedTask.id)
+            const columnBefore = this.isTaskInPending(this.draggedTask.id);
+            if (
+                columnBefore === column
+            ) {
+                return;
+            }
+            this.statusTask = 'charging';
+            const task = this.draggedTask;
             const taskId = this.draggedTask.id;
             this.service.updateStatusTask(this.eventSelected.event._def.extendedProps.event_udi.id,
-                taskId.toString(), column).pipe().subscribe((res: any) => {
-                    if (res.status) {
-
-                        const columnBefore = this.isTaskInPending(taskId);
-                        if (
-                            (columnBefore === 'inProgress' && column === 'pending') ||
-                            (columnBefore === 'completed' && column === 'pending') ||
-                            (columnBefore === 'completed' && column === 'inProgress')
-                        ) {
-                            return;
+                taskId.toString(), column).pipe().subscribe(
+                    (res: any) => {
+                        if (res.status) {
+                            this.removeTask(task);
+                            if (column === 'pending') {
+                                this.pendingTasks = [...this.pendingTasks, task];
+                            } else if (column === 'inProgress') {
+                                this.inProgressTasks = [
+                                    ...this.inProgressTasks,
+                                    task,
+                                ];
+                            } else if (column === 'completed') {
+                                this.completedTasks = [
+                                    ...this.completedTasks,
+                                    task,
+                                ];
+                            }
+                            this.draggedTask = null;
+                            this.cdr.detectChanges();
+                            this.statusTask = 'complete';
                         }
-                        this.removeTask(this.draggedTask);
-                        if (column === 'pending') {
-                            this.pendingTasks = [...this.pendingTasks, this.draggedTask];
-                        } else if (column === 'inProgress') {
-                            this.inProgressTasks = [
-                                ...this.inProgressTasks,
-                                this.draggedTask,
-                            ];
-                        } else if (column === 'completed') {
-                            this.completedTasks = [
-                                ...this.completedTasks,
-                                this.draggedTask,
-                            ];
-                        }
-                        this.draggedTask = null;
-                        this.cdr.detectChanges();
-                    }
-                })
+                    }, (error) => {
+                        this.statusTask = 'error';
+                    })
 
         }
     }
@@ -549,29 +516,35 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     removeTask(task: Task) {
-        this.service.deleteTask(this.eventSelected.event._def.extendedProps.event_udi.id,
-            task.id.toString()
-        ).pipe().subscribe((res: any) => {
-            if (res.status) {
-                this.pendingTasks = this.pendingTasks.filter((t) => t.id !== task.id);
-                this.inProgressTasks = this.inProgressTasks.filter(
-                    (t) => t.id !== task.id
-                );
-                this.completedTasks = this.completedTasks.filter(
-                    (t) => t.id !== task.id
-                );
-            }
-        })
+        this.pendingTasks = this.pendingTasks.filter((t) => t.id !== task.id);
+        this.inProgressTasks = this.inProgressTasks.filter(
+            (t) => t.id !== task.id
+        );
+        this.completedTasks = this.completedTasks.filter(
+            (t) => t.id !== task.id
+        );
     }
 
     showNewTaskDialog() {
         this.taskForm.reset();
         this.newTaskDialog = true;
-        this.taskSelectedId = 0;
+        this.taskSelectedId = '';
     }
 
     deleteTask(task: Task) {
-        this.removeTask(task);
+        this.statusTask = 'charging';
+        this.service.deleteTask(this.eventSelected.event._def.extendedProps.event_udi.id,
+            task.id.toString()
+        ).pipe().subscribe(
+            (res: any) => {
+                if (res.status) {
+                    this.removeTask(task);
+                    this.statusTask = 'complete';
+
+                }
+            }, (error) => {
+                this.statusTask = 'error';
+            })
     }
 
     editTask(task: any) {
@@ -580,12 +553,14 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.titleTask.setValue(task.title);
         this.descriptionTask.setValue(task.description);
         this.endTask.setValue(this.dateFormatService.formatDateDDMMYYYY(task.dateEnd));
-
+        const user = task.user;
+        user.fullName = task.user.name + ' ' + task.user.surnames;
+        this.assignedUser.setValue(user);
         this.taskSelectedId = task.id;
         this.newTaskDialog = true;
     }
 
-    isTaskInPending(id: number): string {
+    isTaskInPending(id: string): string {
         let column = '';
         if (this.pendingTasks.find((task) => task.id === id)) {
             column = 'pending';
@@ -599,81 +574,74 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         return column;
     }
 
-    addTask(id: number) {
-        console.log('this.assignedUser.value', this.assignedUser.value);
+    addTask(id: string) {
+        this.statusTask = 'charging';
         const request = {
             "title": this.titleTask.value,
             "description": this.descriptionTask.value,
             "commitment_date": this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
             "user_id": this.assignedUser.value.id
         }
-        if (id > 0) {
+        if (id) {
             this.service.updateTaskDetail(this.eventSelected.event._def.extendedProps.event_udi.id, id.toString(), request).pipe()
                 .subscribe((res: any) => {
-                    console.log(res);
-                }, (error) => {
-
-                })
-            const taskIndex = this.pendingTasks.findIndex(task => task.id === id);
-            const updateTask: Task = {
-                id: this.getMaxId() + 1,
-                title: this.titleTask.value,
-                description: this.descriptionTask.value,
-                dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
-                user: {
-                    id: this.assignedUser.value.id,
-                    name: this.assignedUser.value.nombre,
-                    surnames: this.assignedUser.value.apellidos
-                }
-            };
-            if (taskIndex !== -1) {
-                this.pendingTasks[taskIndex] = { ...this.pendingTasks[taskIndex], ...updateTask };
-            } else {
-                console.error(`Task with id ${id} not found.`);
-            }
-            this.newTaskDialog = false;
-            this.taskForm.reset();
-            return;
-        }
-        this.service.addTask(this.eventSelected.event._def.extendedProps.event_udi.id, request).pipe()
-            .subscribe((res: any) => {
-                if (res.status) {
-                    const newTask: Task = {
-                        id: this.getMaxId() + 1,
-                        title: this.titleTask.value,
-                        description: this.descriptionTask.value,
-                        dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
-                        user: {
-                            id: this.assignedUser.value.id,
-                            name: this.assignedUser.value.nombre,
-                            surnames: this.assignedUser.value.apellidos
+                    if (res) {
+                        const taskIndex = this.pendingTasks.findIndex(task => task.id === id);
+                        const updateTask: Task = {
+                            id: res.id,
+                            title: this.titleTask.value,
+                            description: this.descriptionTask.value,
+                            dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
+                            user: this.assignedUser.value[0]
+                        };
+                        if (taskIndex !== -1) {
+                            this.pendingTasks[taskIndex] = { ...this.pendingTasks[taskIndex], ...updateTask };
+                        } else {
+                            console.error(`Task with id ${id} not found.`);
                         }
-                        //user_name: this.assignedUser.value.fullName
-                    };
-                    if (!this.isTaskInPending(this.getMaxId() + 1)) {
-                        this.pendingTasks = [...this.pendingTasks, newTask];
                         this.newTaskDialog = false;
                         this.taskForm.reset();
-                    } else {
-                        console.log('Task with this ID already exists.');
+                        this.statusTask = 'complete';
+                        return;
                     }
-                }
-            })
+                }, (error) => {
+                    this.statusTask = 'error';
+                })
+
+        }
+        this.service.addTask(this.eventSelected.event._def.extendedProps.event_udi.id, request).pipe()
+            .subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        const newTask: Task = {
+                            id: res.id_task,
+                            title: this.titleTask.value,
+                            description: this.descriptionTask.value,
+                            dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
+                            user: this.assignedUser.value[0]
+                            //user_name: this.assignedUser.value.fullName
+                        };
+                        if (!this.isTaskInPending(res.id)) {
+                            this.pendingTasks = [...this.pendingTasks, newTask];
+                            this.newTaskDialog = false;
+                            this.taskForm.reset();
+                        } else {
+                            console.log('Task with this ID already exists.');
+                        }
+                        this.statusTask = 'complete';
+
+                    }
+                }, (error) => {
+                    this.statusTask = 'error';
+                })
 
     }
 
-
-    getMaxId(): number | null {
-        const allTasks = [
-            ...this.pendingTasks,
-            ...this.inProgressTasks,
-            ...this.completedTasks,
-        ];
-        if (allTasks.length === 0) {
-            return null;
-        }
-        const maxId = Math.max(...allTasks.map((task) => task.id));
-        return maxId;
+    watchassignedUser() {
+        this.assignedUser.valueChanges.subscribe(
+            (res) => {
+                console.log('valueChanges', res)
+            })
     }
 
     search(event: AutoCompleteCompleteEvent) {
@@ -681,41 +649,23 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.filteredItems = this.usuarios
             .filter(
                 (usuario) =>
-                    usuario.nombre.toLowerCase().includes(query) ||
-                    usuario.apellidos.toLowerCase().includes(query)
+                    usuario.name.toLowerCase().includes(query) ||
+                    usuario.surnames.toLowerCase().includes(query)
             )
             .map((usuario) => ({
                 ...usuario,
-                fullName: `${usuario.nombre} ${usuario.apellidos}`,
+                fullName: `${usuario.name} ${usuario.surnames}`,
             }));
     }
 
     watchUsersManager(): void {
         this.usersManager.valueChanges.pipe().subscribe((value) => {
-            console.log('usersManager', value);
         });
     }
 
     watchUsersParticipants(): void {
         this.usersParticipants.valueChanges.pipe().subscribe((value) => {
-            console.log('usersParticipants', value);
         });
-    }
-
-    addComment(event: KeyboardEvent): void {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            if (this.comment.value) {
-                this.comments.push({
-                    name: 'Gary Velarde',
-                    content: this.comment.value,
-                    isComment: true,
-                    date: new Date().toString()
-                });
-                this.comment.setValue('');
-                this.comment.reset();
-            }
-        }
     }
 
     formatText(text: string): string {
@@ -733,62 +683,67 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     getTask(taskId: string) {
+        this.statusTask = 'charging';
         this.pendingTasks = [];
         this.inProgressTasks = [];
         this.completedTasks = [];
-        this.service.getTask(taskId).pipe().subscribe((res) => {
-            console.log(res);
-            for (let task of res.data) {
-                if (task.status === 'pending') {
-                    this.pendingTasks.push(
-                        {
-                            id: task.id,
-                            title: task.title,
-                            description: task.description,
-                            dateEnd: task.commitment_date,
-                            user: task.user
-                        }
-                    )
+        this.service.getTask(taskId).pipe().subscribe(
+            (res: any) => {
+                for (let task of res.data) {
+                    if (task.status === 'pending') {
+                        this.pendingTasks.push(
+                            {
+                                id: task.id,
+                                title: task.title,
+                                description: task.description,
+                                dateEnd: task.commitment_date,
+                                user: task.user
+                            }
+                        )
+                    }
+                    if (task.status === 'inProgress') {
+                        this.inProgressTasks.push(
+                            {
+                                id: task.id,
+                                title: task.title,
+                                description: task.description,
+                                dateEnd: task.commitment_date,
+                                user: task.user
+                            }
+                        )
+                    }
+                    if (task.status === 'completed') {
+                        this.completedTasks.push(
+                            {
+                                id: task.id,
+                                title: task.title,
+                                description: task.description,
+                                dateEnd: task.commitment_date,
+                                user: task.user
+                            }
+                        )
+                    }
+
                 }
-                if (task.status === 'inProgress') {
-                    this.inProgressTasks.push(
-                        {
-                            id: task.id,
-                            title: task.title,
-                            description: task.description,
-                            dateEnd: task.commitment_date,
-                            user: task.user
-                        }
-                    )
-                }
-                if (task.status === 'completed') {
-                    this.completedTasks.push(
-                        {
-                            id: task.id,
-                            title: task.title,
-                            description: task.description,
-                            dateEnd: task.commitment_date,
-                            user: task.user
-                        }
-                    )
-                }
-            }
-        })
+                this.statusTask = 'complete';
+            }, (error) => {
+                this.statusTask = 'error';
+            })
     }
 
     getTeachersList() {
-        this.service.getTeachersList().pipe().subscribe((res: any) => {
-            if (res) {
-                for (let teachers of res.data)
-                    this.usuarios.push(
-                        { id: teachers.id, nombre: teachers.name, apellidos: teachers.surnames },
-                    )
-            }
-            console.log(this.usuarios);
-        })
+        this.service.getTeachersList().pipe().subscribe(
+            (res: any) => {
+                if (res) {
+                    this.usuarios = res.data;
+                }
+            }, (error) => {
+
+            })
     }
 
     redirectToUrl() {
         window.open(this.eventSelected.event._def.extendedProps.event_udi.meeting_url, '_blank');
     }
+
 }
