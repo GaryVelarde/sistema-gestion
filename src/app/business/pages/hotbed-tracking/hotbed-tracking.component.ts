@@ -232,7 +232,7 @@ hideAddFilesDialog() {
 }
 
 saveFiles() {
-    this.loaderService.show();
+    this.loaderService.show(true);
     this.showDialogAddFiles = false;
     this.service.postRegisterHotbedFile(this.formData, this.articleSelected.id).pipe(
         finalize(() => {

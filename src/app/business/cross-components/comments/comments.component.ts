@@ -204,7 +204,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
       shipment_date_secretary: "00-00-0000",
       created_at: this.dateFormatService.formatCustomDateByFrontComment(new Date()),
       user: {
-        "id": 1,
+        "id": this.tokenService.getUserTag(),
         "name": userName.user.name,
         "surnames": userName.user.surnames
       }
