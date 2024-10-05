@@ -1,14 +1,19 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { MenuItem } from 'primeng/api';
+import { Menu } from 'primeng/menu';
 import { Subject, takeUntil } from 'rxjs';
 import { eModule } from 'src/app/commons/enums/app,enum';
 import { AuthService } from 'src/app/services/auth.service';
 import { DateFormatService } from 'src/app/services/date-format.service';
+import { CommentsService } from './services/comments.service';
+import { TokenService } from 'src/app/services/token.service';
 
 @Component({
   selector: 'app-comments',
   templateUrl: './comments.component.html',
-  styleUrls: ['./comments.component.scss']
+  styleUrls: ['./comments.component.scss'],
+  providers: [CommentsService]
 })
 export class CommentsComponent implements OnInit, OnDestroy {
   @Input() module: eModule;
@@ -35,7 +40,9 @@ export class CommentsComponent implements OnInit, OnDestroy {
     return this.comments.slice().reverse();
   }
 
-  constructor(private fb: FormBuilder, private service: AuthService, private dateFormatService: DateFormatService) {
+  constructor(private fb: FormBuilder, private service: AuthService, private dateFormatService: DateFormatService,
+    private commentService: CommentsService, public tokenService: TokenService
+  ) {
     this.commentsForm = this.fb.group({
       comment: this.comment,
     });
@@ -317,4 +324,114 @@ export class CommentsComponent implements OnInit, OnDestroy {
         break;
     }
   }
+
+  openMenu(menu: Menu, event: Event) {
+    menu.toggle(event);
+  }
+
+  commentMenuItems(comment: any): MenuItem[] {
+    return [
+      {
+        label: 'Editar',
+        icon: 'pi pi-pencil',
+        command: () => this.editComment(comment)
+      },
+      {
+        label: 'Eliminar',
+        icon: 'pi pi-trash',
+        command: () => this.deleteComment(comment)
+      },
+    ];
+  }
+
+  editComment(comment: any) {
+    comment.isEditing = true;
+    comment.originalDescription = comment.description;
+  }
+
+  saveComment(comment: any) {
+    console.log('comment', comment)
+    switch (this.module) {
+      case eModule.eventUdi:
+        this.callPutEventUdiCommentUpdate(comment);
+        break;
+      case eModule.advisory:
+        this.callPutAdvisoryCommentUpdate(comment);
+        break;
+      case eModule.inscription:
+        this.callPutInscriptionCommentUpdate(comment);
+        break;
+      case eModule.hotbed:
+        this.getCommentsByHotbed();
+        break;
+      case eModule.review:
+        this.callPutReviewCommentUpdate(comment);
+        break;
+    }
+  }
+
+  cancelEdit(comment: any) {
+    comment.description = comment.originalDescription;
+    comment.isEditing = false;
+  }
+
+  deleteComment(comment: any) {
+    console.log('Eliminando comentario', comment);
+  }
+
+  callPutInscriptionCommentUpdate(comment: any) {
+    const request = {
+      description: comment.description
+    };
+    this.commentService.putInscriptionCommentUpdate(this.id, comment.id, request).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          comment.isEditing = false;
+        }, (error) => {
+
+        })
+  }
+
+  callPutAdvisoryCommentUpdate(comment: any) {
+    const request = {
+      description: comment.description
+    };
+    this.commentService.putAdvisoryCommentUpdate(this.id, comment.id, request).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          comment.isEditing = false;
+        }, (error) => {
+
+        })
+  }
+
+  callPutReviewCommentUpdate(comment: any) {
+    const request = {
+      description: comment.description
+    };
+    this.commentService.putReviewCommentUpdate(this.id, comment.id, request).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          comment.isEditing = false;
+        }, (error) => {
+
+        })
+  }
+  callPutEventUdiCommentUpdate(comment: any) {
+    const request = {
+      description: comment.description
+    };
+    this.commentService.putEventUdiCommentUpdate(this.id, comment.id, request).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          comment.isEditing = false;
+        }, (error) => {
+
+        })
+  }
+
 }

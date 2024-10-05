@@ -39,14 +39,42 @@
                 <form [formGroup]="userForm">
                     <span class="p-fluid">
                         <p-autoComplete
-                            [pTooltip]="tooltipContent" 
-                            tooltipPosition="bottom" 
+                            [pTooltip]="tooltipContent"
+                            tooltipPosition="bottom"
                             formControlName="userFormControl"
                             [suggestions]="filteredItems"
                             (completeMethod)="search($event)"
                             field="fullName"
                             [multiple]="true"
-                        />
+                        >
+                            <ng-template let-item pTemplate="selectedItem">
+                                <div class="selected-item-template">
+                                    <p-avatar
+                                        [label]="item.fullName.charAt(0)"
+                                        styleClass="mr-2"
+                                        [style]="{
+                                            'background-color':
+                                                'rgb(255 255 255)',
+                                            color: '#1a2551'
+                                        }"
+                                    ></p-avatar>
+                                    <span>{{ item.fullName }}</span>
+                                </div>
+                            </ng-template>
+                            <ng-template let-item pTemplate="item">
+                                <div class="item-template">
+                                    <p-avatar
+                                        [label]="item.fullName.charAt(0)"
+                                        styleClass="mr-2"
+                                        [style]="{
+                                            'background-color': '#dee9fc',
+                                            color: '#1a2551'
+                                        }"
+                                    />
+                                    <span>{{ item.fullName }}</span>
+                                </div>
+                            </ng-template>
+                        </p-autoComplete>
                     </span>
                 </form>
 
@@ -64,7 +92,8 @@
                     width: 100%;
                     border-collapse: collapse;
                 }
-                th, td {
+                th,
+                td {
                     border: 1px solid #dddddd;
                     text-align: left;
                     padding: 8px;
@@ -81,10 +110,10 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let user of userFormControl.value">
-                        <td>{{user.name + ' ' + user.surnames}}</td>
-                        <td>{{user.phone}}</td>
-                        <td>{{user.email}}</td>
-                        <td>{{user.code}}</td>
+                        <td>{{ user.name + " " + user.surnames }}</td>
+                        <td>{{ user.phone }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.code }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -92,6 +121,5 @@
         <div *ngIf="!userFormControl.value.length">
             <p>Aún no se han seleccionado usuarios</p>
         </div>
-        
     </div>
 </ng-template>

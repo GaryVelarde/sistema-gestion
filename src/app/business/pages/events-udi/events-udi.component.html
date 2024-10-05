@@ -217,7 +217,35 @@
                                 (completeMethod)="search($event)"
                                 field="fullName"
                                 [multiple]="true"
-                            />
+                            >
+                                <ng-template let-item pTemplate="selectedItem">
+                                    <div class="selected-item-template">
+                                        <p-avatar
+                                            [label]="item.fullName.charAt(0)"
+                                            styleClass="mr-2"
+                                            [style]="{
+                                                'background-color':
+                                                    'rgb(255 255 255)',
+                                                color: '#1a2551'
+                                            }"
+                                        ></p-avatar>
+                                        <span>{{ item.fullName }}</span>
+                                    </div>
+                                </ng-template>
+                                <ng-template let-item pTemplate="item">
+                                    <div class="item-template">
+                                        <p-avatar
+                                            [label]="item.fullName.charAt(0)"
+                                            styleClass="mr-2"
+                                            [style]="{
+                                                'background-color': '#dee9fc',
+                                                color: '#1a2551'
+                                            }"
+                                        />
+                                        <span>{{ item.fullName }}</span>
+                                    </div>
+                                </ng-template>
+                            </p-autoComplete>
                         </span>
                     </form>
                 </div>
@@ -234,7 +262,35 @@
                                 (completeMethod)="search($event)"
                                 field="fullName"
                                 [multiple]="true"
-                            />
+                            >
+                                <ng-template let-item pTemplate="selectedItem">
+                                    <div class="selected-item-template">
+                                        <p-avatar
+                                            [label]="item.fullName.charAt(0)"
+                                            styleClass="mr-2"
+                                            [style]="{
+                                                'background-color':
+                                                    'rgb(255 255 255)',
+                                                color: '#1a2551'
+                                            }"
+                                        ></p-avatar>
+                                        <span>{{ item.fullName }}</span>
+                                    </div>
+                                </ng-template>
+                                <ng-template let-item pTemplate="item">
+                                    <div class="item-template">
+                                        <p-avatar
+                                            [label]="item.fullName.charAt(0)"
+                                            styleClass="mr-2"
+                                            [style]="{
+                                                'background-color': '#dee9fc',
+                                                color: '#1a2551'
+                                            }"
+                                        />
+                                        <span>{{ item.fullName }}</span>
+                                    </div>
+                                </ng-template>
+                            </p-autoComplete>
                         </span>
                     </form>
                 </div>
@@ -649,7 +705,35 @@
                                 (completeMethod)="search($event)"
                                 field="fullName"
                                 [multiple]="true"
-                            />
+                            >
+                                <ng-template let-item pTemplate="selectedItem">
+                                    <div class="selected-item-template">
+                                        <p-avatar
+                                            [label]="item.fullName.charAt(0)"
+                                            styleClass="mr-2"
+                                            [style]="{
+                                                'background-color':
+                                                    'rgb(255 255 255)',
+                                                color: '#1a2551'
+                                            }"
+                                        ></p-avatar>
+                                        <span>{{ item.fullName }}</span>
+                                    </div>
+                                </ng-template>
+                                <ng-template let-item pTemplate="item">
+                                    <div class="item-template">
+                                        <p-avatar
+                                            [label]="item.fullName.charAt(0)"
+                                            styleClass="mr-2"
+                                            [style]="{
+                                                'background-color': '#dee9fc',
+                                                color: '#1a2551'
+                                            }"
+                                        />
+                                        <span>{{ item.fullName }}</span>
+                                    </div>
+                                </ng-template>
+                            </p-autoComplete>
                         </span>
                     </form>
                 </div>
@@ -668,7 +752,35 @@
                                 (completeMethod)="search($event)"
                                 field="fullName"
                                 [multiple]="true"
-                            />
+                            >
+                                <ng-template let-item pTemplate="selectedItem">
+                                    <div class="selected-item-template">
+                                        <p-avatar
+                                            [label]="item.fullName.charAt(0)"
+                                            styleClass="mr-2"
+                                            [style]="{
+                                                'background-color':
+                                                    'rgb(255 255 255)',
+                                                color: '#1a2551'
+                                            }"
+                                        ></p-avatar>
+                                        <span>{{ item.fullName }}</span>
+                                    </div>
+                                </ng-template>
+                                <ng-template let-item pTemplate="item">
+                                    <div class="item-template">
+                                        <p-avatar
+                                            [label]="item.fullName.charAt(0)"
+                                            styleClass="mr-2"
+                                            [style]="{
+                                                'background-color': '#dee9fc',
+                                                color: '#1a2551'
+                                            }"
+                                        />
+                                        <span>{{ item.fullName }}</span>
+                                    </div>
+                                </ng-template>
+                            </p-autoComplete>
                         </span>
                     </form>
                 </div>
@@ -762,7 +874,21 @@
                             (completeMethod)="search($event)"
                             field="fullName"
                             [multiple]="false"
-                        />
+                        >
+                            <ng-template let-item pTemplate="item">
+                                <div class="item-template">
+                                    <p-avatar
+                                        [label]="item.fullName.charAt(0)"
+                                        styleClass="mr-2"
+                                        [style]="{
+                                            'background-color': '#dee9fc',
+                                            color: '#1a2551'
+                                        }"
+                                    />
+                                    <span>{{ item.fullName }}</span>
+                                </div>
+                            </ng-template>
+                        </p-autoComplete>
                     </span>
                 </div>
             </div>

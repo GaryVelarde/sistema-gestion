@@ -32,7 +32,7 @@ export class AppMenuComponent implements OnInit {
                     { label: 'Proyecto de Tesis', icon: 'pi pi-fw pi-file', routerLink: ['/pages/inscription-tracking'] },
                     { label: 'Asesorías', icon: 'pi pi-fw pi-file-import', routerLink: ['/pages/asesorias'] },
                     { label: 'Revisión de tesis', icon: 'pi pi-fw pi-file-export', routerLink: ['/pages/thesis-review-tracking'] },
-                    { label: 'Sustentación', icon: 'pi pi-fw pi-copy', routerLink: ['/pages/a'] },
+                    { label: 'Sustentación', icon: 'pi pi-fw pi-graduation-cap', routerLink: ['/pages/a'] },
                 ]
             },
             {

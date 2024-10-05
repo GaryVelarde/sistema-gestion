@@ -22,10 +22,14 @@
     <li class="footer">
         <div class="grid d-flex justify-content-center">
             <div class="col-4">
-                <p-avatar [label]="getInitialName()" styleClass="mr-2" size="large" />
+                <p-avatar
+                    [label]="getInitialName()"
+                    styleClass="mr-2"
+                    size="large"
+                />
             </div>
             <div class="col-8 align-content-center">
-                <p>{{getUserFullName()}}</p>
+                <p>{{ getUserFullName() }}</p>
             </div>
         </div>
     </li>

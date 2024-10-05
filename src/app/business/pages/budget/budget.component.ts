@@ -123,6 +123,7 @@ export class BudgetComponent implements OnInit {
 
         // Agregar el nuevo gasto al array de gastos ingresados
         this.gastosIngresados.push(newGasto);
+        console.log('this.gastosIngresados', this.gastosIngresados);
 
         // Limpiar el formulario
         this.gastoForm.reset();

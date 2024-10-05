@@ -57,13 +57,12 @@
                     <div class="mr-auto p-2">
                         <p>{{ file.name }}</p>
                     </div>
-                    <div
-                        class="p-2 cursor-pointer"
-                        style="display: flex"
-                        (click)="download(file.archive)"
-                    >
-                        <i class="pi pi-download"></i>
-                        <i class="pi pi-trash ml-3"></i>
+                    <div class="p-2" style="display: flex">
+                        <i
+                            class="pi pi-download cursor-pointer"
+                            (click)="download(file.archive)"
+                        ></i>
+                        <i class="pi pi-trash ml-3 cursor-pointer"></i>
                     </div>
                 </ng-container>
 
@@ -262,5 +261,10 @@
     </div>
 </ng-template>
 <ng-template #error>
-    <app-label-error class="col-12" [message]="messageError" (reload)="handleReload()"> </app-label-error>
+    <app-label-error
+        class="col-12"
+        [message]="messageError"
+        (reload)="handleReload()"
+    >
+    </app-label-error>
 </ng-template>

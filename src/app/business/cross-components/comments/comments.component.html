@@ -57,29 +57,66 @@
             </div>
             <div *ngIf="comments.length > 0">
                 <div
-                    *ngFor="let comment of visibleComments"
+                    *ngFor="let comment of visibleComments; let i = index"
                     class="mb-4 flex align-items-center"
                 >
                     <p-avatar
                         [label]="getFirstLetter(comment.user.name)"
                         styleClass="ml-3"
                         size="large"
-                    />
+                    ></p-avatar>
                     <div class="ml-3 w-full">
-                        <div class="flex justify-content-between mb-2">
-                            <span class="block text-900">{{
-                                comment.user.name + " " + comment.user.surnames
-                            }}</span>
+                        <div class="flex mb-2">
+                            <span class="mr-auto block text-900">
+                                {{
+                                    comment.user.name +
+                                        " " +
+                                        comment.user.surnames
+                                }}
+                            </span>
                             <span class="block text-700">{{
                                 comment.created_at
                             }}</span>
+
+                            <i *ngIf="tokenService.getUserTag() === comment.user.id"
+                                class="pi pi-ellipsis-v cursor-pointer ml-3"
+                                (click)="openMenu(menu, $event)"
+                            ></i>
+
+                            <p-menu
+                                #menu
+                                [model]="commentMenuItems(comment)"
+                                [popup]="true"
+                            ></p-menu>
                         </div>
+
                         <span
+                            *ngIf="!comment.isEditing"
                             class="block text-900 border-1 surface-ground surface-border p-2 border-round"
                             style="word-break: break-all"
                         >
                             {{ comment.description }}
                         </span>
+
+                        <div
+                            *ngIf="comment.isEditing"
+                            class="flex align-items-center"
+                        >
+                            <input
+                                type="text"
+                                class="w-full"
+                                pInputText
+                                [(ngModel)]="comment.description"
+                            />
+                            <i
+                                class="pi pi-check cursor-pointer ml-2 mt-1"
+                                (click)="saveComment(comment)"
+                            ></i>
+                            <i
+                                class="pi pi-times ml-3 cursor-pointer mt-1"
+                                (click)="cancelEdit(comment)"
+                            ></i>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -100,7 +137,8 @@
             </div>
         </ng-template>
         <ng-template #commentsError>
-            <app-label-error [message]="messageError" (reload)="handleReload()"> </app-label-error>
+            <app-label-error [message]="messageError" (reload)="handleReload()">
+            </app-label-error>
         </ng-template>
     </div>
     <ng-container *ngIf="comments.length > 5">

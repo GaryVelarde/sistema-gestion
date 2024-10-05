@@ -19,6 +19,10 @@ export class TokenService {
     return JSON.parse(localStorage.getItem('dr2lp2'));
   }
 
+  getUserTag() {
+    return this.getDR2LP2().user.id ? this.getDR2LP2().user.id : '';
+  }
+
   revokeToken(): void {
     localStorage.removeItem('access_token');
   }

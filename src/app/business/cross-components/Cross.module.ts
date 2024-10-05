@@ -30,6 +30,7 @@ import { ImageModule } from 'primeng/image';
 import { CarouselModule } from 'primeng/carousel';
 import { MessagesModule } from 'primeng/messages';
 import { LabelErrorComponent } from './label-error/label-error.component';
+import { MenuModule } from 'primeng/menu';
 
 @NgModule({
   imports: [
@@ -56,6 +57,7 @@ import { LabelErrorComponent } from './label-error/label-error.component';
     ImageModule,
     CarouselModule,
     MessagesModule,
+    MenuModule
   ],
   declarations: [
     CommentsComponent,
