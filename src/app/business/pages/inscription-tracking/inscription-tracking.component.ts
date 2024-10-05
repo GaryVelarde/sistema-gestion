@@ -87,6 +87,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     studentsForm: FormGroup;
     teacherForm: FormGroup;
     editForm: FormGroup;
+    titleForm: FormGroup;
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
     private _sentToSecretaryDate: FormControl = new FormControl('', [Validators.required]);
@@ -98,6 +99,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     private _resolutionNumber: FormControl = new FormControl('', [Validators.required]);
     private _facultyReceptionDate: FormControl = new FormControl('', [Validators.required]);
     private _udiApprovalDate: FormControl = new FormControl('', [Validators.required]);
+    private _title: FormControl = new FormControl('', [Validators.required]);
 
     get cancelationComment() {
         return this._cancelationComment;
@@ -131,6 +133,9 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     }
     get udiApprovalDate() {
         return this._udiApprovalDate;
+    }
+    get title() {
+        return this._title;
     }
 
     constructor(
@@ -166,6 +171,9 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
             resolutionNumber: this.resolutionNumber,
             facultyReceptionDate: this.facultyReceptionDate,
             udiApprovalDate: this.udiApprovalDate,
+        });
+        this.titleForm = this.fb.group({
+            title: this.title,
         });
     }
 
@@ -309,7 +317,59 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     saveEdition() {
         this.graduatesList = this.students.value;
         this.reviewerList = this.teacher.value;
-        this.showEdit = false;
+        const request = {
+            file: this.caseNumber.value,
+            professional_school: this.professionalSchool.value,
+            thesis_project_title: this.title.value,
+            office_number: this.officialDocumentNumber.value,
+            resolution_number: this.resolutionNumber.value,
+            reception_date_faculty: this.dateFormat.formatDateDDMMYYYY(this.facultyReceptionDate.value),
+            approval_date_udi: this.dateFormat.formatDateDDMMYYYY(this.udiApprovalDate.value),
+            user_id: this.extractIds(this.teacher.value),
+            user_ids: this.extractIds(this.students.value),
+            reviewer_was_paid: false //default: false
+        }
+        this.service.putInscriptionUpdate(this.inscriptionSelected.inscriptions[0].id, request).pipe(
+            finalize(() => {
+                this.showEdit = false;
+            })
+        ).subscribe(
+            (res: any) => {
+                if (res.status) {
+                    this.inscriptionSelectedUpdate();
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Confirmación',
+                        detail: 'La inscripción se ha actualizado.',
+                        life: 3000,
+                    });
+                }
+            }, (error) => {
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al actualizar la información.',
+                    life: 3000,
+                });
+            })
+    }
+
+    inscriptionSelectedUpdate() {
+        this.inscriptionSelected.file = this.caseNumber.value;
+        this.inscriptionSelected.professional_school = this.professionalSchool.value;
+        this.inscriptionSelected.thesis_project_title = this.title.value;
+        this.inscriptionSelected.office_number = this.officialDocumentNumber.value;
+        this.inscriptionSelected.resolution_number = this.resolutionNumber.value;
+        this.inscriptionSelected.inscriptions[0].reception_date_faculty = this.dateFormat.formatDateDDMMYYYY(this.facultyReceptionDate.value);
+        this.inscriptionSelected.inscriptions[0].approval_date_udi = this.dateFormat.formatDateDDMMYYYY(this.udiApprovalDate.value);
+        this.inscriptionSelected.inscriptions[0].teachers = this.teacher.value;
+        this.inscriptionSelected.graduates = this.students.value;
+    }
+
+    extractIds(arr: Array<{ id: string }>): string[] {
+        return arr.map(item => item.id);
     }
 
     goToReview() {
@@ -629,5 +689,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         this.resolutionNumber.setValue(this.inscriptionSelected.resolution_number);
         this.facultyReceptionDate.setValue(this.inscriptionSelected.inscriptions[0].reception_date_faculty);
         this.udiApprovalDate.setValue(this.inscriptionSelected.inscriptions[0].approval_date_udi);
+        this.title.setValue(this.inscriptionSelected.thesis_project_title);
     }
 }

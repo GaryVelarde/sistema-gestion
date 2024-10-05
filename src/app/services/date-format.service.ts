@@ -347,7 +347,7 @@ export class DateFormatService {
 
     const ddmmyyyyRegex = /^\d{2}-\d{2}-\d{4}$/;
     if (ddmmyyyyRegex.test(value)) {
-      return value; 
+      return value;
     }
 
     const date = new Date(value);
@@ -356,6 +356,65 @@ export class DateFormatService {
     const year = date.getFullYear();
 
     return `${day}-${month}-${year}`;
+  }
+
+
+  formatDateCalendarToBack(dateString: any): string {
+    // Si el valor es un objeto Date o un string tipo 'Fri Oct 18 2024...'
+    if (dateString instanceof Date || !isNaN(Date.parse(dateString))) {
+      // Si es un string compatible con Date, lo convertimos a un objeto Date
+      const date = new Date(dateString);
+
+      // Formatear manualmente la fecha a 'MM-dd-yyyy HH:mm:ss'
+      const formattedMonth = String(date.getMonth() + 1).padStart(2, '0');
+      const formattedDay = String(date.getDate()).padStart(2, '0');
+      const formattedYear = date.getFullYear();
+      const formattedHours = String(date.getHours()).padStart(2, '0');
+      const formattedMinutes = String(date.getMinutes()).padStart(2, '0');
+      const formattedSeconds = String(date.getSeconds()).padStart(2, '0');
+
+      const formattedDate = `${formattedDay}-${formattedMonth}-${formattedYear} ${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+
+      return formattedDate;
+    }
+
+    // Si es un string en el formato '10-10-2024 07:00 AM'
+    if (typeof dateString === 'string') {
+      const [datePart, timePart, amPm] = dateString.split(' ');
+
+      if (!datePart || !timePart || !amPm) {
+        console.error('El formato de fecha no es válido:', dateString);
+        return '';
+      }
+
+      const [day, month, year] = datePart.split('-').map(Number);
+      let [hours, minutes] = timePart.split(':').map(Number);
+
+      // Ajuste de AM/PM
+      if (amPm === 'PM' && hours < 12) {
+        hours += 12;
+      } else if (amPm === 'AM' && hours === 12) {
+        hours = 0;
+      }
+
+      // Crear una nueva fecha con los valores extraídos
+      const date = new Date(year, month - 1, day, hours, minutes);
+
+      // Formatear manualmente la fecha a 'MM-dd-yyyy HH:mm:ss'
+      const formattedMonth = String(date.getMonth() + 1).padStart(2, '0');
+      const formattedDay = String(date.getDate()).padStart(2, '0');
+      const formattedYear = date.getFullYear();
+      const formattedHours = String(date.getHours()).padStart(2, '0');
+      const formattedMinutes = String(date.getMinutes()).padStart(2, '0');
+      const formattedSeconds = '00'; // Segundos por defecto
+
+      const formattedDate = `${formattedDay}-${formattedMonth}-${formattedYear} ${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+
+      return formattedDate;
+    }
+
+    console.error('Formato no válido:', dateString);
+    return ''; // Retornar vacío si el formato no es compatible
   }
 
 

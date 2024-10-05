@@ -33,6 +33,7 @@ import { SidebarModule } from 'primeng/sidebar';
 import { PanelModule } from 'primeng/panel';
 import { BudgetComponent } from './budget.component';
 import { BudgetRoutingModule } from './budget-routing.module';
+import { KeyFilterModule } from 'primeng/keyfilter';
 
 @NgModule({
     imports: [
@@ -68,6 +69,7 @@ import { BudgetRoutingModule } from './budget-routing.module';
         BreadcrumbModule,
         SidebarModule,
         PanelModule,
+        KeyFilterModule,
     ],
     declarations: [BudgetComponent],
     providers: [

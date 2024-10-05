@@ -22,8 +22,7 @@ export class AppTopBarComponent {
                     command: () => {
                         this.logOut();
                     }
-
-                },
+                }
             ]
         }
     ];
@@ -34,9 +33,30 @@ export class AppTopBarComponent {
 
     @ViewChild('topbarmenu') menu!: ElementRef;
 
+    set theme(val: string) {
+        this.layoutService.config.update((config) => ({
+            ...config,
+            theme: val,
+        }));
+    }
+    get theme(): string {
+        return this.layoutService.config().theme;
+    }
+    set colorScheme(val: string) {
+        this.layoutService.config.update((config) => ({
+            ...config,
+            colorScheme: val,
+        }));
+    }
+    get colorScheme(): string {
+        return this.layoutService.config().colorScheme;
+    }
+
     constructor(public layoutService: LayoutService, private router: Router, private service: AuthService,
         private tokenService: TokenService,
-    ) { }
+    ) {
+        this.validateScheme();
+     }
 
     getInitialName(): string {
         const userName = this.tokenService.getDR2LP2();
@@ -63,6 +83,42 @@ export class AppTopBarComponent {
                 this.tokenService.revokeToken();
             });
         this.router.navigate(['/auth/login']);
+    }
+
+    darMode() {
+        this.changeTheme('md-dark-indigo', 'dark');
+        this.validateScheme();
+    }
+
+    lightMode() {
+        this.changeTheme('lara-light-indigo', 'light');
+        this.validateScheme();
+    }
+
+    changeTheme(theme: string, colorScheme: string) {
+        this.theme = theme;
+        this.colorScheme = colorScheme;
+    }
+
+    validateScheme() {
+        if (this.colorScheme === 'light') {
+            this.items[0].items[1] = {
+                label: 'Modo oscuro',
+                icon: 'pi pi-moon',
+                command: () => {
+                    this.darMode();
+                }
+            };
+        } else {
+            this.items[0].items[1] = {
+                label: 'Modo claro',
+                icon: 'pi pi-sun',
+                command: () => {
+                    this.lightMode();
+                }
+            };
+        }
+
     }
 
 }

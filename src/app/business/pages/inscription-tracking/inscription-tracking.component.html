@@ -283,20 +283,23 @@
                     {{ inscriptionSelected.thesis_project_title }}
                 </h5>
             </div>
-            <textarea
-                    *ngIf="showEdit"
-                    rows="3"
-                    cols="30"
-                    pInputTextarea
-                    class="w-full font-bold text-color"
-                    style="
-                        font-family: revert;
-                        text-align: center;
-                        font-size: 17.5px;
-                    "
-                    [(ngModel)]="inscriptionSelected.thesis_project_title"
-                >
-                </textarea>
+            <form *ngIf="showEdit" [formGroup]="titleForm">
+                <textarea
+               
+                rows="3"
+                cols="30"
+                pInputTextarea
+                class="w-full font-bold text-color"
+                style="
+                    font-family: revert;
+                    text-align: center;
+                    font-size: 17.5px;
+                "
+                formControlName="title"
+            >
+            </textarea>
+            </form>
+           
             <div *ngIf="!showEdit">
                 <div class="grid col-12">
                     <div class="col-12 col-md-3">

@@ -1,3 +1,4 @@
+<p-toast key="tst"></p-toast>
 <div [ngClass]="{ 'd-none': showEventDetail }">
     <div class="grid" #cardBody>
         <div class="col-12">
@@ -10,7 +11,7 @@
                             pButton
                             icon="pi pi-plus"
                             label="Nueva reunión"
-                            (click)="newEventDialog = true"
+                            (click)="showNewEventDialog()"
                         ></button>
                     </div>
 
@@ -40,8 +41,8 @@
     <div class="col-12">
         <app-breadcrumb [items]="detailsBreadcrumbItems"></app-breadcrumb>
         <div class="card">
-            <div class="grid d-flex col-12">
-                <div class="mr-auto p-2">
+            <div class="d-flex col-12">
+                <div class="mr-auto">
                     <p-button
                         (click)="backCalendar()"
                         label="Regresar"
@@ -51,7 +52,7 @@
                     />
                     <p-button
                         *ngIf="
-                            !showEdit &&
+                            !edition &&
                             inscriptionState !== 'Cancelado' &&
                             inscriptionState !== 'Aprobado'
                         "
@@ -63,7 +64,7 @@
                     />
                     <p-button
                         *ngIf="
-                            showEdit &&
+                            edition &&
                             inscriptionState !== 'Cancelado' &&
                             inscriptionState !== 'Aprobado'
                         "
@@ -75,7 +76,7 @@
                     />
                     <p-button
                         *ngIf="
-                            showEdit &&
+                            edition &&
                             inscriptionState !== 'Cancelado' &&
                             inscriptionState !== 'Aprobado'
                         "
@@ -86,50 +87,19 @@
                         iconPos="left"
                     />
                 </div>
-                <div class="p-2">
+                <div>
                     <p-button
                         *ngIf="
                             inscriptionState !== 'Cancelado' &&
-                            inscriptionState !== 'Aprobado'
+                            inscriptionState !== 'Aprobado' &&
+                            !edition
                         "
                         label="Cancelar reunión"
                         [outlined]="true"
-                        class="mr-3"
                         icon="pi pi-times"
                         iconPos="left"
                         severity="danger"
                         (click)="goToCancelation()"
-                    />
-                    <p-button
-                        *ngIf="
-                            inscriptionState === 'Inscrito' ||
-                            inscriptionState === 'Observado'
-                        "
-                        label="Pasar a revisión"
-                        [outlined]="true"
-                        icon="pi pi-angle-right"
-                        iconPos="right"
-                        severity="info"
-                        (click)="goToReview()"
-                    />
-                    <p-button
-                        *ngIf="inscriptionState === 'En revisión'"
-                        label="Observado"
-                        [outlined]="true"
-                        icon="pi pi-exclamation-circle"
-                        iconPos="left"
-                        severity="warning"
-                        (click)="goToObserved()"
-                    />
-                    <p-button
-                        *ngIf="inscriptionState === 'En revisión'"
-                        class="ml-3"
-                        label="Aprobado"
-                        [outlined]="true"
-                        icon="pi pi-angle-right"
-                        iconPos="right"
-                        severity="success"
-                        (click)="goToApprove()"
                     />
                 </div>
             </div>
@@ -138,8 +108,8 @@
                     {{ eventSelected.event.title }}
                 </h4>
             </div>
-            <div *ngIf="!showEdit" class="grid col-12">
-                <div class="col-3">
+            <div *ngIf="!edition" class="grid col-12">
+                <div class="col-12">
                     <p class="font-bold">Descripción de la reunión:</p>
                     <p>
                         {{
@@ -148,7 +118,7 @@
                         }}
                     </p>
                 </div>
-                <div class="col-3">
+                <div class="col-6">
                     <p class="font-bold">Url de la reunión:</p>
                     <p class="p-url" (click)="redirectToUrl()">
                         <i class="pi pi-link" style="font-size: 1rem"></i>
@@ -159,7 +129,7 @@
                     </p>
                 </div>
                 <div class="col-3">
-                    <p class="font-bold">Fecha y hora de inicio:</p>
+                    <p class="font-bold">Inicio:</p>
                     <p>
                         <i class="pi pi-clock" style="font-size: 1rem"></i>
                         {{
@@ -170,7 +140,7 @@
                     </p>
                 </div>
                 <div class="col-3">
-                    <p class="font-bold">Fecha y hora de fin:</p>
+                    <p class="font-bold">Fin:</p>
                     <p>
                         <i class="pi pi-clock" style="font-size: 1rem"></i>
                         {{
@@ -181,58 +151,68 @@
                     </p>
                 </div>
             </div>
-            <div *ngIf="showEdit" class="grid col-12">
-                <div class="col-3">
-                    <p class="font-bold">Nro de expediente:</p>
+
+            <form *ngIf="edition" class="grid col-12" [formGroup]="editForm">
+                <div class="col-12">
+                    <p class="font-bold">Descripción de la reunión:</p>
+                    <textarea
+                        rows="3"
+                        class="w-full"
+                        pInputTextarea
+                        formControlName="descriptionEdit"
+                    >
+                    </textarea>
+                </div>
+                <div class="col-6">
+                    <p class="font-bold">Url de la reunión:</p>
                     <input
                         type="text"
                         pInputText
-                        class="full-width"
-                        [value]="eventSelected"
+                        formControlName="eventLinkEdit"
+                        class="w-full"
                     />
                 </div>
                 <div class="col-3">
-                    <p class="font-bold">Escuala profesional:</p>
-                    <input
-                        type="text"
-                        pInputText
-                        class="full-width"
-                        [value]="eventSelected.escuela_profesional"
-                    />
+                    <p class="font-bold">Inicio:</p>
+                    <p-calendar
+                        formControlName="startEdit"
+                        class="w-full"
+                        [iconDisplay]="'input'"
+                        [showIcon]="true"
+                        [showTime]="true"
+                        [hourFormat]="12"
+                        dateFormat="dd-mm-yy"
+                    ></p-calendar>
                 </div>
                 <div class="col-3">
-                    <p class="font-bold">Nro de oficio:</p>
-                    <input
-                        type="text"
-                        pInputText
-                        class="full-width"
-                        [value]="eventSelected.numero_oficio"
-                    />
+                    <p class="font-bold">Fin:</p>
+                    <p-calendar
+                        formControlName="endEdit"
+                        class="w-full"
+                        [iconDisplay]="'input'"
+                        [showIcon]="true"
+                        [showTime]="true"
+                        [hourFormat]="12"
+                        dateFormat="dd-mm-yy"
+                    ></p-calendar>
                 </div>
-                <div class="col-3">
-                    <p class="font-bold">Nro de resolución:</p>
-                    <input
-                        type="text"
-                        pInputText
-                        class="full-width"
-                        [value]="eventSelected.numero_resolucion"
-                    />
-                </div>
-            </div>
+            </form>
+
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
-                <div class="col-12">
-                    <h5>Lista de encargados</h5>
+                <div class="w-full">
+                    <p-messages
+                        [(value)]="alertForUserDuplicateEdit"
+                        [enableService]="false"
+                        [closable]="true"
+                    />
                 </div>
-                <div class="card w-full">
-                    <p>
-                        Digite el nombre del <b>encargado</b> y seleccionelo
-                        para registrarlo en la reunión.
-                    </p>
-                    <form [formGroup]="managerForm">
+                <div class="col-12 w-full">
+                    <p class="mb-3">Encargados de la reunión</p>
+                    <form [formGroup]="managerFormEdit">
                         <span class="p-fluid">
                             <p-autoComplete
-                                formControlName="usersManager"
+                                formControlName="usersManagerEdit"
                                 [suggestions]="filteredItems"
                                 (completeMethod)="search($event)"
                                 field="fullName"
@@ -244,18 +224,12 @@
             </div>
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
-                <div class="col-12">
-                    <h5>Lista de participantes</h5>
-                </div>
-                <div class="card w-full">
-                    <p>
-                        Digite el nombre del <b>participante</b> y seleccionelo
-                        para registrarlo en la reunión.
-                    </p>
-                    <form [formGroup]="participantsForm">
+                <div class="col-12 w-full">
+                    <p class="mb-3">Participantes de la reunión</p>
+                    <form [formGroup]="participantsFormEdit">
                         <span class="p-fluid">
                             <p-autoComplete
-                                formControlName="usersParticipants"
+                                formControlName="usersParticipantsEdit"
                                 [suggestions]="filteredItems"
                                 (completeMethod)="search($event)"
                                 field="fullName"
@@ -310,8 +284,8 @@
                                         class="text-align-center mt-5"
                                     >
                                         <p>
-                                            <i class="pi pi-check"></i> No quedan
-                                            tareas pendientes.
+                                            <i class="pi pi-check"></i> No
+                                            quedan tareas pendientes.
                                         </p>
                                     </div>
                                     <li
@@ -321,7 +295,9 @@
                                         (onDragStart)="dragStart(task)"
                                         (onDragEnd)="dragEnd()"
                                     >
-                                        <p class="task-title">{{ task.title }}</p>
+                                        <p class="task-title">
+                                            {{ task.title }}
+                                        </p>
                                         <p class="task-description">
                                             {{ task.description }}
                                         </p>
@@ -329,7 +305,12 @@
                                             <b
                                                 class="task-description"
                                                 style="padding-top: 5px"
-                                                >Asignado a {{ task.user.name + ' ' + task.user.surnames}}</b
+                                                >Asignado a
+                                                {{
+                                                    task.user.name +
+                                                        " " +
+                                                        task.user.surnames
+                                                }}</b
                                             >
                                         </div>
                                         <div class="grid mr-2 ml-1 mt-1 mt-2">
@@ -353,12 +334,17 @@
                             </ng-template>
                             <ng-template #taskSkeletonPending>
                                 <ul class="task-list">
-                                    <li *ngFor="let row of rowsSkeletonTask" class="mb-2">
-                                        <p-skeleton width="100%" height="5rem" />
+                                    <li
+                                        *ngFor="let row of rowsSkeletonTask"
+                                        class="mb-2"
+                                    >
+                                        <p-skeleton
+                                            width="100%"
+                                            height="5rem"
+                                        />
                                     </li>
                                 </ul>
                             </ng-template>
-                           
                         </div>
 
                         <div
@@ -372,7 +358,9 @@
                             <div [ngSwitch]="statusTask">
                                 <ng-template [ngSwitchCase]="'charging'">
                                     <ng-container
-                                        *ngTemplateOutlet="taskSkeletonInProgress"
+                                        *ngTemplateOutlet="
+                                            taskSkeletonInProgress
+                                        "
                                     ></ng-container>
                                 </ng-template>
                                 <ng-template [ngSwitchCase]="'complete'">
@@ -392,8 +380,8 @@
                                         class="text-align-center mt-5"
                                     >
                                         <p>
-                                            <i class="pi pi-check"></i> No quedan
-                                            tareas en curso.
+                                            <i class="pi pi-check"></i> No
+                                            quedan tareas en curso.
                                         </p>
                                     </div>
                                     <li
@@ -403,7 +391,9 @@
                                         (onDragStart)="dragStart(task)"
                                         (onDragEnd)="dragEnd()"
                                     >
-                                        <p class="task-title">{{ task.title }}</p>
+                                        <p class="task-title">
+                                            {{ task.title }}
+                                        </p>
                                         <p class="task-description">
                                             {{ task.description }}
                                         </p>
@@ -411,7 +401,12 @@
                                             <b
                                                 class="task-description"
                                                 style="padding-top: 5px"
-                                                >Asignado a {{ task.user.name + ' ' + task.user.surnames}}</b
+                                                >Asignado a
+                                                {{
+                                                    task.user.name +
+                                                        " " +
+                                                        task.user.surnames
+                                                }}</b
                                             >
                                             <p class="ml-auto task-description">
                                                 {{ task.dateEnd }}
@@ -422,14 +417,17 @@
                             </ng-template>
                             <ng-template #taskSkeletonInProgress>
                                 <ul class="task-list">
-                                    <li *ngFor="let row of rowsSkeletonTask" class="mb-2">
-                                        <p-skeleton width="100%" height="5rem" />
+                                    <li
+                                        *ngFor="let row of rowsSkeletonTask"
+                                        class="mb-2"
+                                    >
+                                        <p-skeleton
+                                            width="100%"
+                                            height="5rem"
+                                        />
                                     </li>
                                 </ul>
                             </ng-template>
-                            
-
-
                         </div>
 
                         <div
@@ -466,7 +464,9 @@
                                         (onDragStart)="dragStart(task)"
                                         (onDragEnd)="dragEnd()"
                                     >
-                                        <p class="task-title">{{ task.title }}</p>
+                                        <p class="task-title">
+                                            {{ task.title }}
+                                        </p>
                                         <p class="task-description">
                                             {{ task.description }}
                                         </p>
@@ -474,7 +474,12 @@
                                             <b
                                                 class="task-description"
                                                 style="padding-top: 5px"
-                                                >Asignado a {{ task.user.name + ' ' + task.user.surnames}}</b
+                                                >Asignado a
+                                                {{
+                                                    task.user.name +
+                                                        " " +
+                                                        task.user.surnames
+                                                }}</b
                                             >
                                             <p class="ml-auto task-description">
                                                 {{ task.dateEnd }}
@@ -485,12 +490,17 @@
                             </ng-template>
                             <ng-template #taskSkeletonFinalize>
                                 <ul class="task-list">
-                                    <li *ngFor="let row of rowsSkeletonTask" class="mb-2">
-                                        <p-skeleton width="100%" height="5rem" />
+                                    <li
+                                        *ngFor="let row of rowsSkeletonTask"
+                                        class="mb-2"
+                                    >
+                                        <p-skeleton
+                                            width="100%"
+                                            height="5rem"
+                                        />
                                     </li>
                                 </ul>
                             </ng-template>
-                            
                         </div>
                     </div>
                 </div>
@@ -663,6 +673,11 @@
                     </form>
                 </div>
             </div>
+            <p-messages
+                [(value)]="alertForUserDuplicate"
+                [enableService]="false"
+                [closable]="true"
+            />
             <div class="footer">
                 <button
                     pButton

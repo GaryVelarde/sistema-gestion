@@ -1,0 +1,118 @@
+<div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0" style="max-height: 140px">
+        <div *ngIf="statusGet === 'charging'">
+            <ng-container *ngTemplateOutlet="skeleton"></ng-container>
+        </div>
+
+        <div *ngIf="statusGet === 'complete'">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3"> Inscripciones </span>
+                    <div class="text-900 font-medium text-xl">{{data.inscriptions.in_progress}}</div>
+                </div>
+                <div
+                    class="flex align-items-center justify-content-center bg-blue-100 border-round"
+                    [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+                >
+                    <i class="pi pi-shopping-cart text-blue-500 text-xl"></i>
+                </div>
+            </div>
+            <span class="text-green-500 font-medium">{{data.inscriptions.approved}} </span>
+            <span class="text-500">inscipciones aprobadas</span>
+        </div>
+    </div>
+</div>
+
+<div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0" style="max-height: 140px">
+        <div *ngIf="statusGet === 'charging'">
+            <ng-container *ngTemplateOutlet="skeleton"></ng-container>
+        </div>
+
+        <div *ngIf="statusGet === 'complete'">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3">Asesorías</span>
+                    <div class="text-900 font-medium text-xl">{{data.advisories.in_progress}}</div>
+                </div>
+                <div
+                    class="flex align-items-center justify-content-center bg-orange-100 border-round"
+                    [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+                >
+                    <i class="pi pi-map-marker text-orange-500 text-xl"></i>
+                </div>
+            </div>
+            <span class="text-green-500 font-medium">{{data.advisories.approved}} </span>
+            <span class="text-500">asesorías aprobadas</span>
+        </div>
+    </div>
+</div>
+<div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0" style="max-height: 140px">
+        <div *ngIf="statusGet === 'charging'">
+            <ng-container *ngTemplateOutlet="skeleton"></ng-container>
+        </div>
+
+        <div *ngIf="statusGet === 'complete'">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3"
+                        >Revisión de tesis</span
+                    >
+                    <div class="text-900 font-medium text-xl">{{data.reviews.in_progress}}</div>
+                </div>
+                <div
+                    class="flex align-items-center justify-content-center bg-cyan-100 border-round"
+                    [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+                >
+                    <i class="pi pi-inbox text-cyan-500 text-xl"></i>
+                </div>
+            </div>
+            <span class="text-green-500 font-medium">{{data.reviews.approved}} </span>
+            <span class="text-500">revisiones de tesis aprobadas</span>
+        </div>
+    </div>
+</div>
+<div class="col-12 lg:col-6 xl:col-3">
+    <div class="card mb-0" style="max-height: 140px">
+        <div *ngIf="statusGet === 'charging'">
+            <ng-container *ngTemplateOutlet="skeleton"></ng-container>
+        </div>
+
+        <div *ngIf="statusGet === 'complete'">
+            <div class="flex justify-content-between mb-3">
+                <div>
+                    <span class="block text-500 font-medium mb-3"
+                        >Sustentación</span
+                    >
+                    <div class="text-900 font-medium text-xl">{{data.presentations.in_progress}} </div>
+                </div>
+                <div
+                    class="flex align-items-center justify-content-center bg-purple-100 border-round"
+                    [ngStyle]="{ width: '2.5rem', height: '2.5rem' }"
+                >
+                    <i class="pi pi-comment text-purple-500 text-xl"></i>
+                </div>
+            </div>
+            <span class="text-green-500 font-medium">{{data.presentations.approved}} </span>
+            <span class="text-500">sustentaciones aprobadas</span>
+        </div>
+    </div>
+</div>
+
+<ng-template #skeleton>
+    <div class="flex justify-content-between mb-3">
+        <div>
+            <p-skeleton width="4rem" styleClass="block font-medium mb-3" />
+            <p-skeleton
+                width="4rem"
+                height="1.4rem"
+                styleClass="block font-medium mb-3"
+            />
+        </div>
+        <div class="flex align-items-center justify-content-center">
+            <p-skeleton size="2.6rem" styleClass="mr-2" />
+        </div>
+    </div>
+    <p-skeleton width="10rem" styleClass="block font-medium mb-3" />
+</ng-template>

@@ -1,3 +1,10 @@
 <div *ngIf="isLoading" @fade class="loader-overlay">
-  <div class="loader"></div>
+    <div style="text-align: -webkit-center">
+        <div class="loader"></div>
+        <div *ngIf="message">
+            <label style="color: #c8c8c8">Espere un momento</label>
+            <br />
+            <label style="color: #c8c8c8">por favor</label>
+        </div>
+    </div>
 </div>

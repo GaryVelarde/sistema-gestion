@@ -133,7 +133,7 @@ export class AuthService {
     return this.http.get(`${this.API_URL}/advisory`, this.header);
   }
 
-  putUser(id: number, request: any) {
+  putUser(id: string, request: any) {
     return this.http.put(`${this.API_URL}/users/${id}`, request, this.header);
   }
 
@@ -165,7 +165,7 @@ export class AuthService {
     return this.http.get(`${this.API_URL}/meeting`, this.header);
   }
 
-  putAdvisoryUpdate(id: number, request: any) {
+  putAdvisoryUpdate(id: string, request: any) {
     return this.http.put(`${this.API_URL}/advisory/${id}`, request, this.header);
   }
 
@@ -187,6 +187,10 @@ export class AuthService {
 
   getTitlesList() {
     return this.http.get(`${this.API_URL}/titles`, this.header);
+  }
+
+  getArticlesTitlesList() {
+    return this.http.get(`${this.API_URL}/title-articles`, this.header);
   }
 
   postRegisterIncriptionFile(request: any, id: string) {
@@ -243,6 +247,18 @@ export class AuthService {
 
   getNotificationReport() {
     return this.http.get(`${this.API_URL}/notification-report`, this.header);
+  }
+
+  postAddNewEvent(request: any) {
+    return this.http.post(`${this.API_URL}/meeting`, request, this.header);
+  }
+
+  putInscriptionUpdate(id: string, request: any) {
+    return this.http.put(`${this.API_URL}/inscription/${id}`, request, this.header);
+  }
+
+  getCounterReport() {
+    return this.http.get(`${this.API_URL}/counter-report`, this.header);
   }
 
 }

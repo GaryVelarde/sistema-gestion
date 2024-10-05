@@ -169,8 +169,8 @@
     <div class="col-12">
         <app-breadcrumb [items]="detailsBreadcrumbItems"></app-breadcrumb>
         <div class="card">
-            <div class="grid d-flex col-12">
-                <div class="mr-auto p-2">
+            <div class="flex col-12">
+                <div class="mr-auto">
                     <p-button
                         (click)="backList()"
                         label="Regresar"
@@ -215,7 +215,7 @@
                         iconPos="left"
                     />
                 </div>
-                <div class="p-2">
+                <div >
                     <p-button
                         *ngIf="
                             inscriptionState !== 'Cancelado' &&

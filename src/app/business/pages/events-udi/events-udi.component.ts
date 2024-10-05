@@ -19,12 +19,13 @@ import {
     Validators,
 } from '@angular/forms';
 import { DateFormatService } from 'src/app/services/date-format.service';
-import { MenuItem, PrimeNGConfig } from 'primeng/api';
+import { MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth.service';
 import { Router } from '@angular/router';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
+import { finalize } from 'rxjs';
 interface Task {
     id: string;
     title: string;
@@ -51,6 +52,7 @@ interface Usuario {
     selector: 'app-events',
     templateUrl: './events-udi.component.html',
     styleUrls: ['./events-udi.component.scss'],
+    providers: [MessageService],
 })
 export class EventsUdiComponent implements OnInit, AfterViewInit {
     @ViewChild('calendar') calendarComponent: FullCalendarComponent;
@@ -85,77 +87,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
     rowsSkeletonTask = ['1', '2', '3'];
     statusTask = 'charging';
-    data = [
-        {
-            "id": 1,
-            "title": "Reunión UDI 6",
-            "description": "Descripción de la Reunión de UDI",
-            "start_date": "14/09/2024 15:05",
-            "due_date": "15/09/2024 15:05",
-            "color": "#fff544",
-            "status": "En Progreso",
-            "meeting_url": "https://primeng.org/icons",
-            "created_at": "25/07/2024 20:25:59",
-            "managers": [
-                {
-                    "id": 2,
-                    "name": "Lic. Ornela Bravo",
-                    "surnames": "Tijerina",
-                    "code": 12590671,
-                    "email": "lgamboa@example.net",
-                    "phone": 612512384,
-                    "orcid": "inventore",
-                    "cip": 79581284
-                }
-            ],
-            "participants": [
-                {
-                    "id": 9,
-                    "name": "Axel Lira Manzanares",
-                    "surnames": "Preciado",
-                    "code": 56550234,
-                    "email": "peres.regina@example.org",
-                    "phone": 608053584,
-                    "orcid": "occaecati",
-                    "cip": 25255441
-                },
-                {
-                    "id": 8,
-                    "name": "Emilia Delfina Macías Serna",
-                    "surnames": "Ortega",
-                    "code": 14149080,
-                    "email": "quinonez.cristobal@example.com",
-                    "phone": 721170880,
-                    "orcid": "et",
-                    "cip": 35852992
-                }
-            ]
-        }
-    ]
+    data = []
 
-    // Define el arreglo de eventos
-    events: EventInput[] = [
-        {
-            title: 'Reunión de profesores',
-            start: '2024-08-23T14:30:00',
-            end: '2024-08-23T15:20:00',
-            backgroundColor: '#FF5733', // Color de fondo del evento
-            borderColor: '#FF5733', // Color del borde del evento (opcional)
-            editable: true,
-            startResizable: true,
-            durationEditable: true,
-        },
-        {
-            title: 'Evento 2',
-            start: '2024-08-23T14:30:00',
-            end: '2024-08-23T15:20:00',
-            backgroundColor: '#337DFF',
-            borderColor: '#337DFF',
-            editable: true,
-            startResizable: true,
-            durationEditable: true,
-        },
-    ];
+    events: EventInput[] = [];
 
     calendarOptions: CalendarOptions = {
         plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
@@ -190,14 +124,22 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         }
 
     };
+    lasParticipantsList = [];
+    lasManagersList = [];
     teacherL = userType.teacher;
     eventSelected: any;
     module = eModule.eventUdi;
+    edition = false;
+    alertForUserDuplicate: Message[] | undefined;
+    alertForUserDuplicateEdit: Message[] | undefined;
     public eventForm: FormGroup;
     public slotDurationForm: FormGroup;
     public taskForm: FormGroup;
     public managerForm: FormGroup;
     public participantsForm: FormGroup;
+    public managerFormEdit: FormGroup;
+    public participantsFormEdit: FormGroup;
+    public editForm: FormGroup;
     private _slotDuration: FormControl = new FormControl('', [
         Validators.required,
     ]);
@@ -219,12 +161,27 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     private _color: FormControl = new FormControl('#ff0000', [
         Validators.required,
     ]);
-    private _usersManager: FormControl = new FormControl([] as Usuario[], [
+    private _usersManager: FormControl = new FormControl([], [
         Validators.required,
     ]);
-    private _usersParticipants: FormControl = new FormControl([] as Usuario[], [
+    private _usersParticipants: FormControl = new FormControl([], [
         Validators.required,
     ]);
+    private _usersManagerEdit: FormControl = new FormControl({ value: [], disabled: true }, [
+        Validators.required,
+    ]);
+    private _usersParticipantsEdit: FormControl = new FormControl({ value: [], disabled: true }, [
+        Validators.required,
+    ]);
+    private _titleEdit: FormControl = new FormControl('', [
+        Validators.required,
+    ]);
+    private _descriptionEdit: FormControl = new FormControl('', [
+        Validators.required,
+    ]);
+    private _eventLinkEdit: FormControl = new FormControl('');
+    private _startEdit: FormControl = new FormControl('', [Validators.required]);
+    private _endEdit: FormControl = new FormControl('', [Validators.required]);
 
     get slotDuration() {
         return this._slotDuration;
@@ -262,8 +219,29 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     get usersParticipants() {
         return this._usersParticipants;
     }
+    get usersManagerEdit() {
+        return this._usersManagerEdit;
+    }
+    get usersParticipantsEdit() {
+        return this._usersParticipantsEdit;
+    }
     get assignedUser() {
         return this._assignedUser;
+    }
+    get titleEdit() {
+        return this._titleEdit;
+    }
+    get descriptionEdit() {
+        return this._descriptionEdit;
+    }
+    get eventLinkEdit() {
+        return this._eventLinkEdit;
+    }
+    get startEdit() {
+        return this._startEdit;
+    }
+    get endEdit() {
+        return this._endEdit;
     }
     selectedItems: Usuario[] | undefined;
 
@@ -278,6 +256,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         private config: PrimeNGConfig,
         private service: AuthService,
         private loaderService: LoaderService,
+        private messageService: MessageService,
     ) {
         this.slotDurationForm = this.fb.group({
             slotDuration: this.slotDuration,
@@ -289,6 +268,13 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             start: this.start,
             end: this.end,
             color: this.color,
+        });
+        this.editForm = this.fb.group({
+            titleEdit: this.titleEdit,
+            descriptionEdit: this.descriptionEdit,
+            eventLinkEdit: this.eventLinkEdit,
+            startEdit: this.startEdit,
+            endEdit: this.endEdit,
         });
         this.taskForm = this.fb.group({
             titleTask: this.titleTask,
@@ -302,11 +288,20 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.participantsForm = this.fb.group({
             usersParticipants: this.usersParticipants,
         });
+        this.managerFormEdit = this.fb.group({
+            usersManagerEdit: this.usersManagerEdit,
+        });
+        this.participantsFormEdit = this.fb.group({
+            usersParticipantsEdit: this.usersParticipantsEdit,
+        });
     }
 
     ngOnInit() {
         this.callGetEventsUdi();
         this.watchUsersManager();
+        this.watchUsersParticipants();
+        this.watchUsersManagerEdit();
+        this.watchUsersParticipantsEdit();
         this.getTeachersList();
         this.slotDuration.setValue(this.timeslots[this.timeslots.length - 1]);
         this.watchSlotDuration();
@@ -323,7 +318,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             dateFormat: 'dd/mm/yy',
             weekHeader: 'Sm'
         });
-        this.watchassignedUser()
     }
 
     ngAfterViewInit(): void {
@@ -397,41 +391,40 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     handleEventClick(arg) {
         this.loaderService.show();
         this.eventSelected = arg;
-        const usersManager: Usuario[] = [];
-        const usersParticipants: Usuario[] = [];
-        for (let user of this.eventSelected.event._def.extendedProps.event_udi.managers) {
-            const userArr = {
-                id: user.id,
-                nombre: user.name,
-                apellidos: user.surnames,
-                fullName: user.name + ' ' + user.surnames
-            }
-            usersManager.push(userArr);
-        }
-        for (let user of this.eventSelected.event._def.extendedProps.event_udi.participants) {
-            const userArr = {
-                id: user.id,
-                nombre: user.name,
-                apellidos: user.surnames,
-                fullName: user.name + ' ' + user.surnames
-            }
-            usersParticipants.push(userArr);
-        }
-        this.usersManager.setValue(usersManager);
-        this.usersParticipants.setValue(usersParticipants);
+        console.log('this.eventSelected.event._def.extendedProps.event_udi', this.eventSelected.event._def.extendedProps.event_udi);
+        this.usersManagerEdit.setValue(this.addFullNameProperty(this.eventSelected.event._def.extendedProps.event_udi.managers));
+        this.usersParticipantsEdit.setValue(this.addFullNameProperty(this.eventSelected.event._def.extendedProps.event_udi.participants));
         this.getTask(this.eventSelected.event._def.extendedProps.event_udi.id);
         this.showEventDetail = true;
+        this.fillFormEdition(this.eventSelected.event._def.extendedProps.event_udi);
         setTimeout(() => {
             this.loaderService.hide();
-        }, 800);
+        }, 400);
+    }
+
+    fillFormEdition(data: any) {
+        this.titleEdit.setValue(data.title);
+        this.descriptionEdit.setValue(data.description);
+        this.eventLinkEdit.setValue(data.meeting_url);
+        const dateInfo = this.dateFormatService.formatDateWithEndTime(data.start_date)
+        console.log('data.start_date', data.start_date)
+        console.log('dateInfo', dateInfo)
+        this.startEdit.setValue(data.start_date);
+        this.endEdit.setValue(this.dateFormatService.formatDateCalendar(data.due_date));
+    }
+
+    addFullNameProperty(data: any[]): any[] {
+        return data.map(item => ({
+            ...item,
+            fullName: `${item.name} ${item.surnames}`
+        }));
     }
 
     backCalendar() {
         this.loaderService.show();
         this.showEventDetail = false;
+        this.edition = false;
         this.eventSelected = null;
-        this.usersManager.setValue([]);
-        this.usersParticipants.setValue([]);
         setTimeout(() => {
             this.loaderService.hide();
         }, 800);
@@ -449,22 +442,79 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
     addEvent() {
         if (this.eventForm.valid) {
-            const newEvent: EventInput = {
-                title: this.title.value,
-                start: this.dateFormatService.formatDateToISO(this.start.value),
-                end: this.dateFormatService.formatDateToISO(this.end.value),
-                allDay: false,
-                editable: true,
-                startResizable: true,
-                durationEditable: true,
-                backgroundColor: this.color.value,
-                borderColor: this.color.value,
-            };
-            this.events.push(newEvent);
-            const calendarApi = this.calendarComponent.getApi();
-            calendarApi.addEvent(newEvent);
+            this.loaderService.show(true);
             this.newEventDialog = false;
+            const request = {
+                title: this.title.value,
+                description: this.description.value,
+                start_date: this.dateFormatService.formatDateCalendarToBack(this.start.value.toString()),
+                due_date: this.dateFormatService.formatDateCalendarToBack(this.start.value.toString()),
+                color: this.color.value,
+                meeting_url: this.eventLink.value,
+                managers_ids: this.extractIds(this.usersManager.value),
+                users_ids: this.extractIds(this.usersParticipants.value)
+            }
+            this.service.postAddNewEvent(request).pipe(
+                finalize(() => {
+                    this.loaderService.hide();
+                })
+            ).subscribe(
+                (res: any) => {
+                    if (res.status) {
+                        this.messageService.add({
+                            key: 'tst',
+                            severity: 'info',
+                            summary: 'Confirmación',
+                            detail: 'La reunión ha sido guardada.',
+                            life: 3000,
+                        });
+                        const newEvent: EventInput = {
+                            title: this.title.value,
+                            start: this.dateFormatService.formatDateToISO(this.start.value),
+                            end: this.dateFormatService.formatDateToISO(this.end.value),
+                            allDay: false,
+                            editable: true,
+                            startResizable: true,
+                            durationEditable: true,
+                            backgroundColor: this.color.value,
+                            borderColor: this.color.value,
+                            event_udi: this.event(res.id)
+                        };
+                        this.events.push(newEvent);
+                        const calendarApi = this.calendarComponent.getApi();
+                        calendarApi.addEvent(newEvent);
+                        this.newEventDialog = false;
+                    }
+                }, (error) => {
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Se ha producido un error al guardar la reunión.',
+                        life: 3000,
+                    });
+                })
         }
+    }
+
+    event(id: string) {
+        return {
+            id: id,
+            title: this.title.value,
+            description: this.description.value,
+            start_date: this.dateFormatService.formatDateCalendarToBack(this.start.value.toString()),
+            due_date: this.dateFormatService.formatDateCalendarToBack(this.start.value.toString()),
+            color: this.color.value,
+            status: "En Progreso",
+            meeting_url: this.eventLink.value,
+            created_at: "25-09-2024 19:55:13",
+            managers: this.usersManager.value,
+            participants: this.usersParticipants.value
+        }
+    }
+
+    extractIds(arr: Array<{ id: string }>): string[] {
+        return arr.map(item => item.id);
     }
 
     dragStart(task: Task) {
@@ -637,13 +687,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
 
     }
 
-    watchassignedUser() {
-        this.assignedUser.valueChanges.subscribe(
-            (res) => {
-                console.log('valueChanges', res)
-            })
-    }
-
     search(event: AutoCompleteCompleteEvent) {
         const query = event.query.toLowerCase();
         this.filteredItems = this.usuarios
@@ -659,14 +702,85 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     watchUsersManager(): void {
-        this.usersManager.valueChanges.pipe().subscribe((value) => {
+        this.usersManager.valueChanges.pipe().subscribe((value: any[]) => {
+            if (value) {
+                let hasDuplicate = false;
+                const uniqueValues = value.filter((user: any) => {
+                    const isDuplicate = this.isUserDuplicate(user, this.participantsForm.get('usersParticipants')?.value);
+                    if (isDuplicate) {
+                        hasDuplicate = true;
+                    }
+                    return !isDuplicate;
+                });
+                this.managerForm.get('usersManager')?.setValue(uniqueValues, { emitEvent: false });
+                this.alertForUserDuplicate = hasDuplicate
+                    ? [{ severity: 'warn', detail: 'Los encargados y los participantes no pueden ser iguales.' }]
+                    : [];
+            }
         });
     }
 
     watchUsersParticipants(): void {
-        this.usersParticipants.valueChanges.pipe().subscribe((value) => {
+        this.usersParticipants.valueChanges.pipe().subscribe((value: any[]) => {
+            if (value) {
+                let hasDuplicate = false;
+                const uniqueValues = value.filter((user: any) => {
+                    const isDuplicate = this.isUserDuplicate(user, this.managerForm.get('usersManager')?.value);
+                    if (isDuplicate) {
+                        hasDuplicate = true;
+                    }
+                    return !isDuplicate;
+                });
+                this.participantsForm.get('usersParticipants')?.setValue(uniqueValues, { emitEvent: false });
+                this.alertForUserDuplicate = hasDuplicate
+                    ? [{ severity: 'warn', detail: 'Los encargados y los participantes no pueden ser iguales.' }]
+                    : [];
+            }
         });
     }
+
+    watchUsersManagerEdit(): void {
+        this.usersManagerEdit.valueChanges.pipe().subscribe((value: any[]) => {
+            if (value) {
+                let hasDuplicate = false;
+                const uniqueValues = value.filter((user: any) => {
+                    const isDuplicate = this.isUserDuplicate(user, this.participantsFormEdit.get('usersParticipantsEdit')?.value);
+                    if (isDuplicate) {
+                        hasDuplicate = true;
+                    }
+                    return !isDuplicate;
+                });
+                this.managerFormEdit.get('usersManagerEdit')?.setValue(uniqueValues, { emitEvent: false });
+                this.alertForUserDuplicateEdit = hasDuplicate
+                    ? [{ severity: 'warn', detail: 'Los encargados y los participantes no pueden ser iguales.' }]
+                    : [];
+            }
+        });
+    }
+
+    watchUsersParticipantsEdit(): void {
+        this.usersParticipantsEdit.valueChanges.pipe().subscribe((value: any[]) => {
+            if (value) {
+                let hasDuplicate = false;
+                const uniqueValues = value.filter((user: any) => {
+                    const isDuplicate = this.isUserDuplicate(user, this.managerFormEdit.get('usersManagerEdit')?.value);
+                    if (isDuplicate) {
+                        hasDuplicate = true;
+                    }
+                    return !isDuplicate;
+                });
+                this.participantsFormEdit.get('usersParticipantsEdit')?.setValue(uniqueValues, { emitEvent: false });
+                this.alertForUserDuplicateEdit = hasDuplicate
+                    ? [{ severity: 'warn', detail: 'Los encargados y los participantes no pueden ser iguales.' }]
+                    : [];
+            }
+        });
+    }
+
+    isUserDuplicate(user: any, otherList: any[]): boolean {
+        return otherList && otherList.some((otherUser: any) => otherUser.id === user.id);
+    }
+
 
     formatText(text: string): string {
         return text.replace(/\n/g, '<br>');
@@ -738,7 +852,13 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
                     this.usuarios = res.data;
                 }
             }, (error) => {
-
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al traer la lista de profesores.',
+                    life: 3000,
+                })
             })
     }
 
@@ -746,4 +866,23 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         window.open(this.eventSelected.event._def.extendedProps.event_udi.meeting_url, '_blank');
     }
 
+    showEdition() {
+        this.lasManagersList = this.usersManagerEdit.value
+        this.lasParticipantsList = this.usersParticipantsEdit.value;
+        this.usersManagerEdit.enable();
+        this.usersParticipantsEdit.enable();
+        this.edition = true;
+    }
+
+    cancelEdition() {
+        this.usersManagerEdit.setValue(this.lasManagersList)
+        this.usersParticipantsEdit.setValue(this.lasParticipantsList);
+        this.usersManagerEdit.disable();
+        this.usersParticipantsEdit.disable();
+        this.edition = false;
+    }
+
+    showNewEventDialog() {
+        this.newEventDialog = true;
+    }
 }

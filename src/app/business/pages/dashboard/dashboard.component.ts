@@ -54,13 +54,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.service.getNotificationReport().pipe().subscribe(
             (res: any) => {
                 this.notifications = [
-                    ...res.data.comments.map(comment => ({ ...comment, type: 'comment', icon: this.getNotificationIcon(comment.comment) })),
-                    ...res.data.tasks.map(task => ({ ...task, type: 'task', icon: this.getNotificationIcon(task.task) }))
+                    ...res.data.comments.map(comment => ({ ...comment, type: 'comment', icon: this.getNotificationIcon(comment.comment || comment.status) })),
+                    ...res.data.tasks.map(task => ({ ...task, type: 'task', icon: this.getNotificationIcon(task.task) })),
+                    ...res.data.status.map(status => ({ ...status, type: 'status', icon: this.getNotificationIcon(status.status) })) // Añadir los status
                 ];
                 this.categorizeNotifications();
-            }, (error) => {
+            },
+            (error) => {
                 this.stateCallNotifications = 'error';
-            });
+            }
+        );
     }
 
     refreshNotificactions() {
@@ -75,7 +78,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const today = this.normalizeDate(new Date());
 
         this.notifications.forEach(notification => {
-            const notificationDate = this.normalizeDate(this.parseDate(notification.created_at));
+            let date = '';
+            notification.created_at ? date = notification.created_at : date = notification.updated_at;
+            const notificationDate = this.normalizeDate(this.parseDate(date));
             const diffDays = this.calculateDiffDays(notificationDate, today);
 
             if (diffDays === 0) {
@@ -118,6 +123,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     getNotificationIcon(text: string): string {
+        console.log(text);
         if (text.includes("en la reunión")) {
             return "pi pi-fw pi-calendar-plus";
         } else if (text.includes("en el artículo")) {
@@ -130,10 +136,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
             return "pi pi-fw pi-file-import";
         } else if (text.includes("en la inscripción")) {
             return "pi pi-fw pi-file";
+        } else if (text.includes("actualización de estado")) {  // Nuevo ícono para status
+            return "pi pi-fw pi-refresh";
         }
         // Ícono por defecto
         return "pi pi-comment";
     }
+
 
     initChart() {
         const documentStyle = getComputedStyle(document.documentElement);

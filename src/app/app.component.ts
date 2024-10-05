@@ -79,7 +79,7 @@ export class AppComponent implements OnInit, OnDestroy {
         setTimeout(() => {
           this.secondValidatonByDataLocalStorage()
           this.loaderService.hide();
-        }, 800);
+        }, 400);
       }
     });
   }

@@ -8,8 +8,12 @@ export class LoaderService {
   private loadingSubject = new BehaviorSubject<boolean>(false);
   loading$ = this.loadingSubject.asObservable();
 
-  show() {
+  private showMessageSubject = new BehaviorSubject<boolean>(false);
+  showMessage$ = this.showMessageSubject.asObservable();
+
+  show(message: boolean = false) {
     this.loadingSubject.next(true);
+    this.showMessageSubject.next(message);
   }
 
   hide() {

@@ -12,6 +12,7 @@ import { DashboardsRoutingModule } from './dashboard-routing.module';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
+import { DegreeProcessCardsComponent } from './components/degree-process-cards/degree-process-cards.component';
 
 @NgModule({
     imports: [
@@ -28,6 +29,6 @@ import { CrossComponentsModule } from '../../cross-components/Cross.module';
         SkeletonModule,
         CrossComponentsModule,
     ],
-    declarations: [DashboardComponent]
+    declarations: [DashboardComponent, DegreeProcessCardsComponent]
 })
 export class DashboardModule { }

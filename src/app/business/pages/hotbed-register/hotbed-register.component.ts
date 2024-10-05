@@ -8,6 +8,7 @@ import { finalize } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
 import { IStudent } from '../../cross-interfaces/comments-interfaces';
+import { ThesisSimilarityService } from 'src/app/services/thesis-similarity.service';
 
 @Component({
   selector: 'app-hotbed-register',
@@ -18,7 +19,7 @@ import { IStudent } from '../../cross-interfaces/comments-interfaces';
         flex-basis: 50rem;
     } `
   ],
-  providers: [MessageService]
+  providers: [MessageService, ThesisSimilarityService]
 
 })
 export class HotbedRegisterComponent implements OnInit {
@@ -83,6 +84,11 @@ export class HotbedRegisterComponent implements OnInit {
     }
   ];
   filteredItems: any[] | undefined;
+  results: Array<{ title: string, similarity: number }> = [];
+  minimumPercentage: number = 60;
+  lastMinimumPercentage: number = 60;
+  configCompareTitle: boolean = false;
+  thesisTitles = [];
   articleForm: FormGroup;
   studentsForm: FormGroup;
   private _title = new FormControl('', [Validators.required]);
@@ -105,7 +111,8 @@ export class HotbedRegisterComponent implements OnInit {
 
 
   constructor(private fb: FormBuilder, private cd: ChangeDetectorRef, private router: Router, private service: AuthService,
-    private loaderService: LoaderService, private messageService: MessageService,
+    private loaderService: LoaderService, private messageService: MessageService, private thesisSimilarity: ThesisSimilarityService,
+
   ) {
     this.articleForm = this.fb.group({
       title: this.title,
@@ -117,7 +124,9 @@ export class HotbedRegisterComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.callGetTitlesList();
     this.watchStudents();
+    this.watchTitle();
   }
 
 
@@ -201,5 +210,52 @@ export class HotbedRegisterComponent implements OnInit {
   getUserSelected(userSelected: any) {
     console.log('userSelected', userSelected)
     this.students.setValue(userSelected);
+  }
+
+  watchTitle(): void {
+    this.title.valueChanges.pipe().subscribe((value) => {
+      if (value) {
+        this.results = this.thesisSimilarity.compareWithThesisTitles(value, this.thesisTitles, this.minimumPercentage)
+          .sort((a, b) => b.similarity - a.similarity);
+      }
+    });
+  }
+
+  getSeverity(status: number): string {
+    if (status < 60) {
+      return 'info';
+    }
+    if (status > 70 && status < 90) {
+      return 'warning';
+    }
+    if (status > 90) {
+      return 'danger';
+    }
+    return '';
+  }
+
+  showConfigCompareTitle() {
+    this.lastMinimumPercentage = this.minimumPercentage;
+    this.configCompareTitle = true;
+  }
+
+  cancelConfigCompareTitle() {
+    this.minimumPercentage = this.lastMinimumPercentage;
+    this.configCompareTitle = false;
+  }
+
+  saveConfigCompareTitle() {
+    this.results = this.thesisSimilarity.compareWithThesisTitles(this.title.value, this.thesisTitles, this.minimumPercentage)
+      .sort((a, b) => b.similarity - a.similarity);
+    this.configCompareTitle = false;
+  }
+
+  callGetTitlesList() {
+    this.service.getArticlesTitlesList().pipe().subscribe(
+      (res: any) => {
+        if (res.data) {
+          this.thesisTitles = res.data;
+        }
+      })
   }
 }

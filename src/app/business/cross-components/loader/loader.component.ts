@@ -21,10 +21,17 @@ import { trigger, state, style, animate, transition } from '@angular/animations'
 })
 export class LoaderComponent {
   isLoading: boolean = false;
+  message: boolean = false;
 
   constructor(private loaderService: LoaderService) {
     this.loaderService.loading$.subscribe(isLoading => {
       this.isLoading = isLoading;
+      if(isLoading) {
+        this.loaderService.showMessage$.subscribe(message => {
+          this.message = message;
+        });
+      }
     });
+    
   }
 }

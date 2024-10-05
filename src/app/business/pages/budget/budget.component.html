@@ -3,78 +3,190 @@
     <div class="col-12">
         <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
         <div class="card px-6 py-6">
-
-
-
-
-
-
-
-
             <div>
                 <h2>Registro de Gastos</h2>
-              
+
                 <p>
-                  <label>Selecciona un Plan:</label>
-                  <p-dropdown 
-                    [options]="testData" 
-                    [(ngModel)]="selectedPlan" 
-                    [optionLabel]="'tituloGeneral'" 
-                    (onChange)="onPlanChange()">
-                  </p-dropdown>
+                    <label>Selecciona un Plan:</label>
+                    <p-dropdown
+                        [options]="testData"
+                        [(ngModel)]="selectedPlan"
+                        [optionLabel]="'tituloGeneral'"
+                        (onChange)="onPlanChange()"
+                    >
+                    </p-dropdown>
                 </p>
-              
+
                 <p *ngIf="selectedPlan">
-                  <label>Selecciona una Actividad:</label>
-                  <p-dropdown 
-                    [options]="selectedPlan.actividades" 
-                    [(ngModel)]="selectedActividad" 
-                    [optionLabel]="'descripcion'" 
-                    (onChange)="onActividadChange()">
-                  </p-dropdown>
+                    <label>Selecciona una Actividad:</label>
+                    <p-dropdown
+                        [options]="selectedPlan.actividades"
+                        [(ngModel)]="selectedActividad"
+                        [optionLabel]="'descripcion'"
+                        (onChange)="onActividadChange()"
+                    >
+                    </p-dropdown>
                 </p>
-              
+
                 <div *ngIf="selectedActividad">
                     <label>Selecciona una Tarea:</label>
-                    <p-dropdown 
-                      [options]="selectedActividad.tareas" 
-                      [(ngModel)]="selectedTarea" 
-                      [optionLabel]="'descripcion'"
-                      (onChange)="onTareaChange()"> <!-- Asegúrate de tener este evento -->
+                    <p-dropdown
+                        [options]="selectedActividad.tareas"
+                        [(ngModel)]="selectedTarea"
+                        [optionLabel]="'descripcion'"
+                        (onChange)="onTareaChange()"
+                    >
+                        <!-- Asegúrate de tener este evento -->
                     </p-dropdown>
-                  </div>
-              
-                <div *ngIf="selectedTarea">
-                  <h3>Registrar Gasto Específico</h3>
-                  
-                  <form [formGroup]="gastoForm" (ngSubmit)="agregarGasto()">
-                    <label>Gasto Específico:</label>
-                    <input type="text" pInputText formControlName="gastoEspecifico" />
+                </div>
 
-              
-                    <div formArrayName="meses">
-                        <div *ngFor="let mes of ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']; let i = index">
-                            <label>{{ mes }}:</label>
-                            <p-inputNumber [formControlName]="i"></p-inputNumber>
+                <form
+                    *ngIf="selectedTarea"
+                    [formGroup]="gastoForm"
+                    (ngSubmit)="agregarGasto()"
+                >
+                    <div
+                        class="mb-4"
+                        style="
+                            border: 1px dashed #d1d5db;
+                            border-radius: 5px;
+                            padding: 15px;
+                        "
+                    >
+                        <div class="flex">
+                            <div class="mr-auto">
+                                <label for="tituloGeneral" class="col-12">
+                                    1.1 Tarea</label
+                                >
+                            </div>
+                            <button
+                                pButton
+                                type="button"
+                                icon="pi pi-times"
+                                class="p-button-danger"
+                                [rounded]="true"
+                                [text]="true"
+                            ></button>
+                        </div>
+
+                        <!-- Descripción de la Actividad -->
+                        <div class="p-field p-grid">
+                            <div class="col-12">
+                                <input
+                                    pInputText
+                                    id="descripcion"
+                                    style="width: 100%"
+                                    placeholder="Gasto específico"
+                                    formControlName="gastoEspecifico"
+                                    class="p-inputtext-sm"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <!-- Meses -->
+                            <div class="p-field p-grid">
+                                <label class="p-col-12 p-md-2">Meses:</label>
+
+                                <div
+                                    formArrayName="meses"
+                                    class="grid col-12 p-align-center p-justify-center flex"
+                                >
+                                    <div
+                                        *ngFor="
+                                            let mes of [
+                                                'Ene',
+                                                'Feb',
+                                                'Mar',
+                                                'Abr',
+                                                'May',
+                                                'Jun',
+                                                'Jul',
+                                                'Ago',
+                                                'Sep',
+                                                'Oct',
+                                                'Nov',
+                                                'Dic'
+                                            ];
+                                            let i = index
+                                        "
+                                        class="col-2"
+                                    >
+                                        <!-- <p-inputNumber
+                                                class="w-full"
+                                                [placeholder]="mes"
+                                            ></p-inputNumber> -->
+                                            <p>{{mes}}</p>
+                                        <input
+                                            type="number"
+                                            style="
+                                                width: -webkit-fill-available;
+                                            "
+                                            [placeholder]="mes"
+                                            pInputText
+                                            [formControlName]="i"
+                                            pKeyFilter="int"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <div class="col-12">
+                                        <input
+                                            pInputText
+                                            id="descripcion"
+                                            style="width: 100%"
+                                            placeholder="Rubro Contable"
+                                            formControlName="rubroContable"
+                                            class="p-inputtext-sm"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Comentario -->
+                            <div class="p-field p-grid">
+                                <div class="p-col-12 p-md-10">
+                                    <p-button
+                                        label="Agregar Gasto"
+                                        type="submit"
+                                    ></p-button>
+                                </div>
+                            </div>
                         </div>
                     </div>
-              
-                    <label>Rubro Contable:</label>
-                    <input type="text" pInputText formControlName="rubroContable" />
+                </form>
 
-              
-                    <p-button label="Agregar Gasto" type="submit"></p-button>
-                  </form>
-                </div>
-              
                 <h3>Vista Previa de Gastos</h3>
-                <p-table [value]="gastosIngresados" styleClass="p-datatable-gridlines" responsiveLayout="scroll">
+                <p-table
+                    [value]="gastosIngresados"
+                    styleClass="p-datatable-gridlines"
+                    responsiveLayout="scroll"
+                >
                     <ng-template pTemplate="header">
                         <tr>
                             <th>Actividad</th>
                             <th>Tarea</th>
                             <th>Gasto Específico</th>
-                            <th *ngFor="let mes of ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']">{{ mes }}</th>
+                            <th
+                                *ngFor="
+                                    let mes of [
+                                        'Ene',
+                                        'Feb',
+                                        'Mar',
+                                        'Abr',
+                                        'May',
+                                        'Jun',
+                                        'Jul',
+                                        'Ago',
+                                        'Sep',
+                                        'Oct',
+                                        'Nov',
+                                        'Dic'
+                                    ]
+                                "
+                            >
+                                {{ mes }}
+                            </th>
                             <th>Total</th>
                             <th>Rubro Contable</th>
                         </tr>
@@ -84,7 +196,9 @@
                             <td>{{ gasto.actividad }}</td>
                             <td>{{ gasto.tarea }}</td>
                             <td>{{ gasto.gastoEspecifico }}</td>
-                            <td *ngFor="let monto of gasto.meses">{{ monto}}</td>
+                            <td *ngFor="let monto of gasto.meses">
+                                {{ monto }}
+                            </td>
                             <td>{{ calcularTotal(gasto.meses) }}</td>
                             <td>{{ gasto.rubroContable }}</td>
                         </tr>
@@ -92,19 +206,13 @@
                     <ng-template pTemplate="footer">
                         <tr>
                             <td colspan="3">TOTAL</td>
-                            <td *ngFor="let mes of totalMeses()">{{ mes}}</td>
-                            <td>{{ calcularTotalTotal()  }}</td>
+                            <td *ngFor="let mes of totalMeses()">{{ mes }}</td>
+                            <td>{{ calcularTotalTotal() }}</td>
                             <td></td>
                         </tr>
                     </ng-template>
                 </p-table>
-              </div>
-
-
-
-
-
-
+            </div>
         </div>
     </div>
 </div>

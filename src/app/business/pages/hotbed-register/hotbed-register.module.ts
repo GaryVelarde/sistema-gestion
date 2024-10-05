@@ -11,6 +11,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ToastModule } from 'primeng/toast';
+import { DialogModule } from 'primeng/dialog';
+import { SliderModule } from 'primeng/slider';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
 
 @NgModule({
   imports: [
@@ -27,6 +31,10 @@ import { ToastModule } from 'primeng/toast';
     AutoCompleteModule,
     ToastModule,
     CrossComponentsModule,
+    DialogModule,
+    SliderModule,
+    TableModule,
+    TagModule,
   ],
   declarations: [HotbedRegisterComponent]
 })
