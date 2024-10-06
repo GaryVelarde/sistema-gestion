@@ -30,7 +30,6 @@ import { ColorPickerModule } from 'primeng/colorpicker';
 import { EventsUdiComponent } from './events-udi.component';
 import { EventsUdiRoutingModule } from './events-udi-routing.module';
 import { MessagesModule } from 'primeng/messages';
-import { ContextMenuModule } from 'primeng/contextmenu';
 import { DragDropModule } from 'primeng/dragdrop';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { SidebarModule } from 'primeng/sidebar';
@@ -71,7 +70,6 @@ import { CrossComponentsModule } from '../../cross-components/Cross.module';
         FloatLabelModule,
         ColorPickerModule,
         MessagesModule,
-        ContextMenuModule,
         AutoCompleteModule,
         SidebarModule,
         AvatarModule,

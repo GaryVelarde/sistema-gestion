@@ -6,6 +6,8 @@ import {
     ChangeDetectorRef,
     ElementRef,
     OnDestroy,
+    OnChanges,
+    SimpleChanges,
 } from '@angular/core';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import { FullCalendarComponent } from '@fullcalendar/angular';
@@ -55,7 +57,7 @@ interface Usuario {
     styleUrls: ['./events-udi.component.scss'],
     providers: [MessageService],
 })
-export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy {
+export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
     @ViewChild('calendar') calendarComponent: FullCalendarComponent;
     @ViewChild('cardBody') cardBody!: ElementRef;
     resizeObserver!: ResizeObserver;
@@ -322,6 +324,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
+        if (this.resizeObserver) {
+            this.resizeObserver.disconnect();
+        }
         this.destroy$.next();
         this.destroy$.complete();
     }
@@ -336,6 +341,21 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy {
             this.resizeObserver.observe(this.cardBody.nativeElement);
         }
     }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['showEventDetail']) {
+            if (!this.showEventDetail) {
+                if (this.cardBody && this.cardBody.nativeElement) {
+                    this.resizeObserver.observe(this.cardBody.nativeElement);
+                }
+            } else {
+                if (this.resizeObserver) {
+                    this.resizeObserver.disconnect();
+                }
+            }
+        }
+    }
+
 
     async callGetEventsUdi() {
         await this.service.getEventsUdiList().pipe(takeUntil(this.destroy$)).subscribe(
@@ -437,7 +457,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     renderizeCalendar() {
-        this.calendarComponent.getApi().render();
+        if (this.calendarComponent && this.calendarComponent.getApi()) {
+            this.calendarComponent.getApi().render();
+        }
     }
 
     handleEventDrop(eventDropInfo) {

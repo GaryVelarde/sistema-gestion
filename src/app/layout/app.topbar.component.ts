@@ -14,7 +14,19 @@ export class AppTopBarComponent {
 
     items: MenuItem[] = [
         {
-            label: 'Opciones',
+            label: 'Configuración',
+            items: [
+                {
+                    label: 'Modo oscuro',
+                    icon: 'pi pi-moon',
+                    command: () => {
+                        this.darMode();
+                    }
+                }
+            ]
+        },
+        {
+            label: 'Perfil',
             items: [
                 {
                     label: 'Cerrar sesión',
@@ -24,7 +36,10 @@ export class AppTopBarComponent {
                     }
                 }
             ]
-        }
+        },
+        {
+            separator: true
+        },
     ];
 
     @ViewChild('menubutton') menuButton!: ElementRef;
@@ -56,7 +71,7 @@ export class AppTopBarComponent {
         private tokenService: TokenService,
     ) {
         this.validateScheme();
-     }
+    }
 
     getInitialName(): string {
         const userName = this.tokenService.getDR2LP2();
@@ -102,21 +117,40 @@ export class AppTopBarComponent {
 
     validateScheme() {
         if (this.colorScheme === 'light') {
-            this.items[0].items[1] = {
-                label: 'Modo oscuro',
-                icon: 'pi pi-moon',
-                command: () => {
-                    this.darMode();
-                }
+            this.items[0] = {
+                label: 'Configuración',
+                items: [
+                    {
+                        label: 'Modo oscuro',
+                        icon: 'pi pi-moon',
+                        command: () => {
+                            this.darMode();
+                        }
+                    }
+                ]
+            },
+            {
+                separator: true
             };
+
+
         } else {
-            this.items[0].items[1] = {
-                label: 'Modo claro',
-                icon: 'pi pi-sun',
-                command: () => {
-                    this.lightMode();
-                }
-            };
+            this.items[0] = {
+                label: 'Configuración',
+                items: [
+                    {
+                        label: 'Modo claro',
+                        icon: 'pi pi-sun',
+                        command: () => {
+                            this.lightMode();
+                        }
+                    }
+                ]
+            },
+            {
+                separator: true
+            }
+
         }
 
     }

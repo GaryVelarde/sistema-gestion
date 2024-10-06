@@ -1,5 +1,5 @@
 <p-toast key="tst"></p-toast>
-<div [ngClass]="{ 'd-none': showEventDetail }">
+<div  *ngIf="!showEventDetail">
     <div class="grid" #cardBody>
         <div class="col-12">
             <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>

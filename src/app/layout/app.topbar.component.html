@@ -23,7 +23,19 @@
             <span>Settings</span>
         </button>-->
         <div class="flex justify-content-center">
-            <p-menu #menuO class="test" [model]="items" [popup]="true" />
+            <p-menu #menuO class="test" [model]="items" [popup]="true" styleClass="w-full md:w-15rem" >
+                <ng-template pTemplate="end">
+                    <button pRipple class="relative overflow-hidden w-full p-link flex align-items-center p-2 pl-3 text-color hover:surface-200 border-noround">
+                        <p-avatar 
+                            [label]="getInitialName()" 
+                            size="large" />
+                        <span class="inline-flex flex-column ml-1">
+                            <span class="font-bold">{{tokenService.getDR2LP2().user.name + ' ' + tokenService.getDR2LP2().user.surnames}}</span>
+                            <span class="text-sm">{{tokenService.getDR2LP2().user.role}}</span>
+                        </span>
+                    </button>
+                </ng-template>
+            </p-menu>
             <p-button [text]="true" severity="secondary" (onClick)="menuO.show($event)" icon="pi pi-chevron-down"/>
         </div>
     </div>

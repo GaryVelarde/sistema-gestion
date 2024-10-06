@@ -331,7 +331,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
   }
 
   commentMenuItems(comment: any): MenuItem[] {
-    console.log('comment',comment)
     return [
       {
         label: 'Editar',
@@ -341,7 +340,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
       {
         label: 'Eliminar',
         icon: 'pi pi-trash',
-        command: () => (this.deleteComment(comment))
+        command: () => this.deleteComment(comment)
       },
     ];
   }
