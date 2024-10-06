@@ -15,6 +15,9 @@ export class CommentsService {
     }
     constructor(private http: HttpClient) { }
 
+    /**
+        Actualizar comentarios
+     */
     putInscriptionCommentUpdate(inscriptionId: string, commentId: string, request: any) {
         return this.http.put(`${this.API_URL}/inscription/${inscriptionId}/observations/${commentId}`, request, this.header);
     }
@@ -30,4 +33,33 @@ export class CommentsService {
     putEventUdiCommentUpdate(eventId: string, commentId: string, request: any) {
         return this.http.put(`${this.API_URL}/meeting/${eventId}/observations/${commentId}`, request, this.header);
     }
+
+    putArticleCommentUpdate(articleId: string, commentId: string, request: any) {
+        return this.http.put(`${this.API_URL}/article/${articleId}/observations/${commentId}`, request, this.header);
+    }
+
+    /**
+       Eliminar comentarios
+    */
+
+    deleteArticleComment(articleId: string, commentId: string) {
+        return this.http.delete(`${this.API_URL}/article/${articleId}/observations/${commentId}`);
+    }
+
+    deleteInscriptionComment(inscriptionId: string, commentId: string) {
+        return this.http.delete(`${this.API_URL}/inscription/${inscriptionId}/observations/${commentId}`);
+    }
+
+    deleteReviewComment(reviewId: string, commentId: string) {
+        return this.http.delete(`${this.API_URL}/review/${reviewId}/observations/${commentId}`);
+    }
+
+    deleteAdvisoryComment(advisoryId: string, commentId: string) {
+        return this.http.delete(`${this.API_URL}/advisory/${advisoryId}/observations/${commentId}`);
+    }
+
+    deleteEventUdiComment(eventId: string, commentId: string) {
+        return this.http.delete(`${this.API_URL}/meeting/${eventId}/observations/${commentId}`);
+    }
+
 }

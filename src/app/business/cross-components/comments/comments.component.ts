@@ -334,12 +334,12 @@ export class CommentsComponent implements OnInit, OnDestroy {
       {
         label: 'Editar',
         icon: 'pi pi-pencil',
-        command: () => this.editComment(comment)
+        command: () => (this.editComment(comment))
       },
       {
         label: 'Eliminar',
         icon: 'pi pi-trash',
-        command: () => this.deleteComment(comment)
+        command: () => (this.deleteComment(comment))
       },
     ];
   }
@@ -362,7 +362,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
         this.callPutInscriptionCommentUpdate(comment);
         break;
       case eModule.hotbed:
-        this.getCommentsByHotbed();
+        this.callPutArticleCommentUpdate(comment);
         break;
       case eModule.review:
         this.callPutReviewCommentUpdate(comment);
@@ -376,8 +376,25 @@ export class CommentsComponent implements OnInit, OnDestroy {
   }
 
   deleteComment(comment: any) {
-    console.log('Eliminando comentario', comment);
+    switch (this.module) {
+      case eModule.eventUdi:
+        this.callDeleteEventUdiComment(comment);
+        break;
+      case eModule.advisory:
+        this.callDeleteAdvisoryComment(comment);
+        break;
+      case eModule.inscription:
+        this.callDeleteInscriptionComment(comment);
+        break;
+      case eModule.hotbed:
+        this.callDeleteArticleComment(comment);
+        break;
+      case eModule.review:
+        this.callDeleteReviewComment(comment);
+        break;
+    }
   }
+
 
   callPutInscriptionCommentUpdate(comment: any) {
     const request = {
@@ -434,4 +451,113 @@ export class CommentsComponent implements OnInit, OnDestroy {
         })
   }
 
+  callPutArticleCommentUpdate(comment: any) {
+    const request = {
+      description: comment.description
+    };
+    this.commentService.putArticleCommentUpdate(this.id, comment.id, request).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          comment.isEditing = false;
+        }, (error) => {
+
+        })
+  }
+
+  callDeleteArticleComment(comment) {
+    this.commentService.deleteArticleComment(this.id, comment.id).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            const commentId = comment.id;
+            const index = this.comments.findIndex(comment => comment.id === commentId);
+            if (index !== -1) {
+              this.comments.splice(index, 1);
+              this.comments = [...this.comments];
+              this.updateVisibleComments();
+            }
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callDeleteInscriptionComment(comment) {
+    this.commentService.deleteInscriptionComment(this.id, comment.id).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            const commentId = comment.id;
+            const index = this.comments.findIndex(comment => comment.id === commentId);
+            if (index !== -1) {
+              this.comments.splice(index, 1);
+              this.comments = [...this.comments];
+              this.updateVisibleComments();
+            }
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callDeleteReviewComment(comment) {
+    this.commentService.deleteReviewComment(this.id, comment.id).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            const commentId = comment.id;
+            const index = this.comments.findIndex(comment => comment.id === commentId);
+            if (index !== -1) {
+              this.comments.splice(index, 1);
+              this.comments = [...this.comments];
+              this.updateVisibleComments();
+            }
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callDeleteEventUdiComment(comment) {
+    this.commentService.deleteEventUdiComment(this.id, comment.id).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            const commentId = comment.id;
+            const index = this.comments.findIndex(comment => comment.id === commentId);
+            if (index !== -1) {
+              this.comments.splice(index, 1);
+              this.comments = [...this.comments];
+              this.updateVisibleComments();
+            }
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callDeleteAdvisoryComment(comment) {
+    this.commentService.deleteAdvisoryComment(this.id, comment.id).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            const commentId = comment.id;
+            const index = this.comments.findIndex(comment => comment.id === commentId); // Buscar índice por id
+            if (index !== -1) {
+              this.comments.splice(index, 1); // Eliminar el comentario del array
+              this.comments = [...this.comments]; // Crear nueva referencia al array
+              this.updateVisibleComments();
+            }
+          }
+        }, (error) => {
+
+        })
+  }
 }
+
