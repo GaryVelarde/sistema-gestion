@@ -57,7 +57,7 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Reuniones UDI',
                 items: [
-                    { label: 'Agenda UDI', icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/pages/eventos-udi'] },
+                    { label: 'Agenda UDI', icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/pages/agenda-udi'] },
                 ]
             },
         ];

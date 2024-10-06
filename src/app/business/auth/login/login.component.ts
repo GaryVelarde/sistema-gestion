@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit {
             });
             return;
         }
-        this.loaderService.show();
+        this.loaderService.show(true);
         const request: AuthCredentials = {
             email: this.email.value,
             password: this.password.value

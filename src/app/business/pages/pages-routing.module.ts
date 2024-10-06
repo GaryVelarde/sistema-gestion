@@ -9,7 +9,7 @@ import { isUserAuthenticatedGuard } from 'src/app/guards/auth.guard';
         { path: 'new-titulation-process', loadChildren: () => import('./inscription/insctiption.module').then(m => m.InsctiptionModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'inscription-tracking', loadChildren: () => import('./inscription-tracking/inscription-tracking.module').then(m => m.InscriptionTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'events', loadChildren: () => import('./events/events.module').then(m => m.EventsModule), canActivate: [isUserAuthenticatedGuard] },
-        { path: 'eventos-udi', loadChildren: () => import('./events-udi/events-udi.module').then(m => m.EventsUdiModule), canActivate: [isUserAuthenticatedGuard] },
+        { path: 'agenda-udi', loadChildren: () => import('./events-udi/events-udi.module').then(m => m.EventsUdiModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'asesorias', loadChildren: () => import('./advisory-tracking/advisory-tracking.module').then(m => m.AdvisoryTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'articulos-semilleros', loadChildren: () => import('./hotbed-tracking/hotbed-tracking.module').then(m => m.HotbedTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'registrar-semilleros', loadChildren: () => import('./hotbed-register/hotbed-register.module').then(m => m.HotbedRegisterModule), canActivate: [isUserAuthenticatedGuard] },

@@ -70,12 +70,12 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     breadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
         { label: 'Eventos' },
-        { label: 'Reuniones UDI', visible: true },
+        { label: 'Agenda UDI', visible: true },
     ];
     detailsBreadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
         { label: 'Eventos' },
-        { label: 'Reuniones UDI' },
+        { label: 'Agenda UDI' },
         { label: 'Detalle de la reunión', visible: true },
     ];
     timeslots = [
@@ -625,6 +625,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     addTask(id: string) {
+        this.newTaskDialog = false;
         this.statusTask = 'charging';
         const request = {
             "title": this.titleTask.value,
@@ -642,20 +643,26 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
                             title: this.titleTask.value,
                             description: this.descriptionTask.value,
                             dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
-                            user: this.assignedUser.value[0]
+                            user: this.assignedUser.value
                         };
                         if (taskIndex !== -1) {
                             this.pendingTasks[taskIndex] = { ...this.pendingTasks[taskIndex], ...updateTask };
                         } else {
                             console.error(`Task with id ${id} not found.`);
                         }
-                        this.newTaskDialog = false;
                         this.taskForm.reset();
                         this.statusTask = 'complete';
                         return;
                     }
                 }, (error) => {
                     this.statusTask = 'error';
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Se ha producido un error al actualizar la tarea.',
+                        life: 3000,
+                    });
                 })
 
         }
@@ -668,12 +675,13 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
                             title: this.titleTask.value,
                             description: this.descriptionTask.value,
                             dateEnd: this.dateFormatService.formatDateDDMMYYYY(this.endTask.value),
-                            user: this.assignedUser.value[0]
+                            user: this.assignedUser.value
                             //user_name: this.assignedUser.value.fullName
                         };
+
+                        console.log('newTask', newTask)
                         if (!this.isTaskInPending(res.id)) {
                             this.pendingTasks = [...this.pendingTasks, newTask];
-                            this.newTaskDialog = false;
                             this.taskForm.reset();
                         } else {
                             console.log('Task with this ID already exists.');
@@ -683,6 +691,13 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
                     }
                 }, (error) => {
                     this.statusTask = 'error';
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Se ha producido un error al registrar la tarea.',
+                        life: 3000,
+                    })
                 })
 
     }
