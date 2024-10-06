@@ -293,7 +293,8 @@ export class CommentsComponent implements OnInit, OnDestroy {
   getCommentsByEventsUDI() {
     this.state = 'charging';
     this.registerState = 'charging';
-    this.service.getCommentsByEventsUDI(this.id).pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
+    this.service.getCommentsByEventsUDI(this.id).pipe(takeUntil(this.destroy$)).subscribe(
+      (res: any) => {
       res.data.forEach(item => {
         item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
       });
@@ -330,11 +331,12 @@ export class CommentsComponent implements OnInit, OnDestroy {
   }
 
   commentMenuItems(comment: any): MenuItem[] {
+    console.log('comment',comment)
     return [
       {
         label: 'Editar',
         icon: 'pi pi-pencil',
-        command: () => (this.editComment(comment))
+        command: () => this.editComment(comment)
       },
       {
         label: 'Eliminar',
@@ -345,6 +347,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
   }
 
   editComment(comment: any) {
+    console.log('entra')
     comment.isEditing = true;
     comment.originalDescription = comment.description;
   }

@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import {
@@ -13,6 +13,8 @@ import { LoaderService } from 'src/app/layout/service/loader.service';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { DateFormatService } from 'src/app/services/date-format.service';
+import { FileListComponent } from '../../cross-components/file-list/file-list.component';
+import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
 
 @Component({
     templateUrl: './inscription-tracking.component.html',
@@ -20,6 +22,9 @@ import { DateFormatService } from 'src/app/services/date-format.service';
     providers: [MessageService],
 })
 export class InscriptionTrackingComponent implements OnInit, OnDestroy {
+    @ViewChild('fileList') fileList: FileListComponent;
+    @ViewChild('upload') upload: UploadArchivesComponent;
+
     products: any[] = [];
 
     rowsPerPageOptions = [5, 10, 20];
@@ -80,7 +85,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         { label: 'Detalle de proyecto de tesis', visible: true },
     ];
     formData = new FormData();
-    reloadFiles = false;
     messageError: string = 'Se produjo un error al cargar la lista de proyectos de tesis. Por favor, inténtelo de nuevo más tarde';
     cancelattionForm: FormGroup;
     aprobationForm: FormGroup;
@@ -646,17 +650,24 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         this.showDialogAddFiles = false;
     }
 
+    showDialogAddFile() {
+        this.clearFile();
+        this.upload.clearFile();
+        this.showDialogAddFiles = true;
+    }
+
     saveFiles() {
-        this.loaderService.show();
+        this.loaderService.show(true);
         this.showDialogAddFiles = false;
         this.service.postRegisterIncriptionFile(this.formData, this.inscriptionSelected.inscriptions[0].id).pipe(
             finalize(() => {
+                this.upload.clearFile()
                 this.loaderService.hide();
             })
         ).subscribe(
             (res: any) => {
                 if (res.status) {
-                    this.reloadFiles = true;
+                    this.fileList.callGetFileList();
                     this.hideAddFilesDialog();
                     this.messageService.add({
                         key: 'tst',

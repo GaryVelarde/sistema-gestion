@@ -1,10 +1,10 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/services/auth.service';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { LoaderService } from 'src/app/layout/service/loader.service';
-import { finalize } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
 import { IStudent } from '../../cross-interfaces/comments-interfaces';
@@ -22,67 +22,10 @@ import { ThesisSimilarityService } from 'src/app/services/thesis-similarity.serv
   providers: [MessageService, ThesisSimilarityService]
 
 })
-export class HotbedRegisterComponent implements OnInit {
+export class HotbedRegisterComponent implements OnInit, OnDestroy {
   @ViewChild('userSelection') userSelection: UserSelectionComponent;
 
-  usuarios: IStudent[] = [
-    {
-      "id": 4,
-      "name": "Mario",
-      "surnames": "Ayala Sanchez",
-      "email": "mario@testt.com",
-      "phone": '987145312',
-      "code": '15467824'
-    },
-    {
-      "id": 5,
-      "name": "Daniel",
-      "surnames": "Minaya Alvarez",
-      "email": "daniel@testt.com",
-      "phone": '987145312',
-      "code": '15467824'
-    },
-    {
-      "id": 6,
-      "name": "Lucía",
-      "surnames": "Martinez Herrera",
-      "email": "lucia@testt.com",
-      "phone": '981245312',
-      "code": '12547896'
-    },
-    {
-      "id": 7,
-      "name": "Javier",
-      "surnames": "Lopez Diaz",
-      "email": "javier@testt.com",
-      "phone": '987654321',
-      "code": '11457832'
-    },
-    {
-      "id": 8,
-      "name": "Ana",
-      "surnames": "Perez Morales",
-      "email": "ana@testt.com",
-      "phone": '986532147',
-      "code": '11326745'
-    },
-    {
-      "id": 9,
-      "name": "Carlos",
-      "surnames": "Ramirez Soto",
-      "email": "carlos@testt.com",
-      "phone": '985641237',
-      "code": '15478965'
-    },
-    {
-      "id": 10,
-      "name": "Valeria",
-      "surnames": "Rojas Gutierrez",
-      "email": "valeria@testt.com",
-      "phone": '984512376',
-      "code": '12547896'
-    }
-  ];
+  private destroy$ = new Subject<void>();
   filteredItems: any[] | undefined;
   results: Array<{ title: string, similarity: number }> = [];
   minimumPercentage: number = 60;
@@ -129,6 +72,10 @@ export class HotbedRegisterComponent implements OnInit {
     this.watchTitle();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   onFileChange(files: any) {
     this.formData = files;
@@ -213,7 +160,7 @@ export class HotbedRegisterComponent implements OnInit {
   }
 
   watchTitle(): void {
-    this.title.valueChanges.pipe().subscribe((value) => {
+    this.title.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
       if (value) {
         this.results = this.thesisSimilarity.compareWithThesisTitles(value, this.thesisTitles, this.minimumPercentage)
           .sort((a, b) => b.similarity - a.similarity);
@@ -251,7 +198,7 @@ export class HotbedRegisterComponent implements OnInit {
   }
 
   callGetTitlesList() {
-    this.service.getArticlesTitlesList().pipe().subscribe(
+    this.service.getArticlesTitlesList().pipe(takeUntil(this.destroy$)).subscribe(
       (res: any) => {
         if (res.data) {
           this.thesisTitles = res.data;

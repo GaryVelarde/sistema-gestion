@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { MenuItem } from 'primeng/api';
+import { InscriptionPresenter } from './insctiption-presenter';
 
 @Component({
     templateUrl: './insctiption.component.html',
@@ -8,8 +9,9 @@ import { MenuItem } from 'primeng/api';
             flex-wrap: wrap;
         }
     `],
+    providers: [InscriptionPresenter]
 })
-export class InsctiptionComponent {
+export class InsctiptionComponent implements OnDestroy {
     breadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
         { label: 'Proceso de titulación' },
@@ -22,4 +24,12 @@ export class InsctiptionComponent {
         { label: 'Datos del revisor', routerLink: 'step3' },
         { label: 'Datos de la tesis', routerLink: 'step4' },
     ];
+
+    constructor(private presenter: InscriptionPresenter) {
+
+    }
+
+    ngOnDestroy(): void {
+        this.presenter.clearValues()
+    }
 }

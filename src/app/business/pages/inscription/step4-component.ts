@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { InscriptionPresenter } from './insctiption-presenter';
@@ -6,7 +6,7 @@ import { MessageService } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth.service';
 import { ThesisSimilarityService } from 'src/app/services/thesis-similarity.service';
 import { LoaderService } from 'src/app/layout/service/loader.service';
-import { finalize } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 
 interface UploadEvent {
   originalEvent: Event;
@@ -18,7 +18,7 @@ interface UploadEvent {
   styleUrls: ['./insctiption.component.scss'],
   providers: [MessageService, ThesisSimilarityService],
 })
-export class Step4Component implements OnInit {
+export class Step4Component implements OnInit, OnDestroy {
   thesisTitles = [];
   results: Array<{ title: string, similarity: number }> = [];
   reader = new FileReader();
@@ -28,6 +28,7 @@ export class Step4Component implements OnInit {
   formData = new FormData();
   approvalDate: FormControl = new FormControl('');
   jobNumber: FormControl = new FormControl('');
+  private destroy$ = new Subject<void>();
 
   constructor(
     private router: Router,
@@ -43,8 +44,13 @@ export class Step4Component implements OnInit {
     this.watchTitle();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   finalize() {
-    this.loaderService.show();
+    this.loaderService.show(true);
     this.authService.postInscription(this.presenter.generateRequest()).pipe(
     ).subscribe(
       (res) => {
@@ -120,7 +126,7 @@ export class Step4Component implements OnInit {
   }
 
   watchTitle(): void {
-    this.presenter.title.valueChanges.pipe().subscribe((value) => {
+    this.presenter.title.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
       if (value) {
         this.results = this.thesisSimilarity.compareWithThesisTitles(value, this.thesisTitles, this.minimumPercentage)
           .sort((a, b) => b.similarity - a.similarity);
@@ -158,7 +164,7 @@ export class Step4Component implements OnInit {
   }
 
   callGetTitlesList() {
-    this.authService.getTitlesList().pipe().subscribe(
+    this.authService.getTitlesList().pipe(takeUntil(this.destroy$)).subscribe(
       (res: any) => {
         if (res.data) {
           this.thesisTitles = res.data;

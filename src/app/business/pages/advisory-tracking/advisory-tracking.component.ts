@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import {
@@ -14,14 +14,17 @@ import { finalize, Subject, takeUntil } from 'rxjs';
 import { DateFormatService } from 'src/app/services/date-format.service';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
+import { FileListComponent } from '../../cross-components/file-list/file-list.component';
 
 @Component({
     templateUrl: './advisory-tracking.component.html',
     styleUrls: ['./advisory-tracking.component.scss'],
     providers: [MessageService, ConfirmationService],
 })
-export class AdvisoryTrackingComponent implements OnInit {
+export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
     @ViewChild('upload') upload: UploadArchivesComponent;
+    @ViewChild('fileList') fileList : FileListComponent;
+
     private destroy$ = new Subject<void>();
     products: any[] = [];
     breadcrumbItems: MenuItem[] = [
@@ -55,7 +58,6 @@ export class AdvisoryTrackingComponent implements OnInit {
     studentType = userType.student;
     showDialogCancel = false;
     showDialogAddFiles = false;
-    reloadFiles = false;
     showSelectNewReviwer = false;
     showSelectNewStudent = false;
     showEditSudents = false;
@@ -208,9 +210,14 @@ export class AdvisoryTrackingComponent implements OnInit {
         });
     }
 
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
     getAdvisoryList() {
         this.getStatusList = 'charging';
-        this.service.getAdvisoryList().pipe().subscribe(
+        this.service.getAdvisoryList().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 this.registros = res.data;
                 this.getStatusList = 'complete';
@@ -614,16 +621,17 @@ export class AdvisoryTrackingComponent implements OnInit {
     }
 
     saveFiles() {
-        this.loaderService.show();
+        this.loaderService.show(true);
         this.showDialogAddFiles = false;
         this.service.postRegisterAdvisoryFile(this.formData, this.advisorySelected.id).pipe(
             finalize(() => {
+                this.upload.clearFile()
                 this.loaderService.hide();
             })
         ).subscribe(
             (res: any) => {
                 if (res.status) {
-                    this.reloadFiles = true;
+                    this.fileList.callGetFileList();
                     this.clearFile();
                     this.hideAddFilesDialog();
                     this.messageService.add({

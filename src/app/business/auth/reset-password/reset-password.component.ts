@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { finalize } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { TokenService } from 'src/app/services/token.service';
@@ -20,18 +20,14 @@ import { TokenService } from 'src/app/services/token.service';
         }
     `]
 })
-export class ResetPasswordComponent implements OnInit {
+export class ResetPasswordComponent implements OnInit, OnDestroy {
 
     loginForm: FormGroup;
-
     valCheck: string[] = ['remember'];
-
     stateSecondPassword: string;
-
     token: string;
-
     emailUrl: string;
-
+    private destroy$ = new Subject<void>();
     private _email: FormControl = new FormControl('', [Validators.required])
     private _password: FormControl = new FormControl('', [Validators.required])
     private _secondPassword: FormControl = new FormControl('', [Validators.required])
@@ -70,6 +66,11 @@ export class ResetPasswordComponent implements OnInit {
         this.email.setValue(this.emailUrl);
         localStorage.removeItem('dr2lp2');
         this.watchSecondPassword();
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     callToResetPassword() {
@@ -130,7 +131,7 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     watchSecondPassword(): void {
-        this.secondPassword.valueChanges.pipe().subscribe((value: string) => {
+        this.secondPassword.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value: string) => {
             console.log('value', value)
 
             if (value) {

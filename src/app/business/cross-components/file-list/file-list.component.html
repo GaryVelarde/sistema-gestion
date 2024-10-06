@@ -36,9 +36,9 @@
     </div>
     <p-carousel
         *ngIf="files.length > 0"
-        style="width: -webkit-fill-available"
+        style="width: inherit"
         [value]="files"
-        [numVisible]="5"
+        [numVisible]="4"
         [numScroll]="3"
     >
         <ng-template let-file pTemplate="item">
@@ -50,7 +50,7 @@
                     max-width: 210px;
                 "
             >
-                <ng-container *ngIf="isPDF(file.archive)">
+                <ng-container *ngIf="isPDF(file.name)">
                     <div class="content-file">
                         <i class="pi pi-file-pdf" style="font-size: 2em"></i>
                     </div>
@@ -62,12 +62,15 @@
                             class="pi pi-download cursor-pointer"
                             (click)="download(file.archive)"
                         ></i>
-                        <i class="pi pi-trash ml-3 cursor-pointer"></i>
+                        <i
+                            *ngIf="tokenService.getUserTag() === file.user_id"
+                            class="pi pi-trash ml-3 cursor-pointer"
+                            (click)="deleteArchive(file.id)"
+                        ></i>
                     </div>
                 </ng-container>
 
-                <!-- Previsualización de imágenes -->
-                <ng-container *ngIf="isImage(file.archive)">
+                <ng-container *ngIf="isImage(file.name)">
                     <div class="content-file">
                         <p-image
                             [src]="file.archive"
@@ -80,59 +83,65 @@
                     <div class="mr-auto p-2">
                         <p>{{ file.name }}</p>
                     </div>
-                    <div
-                        class="p-2 cursor-pointer"
-                        style="display: flex"
-                        (click)="download(file.archive)"
-                    >
-                        <i class="pi pi-download"></i>
-                        <i class="pi pi-trash ml-3"></i>
+                    <div class="p-2 cursor-pointer" style="display: flex">
+                        <i
+                            class="pi pi-download"
+                            (click)="download(file.archive)"
+                        ></i>
+                        <i
+                            *ngIf="tokenService.getUserTag() === file.user_id"
+                            class="pi pi-trash ml-3"
+                            (click)="deleteArchive(file.id)"
+                        ></i>
                     </div>
                 </ng-container>
 
-                <!-- Vista alternativa para archivos Word -->
-                <ng-container *ngIf="isWord(file.archive)">
+                <ng-container *ngIf="isWord(file.name)">
                     <div class="content-file">
                         <i class="pi pi-file-word" style="font-size: 2em"></i>
                     </div>
                     <div class="mr-auto p-2">
                         <p>{{ file.name }}</p>
                     </div>
-                    <div
-                        class="p-2 cursor-pointer"
-                        style="display: flex"
-                        (click)="download(file.archive)"
-                    >
-                        <i class="pi pi-download"></i>
-                        <i class="pi pi-trash ml-3"></i>
+                    <div class="p-2 cursor-pointer" style="display: flex">
+                        <i
+                            class="pi pi-download"
+                            (click)="download(file.archive)"
+                        ></i>
+                        <i
+                            *ngIf="tokenService.getUserTag() === file.user_id"
+                            class="pi pi-trash ml-3"
+                            (click)="deleteArchive(file.id)"
+                        ></i>
                     </div>
                 </ng-container>
 
-                <!-- Vista alternativa para archivos Excel -->
-                <ng-container *ngIf="isExcel(file.archive)">
+                <ng-container *ngIf="isExcel(file.name)">
                     <div class="content-file">
                         <i class="pi pi-file-excel" style="font-size: 2em"></i>
                     </div>
                     <div class="mr-auto p-2">
                         <p>{{ file.name }}</p>
                     </div>
-                    <div
-                        class="p-2 cursor-pointer"
-                        style="display: flex"
-                        (click)="download(file.archive)"
-                    >
-                        <i class="pi pi-download"></i>
-                        <i class="pi pi-trash ml-3"></i>
+                    <div class="p-2 cursor-pointer" style="display: flex">
+                        <i
+                            class="pi pi-download"
+                            (click)="download(file.archive)"
+                        ></i>
+                        <i
+                            *ngIf="tokenService.getUserTag() === file.user_id"
+                            class="pi pi-trash ml-3"
+                            (click)="deleteArchive(file.id)"
+                        ></i>
                     </div>
                 </ng-container>
 
-                <!-- Vista para otros tipos de archivo -->
                 <ng-container
                     *ngIf="
-                        !isPDF(file.archive) &&
-                        !isImage(file.archive) &&
-                        !isWord(file.archive) &&
-                        !isExcel(file.archive)
+                        !isPDF(file.name) &&
+                        !isImage(file.name) &&
+                        !isWord(file.name) &&
+                        !isExcel(file.name)
                     "
                 >
                     <div class="content-file">
@@ -141,13 +150,16 @@
                     <div class="mr-auto p-2">
                         <p>{{ file.name }}</p>
                     </div>
-                    <div
-                        class="p-2 cursor-pointer"
-                        style="display: flex"
-                        (click)="download(file.archive)"
-                    >
-                        <i class="pi pi-download"></i>
-                        <i class="pi pi-trash ml-3"></i>
+                    <div class="p-2 cursor-pointer" style="display: flex">
+                        <i
+                            class="pi pi-download"
+                            (click)="download(file.archive)"
+                        ></i>
+                        <i
+                            *ngIf="tokenService.getUserTag() === file.user_id"
+                            class="pi pi-trash ml-3"
+                            (click)="deleteArchive(file.id)"
+                        ></i>
                     </div>
                 </ng-container>
             </div>
@@ -156,12 +168,12 @@
 </ng-template>
 <!-- <ng-template #list2>
     <div class="col-12 grid">
-        <div class="col-12 col-md-4 col-lg-2" *ngFor="let file of files">
+        <div class="col-12 col-md-4 col-lg-3" *ngFor="let file of files">
             <div
                 class="w-full p-2 card-file"
                 style="border: 1px solid #d1d5db; border-radius: 4px"
             >
-                <ng-container *ngIf="isPDF(file.archive)">
+                <ng-container *ngIf="isPDF(file.name)">
                     <div class="content-file">
                         <i class="pi pi-file-pdf" style="font-size: 2em"></i>
                     </div>
@@ -176,7 +188,7 @@
                     </div>
                 </ng-container>
 
-                <ng-container *ngIf="isImage(file.archive)">
+                <ng-container *ngIf="isImage(file.name)">
                     <div class="content-file">
                         <p-image
                             [src]="file.archive"
@@ -197,7 +209,7 @@
                     </div>
                 </ng-container>
 
-                <ng-container *ngIf="isWord(file.archive)">
+                <ng-container *ngIf="isWord(file.name)">
                     <div class="content-file">
                         <i class="pi pi-file-word" style="font-size: 2em"></i>
                     </div>
@@ -212,7 +224,7 @@
                     </div>
                 </ng-container>
 
-                <ng-container *ngIf="isExcel(file.archive)">
+                <ng-container *ngIf="isExcel(file.name)">
                     <div class="content-file">
                         <i class="pi pi-file-excel" style="font-size: 2em"></i>
                     </div>
@@ -229,10 +241,10 @@
 
                 <ng-container
                     *ngIf="
-                        !isPDF(file.archive) &&
-                        !isImage(file.archive) &&
-                        !isWord(file.archive) &&
-                        !isExcel(file.archive)
+                        !isPDF(file.name) &&
+                        !isImage(file.name) &&
+                        !isWord(file.name) &&
+                        !isExcel(file.name)
                     "
                 >
                     <div class="content-file">

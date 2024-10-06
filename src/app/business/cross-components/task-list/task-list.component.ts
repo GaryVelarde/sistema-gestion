@@ -4,11 +4,13 @@ import { Message } from 'primeng/api';
 import { Subject, takeUntil } from 'rxjs';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { AuthService } from 'src/app/services/auth.service';
+import { TaskService } from './services/task.service';
 
 @Component({
   selector: 'app-task-list',
   templateUrl: './task-list.component.html',
-  styleUrls: ['./task-list.component.scss']
+  styleUrls: ['./task-list.component.scss'],
+  providers: [TaskService]
 })
 export class TaskListComponent implements OnInit, OnDestroy {
   _visible: boolean;
@@ -47,6 +49,7 @@ export class TaskListComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private elRef: ElementRef,
     private service: AuthService,
+    private taskService: TaskService,
   ) {
     this.tasksForm = this.fb.group({
       taskDescription: this.taskDescription,
@@ -70,7 +73,6 @@ export class TaskListComponent implements OnInit, OnDestroy {
         this.tasks = res.data;
         this.countTask();
       }
-
     }, (error) => {
       this.statusCallService = 'error';
     });
@@ -84,7 +86,6 @@ export class TaskListComponent implements OnInit, OnDestroy {
         this.tasks = res.data;
         this.countTask();
       }
-
     }, (error) => {
       this.statusCallService = 'error';
     });
@@ -100,7 +101,6 @@ export class TaskListComponent implements OnInit, OnDestroy {
           description: this.taskDescription.value
         }
         this.registerTask(rq);
-
       }
     }
   }
@@ -157,7 +157,6 @@ export class TaskListComponent implements OnInit, OnDestroy {
       if (checkbox) {
         checkbox.disabled = true;
       }
-
       this.countTask();
     }
 
@@ -170,7 +169,20 @@ export class TaskListComponent implements OnInit, OnDestroy {
   }
 
   removeTask(taskId: string) {
-    console.log('taskId', taskId)
+    switch (this.module) {
+      case eModule.advisory:
+        this.callDeleteAdvisoryTask(taskId);
+        break;
+      case eModule.inscription:
+        this.callDeleteInscriptionTask(taskId);
+        break;
+      case eModule.eventUdi:
+        this.callDeleteEventUdiTask(taskId);
+        break;
+    }
+  }
+
+  confirmRemoveTask(taskId: string) {
     const index = this.tasks.findIndex((task) => task.id === taskId);
     if (index !== -1) {
       this.tasks.splice(index, 1);
@@ -190,7 +202,6 @@ export class TaskListComponent implements OnInit, OnDestroy {
       }
       this.totalTask++;
     });
-    console.log('this.totalTask', this.totalTask)
   }
 
   callTaskList() {
@@ -213,4 +224,51 @@ export class TaskListComponent implements OnInit, OnDestroy {
     }
   }
 
+  callDeleteAdvisoryTask(taskId: string) {
+    this.taskService.deleteAdvisoryTask(this.idModule, taskId).pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            this.confirmRemoveTask(taskId);
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callDeleteArticleTask(taskId: string) {
+    this.taskService.deleteArticleTask(this.idModule, taskId).pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            this.confirmRemoveTask(taskId);
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callDeleteEventUdiTask(taskId: string) {
+    this.taskService.deleteEventUdiTask(this.idModule, taskId).pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            this.confirmRemoveTask(taskId);
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callDeleteInscriptionTask(taskId: string) {
+    this.taskService.deleteInscriptionTask(this.idModule, taskId).pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            this.confirmRemoveTask(taskId);
+          }
+        }, (error) => {
+
+        })
+  }
 }

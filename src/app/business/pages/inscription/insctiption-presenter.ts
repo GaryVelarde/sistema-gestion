@@ -6,6 +6,7 @@ import {
     Validators,
 } from '@angular/forms';
 import { Message } from 'primeng/api';
+import { Subject, takeUntil } from 'rxjs';
 import { DateFormatService } from 'src/app/services/date-format.service';
 
 @Injectable({
@@ -16,7 +17,8 @@ export class InscriptionPresenter {
     formStep2: FormGroup;
     formStep3: FormGroup;
     formStep4: FormGroup;
-	messages: Message[] | undefined;
+    messages: Message[] | undefined;
+    private destroy$ = new Subject<void>();
 
     private _receptionDate: FormControl = new FormControl(
         '',
@@ -50,7 +52,7 @@ export class InscriptionPresenter {
     reviewerIsValid = false;
     reviewerSelected: any;
     uploadedFiles: any[] = [];
-    
+
     get receptionDate() {
         return this._receptionDate;
     }
@@ -110,15 +112,15 @@ export class InscriptionPresenter {
     }
 
     watchEstudent() {
-        this.student.valueChanges.pipe().subscribe((data: any) => {
+        this.student.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((data: any) => {
             if (data.code) {
-				if(data === this.dataStudentTwoSelected){
-					this.messages = [
-						{ severity: 'warn', detail: 'Se está seleccionando el mismo estudiante para ambos campos. Por favor seleccione otro.' },
-					];
-					return;
-				}
-				this.messages = [];
+                if (data === this.dataStudentTwoSelected) {
+                    this.messages = [
+                        { severity: 'warn', detail: 'Se está seleccionando el mismo estudiante para ambos campos. Por favor seleccione otro.' },
+                    ];
+                    return;
+                }
+                this.messages = [];
                 this.studentOneIsValid = true;
                 this.dataStudentOneSelected = data;
             } else {
@@ -129,15 +131,15 @@ export class InscriptionPresenter {
     }
 
     watchEstudentTwo() {
-        this.studentTwo.valueChanges.pipe().subscribe((data: any) => {
+        this.studentTwo.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((data: any) => {
             if (data.code) {
-				if(data === this.dataStudentOneSelected){
-					this.messages = [
-						{ severity: 'warn', detail: 'Se está seleccionando el mismo estudiante para ambos campos. Por favor seleccione otro.' },
-					];
-					return;
-				}
-				this.messages = [];
+                if (data === this.dataStudentOneSelected) {
+                    this.messages = [
+                        { severity: 'warn', detail: 'Se está seleccionando el mismo estudiante para ambos campos. Por favor seleccione otro.' },
+                    ];
+                    return;
+                }
+                this.messages = [];
                 this.studentTwoIsValid = true;
                 this.dataStudentTwoSelected = data;
             } else {
@@ -153,8 +155,8 @@ export class InscriptionPresenter {
     }
 
     hideStudentTwo() {
-		this.messages = [];
-		this.dataStudentTwoSelected = {};
+        this.messages = [];
+        this.dataStudentTwoSelected = {};
         this.studentTwoRequired = false;
         this.studentTwoIsValid = false;
         this.formStep2.removeControl('studentTwo');
@@ -166,7 +168,7 @@ export class InscriptionPresenter {
     }
 
     watchReviewer() {
-        this.reviewer.valueChanges.pipe().subscribe((data: any) => {
+        this.reviewer.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((data: any) => {
             if (data.code) {
                 this.reviewerIsValid = true;
                 this.reviewerSelected = data;
@@ -197,5 +199,14 @@ export class InscriptionPresenter {
         };
         console.log(request);
         return request;
+    }
+
+    clearValues() {
+        this.formStep1.reset();
+        this.formStep2.reset();
+        this.formStep3.reset();
+        this.formStep4.reset();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

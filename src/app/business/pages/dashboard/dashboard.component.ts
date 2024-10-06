@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MenuItem } from 'primeng/api';
-import { Subscription, debounceTime } from 'rxjs';
+import { Subject, Subscription, debounceTime, takeUntil } from 'rxjs';
 import { ProductService } from 'src/app/demo/service/product.service';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -27,6 +27,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     notificationsToday = [];
     notificationsYesterday = [];
     notificationsDaysAgo = {};
+    private destroy$ = new Subject<void>();
 
     messageError = 'Ha ocurrido un error al cargar las notificaciones. Por favor, inténtalo de nuevo más tarde.'
 
@@ -51,7 +52,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     callGetNotificationReport() {
         this.stateCallNotifications = 'charging';
-        this.service.getNotificationReport().pipe().subscribe(
+        this.service.getNotificationReport().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 this.notifications = [
                     ...res.data.comments.map(comment => ({ ...comment, type: 'comment', icon: this.getNotificationIcon(comment.comment || comment.status) })),
@@ -207,5 +208,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 }

@@ -323,57 +323,27 @@
                 <div class="grid col-12">
                     <div class="col-3">
                         <p class="font-bold">Fecha de recepción a Facultad:</p>
-                        <p *ngIf="!showEdit">
+                        <p>
                             <i class="pi pi-calendar"></i>
                             {{
                                 inscriptionSelected.inscriptions[0]
                                     .reception_date_faculty
                             }}
                         </p>
-                        <div *ngIf="showEdit" class="grid p-fluid">
-                            <div class="field col-12 md:col-12">
-                                <p-calendar
-                                    *ngIf="showEdit"
-                                    [(ngModel)]="
-                                        inscriptionSelected.inscriptions[0]
-                                            .reception_date_faculty
-                                    "
-                                    [iconDisplay]="'input'"
-                                    class="full-width"
-                                    [showIcon]="true"
-                                    dateFormat="yy-mm-dd"
-                                    inputId="icondisplay"
-                                />
-                            </div>
-                        </div>
                     </div>
                     <div class="col-3">
                         <p class="font-bold">Fecha de aprobación UDI:</p>
-                        <p *ngIf="!showEdit">
+                        <p>
                             <i class="pi pi-calendar"></i>
                             {{
                                 inscriptionSelected.inscriptions[0]
                                     .approval_date_udi
                             }}
                         </p>
-                        <div *ngIf="showEdit" class="grid p-fluid">
-                            <div class="field col-12 md:col-12">
-                                <p-calendar
-                                    *ngIf="showEdit"
-                                    [(ngModel)]="
-                                        inscriptionSelected.inscriptions[0]
-                                            .approval_date_udi
-                                    "
-                                    [iconDisplay]="'input'"
-                                    class="full-width"
-                                    [showIcon]="true"
-                                    dateFormat="yy-mm-dd"
-                                    inputId="icondisplay"
-                                />
-                            </div>
-                        </div>
                     </div>
-                    <div class="col-3"></div>
+                    <div class="col-3">
+                        
+                    </div>
                     <div class="card col-3" style="max-height: 100px">
                         <p class="font-bold">Estado:</p>
                         <p-tag
@@ -550,11 +520,11 @@
                 ></app-task-list>
                 <div class="ml-2 mr-2 separator"></div>
                 <app-file-list
+                    #fileList
                     class="w-full"
                     [module]="module"
                     [id]="inscriptionSelected.inscriptions[0].id"
-                    (addArchiveClicked)="showDialogAddFiles = true"
-                    [reload]="reloadFiles"
+                    (addArchiveClicked)="showDialogAddFile()"
                 >
                 </app-file-list>
                 <div class="ml-2 mr-2 separator"></div>
@@ -697,6 +667,7 @@
         <div class="grid" style="height: 100%">
             <div class="col-12">
                 <app-upload-archives
+                    #upload
                     (onFileChangeEmitter)="onFileChange($event)"
                     (clearFilesEmitter)="clearFile()"
                 >

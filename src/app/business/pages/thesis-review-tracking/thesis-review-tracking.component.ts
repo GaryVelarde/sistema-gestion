@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ConfirmationService, MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import {
@@ -20,7 +20,7 @@ import { UploadArchivesComponent } from '../../cross-components/upload-archives/
     styleUrls: ['./thesis-review-tracking.component.scss'],
     providers: [MessageService, ConfirmationService],
 })
-export class ThesisReviewTrackingComponent implements OnInit {
+export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     @ViewChild('upload') upload: UploadArchivesComponent;
     private destroy$ = new Subject<void>();
     products: any[] = [];
@@ -192,16 +192,21 @@ export class ThesisReviewTrackingComponent implements OnInit {
         });
     }
 
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
     getThesisReviewList() {
         this.getStatusList = 'charging';
-        this.service.getThesisReviewList().pipe().subscribe(
+        this.service.getThesisReviewList().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 console.log(res);
                 this.registros = res.data;
                 this.getStatusList = 'complete'
-        }, (error) => {
-            this.getStatusList = 'error';
-        })
+            }, (error) => {
+                this.getStatusList = 'error';
+            })
     }
 
     goToInscription() {

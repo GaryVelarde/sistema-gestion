@@ -5,6 +5,7 @@ import {
     AfterViewInit,
     ChangeDetectorRef,
     ElementRef,
+    OnDestroy,
 } from '@angular/core';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import { FullCalendarComponent } from '@fullcalendar/angular';
@@ -25,7 +26,7 @@ import { Router } from '@angular/router';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
-import { finalize } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 interface Task {
     id: string;
     title: string;
@@ -54,11 +55,11 @@ interface Usuario {
     styleUrls: ['./events-udi.component.scss'],
     providers: [MessageService],
 })
-export class EventsUdiComponent implements OnInit, AfterViewInit {
+export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy {
     @ViewChild('calendar') calendarComponent: FullCalendarComponent;
     @ViewChild('cardBody') cardBody!: ElementRef;
     resizeObserver!: ResizeObserver;
-
+    private destroy$ = new Subject<void>();
     pendingTasks: Task[] = [];
     inProgressTasks: Task[] = [];
     completedTasks: Task[] = [];
@@ -320,6 +321,11 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         });
     }
 
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
     ngAfterViewInit(): void {
         this.resizeObserver = new ResizeObserver((entries) => {
             for (let entry of entries) {
@@ -332,7 +338,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     async callGetEventsUdi() {
-        await this.service.getEventsUdiList().pipe().subscribe(
+        await this.service.getEventsUdiList().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 for (let event of res.data) {
                     const ev: EventInput = {
@@ -533,7 +539,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             const task = this.draggedTask;
             const taskId = this.draggedTask.id;
             this.service.updateStatusTask(this.eventSelected.event._def.extendedProps.event_udi.id,
-                taskId.toString(), column).pipe().subscribe(
+                taskId.toString(), column).pipe(takeUntil(this.destroy$)).subscribe(
                     (res: any) => {
                         if (res.status) {
                             this.removeTask(task);
@@ -585,7 +591,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.statusTask = 'charging';
         this.service.deleteTask(this.eventSelected.event._def.extendedProps.event_udi.id,
             task.id.toString()
-        ).pipe().subscribe(
+        ).pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 if (res.status) {
                     this.removeTask(task);
@@ -634,7 +640,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
             "user_id": this.assignedUser.value.id
         }
         if (id) {
-            this.service.updateTaskDetail(this.eventSelected.event._def.extendedProps.event_udi.id, id.toString(), request).pipe()
+            this.service.updateTaskDetail(this.eventSelected.event._def.extendedProps.event_udi.id, id.toString(), request).
+                pipe(takeUntil(this.destroy$))
                 .subscribe((res: any) => {
                     if (res) {
                         const taskIndex = this.pendingTasks.findIndex(task => task.id === id);
@@ -666,7 +673,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
                 })
 
         }
-        this.service.addTask(this.eventSelected.event._def.extendedProps.event_udi.id, request).pipe()
+        this.service.addTask(this.eventSelected.event._def.extendedProps.event_udi.id, request).pipe(takeUntil(this.destroy$))
             .subscribe(
                 (res: any) => {
                     if (res.status) {
@@ -816,7 +823,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
         this.pendingTasks = [];
         this.inProgressTasks = [];
         this.completedTasks = [];
-        this.service.getTask(taskId).pipe().subscribe(
+        this.service.getTask(taskId).pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 for (let task of res.data) {
                     if (task.status === 'pending') {
@@ -861,7 +868,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit {
     }
 
     getTeachersList() {
-        this.service.getTeachersList().pipe().subscribe(
+        this.service.getTeachersList().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 if (res) {
                     this.usuarios = res.data;
