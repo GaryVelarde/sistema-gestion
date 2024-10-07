@@ -268,7 +268,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
         }
         setTimeout(() => {
             this.loaderService.hide();
-        }, 800);
+        }, 400);
     }
 
     backList() {
@@ -281,7 +281,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
         this.editForm.reset();
         setTimeout(() => {
             this.loaderService.hide();
-        }, 800);
+        }, 400);
     }
 
     showEdition() {

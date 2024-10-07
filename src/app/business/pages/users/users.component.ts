@@ -348,8 +348,8 @@ export class UsersComponent implements OnInit, OnDestroy {
         this.service.postCreateNewUser(rq).pipe(
             finalize(() => {
                 setTimeout(() => {
-                    this.loaderService.hide(); // Ocultar el loader después de 800ms
-                }, 800);
+                    this.loaderService.hide();
+                }, 400);
             }), takeUntil(this.destroy$)
         ).subscribe(
             (res) => {

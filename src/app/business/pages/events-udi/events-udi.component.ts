@@ -453,7 +453,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         this.eventSelected = null;
         setTimeout(() => {
             this.loaderService.hide();
-        }, 800);
+        }, 400);
     }
 
     renderizeCalendar() {

@@ -258,7 +258,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         }
         setTimeout(() => {
             this.loaderService.hide();
-        }, 800);
+        }, 400);
     }
 
     backList() {
@@ -273,7 +273,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         this.teacherForm.reset();
         setTimeout(() => {
             this.loaderService.hide();
-        }, 800);
+        }, 400);
     }
 
     get severity(): string {

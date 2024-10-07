@@ -136,6 +136,6 @@ export class PlansRegisterComponent implements OnInit {
     }
     
     backList() {
-        this.router.navigate(['/pages/plans'])
+        this.router.navigate(['/pages/planes'])
     }
 }

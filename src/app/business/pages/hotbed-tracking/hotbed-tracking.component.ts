@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
@@ -8,6 +8,8 @@ import { AuthService } from 'src/app/services/auth.service';
 import { IStudent } from '../../cross-interfaces/comments-interfaces';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { eModule } from 'src/app/commons/enums/app,enum';
+import { FileListComponent } from '../../cross-components/file-list/file-list.component';
+import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
 
 @Component({
   selector: 'app-hotbed-tracking',
@@ -16,7 +18,8 @@ import { eModule } from 'src/app/commons/enums/app,enum';
   providers: [MessageService],
 })
 export class HotbedTrackingComponent implements OnInit, OnDestroy {
-
+  @ViewChild('upload') upload: UploadArchivesComponent;
+  @ViewChild('fileList') fileList: FileListComponent;
   registros = [];
   events = [
     { status: 'En desarrollo', date: '15-10-2020 10:30', icon: 'pi pi-pencil', color: '#6366f1', message: 'El artículo pasó a desarrollo el día ' },
@@ -48,7 +51,6 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
   viewDetail = false;
   viewHistory = false;
   showDialogAddFiles = false;
-  reloadFiles = false;
   module = eModule.hotbed;
   articleSelected: any;
   getArticleListProcess = '';
@@ -100,7 +102,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     console.log(this.articleSelected);
     setTimeout(() => {
       this.loaderService.hide();
-    }, 800);
+    }, 400);
   }
 
   getArticleList() {
@@ -185,7 +187,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     this.articleSelected = {};
     setTimeout(() => {
       this.loaderService.hide();
-    }, 800);
+    }, 400);
   }
 
   backToDetail() {
@@ -194,7 +196,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     this.viewHistory = false;
     setTimeout(() => {
       this.loaderService.hide();
-    }, 800);
+    }, 400);
   }
 
   goToHistory() {
@@ -202,7 +204,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     this.viewHistory = true;
     setTimeout(() => {
       this.loaderService.hide();
-    }, 800);
+    }, 400);
   }
 
   getUserSelected(userSelected: any) {
@@ -220,49 +222,56 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
 
   onFileChange(files: any) {
     this.formData = files;
-}
+  }
 
-clearFile() {
+  clearFile() {
     this.formData = new FormData();
-}
+  }
 
-hideAddFilesDialog() {
+  hideAddFilesDialog() {
     this.clearFile();
     this.showDialogAddFiles = false;
+  }
+
+  showDialogAddFile() {
+    this.clearFile();
+    this.upload.clearFile();
+    this.showDialogAddFiles = true;
 }
 
-saveFiles() {
+  saveFiles() {
     this.loaderService.show(true);
     this.showDialogAddFiles = false;
     this.service.postRegisterHotbedFile(this.formData, this.articleSelected.id).pipe(
-        finalize(() => {
-            this.loaderService.hide();
-        })
+      finalize(() => {
+        this.upload.clearFile()
+        this.loaderService.hide();
+      })
     ).subscribe(
-        (res: any) => {
-            if (res.status) {
-                this.reloadFiles = true;
-                this.hideAddFilesDialog();
-                this.messageService.add({
-                    key: 'tst',
-                    severity: 'info',
-                    summary: 'Confirmación',
-                    detail: 'Los archivos han sido guardados.',
-                    life: 3000,
-                });
-            }
-        }, (error) => {
-            this.messageService.add({
-                key: 'tst',
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Se ha producido un error al guardar los archivos.',
-                life: 3000,
-            });
+      (res: any) => {
+        if (res.status) {
+          this.fileList.callGetFileList();
+          this.hideAddFilesDialog();
+          this.messageService.add({
+            key: 'tst',
+            severity: 'info',
+            summary: 'Confirmación',
+            detail: 'Los archivos han sido guardados.',
+            life: 3000,
+          });
+        }
+      }, (error) => {
+        this.messageService.add({
+          key: 'tst',
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Se ha producido un error al guardar los archivos.',
+          life: 3000,
         });
-}
+      });
+  }
 
-isFormDataEmpty(formData: FormData): boolean {
+  isFormDataEmpty(formData: FormData): boolean {
     return !(formData as any).entries().next().done;
-}
+  }
 }

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DashboardComponent } from './dashboard.component';
 import { ChartModule } from 'primeng/chart';
 import { MenuModule } from 'primeng/menu';
@@ -13,6 +13,11 @@ import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
 import { DegreeProcessCardsComponent } from './components/degree-process-cards/degree-process-cards.component';
+import { SimilarityTitlesComponent } from './components/similarity-titles/similarity-titles.component';
+import { InputTextModule } from 'primeng/inputtext';
+import { DialogModule } from 'primeng/dialog';
+import { SliderModule } from 'primeng/slider';
+import { DividerModule } from 'primeng/divider';
 
 @NgModule({
     imports: [
@@ -28,7 +33,13 @@ import { DegreeProcessCardsComponent } from './components/degree-process-cards/d
         TooltipModule,
         SkeletonModule,
         CrossComponentsModule,
+        InputTextModule,
+        ReactiveFormsModule,
+        FormsModule,
+        DialogModule,
+        SliderModule,
+        DividerModule,
     ],
-    declarations: [DashboardComponent, DegreeProcessCardsComponent]
+    declarations: [DashboardComponent, DegreeProcessCardsComponent, SimilarityTitlesComponent]
 })
 export class DashboardModule { }

@@ -1,0 +1,141 @@
+<div class="card">
+    <div class="flex justify-content-between align-items-center mb-2">
+        <h5>Similitud de títulos</h5>
+        <div>
+            <button
+                pButton
+                type="button"
+                icon="pi pi-cog"
+                class="p-button-rounded p-button-text p-button-plain"
+                (click)="showConfigCompareTitle()"
+            ></button>
+        </div>
+    </div>
+
+    <div [ngSwitch]="status">
+        <ng-template [ngSwitchCase]="'charging'">
+            <ng-container *ngTemplateOutlet="skeleton"></ng-container>
+        </ng-template>
+        <ng-template [ngSwitchCase]="'error'">
+            <ng-container *ngTemplateOutlet="error"></ng-container>
+        </ng-template>
+        <ng-template [ngSwitchCase]="'complete'">
+            <ng-container *ngTemplateOutlet="list"></ng-container>
+        </ng-template>
+        <ng-template ngSwitchDefault>
+            <p>Invalid state</p>
+        </ng-template>
+    </div>
+</div>
+
+<ng-template #list>
+    <form [formGroup]="titleForm">
+        <input
+            type="text"
+            class="w-full mb-3"
+            pInputText
+            formControlName="title"
+        />
+    </form>
+
+    <div *ngIf="title.value.length < 1">
+        <p>digita un titulo</p>
+    </div>
+    <div *ngIf="title.value.length > 1 && results.length < 1">
+        <p>No se encontraron titulos</p>
+    </div>
+    <ul class="list-none p-0 m-0">
+        <li
+            *ngFor="let result of results"
+            class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4"
+        >
+            <div>
+                <span class="text-900 font-medium mr-2 mb-1 md:mb-0 pl-2">{{
+                    result.title
+                }}</span>
+            </div>
+            <div class="mt-2 md:mt-0 flex align-items-center">
+                <div
+                    class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem"
+                    [ngStyle]="{ height: '8px' }"
+                >
+                    <div
+                        class="h-full"
+                        [ngStyle]="{ width: result.similarity + '%' }"
+                        [ngClass]="getSimilarityClass(result.similarity)"
+                    ></div>
+                </div>
+                <span
+                    class="ml-3 font-medium"
+                    [ngClass]="getSimilarityClassText(result.similarity)"
+                >
+                    {{ result.similarity }}%
+                </span>
+            </div>
+        </li>
+    </ul>
+</ng-template>
+
+<ng-template #skeleton>
+    <p-skeleton height="3rem" styleClass="mb-3" />
+    <div class="w-full" style="display: flex">
+        <div style="width: 60%">
+            <p-skeleton height="1.5rem" styleClass="mb-2" />
+        </div>
+        <div style="width: 20%" class="ml-5">
+            <p-skeleton height="1.5rem" styleClass="mb-2 ml-auto" />
+        </div>
+    </div>
+    <div class="w-full" style="display: flex">
+        <div style="width: 60%">
+            <p-skeleton height="1.5rem" styleClass="mb-2" />
+        </div>
+        <div style="width: 20%" class="ml-5">
+            <p-skeleton height="1.5rem" styleClass="mb-2 ml-auto" />
+        </div>
+    </div>
+    <div class="w-full" style="display: flex">
+        <div style="width: 60%">
+            <p-skeleton height="1.5rem" styleClass="mb-2" />
+        </div>
+        <div style="width: 20%" class="ml-5">
+            <p-skeleton height="1.5rem" styleClass="mb-2 ml-auto" />
+        </div>
+    </div>
+</ng-template>
+<p-dialog
+    header="Configuración de similitud de título de tesis"
+    [modal]="true"
+    [(visible)]="configCompareTitle"
+    [style]="{ width: '45rem' }"
+    [closeOnEscape]="false"
+    [draggable]="false"
+    [closable]="false"
+>
+    <span class="p-text-secondary block mb-5"
+        >Porcentaje mínimo de similitud.</span
+    >
+    <div class="justify-content-center gap-3 mb-3">
+        <div class="flex">
+            <input
+                type="text"
+                style="width: 50px"
+                pInputText
+                [(ngModel)]="minimumPercentage"
+                class="mb-3"
+            />
+            <label class="label-porcantaje">%</label>
+        </div>
+        <div class="w-full">
+            <p-slider [(ngModel)]="minimumPercentage" class="w-full" />
+        </div>
+    </div>
+    <div class="flex justify-content-end gap-2">
+        <p-button
+            label="Cancelar"
+            severity="secondary"
+            (onClick)="cancelConfigCompareTitle()"
+        />
+        <p-button label="Guardar" (onClick)="saveConfigCompareTitle()" />
+    </div>
+</p-dialog>

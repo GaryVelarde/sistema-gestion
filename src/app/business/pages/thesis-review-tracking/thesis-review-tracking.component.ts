@@ -234,7 +234,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     }
 
 
-    viewDetailsInscription(data: any) {
+    viewDetailsReview(data: any) {
         this.loaderService.show();
         if (data) {
             data.reviewer.length < 1
@@ -253,7 +253,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
         }
         setTimeout(() => {
             this.loaderService.hide();
-        }, 800);
+        }, 400);
     }
 
     backList() {
@@ -266,7 +266,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
         this.editForm.reset();
         setTimeout(() => {
             this.loaderService.hide();
-        }, 800);
+        }, 400);
     }
 
     showEdition() {

@@ -215,7 +215,7 @@
                         iconPos="left"
                     />
                 </div>
-                <div >
+                <div>
                     <p-button
                         *ngIf="
                             inscriptionState !== 'Cancelado' &&
@@ -329,14 +329,14 @@
                 </div>
             </div>
             <div class="ml-2 mr-2 separator"></div>
-                <app-file-list
-                    class="w-full"
-                    [module]="module"
-                    [id]="articleSelected.id"
-                    (addArchiveClicked)="showDialogAddFiles = true"
-                    [reload]="reloadFiles"
-                >
-                </app-file-list>
+            <app-file-list
+                #fileList
+                class="w-full"
+                [module]="module"
+                [id]="articleSelected.id"
+                (addArchiveClicked)="showDialogAddFile()"
+            >
+            </app-file-list>
             <div class="ml-2 mr-2 separator"></div>
             <app-comments
                 class="w-full"
@@ -416,6 +416,7 @@
         <div class="grid" style="height: 100%">
             <div class="col-12">
                 <app-upload-archives
+                    #upload
                     (onFileChangeEmitter)="onFileChange($event)"
                     (clearFilesEmitter)="clearFile()"
                 >
