@@ -382,7 +382,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         // );
         this.loaderService.show();
         const rq = {
-            status: 'En Revisión'
+            status: 'En revisión'
         }
         this.service.putInscriptionStatusUpdate(this.inscriptionSelected.inscriptions[0].id, rq).pipe(
             finalize(() => {
@@ -398,7 +398,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
                         detail: 'La inscripción pasó a Revisión.',
                         life: 3000,
                     });
-                    this.inscriptionState = 'En Revisión';
+                    this.inscriptionState = 'En revisión';
                 }
             }, (error) => {
                 this.messageService.add({

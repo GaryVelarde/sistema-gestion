@@ -240,7 +240,7 @@
                         (click)="goToReview()"
                     />
                     <p-button
-                        *ngIf="advisoryState === 'En Revisión' && !showEdit"
+                        *ngIf="advisoryState === 'En revisión' && !showEdit"
                         label="Observado"
                         [outlined]="true"
                         icon="pi pi-exclamation-circle"
@@ -249,7 +249,7 @@
                         (click)="goToObserved()"
                     />
                     <p-button
-                        *ngIf="advisoryState === 'En Revisión' && !showEdit"
+                        *ngIf="advisoryState === 'En revisión' && !showEdit"
                         class="ml-3"
                         label="Aprobado"
                         [outlined]="true"
@@ -328,7 +328,7 @@
                             value="En asesoría"
                         />
                         <p-tag
-                            *ngIf="advisoryState === 'En Revisión'"
+                            *ngIf="advisoryState === 'En revisión'"
                             severity="info"
                             value="En revisión"
                         />

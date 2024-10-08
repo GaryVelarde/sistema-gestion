@@ -137,7 +137,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
             console.log(res);
           }, (error) => {
             this.registerState = 'complete';
-            console.log(error);
           });
         break;
       case eModule.inscription:
@@ -150,7 +149,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
             console.log(res);
           }, (error) => {
             this.registerState = 'complete';
-            console.log(error);
           });
         break;
       case eModule.advisory:
@@ -163,7 +161,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
             console.log(res);
           }, (error) => {
             this.registerState = 'complete';
-            console.log(error);
           });
         break;
       case eModule.hotbed:
@@ -176,11 +173,10 @@ export class CommentsComponent implements OnInit, OnDestroy {
             console.log(res);
           }, (error) => {
             this.registerState = 'complete';
-            console.log(error);
           });
         break;
-      case eModule.hotbed:
-        this.service.postAddThesisReviewComment(this.id, rq).pipe(takeUntil(this.destroy$)).subscribe(
+      case eModule.review:
+        this.commentService.postAddThesisReviewComment(this.id, rq).pipe(takeUntil(this.destroy$)).subscribe(
           (res: any) => {
             if (res.status) {
               this.registerState = 'complete';
@@ -189,7 +185,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
             console.log(res);
           }, (error) => {
             this.registerState = 'complete';
-            console.log(error);
           });
         break;
     }
@@ -255,7 +250,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
   getCommentsByThesisReview() {
     this.state = 'charging';
     this.registerState = 'charging';
-    this.service.getCommentsByThesisReview(this.id).pipe(takeUntil(this.destroy$)).subscribe(
+    this.commentService.getCommentsByThesisReview(this.id).pipe(takeUntil(this.destroy$)).subscribe(
       (res: any) => {
         res.data.forEach(item => {
           item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);

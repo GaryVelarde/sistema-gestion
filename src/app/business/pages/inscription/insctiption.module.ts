@@ -38,6 +38,7 @@ import { DialogModule } from 'primeng/dialog';
 import { KeyFilterModule } from 'primeng/keyfilter';
 import { AvatarModule } from 'primeng/avatar';
 import { SliderModule } from 'primeng/slider';
+import { MessageService } from 'primeng/api';
 
 @NgModule({
     declarations: [
@@ -95,6 +96,7 @@ import { SliderModule } from 'primeng/slider';
     ],
     providers: [
         InscriptionPresenter,
+        MessageService,
         provideHttpClient(withInterceptorsFromDi()),
     ],
 })

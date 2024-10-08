@@ -62,4 +62,21 @@ export class CommentsService {
         return this.http.delete(`${this.API_URL}/meeting/${eventId}/observations/${commentId}`);
     }
 
+    /**
+      Listar comentarios
+    */
+
+    getCommentsByThesisReview(id: string): Observable<any> {
+        return this.http.get(`${this.API_URL}/review/${id}/observations`, this.header);
+    }
+
+    /**
+      Registrar comentarios
+    */
+
+    postAddThesisReviewComment(id: any, request: any) {
+        return this.http.post(`${this.API_URL}/review/${id}/observations`, request, this.header);
+    }
+
+
 }

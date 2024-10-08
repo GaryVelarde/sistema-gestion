@@ -152,10 +152,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
         this.chartData = {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Dic'],
             datasets: [
                 {
-                    label: 'First Dataset',
+                    label: 'En revision',
                     data: [65, 59, 80, 81, 56, 55, 40],
                     fill: false,
                     backgroundColor: documentStyle.getPropertyValue('--bluegray-700'),
@@ -163,11 +163,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     tension: .4
                 },
                 {
-                    label: 'Second Dataset',
-                    data: [28, 48, 40, 19, 86, 27, 90],
+                    label: 'Aprobado',
+                    data: [28, 48, 40, 19, 86, 27, 110],
                     fill: false,
                     backgroundColor: documentStyle.getPropertyValue('--green-600'),
                     borderColor: documentStyle.getPropertyValue('--green-600'),
+                    tension: .4
+                },
+                {
+                    label: 'Cancelado',
+                    data: [0,0,0,0,0,0,1],
+                    fill: false,
+                    backgroundColor: documentStyle.getPropertyValue('--red-600'),
+                    borderColor: documentStyle.getPropertyValue('--red-600'),
                     tension: .4
                 }
             ]

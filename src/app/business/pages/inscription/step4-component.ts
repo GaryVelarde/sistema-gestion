@@ -8,11 +8,6 @@ import { ThesisSimilarityService } from 'src/app/services/thesis-similarity.serv
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { finalize, Subject, takeUntil } from 'rxjs';
 
-interface UploadEvent {
-  originalEvent: Event;
-  files: File[];
-}
-
 @Component({
   templateUrl: './step4-component.html',
   styleUrls: ['./insctiption.component.scss'],
@@ -20,6 +15,8 @@ interface UploadEvent {
 })
 export class Step4Component implements OnInit, OnDestroy {
   thesisTitles = [];
+  statusTitlesList = '';
+  messsageTitlesError = 'Hubo un problema al recopilar información, por favor vuelve a intentarlo más tarde.';
   results: Array<{ title: string, similarity: number }> = [];
   reader = new FileReader();
   minimumPercentage: number = 60;
@@ -35,7 +32,6 @@ export class Step4Component implements OnInit, OnDestroy {
     public presenter: InscriptionPresenter,
     private service: MessageService,
     private authService: AuthService,
-    private cd: ChangeDetectorRef,
     private thesisSimilarity: ThesisSimilarityService,
     private loaderService: LoaderService) { }
 
@@ -62,10 +58,12 @@ export class Step4Component implements OnInit, OnDestroy {
           ).subscribe(
             (res: any) => {
               if (res.status) {
-                this.service.add({ severity: 'success', summary: 'Success', detail: 'El proyecto de tesis se ha registrado de manera correcta.' });
+                this.presenter.complete = true;
+                this.router.navigate(['/pages/new-titulation-process/step1'])
               }
             }, (error) => {
-              this.service.add({ severity: 'error', summary: 'Error', detail: 'Ha ocurrido un error al guardar los archivos.' });
+              this.presenter.complete = false;
+              this.service.add({ key: 'tst', severity: 'error', summary: 'Error', detail: 'Ha ocurrido un error al guardar los archivos.' });
             })
         }
       },
@@ -127,10 +125,8 @@ export class Step4Component implements OnInit, OnDestroy {
 
   watchTitle(): void {
     this.presenter.title.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
-      if (value) {
-        this.results = this.thesisSimilarity.compareWithThesisTitles(value, this.thesisTitles, this.minimumPercentage)
+      this.results = this.thesisSimilarity.compareWithThesisTitles(value, this.thesisTitles, this.minimumPercentage)
           .sort((a, b) => b.similarity - a.similarity);
-      }
     });
   }
 
@@ -164,11 +160,16 @@ export class Step4Component implements OnInit, OnDestroy {
   }
 
   callGetTitlesList() {
-    this.authService.getTitlesList().pipe(takeUntil(this.destroy$)).subscribe(
+    this.statusTitlesList = 'charging';
+    this.authService.getTitlesList().pipe(takeUntil(this.destroy$)).
+    subscribe(
       (res: any) => {
         if (res.data) {
+          this.statusTitlesList = 'complete';
           this.thesisTitles = res.data;
         }
+      }, (error) => {
+        this.statusTitlesList = 'error';
       })
   }
 

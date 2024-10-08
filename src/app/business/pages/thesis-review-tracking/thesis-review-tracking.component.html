@@ -1,5 +1,5 @@
 <p-toast key="tst"></p-toast>
-<div *ngIf="!advisorySelected" class="grid">
+<div *ngIf="!reviewSelected" class="grid">
     <div class="col-12">
         <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
         <div class="card px-6 py-6">
@@ -125,9 +125,7 @@
                                             label="Ver detalle"
                                             [outlined]="true"
                                             severity="contrast"
-                                            (click)="
-                                                viewDetailsReview(data)
-                                            "
+                                            (click)="viewDetailsReview(data)"
                                         />
 
                                         <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
@@ -165,7 +163,7 @@
         </div>
     </ng-template>
 </p-confirmDialog>
-<div *ngIf="advisorySelected && !requiereMoreInfo" class="grid">
+<div *ngIf="reviewSelected && !requiereMoreInfo" class="grid">
     <div class="col-12">
         <app-breadcrumb [items]="detailBreadcrumbItems"></app-breadcrumb>
         <div class="card">
@@ -180,33 +178,8 @@
                     />
                     <p-button
                         *ngIf="
-                            !showEdit &&
-                            advisoryState !== 'Cancelado' &&
-                            advisoryState !== 'Aprobado'
-                        "
-                        class="ml-3"
-                        (click)="showEdition()"
-                        label="Editar"
-                        icon="pi pi-pencil"
-                        iconPos="left"
-                    />
-                    <p-button
-                        *ngIf="
-                            showEdit &&
-                            advisoryState !== 'Cancelado' &&
-                            advisoryState !== 'Aprobado'
-                        "
-                        class="ml-3"
-                        (click)="cancelEdition()"
-                        label="Cancelar edición"
-                        icon="pi pi-times"
-                        iconPos="right"
-                    />
-                    <p-button
-                        *ngIf="
-                            showEdit &&
-                            advisoryState !== 'Cancelado' &&
-                            advisoryState !== 'Aprobado'
+                            reviewState !== 'No aprobado' &&
+                            reviewState !== 'Aprobado'
                         "
                         class="ml-3"
                         (click)="saveEdition()"
@@ -218,11 +191,10 @@
                 <div class="p-2">
                     <p-button
                         *ngIf="
-                            advisoryState !== 'Cancelado' &&
-                            advisoryState !== 'Aprobado' &&
-                            !showEdit
+                            reviewState !== 'No aprobado' &&
+                            reviewState !== 'Aprobado'
                         "
-                        label="Cancelar revisión"
+                        label="Desaprobado"
                         [outlined]="true"
                         class="mr-3"
                         icon="pi pi-times"
@@ -232,34 +204,12 @@
                     />
                     <p-button
                         *ngIf="
-                            (advisoryState === 'Revisión de Tesis' ||
-                                advisoryState === 'Observado') &&
-                            !showEdit
+                            reviewState === 'Revisión de Tesis'
                         "
-                        label="Pasar a revisión"
-                        [outlined]="true"
-                        icon="pi pi-angle-right"
-                        iconPos="right"
-                        severity="info"
-                        (click)="goToReview()"
-                    />
-                    <p-button
-                        *ngIf="advisoryState === 'En Revisión' && !showEdit"
-                        label="Observado"
-                        [outlined]="true"
-                        icon="pi pi-exclamation-circle"
-                        iconPos="left"
-                        severity="warning"
-                        (click)="goToObserved()"
-                    />
-                    <p-button
-                        *ngIf="advisoryState === 'En Revisión' && !showEdit"
-                        class="ml-3"
                         label="Aprobado"
                         [outlined]="true"
                         icon="pi pi-angle-right"
                         iconPos="right"
-                        severity="success"
                         (click)="goToApprove()"
                     />
                 </div>
@@ -269,302 +219,82 @@
                     class="font-bold text-color"
                     style="font-family: revert; text-align: center"
                 >
-                    {{ advisorySelected.degree_processes.thesis_project_title }}
+                    {{
+                        reviewSelected.degree_processes
+                            .thesis_project_title
+                    }}
                 </h5>
             </div>
             <div class="grid col-12">
                 <div class="col-12 col-md-3">
                     <p class="font-bold">Nro de expediente:</p>
-                    <p>{{ advisorySelected.degree_processes.file }}</p>
+                    <p>
+                        {{ reviewSelected.degree_processes.file }}
+                    </p>
                 </div>
                 <div class="col-12 col-md-3">
                     <p class="font-bold">Escuala profesional:</p>
                     <p>
                         {{
-                            advisorySelected.degree_processes
+                            reviewSelected.degree_processes
                                 .professional_school
                         }}
                     </p>
                 </div>
                 <div class="col-12 col-md-3">
                     <p class="font-bold">Nro de oficio:</p>
-                    <p>{{ advisorySelected.degree_processes.office_number }}</p>
+                    <p>
+                        {{
+                            reviewSelected.degree_processes
+                                .office_number
+                        }}
+                    </p>
                 </div>
                 <div class="col-12 col-md-3">
                     <p class="font-bold">Nro de resolución:</p>
                     <p>
                         {{
-                            advisorySelected.degree_processes.resolution_number
+                            reviewSelected.degree_processes
+                                .resolution_number
                         }}
                     </p>
                 </div>
             </div>
-            <div *ngIf="!showEdit">
+            <div>
                 <div class="grid col-12">
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">
-                            Fecha de recepción de la asesoría a Facultad:
-                        </p>
-                        <p>
-                            <i class="pi pi-calendar"></i>
-                            {{ advisorySelected.reception_date_faculty }}
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">
-                            Fecha de aprobación a asesoría UDI:
-                        </p>
-                        <p>
-                            <i class="pi pi-calendar"></i>
-                            {{ advisorySelected.approval_date_udi }}
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">Fecha de pago:</p>
-                        <p>
-                            <i class="pi pi-calendar"></i>
-                            {{ advisorySelected.payment_date }}
-                        </p>
-                    </div>
+                    <div class="col-12 col-md-3"></div>
+                    <div class="col-12 col-md-3"></div>
+                    <div class="col-12 col-md-3"></div>
                     <div class="card col-12 col-md-3" style="max-height: 100px">
                         <p class="font-bold">Estado:</p>
                         <p-tag
-                            *ngIf="advisoryState === 'Revisión de Tesis'"
+                            *ngIf="reviewState === 'Revisión de Tesis'"
                             value="En revisión de tesis"
                         />
                         <p-tag
-                            *ngIf="advisoryState === 'En Revisión'"
-                            severity="info"
-                            value="En revisión"
-                        />
-                        <p-tag
-                            *ngIf="advisoryState === 'Observado'"
-                            severity="warning"
-                            value="Observado"
-                        />
-                        <p-tag
-                            *ngIf="advisoryState === 'Cancelado'"
+                            *ngIf="reviewState === 'No aprobado'"
                             severity="danger"
-                            value="Cancelado"
+                            value="Desaprobado"
                         />
                         <p-tag
-                            *ngIf="advisoryState === 'Aprobado'"
+                            *ngIf="reviewState === 'Aprobado'"
                             value="Aprobado"
                         />
-                    </div>
-                </div>
-                <div class="grid col-12">
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">Fecha de envío a secretaría:</p>
-                        <p>
-                            <i class="pi pi-calendar"></i>
-                            {{ advisorySelected.shipment_date_secretary }}
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">Nro de informe:</p>
-                        <p>
-                            {{ advisorySelected.report }}
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">Fecha de resolución:</p>
-                        <p>
-                            <i class="pi pi-calendar"></i>
-                            {{ advisorySelected.resolution_date }}
-                        </p>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">Inicio de asesoría:</p>
-                        <p>
-                            <i class="pi pi-calendar"></i>
-                            {{ advisorySelected.start_date_advisory }}
-                        </p>
-                    </div>
-                </div>
-                <div class="grid col-12">
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">Fin de asesoría:</p>
-                        <p>
-                            <i class="pi pi-calendar"></i>
-                            {{ advisorySelected.end_date_advisory }}
-                        </p>
                     </div>
                 </div>
             </div>
-
-            <form *ngIf="showEdit" [formGroup]="editForm">
-                <div class="grid col-12">
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">
-                            Fecha de recepción de la asesoría a Facultad:
-                        </p>
-                        <div class="grid p-fluid">
-                            <div class="col-12 md:col-12">
-                                <p-calendar
-                                    formControlName="advisoryReceptionDateToFacultyMI"
-                                    placeholder="Seleccione una fecha"
-                                    [iconDisplay]="'input'"
-                                    class="full-width"
-                                    [showIcon]="true"
-                                    dateFormat="dd-mm-yy"
-                                    inputId="icondisplay"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">
-                            Fecha de aprobación a asesoría UDI:
-                        </p>
-                        <div class="grid p-fluid">
-                            <div class="col-12 md:col-12">
-                                <p-calendar
-                                    formControlName="advisoryApprovalDateUDIMI"
-                                    placeholder="Seleccione una fecha"
-                                    [iconDisplay]="'input'"
-                                    class="full-width"
-                                    [showIcon]="true"
-                                    dateFormat="dd-mm-yy"
-                                    inputId="icondisplay"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">Fecha de pago:</p>
-                        <div class="grid p-fluid">
-                            <div class="col-12 md:col-12">
-                                <p-calendar
-                                    formControlName="paymentDateMI"
-                                    placeholder="Seleccione una fecha"
-                                    [iconDisplay]="'input'"
-                                    class="full-width"
-                                    [showIcon]="true"
-                                    dateFormat="dd-mm-yy"
-                                    inputId="icondisplay"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card col-12 col-md-3" style="max-height: 100px">
-                        <p class="font-bold">Estado:</p>
-                        <p-tag
-                            *ngIf="advisoryState === 'En Revisión de Tesis'"
-                            value="En revisión de tesis"
-                        />
-                        <p-tag
-                            *ngIf="advisoryState === 'En revisión'"
-                            severity="info"
-                            value="En revisión"
-                        />
-                        <p-tag
-                            *ngIf="advisoryState === 'Observado'"
-                            severity="warning"
-                            value="Observado"
-                        />
-                        <p-tag
-                            *ngIf="advisoryState === 'Cancelado'"
-                            severity="danger"
-                            value="Cancelado"
-                        />
-                        <p-tag
-                            *ngIf="advisoryState === 'Aprobado'"
-                            value="Aprobado"
-                        />
-                    </div>
-                </div>
-                <div class="grid col-12">
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">Fecha de envío a secretaría:</p>
-                        <div class="grid p-fluid">
-                            <div class="col-12 md:col-12">
-                                <p-calendar
-                                    formControlName="submissionDateToSecretariatMI"
-                                    placeholder="Seleccione una fecha"
-                                    [iconDisplay]="'input'"
-                                    class="full-width"
-                                    [showIcon]="true"
-                                    dateFormat="dd-mm-yy"
-                                    inputId="icondisplay"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">Nro de informe:</p>
-                        <input
-                            formControlName="reportNumberMI"
-                            type="text"
-                            pInputText
-                            placeholder="Complete la información"
-                            class="full-width"
-                        />
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">Fecha de resolución:</p>
-                        <div class="grid p-fluid">
-                            <div class="col-12 md:col-12">
-                                <p-calendar
-                                    formControlName="resolutionDateMI"
-                                    placeholder="Seleccione una fecha"
-                                    [iconDisplay]="'input'"
-                                    class="full-width"
-                                    [showIcon]="true"
-                                    dateFormat="dd-mm-yy"
-                                    inputId="icondisplay"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">Inicio de asesoría:</p>
-                        <div class="grid p-fluid">
-                            <div class="col-12 md:col-12">
-                                <p-calendar
-                                    formControlName="advisoryStartDate"
-                                    placeholder="Seleccione una fecha"
-                                    [iconDisplay]="'input'"
-                                    class="full-width"
-                                    [showIcon]="true"
-                                    dateFormat="dd-mm-yy"
-                                    inputId="icondisplay"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid col-12">
-                    <div class="col-12 col-md-3">
-                        <p class="font-bold">Fin de asesoría:</p>
-                        <div class="grid p-fluid">
-                            <div class="col-12 md:col-12">
-                                <p-calendar
-                                    formControlName="advisoryEndDate"
-                                    placeholder="Seleccione una fecha"
-                                    [iconDisplay]="'input'"
-                                    class="full-width"
-                                    [showIcon]="true"
-                                    dateFormat="dd-mm-yy"
-                                    inputId="icondisplay"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
                 <div class="col-6">
                     <div>
-                        <p>Asesor de tesis</p>
+                        <p>Revisor de tesis</p>
                         <app-user-selection
                             #userSelection
                             [typeUserList]="reviewerType"
                             maxUsersAllow="1"
-                            [usersPreSelected]="[advisory.value]"
+                            [usersPreSelected]="[reviewer.value]"
                             (userSelected)="getTeacherSelected($event)"
-                            [disabled]="!showEdit"
+                            [disabled]="true"
                         >
                         </app-user-selection>
                     </div>
@@ -588,19 +318,20 @@
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
                 <app-file-list
+                    #fileList
                     class="w-full"
                     [module]="module"
-                    [id]="advisorySelected.id"
+                    [id]="reviewSelected.id"
                     (addArchiveClicked)="showDialogAddFile()"
-                    [reload]="reloadFiles"
                     [clear]="clearFiles"
                 >
                 </app-file-list>
                 <div class="ml-2 mr-2 separator"></div>
                 <app-comments
+                    #comments
                     class="w-full"
                     [module]="module"
-                    [id]="advisorySelected.id"
+                    [id]="reviewSelected.id"
                     [visible]="commentsVisible"
                 ></app-comments>
             </div>
@@ -608,7 +339,7 @@
     </div>
 </div>
 
-<div *ngIf="advisorySelected && requiereMoreInfo" class="grid">
+<div *ngIf="reviewSelected && requiereMoreInfo" class="grid">
     <div class="col-12">
         <app-breadcrumb [items]="detailBreadcrumbItems"></app-breadcrumb>
         <div class="card">
@@ -629,7 +360,7 @@
                         label="Guardar"
                         icon="pi pi-save"
                         iconPos="left"
-                        [disabled]="!moreInfoForm.valid || !advisoryForm.valid"
+                        [disabled]="!reviewer.valid"
                     />
                 </div>
             </div>
@@ -638,7 +369,10 @@
                     class="font-bold text-color"
                     style="font-family: revert; text-align: center"
                 >
-                    {{ advisorySelected.degree_processes.thesis_project_title }}
+                    {{
+                        reviewSelected.degree_processes
+                            .thesis_project_title
+                    }}
                 </h5>
             </div>
             <p-messages
@@ -649,26 +383,34 @@
             <div class="grid col-12">
                 <div class="col-12 col-md-3">
                     <p class="font-bold">Nro de expediente:</p>
-                    <p>{{ advisorySelected.degree_processes.file }}</p>
+                    <p>
+                        {{ reviewSelected.degree_processes.file }}
+                    </p>
                 </div>
                 <div class="col-12 col-md-3">
                     <p class="font-bold">Escuela profesional:</p>
                     <p>
                         {{
-                            advisorySelected.degree_processes
+                            reviewSelected.degree_processes
                                 .professional_school
                         }}
                     </p>
                 </div>
                 <div class="col-12 col-md-3">
                     <p class="font-bold">Nro de oficio:</p>
-                    <p>{{ advisorySelected.degree_processes.office_number }}</p>
+                    <p>
+                        {{
+                            reviewSelected.degree_processes
+                                .office_number
+                        }}
+                    </p>
                 </div>
                 <div class="col-12 col-md-3">
                     <p class="font-bold">Nro de resolución:</p>
                     <p>
                         {{
-                            advisorySelected.degree_processes.resolution_number
+                            reviewSelected.degree_processes
+                                .resolution_number
                         }}
                     </p>
                 </div>
@@ -677,16 +419,14 @@
             <div class="grid col-12">
                 <div class="col-12">
                     <p>Por favor asigne un asesor de tesis</p>
-                    <form [formGroup]="advisoryForm">
-                        <app-user-selection
-                            #userSelection
-                            formControlName="advisory"
-                            [typeUserList]="reviewerType"
-                            maxUsersAllow="1"
-                            (userSelected)="getTeacherSelected($event)"
-                        >
-                        </app-user-selection>
-                    </form>
+                    <app-user-selection
+                        #userSelection
+                        formControlName="advisory"
+                        [typeUserList]="reviewerType"
+                        maxUsersAllow="1"
+                        (userSelected)="getTeacherSelected($event)"
+                    >
+                    </app-user-selection>
                 </div>
                 <div class="col-12" style="margin-top: -30px">
                     <p>Estudiante(s)</p>
@@ -703,6 +443,45 @@
         </div>
     </div>
 </div>
+<p-sidebar
+    [(visible)]="showDialogAddFiles"
+    [style]="{ width: '40%' }"
+    position="right"
+>
+    <ng-template pTemplate="header">
+        <span class="font-semibold text-xl">Agregar archivos adjuntos</span>
+    </ng-template>
+    <div class="content">
+        <div class="grid" style="height: 100%">
+            <div class="col-12">
+                <app-upload-archives
+                    #upload
+                    (onFileChangeEmitter)="onFileChange($event)"
+                    (clearFilesEmitter)="clearFile()"
+                >
+                </app-upload-archives>
+            </div>
+            <div class="footer mt-5">
+                <button
+                    pButton
+                    pRipple
+                    label="Regresar"
+                    icon="pi pi-angle-left"
+                    class="p-button-text"
+                    iconPos="left"
+                    (click)="hideAddFilesDialog()"
+                ></button>
+                <p-button
+                    label="Guardar archivos"
+                    iconPos="right"
+                    icon="pi pi-check"
+                    (click)="saveFiles()"
+                    [disabled]="!isFormDataEmpty(formData)"
+                />
+            </div>
+        </div>
+    </div>
+</p-sidebar>
 <p-sidebar
     [(visible)]="showDialogCancel"
     [style]="{ width: '40%' }"
@@ -753,45 +532,6 @@
                     />
                 </div>
             </form>
-        </div>
-    </div>
-</p-sidebar>
-<p-sidebar
-    [(visible)]="showDialogAddFiles"
-    [style]="{ width: '40%' }"
-    position="right"
->
-    <ng-template pTemplate="header">
-        <span class="font-semibold text-xl">Agregar archivos adjuntos</span>
-    </ng-template>
-    <div class="content">
-        <div class="grid" style="height: 100%">
-            <div class="col-12">
-                <app-upload-archives
-                    #upload
-                    (onFileChangeEmitter)="onFileChange($event)"
-                    (clearFilesEmitter)="clearFile()"
-                >
-                </app-upload-archives>
-            </div>
-            <div class="footer mt-5">
-                <button
-                    pButton
-                    pRipple
-                    label="Regresar"
-                    icon="pi pi-angle-left"
-                    class="p-button-text"
-                    iconPos="left"
-                    (click)="hideAddFilesDialog()"
-                ></button>
-                <p-button
-                    label="Guardar archivos"
-                    iconPos="right"
-                    icon="pi pi-check"
-                    (click)="saveFiles()"
-                    [disabled]="!isFormDataEmpty(formData)"
-                />
-            </div>
         </div>
     </div>
 </p-sidebar>

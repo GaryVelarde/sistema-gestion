@@ -1,17 +1,19 @@
 <div class="card">
+    <p-messages [(value)]="presenter.messages" [enableService]="false" />
     <h5>Datos del área de UDI</h5>
-    <p>
-        Complete todos los campos para continuar.
-    </p>
+    <p>Complete todos los campos para continuar.</p>
+
     <form [formGroup]="presenter.formStep1">
         <div class="grid p-fluid mt-3">
             <div class="field col-12 md:col-4">
                 <span class="p-float-label">
                     <p-calendar
                         formControlName="receptionDate"
-                        inputId="egressDate"></p-calendar>
-                    <label for="egressDate">Fecha de
-                        recepción a facultad</label>
+                        inputId="egressDate"
+                    ></p-calendar>
+                    <label for="egressDate"
+                        >Fecha de recepción a facultad</label
+                    >
                 </span>
             </div>
             <div class="field col-12 md:col-4">
@@ -21,7 +23,8 @@
                         id="inputtext"
                         formControlName="fileNumber"
                         pKeyFilter="int"
-                        pInputText />
+                        pInputText
+                    />
                     <label for="inputtext">Número de expediente</label>
                 </span>
             </div>
@@ -32,18 +35,27 @@
                         inputId="role"
                         [autoDisplayFirst]="false"
                         [options]="options"
-                        optionLabel="name"></p-dropdown>
+                        optionLabel="name"
+                    ></p-dropdown>
                     <label for="role">Seleccione una escuela profesional</label>
                 </span>
             </div>
         </div>
         <div class="flex gap-3 mt-1">
-            <p-button (click)="goToList()" label="Ver listado" [outlined]="true"
-                icon="pi pi-angle-left" iconPos="left" />
-            <p-button (click)="nextStep()" label="Siguiente"
-                icon="pi pi-angle-right" iconPos="right"
-                [disabled]="presenter.formStep1.invalid" />
+            <p-button
+                (click)="goToList()"
+                label="Ver listado"
+                [outlined]="true"
+                icon="pi pi-angle-left"
+                iconPos="left"
+            />
+            <p-button
+                (click)="nextStep()"
+                label="Siguiente"
+                icon="pi pi-angle-right"
+                iconPos="right"
+                [disabled]="presenter.formStep1.invalid"
+            />
         </div>
     </form>
-
 </div>

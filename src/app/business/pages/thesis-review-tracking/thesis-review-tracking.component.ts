@@ -14,6 +14,8 @@ import { finalize, Subject, takeUntil } from 'rxjs';
 import { DateFormatService } from 'src/app/services/date-format.service';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
+import { FileListComponent } from '../../cross-components/file-list/file-list.component';
+import { CommentsComponent } from '../../cross-components/comments/comments.component';
 
 @Component({
     templateUrl: './thesis-review-tracking.component.html',
@@ -21,7 +23,10 @@ import { UploadArchivesComponent } from '../../cross-components/upload-archives/
     providers: [MessageService, ConfirmationService],
 })
 export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
+    @ViewChild('fileList') fileList: FileListComponent;
     @ViewChild('upload') upload: UploadArchivesComponent;
+    @ViewChild('comments') comments: CommentsComponent;
+
     private destroy$ = new Subject<void>();
     products: any[] = [];
     breadcrumbItems: MenuItem[] = [
@@ -40,15 +45,15 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     getStatusList = '';
     reviewerType = userType.teacher;
     studentType = userType.student;
-    showDialogCancel = false;
     showDialogAddFiles = false;
     reloadFiles = false;
     showSelectNewReviwer = false;
     showSelectNewStudent = false;
     showEditSudents = false;
     commentsVisible = true;
+    showDialogCancel = false;
     module = eModule.review;
-    advisoryState = '';
+    reviewState = '';
     filteredReviewers: any;
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     columnTitles: string[] = [
@@ -59,8 +64,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     ];
     selectedProducts: any[] = [];
     formData = new FormData();
-    advisorySelected: any;
-    showEdit = false;
+    reviewSelected: any;
     titleModalDetailIserSelected: string = '';
     filteredStudents: any[];
     filteredSecondStudents: any[];
@@ -72,25 +76,15 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     requiereMoreInfo: boolean = false;
     public tasksForm: FormGroup;
     public cancelattionForm: FormGroup;
-    public advisoryForm: FormGroup;
+    public reviewerForm: FormGroup;
     public studentForm: FormGroup;
-    public editForm: FormGroup;
-    public moreInfoForm: FormGroup;
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
     private _taskDescription: FormControl = new FormControl('', [
         Validators.required,
     ]);
-    private _advisory: FormControl = new FormControl([], [Validators.required]);
+    private _reviewer: FormControl = new FormControl([], [Validators.required]);
     private _students: FormControl = new FormControl([], [Validators.required]);
-    private _advisoryReceptionDateToFacultyMI: FormControl = new FormControl('', [Validators.required]);
-    private _advisoryApprovalDateUDIMI: FormControl = new FormControl('', [Validators.required]);
-    private _paymentDateMI: FormControl = new FormControl('', [Validators.required]);
-    private _submissionDateToSecretariatMI: FormControl = new FormControl('', [Validators.required]);
-    private _reportNumberMI: FormControl = new FormControl('', [Validators.required]);
-    private _resolutionDateMI: FormControl = new FormControl('', [Validators.required]);
-    private _advisoryStartDate: FormControl = new FormControl('', [Validators.required]);
-    private _advisoryEndDate: FormControl = new FormControl('', [Validators.required]);
 
     get cancelationComment() {
         return this._cancelationComment;
@@ -101,35 +95,11 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     get taskDescription() {
         return this._taskDescription;
     }
-    get advisory() {
-        return this._advisory;
+    get reviewer() {
+        return this._reviewer;
     }
     get students() {
         return this._students;
-    }
-    get advisoryReceptionDateToFacultyMI() {
-        return this._advisoryReceptionDateToFacultyMI;
-    }
-    get advisoryApprovalDateUDIMI() {
-        return this._advisoryApprovalDateUDIMI;
-    }
-    get paymentDateMI() {
-        return this._paymentDateMI;
-    }
-    get submissionDateToSecretariatMI() {
-        return this._submissionDateToSecretariatMI;
-    }
-    get reportNumberMI() {
-        return this._reportNumberMI;
-    }
-    get resolutionDateMI() {
-        return this._resolutionDateMI;
-    }
-    get advisoryStartDate() {
-        return this._advisoryStartDate;
-    }
-    get advisoryEndDate() {
-        return this._advisoryEndDate;
     }
 
     constructor(
@@ -142,34 +112,14 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
         private loaderService: LoaderService,
         private dateFormatService: DateFormatService
     ) {
-        this.moreInfoForm = this.fb.group({
-            advisoryReceptionDateToFacultyMI: this.advisoryReceptionDateToFacultyMI,
-            advisoryApprovalDateUDIMI: this.advisoryApprovalDateUDIMI,
-            paymentDateMI: this.paymentDateMI,
-            submissionDateToSecretariatMI: this.submissionDateToSecretariatMI,
-            reportNumberMI: this.reportNumberMI,
-            resolutionDateMI: this.resolutionDateMI,
-            advisoryStartDate: this.advisoryStartDate,
-            advisoryEndDate: this.advisoryEndDate,
-        });
-        this.editForm = this.fb.group({
-            advisoryReceptionDateToFacultyMI: this.advisoryReceptionDateToFacultyMI,
-            advisoryApprovalDateUDIMI: this.advisoryApprovalDateUDIMI,
-            paymentDateMI: this.paymentDateMI,
-            submissionDateToSecretariatMI: this.submissionDateToSecretariatMI,
-            reportNumberMI: this.reportNumberMI,
-            resolutionDateMI: this.resolutionDateMI,
-            advisoryStartDate: this.advisoryStartDate,
-            advisoryEndDate: this.advisoryEndDate,
-        });
         this.tasksForm = this.fb.group({
             taskDescription: this.taskDescription,
         });
         this.cancelattionForm = this.fb.group({
             cancelationComment: this.cancelationComment,
         });
-        this.advisoryForm = this.fb.group({
-            advisory: this.advisory,
+        this.reviewerForm = this.fb.group({
+            reviewer: this.reviewer,
         });
         this.studentForm = this.fb.group({
             students: this.students,
@@ -240,16 +190,15 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
             data.reviewer.length < 1
                 ? this.requiereMoreInfo = true
                 : this.requiereMoreInfo = false;
-            this.advisorySelected = data;
+            this.reviewSelected = data;
 
-            console.log('this.advisorySelected', this.advisorySelected)
-            this.advisoryState = this.advisorySelected.status;
-            this.advisoryState === 'Aprobado' || this.advisoryState === 'Renuncia'
+            console.log('this.reviewSelected', this.reviewSelected)
+            this.reviewState = this.reviewSelected.status;
+            this.reviewState === 'Aprobado' || this.reviewState === 'Renuncia'
                 ? this.commentsVisible = false
                 : this.commentsVisible = true
             this.students.setValue(data.degree_processes.graduates);
-            this.advisory.setValue(data.reviewer);
-            this.fillDataInEditForm();
+            this.reviewer.setValue(data.reviewer);
         }
         setTimeout(() => {
             this.loaderService.hide();
@@ -259,128 +208,12 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     backList() {
         this.loaderService.show();
         this.getThesisReviewList();
-        this.advisorySelected = null;
+        this.reviewSelected = null;
         this.students.setValue([]);
-        this.advisory.setValue([]);
-        this.moreInfoForm.reset();
-        this.editForm.reset();
+        this.reviewer.setValue([]);
         setTimeout(() => {
             this.loaderService.hide();
         }, 400);
-    }
-
-    showEdition() {
-        this.fillDataInEditForm();
-        this.showEdit = true;
-    }
-
-    cancelEdition() {
-        this.showEdit = false;
-    }
-
-    saveEdition() {
-        this.loaderService.show();
-        const rq = {
-            user_id: this.advisory.value[0].id,
-            reception_date_faculty: this.dateFormatService.transformDDMMYYYY(this.advisoryReceptionDateToFacultyMI.value),
-            payment_date: this.dateFormatService.transformDDMMYYYY(this.paymentDateMI.value),
-            approval_date_udi: this.dateFormatService.transformDDMMYYYY(this.advisoryApprovalDateUDIMI.value),
-            shipment_date_secretary: this.dateFormatService.transformDDMMYYYY(this.submissionDateToSecretariatMI.value),
-            report: this.reportNumberMI.value,
-            resolution_date: this.dateFormatService.transformDDMMYYYY(this.resolutionDateMI.value),
-            start_date_advisory: this.dateFormatService.transformDDMMYYYY(this.advisoryStartDate.value),
-            end_date_advisory: this.dateFormatService.transformDDMMYYYY(this.advisoryEndDate.value),
-        }
-        this.service.putAdvisoryUpdate(this.advisorySelected.id, rq).pipe(
-            finalize(() => {
-                this.loaderService.hide();
-            })
-        ).subscribe(
-            (res: any) => {
-                if (res.status) {
-                    this.advisorySelectedUpdate();
-                    this.showEdit = false;
-                    this.messageService.add({
-                        key: 'tst',
-                        severity: 'info',
-                        summary: 'Confirmado',
-                        detail: 'Lo datos han sido guardados.',
-                        life: 3000,
-                    });
-                }
-            }, (error) => {
-                this.messageService.add({
-                    key: 'tst',
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Se ha producido un error al guardar la información.',
-                    life: 3000,
-                });
-            })
-    }
-
-    goToReview() {
-        this.loaderService.show();
-        const rq = {
-            status: 'En Revisión'
-        }
-        this.service.putAdvisoryStatusUpdate(this.advisorySelected.id, rq).pipe(
-            finalize(() => {
-                this.loaderService.hide();
-            }), takeUntil(this.destroy$)
-        ).subscribe(
-            (res: any) => {
-                if (res.status) {
-                    this.messageService.add({
-                        key: 'tst',
-                        severity: 'info',
-                        summary: 'Confirmación',
-                        detail: 'La asesoría pasó a Revisión.',
-                        life: 3000,
-                    });
-                    this.advisoryState = 'En Revisión';
-                }
-            }, (error) => {
-                this.messageService.add({
-                    key: 'tst',
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Se ha producido un error al actualizar el estado.',
-                    life: 3000,
-                });
-            });
-    }
-
-    goToObserved() {
-        this.loaderService.show();
-        const rq = {
-            status: 'Observado'
-        }
-        this.service.putAdvisoryStatusUpdate(this.advisorySelected.id, rq).pipe(
-            finalize(() => {
-                this.loaderService.hide();
-            }), takeUntil(this.destroy$)
-        ).subscribe(
-            (res: any) => {
-                if (res.status) {
-                    this.messageService.add({
-                        key: 'tst',
-                        severity: 'info',
-                        summary: 'Confirmación',
-                        detail: 'La asesoría pasó a Revisión.',
-                        life: 3000,
-                    });
-                    this.advisoryState = 'Observado';
-                }
-            }, (error) => {
-                this.messageService.add({
-                    key: 'tst',
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Se ha producido un error al actualizar el estado.',
-                    life: 3000,
-                });
-            });
     }
 
     goToCancelation() {
@@ -394,25 +227,25 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
         this.showDialogCancel = false;
         this.loaderService.show();
         const rq = {
-            status: 'Renuncia',
+            status: 'No aprobado',
             description: this.cancelationComment.value,
         }
-        this.service.putAdvisoryStatusUpdate(this.advisorySelected.id, rq).pipe(
+        this.service.putReviewStatusUpdate(this.reviewSelected.id, rq).pipe(
             finalize(() => {
                 this.loaderService.hide();
             }), takeUntil(this.destroy$)
         ).subscribe(
             (res: any) => {
                 if (res.status) {
-                    this.cancelEdition();
-                    this.advisoryState = 'Renuncia';
+                    this.reviewState = 'No aprobado';
                     this.messageService.add({
                         key: 'tst',
                         severity: 'info',
                         summary: 'Conformación',
-                        detail: 'Se ha realizado la cencelación de la asesoría.',
+                        detail: 'Se realizó la desaprobación de la asesoría.',
                         life: 3000,
                     });
+                    this.comments.getCommentsList();
                     this.commentsVisible = false
                 }
             }, (error) => {
@@ -432,9 +265,9 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
 
     goToApprove() {
         this.confirmationService.confirm({
-            header: 'Confirmación',
+            header: 'Aprobado',
             message:
-                'Estás a punto de aprobar esta inscripción, ¿estás seguro(a)?.',
+                'Estás a punto de aprobar esta revisión de tesis, ¿estás seguro(a)?.',
             acceptIcon: 'pi pi-check mr-2',
             rejectIcon: 'pi pi-times mr-2',
             rejectButtonStyleClass: 'p-button-sm',
@@ -444,20 +277,19 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
                 const rq = {
                     status: 'Aprobado',
                 }
-                this.service.putAdvisoryStatusUpdate(this.advisorySelected.id, rq).pipe(
+                this.service.putReviewStatusUpdate(this.reviewSelected.id, rq).pipe(
                     finalize(() => {
                         this.loaderService.hide();
                     }), takeUntil(this.destroy$)
                 ).subscribe(
                     (res: any) => {
                         if (res.status) {
-                            this.cancelEdition();
-                            this.advisoryState = 'Aprobado';
+                            this.reviewState = 'Aprobado';
                             this.messageService.add({
                                 key: 'tst',
                                 severity: 'info',
                                 summary: 'Conformación',
-                                detail: 'Se ha realizado la aprobación de la asesoría.',
+                                detail: 'Se ha realizado la aprobación de la revisión de tesis.',
                                 life: 3000,
                             });
                             this.commentsVisible = false
@@ -475,6 +307,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
             reject: () => { },
         });
     }
+
 
     formatText(text: string): string {
         return text.replace(/\n/g, '<br>');
@@ -499,7 +332,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     }
 
     getTeacherSelected(userSelected: any) {
-        this.advisory.setValue(userSelected);
+        this.reviewer.setValue(userSelected);
     }
 
     getStudentSelected(userSelected: any) {
@@ -513,26 +346,18 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     }
 
     saveMoreInfo() {
-        this.loaderService.show();
+        this.loaderService.show(true);
         const rq = {
-            user_id: this.advisory.value[0].id,
-            reception_date_faculty: this.dateFormatService.transformDDMMYYYY(this.advisoryReceptionDateToFacultyMI.value),
-            payment_date: this.dateFormatService.transformDDMMYYYY(this.paymentDateMI.value),
-            approval_date_udi: this.dateFormatService.transformDDMMYYYY(this.advisoryApprovalDateUDIMI.value),
-            shipment_date_secretary: this.dateFormatService.transformDDMMYYYY(this.submissionDateToSecretariatMI.value),
-            report: this.reportNumberMI.value,
-            resolution_date: this.dateFormatService.transformDDMMYYYY(this.resolutionDateMI.value),
-            start_date_advisory: this.dateFormatService.transformDDMMYYYY(this.advisoryStartDate.value),
-            end_date_advisory: this.dateFormatService.transformDDMMYYYY(this.advisoryEndDate.value),
+            user_id: this.reviewer.value[0].id,
         }
-        this.service.putAdvisoryUpdate(this.advisorySelected.id, rq).pipe(
+        this.service.putReviewUpdate(this.reviewSelected.id, rq).pipe(
             finalize(() => {
                 this.loaderService.hide();
             })
         ).subscribe(
             (res: any) => {
                 if (res.status) {
-                    this.advisorySelectedUpdate();
+                    this.reviewerSelectedUpdate();
                     this.requiereMoreInfo = false;
                     this.messageService.add({
                         key: 'tst',
@@ -541,7 +366,6 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
                         detail: 'Lo datos han sido guardados.',
                         life: 3000,
                     });
-                    this.moreInfoForm.reset();
                 }
             }, (error) => {
                 this.messageService.add({
@@ -554,29 +378,8 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
             })
     }
 
-    fillDataInEditForm(): void {
-        this.advisoryReceptionDateToFacultyMI.setValue(this.advisorySelected.reception_date_faculty);
-        this.advisoryApprovalDateUDIMI.setValue(this.advisorySelected.approval_date_udi);
-        this.paymentDateMI.setValue(this.advisorySelected.payment_date);
-        this.submissionDateToSecretariatMI.setValue(this.advisorySelected.shipment_date_secretary);
-        this.reportNumberMI.setValue(this.advisorySelected.report);
-        this.resolutionDateMI.setValue(this.advisorySelected.resolution_date);
-        this.advisoryStartDate.setValue(this.advisorySelected.start_date_advisory);
-        this.advisoryEndDate.setValue(this.advisorySelected.end_date_advisory);
-
-    }
-
-    advisorySelectedUpdate(): void {
-        this.advisorySelected.reviewer = this.dateFormatService.transformDDMMYYYY(this.advisory.value);
-        this.advisorySelected.approval_date_udi = this.dateFormatService.transformDDMMYYYY(this.advisoryApprovalDateUDIMI.value);
-        this.advisorySelected.reception_date_faculty = this.dateFormatService.transformDDMMYYYY(this.advisoryReceptionDateToFacultyMI.value);
-        this.advisorySelected.payment_date = this.dateFormatService.transformDDMMYYYY(this.paymentDateMI.value);
-        this.advisorySelected.shipment_date_secretary = this.dateFormatService.transformDDMMYYYY(this.submissionDateToSecretariatMI.value);
-        this.advisorySelected.report = this.reportNumberMI.value;
-        this.advisorySelected.resolution_date = this.dateFormatService.transformDDMMYYYY(this.resolutionDateMI.value);
-        this.advisorySelected.start_date_advisory = this.dateFormatService.transformDDMMYYYY(this.advisoryStartDate.value);
-        this.advisorySelected.end_date_advisory = this.dateFormatService.transformDDMMYYYY(this.advisoryEndDate.value);
-        this.advisorySelected.degree_processes.graduates = this.dateFormatService.transformDDMMYYYY(this.students.value);
+    reviewerSelectedUpdate(): void {
+        this.reviewSelected.reviewer = this.reviewer.value;
     }
 
     onFileChange(files: any) {
@@ -589,6 +392,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
 
     hideAddFilesDialog() {
         this.clearFile();
+        this.upload.clearFile();
         this.showDialogAddFiles = false;
     }
 
@@ -599,16 +403,17 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     }
 
     saveFiles() {
-        this.loaderService.show();
+        this.loaderService.show(true);
         this.showDialogAddFiles = false;
-        this.service.postRegisterAdvisoryFile(this.formData, this.advisorySelected.id).pipe(
+        this.service.postRegisterReviewFile(this.formData, this.reviewSelected.id).pipe(
             finalize(() => {
+                this.upload.clearFile()
                 this.loaderService.hide();
             })
         ).subscribe(
             (res: any) => {
                 if (res.status) {
-                    this.reloadFiles = true;
+                    this.fileList.callGetFileList();
                     this.clearFile();
                     this.hideAddFilesDialog();
                     this.messageService.add({

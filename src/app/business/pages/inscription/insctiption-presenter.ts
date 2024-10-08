@@ -13,6 +13,7 @@ import { DateFormatService } from 'src/app/services/date-format.service';
     providedIn: 'root',
 })
 export class InscriptionPresenter {
+    complete: boolean = false;
     formStep1: FormGroup;
     formStep2: FormGroup;
     formStep3: FormGroup;
@@ -42,7 +43,7 @@ export class InscriptionPresenter {
         '',
         Validators.required
     );
-    private _comments: FormControl = new FormControl('', Validators.required);
+    private _comments: FormControl = new FormControl('');
 
     studentTwoRequired = false;
     studentOneIsValid = false;
@@ -206,7 +207,6 @@ export class InscriptionPresenter {
         this.formStep2.reset();
         this.formStep3.reset();
         this.formStep4.reset();
-        this.destroy$.next();
-        this.destroy$.complete();
+        this.complete = false;
     }
 }

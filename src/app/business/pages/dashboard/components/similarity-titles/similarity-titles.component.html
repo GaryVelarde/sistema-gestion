@@ -30,56 +30,83 @@
 
 <ng-template #list>
     <form [formGroup]="titleForm">
-        <input
-            type="text"
-            class="w-full mb-3"
-            pInputText
-            formControlName="title"
-        />
+        <div class="w-full">
+            <p-floatLabel>
+                <textarea
+                    formControlName="title"
+                    class="w-full mb-3"
+                    rows="3"
+                    pInputTextarea
+                >
+                </textarea>
+                <label for="title">Título del artículo</label>
+            </p-floatLabel>
+        </div>
     </form>
 
-    <div *ngIf="title.value.length < 1">
+    <div *ngIf="title.value.length < 1" style="margin-top: -10px">
         <p>digita un titulo</p>
     </div>
-    <div *ngIf="title.value.length > 1 && results.length < 1">
-        <p>No se encontraron titulos</p>
+    <div
+        *ngIf="title.value.length > 1 && results.length < 1"
+        style="margin-top: -10px"
+    >
+        <p>
+            No se encontraron titulos coincidentes del {{ minimumPercentage }}%
+            en adelante.
+        </p>
     </div>
-    <ul class="list-none p-0 m-0">
-        <li
-            *ngFor="let result of results"
-            class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4"
-        >
-            <div>
-                <span class="text-900 font-medium mr-2 mb-1 md:mb-0 pl-2">{{
-                    result.title
-                }}</span>
-            </div>
-            <div class="mt-2 md:mt-0 flex align-items-center">
-                <div
-                    class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem"
-                    [ngStyle]="{ height: '8px' }"
-                >
-                    <div
-                        class="h-full"
-                        [ngStyle]="{ width: result.similarity + '%' }"
-                        [ngClass]="getSimilarityClass(result.similarity)"
-                    ></div>
+    <div
+        *ngIf="title.value.length > 1 && results.length > 0"
+        style="margin-top: -10px"
+    >
+        <p>Se encontraron {{ results.length }} resultados.</p>
+    </div>
+    <p-scrollPanel
+        [style]="{
+            width: '100%',
+            height: results.length > 0 ? '250px' : 'auto'
+        }"
+        styleClass="mt-2"
+    >
+        <ul class="list-none p-0 m-0">
+            <li
+                *ngFor="let result of results"
+                class="flex flex-column md:flex-row md:align-items-center md:justify-content-between mb-4"
+                style="text-align: justify"
+            >
+                <div style="padding-right: 20px">
+                    <span class="text-900 font-medium mr-2 mb-1 md:mb-0 pl-2">{{
+                        result.title
+                    }}</span>
                 </div>
-                <span
-                    class="ml-3 font-medium"
-                    [ngClass]="getSimilarityClassText(result.similarity)"
-                >
-                    {{ result.similarity }}%
-                </span>
-            </div>
-        </li>
-    </ul>
+                <div class="mt-2 md:mt-0 flex align-items-center">
+                    <div
+                        class="surface-300 border-round overflow-hidden w-10rem lg:w-6rem"
+                        [ngStyle]="{ height: '8px' }"
+                    >
+                        <div
+                            class="h-full"
+                            [ngStyle]="{ width: result.similarity + '%' }"
+                            [ngClass]="getSimilarityClass(result.similarity)"
+                        ></div>
+                    </div>
+                    <span
+                        class="ml-3 font-medium"
+                        [ngClass]="getSimilarityClassText(result.similarity)"
+                    >
+                        {{ result.similarity }}%
+                    </span>
+                </div>
+            </li>
+        </ul>
+    </p-scrollPanel>
 </ng-template>
 
 <ng-template #skeleton>
     <p-skeleton height="3rem" styleClass="mb-3" />
     <div class="w-full" style="display: flex">
-        <div style="width: 60%">
+        <div style="width: 70%">
             <p-skeleton height="1.5rem" styleClass="mb-2" />
         </div>
         <div style="width: 20%" class="ml-5">
@@ -87,7 +114,7 @@
         </div>
     </div>
     <div class="w-full" style="display: flex">
-        <div style="width: 60%">
+        <div style="width: 70%">
             <p-skeleton height="1.5rem" styleClass="mb-2" />
         </div>
         <div style="width: 20%" class="ml-5">
@@ -95,7 +122,7 @@
         </div>
     </div>
     <div class="w-full" style="display: flex">
-        <div style="width: 60%">
+        <div style="width: 70%">
             <p-skeleton height="1.5rem" styleClass="mb-2" />
         </div>
         <div style="width: 20%" class="ml-5">

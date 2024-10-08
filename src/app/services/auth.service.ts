@@ -229,20 +229,12 @@ export class AuthService {
     return this.http.get(`${this.API_URL}/review`, this.header);
   }
 
-  getCommentsByThesisReview(id: string): Observable<any> {
-    return this.http.get(`${this.API_URL}/review/${id}/observations`, this.header);
-  }
-
   postRegisterThesisReviewFile(request: any, id: string) {
     return this.http.post(`${this.API_URL}/review/${id}/archive`, request, this.header);
   }
 
   getThesisReviewFiles(id: string) {
     return this.http.get(`${this.API_URL}/review/${id}/archive`, this.header);
-  }
-
-  postAddThesisReviewComment(id: any, request: any) {
-    return this.http.post(`${this.API_URL}/review/${id}/observations`, request, this.header);
   }
 
   getNotificationReport() {
@@ -259,6 +251,18 @@ export class AuthService {
 
   getCounterReport() {
     return this.http.get(`${this.API_URL}/counter-report`, this.header);
+  }
+
+  putReviewUpdate(id: string, request: any) {
+    return this.http.put(`${this.API_URL}/review/${id}`, request, this.header);
+  }
+
+  putReviewStatusUpdate(id: string, request: any) {
+    return this.http.put(`${this.API_URL}/review/${id}/status`, request, this.header);
+  }
+
+  postRegisterReviewFile(request: any, id: string) {
+    return this.http.post(`${this.API_URL}/review/${id}/archive`, request, this.header);
   }
 
 }

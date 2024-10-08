@@ -30,6 +30,6 @@ export class InsctiptionComponent implements OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.presenter.clearValues()
+        this.presenter.clearValues();
     }
 }

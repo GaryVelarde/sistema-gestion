@@ -20,7 +20,12 @@
         <ng-container *ngTemplateOutlet="error"></ng-container>
     </ng-template>
     <ng-template [ngSwitchCase]="'complete'">
-        <ng-container *ngTemplateOutlet="list"></ng-container>
+        <div *ngIf="files.length > 4" class="w-full">
+            <ng-container *ngTemplateOutlet="list"></ng-container>
+        </div>
+        <div *ngIf="files.length < 5" class="w-full">
+            <ng-container *ngTemplateOutlet="list2"></ng-container>
+        </div>
     </ng-template>
     <ng-template ngSwitchDefault>
         <p>Invalid state</p>
@@ -40,6 +45,7 @@
         [value]="files"
         [numVisible]="4"
         [numScroll]="3"
+        [responsiveOptions]="responsiveOptions"
     >
         <ng-template let-file pTemplate="item">
             <div
@@ -47,14 +53,14 @@
                 style="
                     border: 1px solid #d1d5db;
                     border-radius: 4px;
-                    max-width: 210px;
+                    max-width: 250px;
                 "
             >
                 <ng-container *ngIf="isPDF(file.name)">
                     <div class="content-file">
                         <i class="pi pi-file-pdf" style="font-size: 2em"></i>
                     </div>
-                    <div class="mr-auto p-2">
+                    <div class="mr-auto p-2" style="word-wrap: break-word">
                         <p>{{ file.name }}</p>
                     </div>
                     <div class="p-2" style="display: flex">
@@ -80,17 +86,17 @@
                             [preview]="true"
                         />
                     </div>
-                    <div class="mr-auto p-2">
+                    <div class="mr-auto p-2" style="word-wrap: break-word">
                         <p>{{ file.name }}</p>
                     </div>
-                    <div class="p-2 cursor-pointer" style="display: flex">
+                    <div class="p-2" style="display: flex">
                         <i
-                            class="pi pi-download"
+                            class="pi pi-download cursor-pointer"
                             (click)="download(file.archive)"
                         ></i>
                         <i
                             *ngIf="tokenService.getUserTag() === file.user_id"
-                            class="pi pi-trash ml-3"
+                            class="pi pi-trash ml-3 cursor-pointer"
                             (click)="deleteArchive(file.id)"
                         ></i>
                     </div>
@@ -100,17 +106,17 @@
                     <div class="content-file">
                         <i class="pi pi-file-word" style="font-size: 2em"></i>
                     </div>
-                    <div class="mr-auto p-2">
+                    <div class="mr-auto p-2" style="word-wrap: break-word">
                         <p>{{ file.name }}</p>
                     </div>
-                    <div class="p-2 cursor-pointer" style="display: flex">
+                    <div class="p-2" style="display: flex">
                         <i
-                            class="pi pi-download"
+                            class="pi pi-download cursor-pointer"
                             (click)="download(file.archive)"
                         ></i>
                         <i
                             *ngIf="tokenService.getUserTag() === file.user_id"
-                            class="pi pi-trash ml-3"
+                            class="pi pi-trash ml-3 cursor-pointer"
                             (click)="deleteArchive(file.id)"
                         ></i>
                     </div>
@@ -120,17 +126,17 @@
                     <div class="content-file">
                         <i class="pi pi-file-excel" style="font-size: 2em"></i>
                     </div>
-                    <div class="mr-auto p-2">
+                    <div class="mr-auto p-2" style="word-wrap: break-word">
                         <p>{{ file.name }}</p>
                     </div>
-                    <div class="p-2 cursor-pointer" style="display: flex">
+                    <div class="p-2" style="display: flex">
                         <i
-                            class="pi pi-download"
+                            class="pi pi-download cursor-pointer"
                             (click)="download(file.archive)"
                         ></i>
                         <i
                             *ngIf="tokenService.getUserTag() === file.user_id"
-                            class="pi pi-trash ml-3"
+                            class="pi pi-trash ml-3 cursor-pointer"
                             (click)="deleteArchive(file.id)"
                         ></i>
                     </div>
@@ -147,17 +153,17 @@
                     <div class="content-file">
                         <i class="pi pi-file" style="font-size: 2em"></i>
                     </div>
-                    <div class="mr-auto p-2">
+                    <div class="mr-auto p-2" style="word-wrap: break-word">
                         <p>{{ file.name }}</p>
                     </div>
-                    <div class="p-2 cursor-pointer" style="display: flex">
+                    <div class="p-2" style="display: flex">
                         <i
-                            class="pi pi-download"
+                            class="pi pi-download cursor-pointer"
                             (click)="download(file.archive)"
                         ></i>
                         <i
                             *ngIf="tokenService.getUserTag() === file.user_id"
-                            class="pi pi-trash ml-3"
+                            class="pi pi-trash ml-3 cursor-pointer"
                             (click)="deleteArchive(file.id)"
                         ></i>
                     </div>
@@ -166,8 +172,15 @@
         </ng-template>
     </p-carousel>
 </ng-template>
-<!-- <ng-template #list2>
+<ng-template #list2>
     <div class="col-12 grid">
+        <div *ngIf="files.length < 1" class="col-12" style="margin-top: -30px">
+            <p-messages
+                [(value)]="messages"
+                [enableService]="false"
+                [closable]="false"
+            />
+        </div>
         <div class="col-12 col-md-4 col-lg-3" *ngFor="let file of files">
             <div
                 class="w-full p-2 card-file"
@@ -177,14 +190,19 @@
                     <div class="content-file">
                         <i class="pi pi-file-pdf" style="font-size: 2em"></i>
                     </div>
-                    <div class="mr-auto p-2"><p>{{file.name}}</p></div>
-                    <div
-                        class="p-2 cursor-pointer"
-                        style="display: flex"
-                        (click)="download(file.archive)"
-                    >
-                        <i class="pi pi-download"></i>
-                        <i class="pi pi-trash ml-3"></i>
+                    <div class="mr-auto p-2" style="word-wrap: break-word">
+                        <p>{{ file.name }}</p>
+                    </div>
+                    <div class="p-2" style="display: flex">
+                        <i
+                            class="pi pi-download cursor-pointer"
+                            (click)="download(file.archive)"
+                        ></i>
+                        <i
+                            *ngIf="tokenService.getUserTag() === file.user_id"
+                            class="pi pi-trash ml-3 cursor-pointer"
+                            (click)="deleteArchive(file.id)"
+                        ></i>
                     </div>
                 </ng-container>
 
@@ -198,14 +216,19 @@
                             [preview]="true"
                         />
                     </div>
-                    <div class="mr-auto p-2"><p>{{file.name}}</p></div>
-                    <div
-                        class="p-2 cursor-pointer"
-                        style="display: flex"
-                        (click)="download(file.archive)"
-                    >
-                        <i class="pi pi-download"></i>
-                        <i class="pi pi-trash ml-3"></i>
+                    <div class="mr-auto p-2" style="word-wrap: break-word">
+                        <p>{{ file.name }}</p>
+                    </div>
+                    <div class="p-2" style="display: flex">
+                        <i
+                            class="pi pi-download cursor-pointer"
+                            (click)="download(file.archive)"
+                        ></i>
+                        <i
+                            *ngIf="tokenService.getUserTag() === file.user_id"
+                            class="pi pi-trash ml-3 cursor-pointer"
+                            (click)="deleteArchive(file.id)"
+                        ></i>
                     </div>
                 </ng-container>
 
@@ -213,14 +236,19 @@
                     <div class="content-file">
                         <i class="pi pi-file-word" style="font-size: 2em"></i>
                     </div>
-                    <div class="mr-auto p-2"><p>{{file.name}}</p></div>
-                    <div
-                        class="p-2 cursor-pointer"
-                        style="display: flex"
-                        (click)="download(file.archive)"
-                    >
-                        <i class="pi pi-download"></i>
-                        <i class="pi pi-trash ml-3"></i>
+                    <div class="mr-auto p-2" style="word-wrap: break-word">
+                        <p>{{ file.name }}</p>
+                    </div>
+                    <div class="p-2" style="display: flex">
+                        <i
+                            class="pi pi-download cursor-pointer"
+                            (click)="download(file.archive)"
+                        ></i>
+                        <i
+                            *ngIf="tokenService.getUserTag() === file.user_id"
+                            class="pi pi-trash ml-3 cursor-pointer"
+                            (click)="deleteArchive(file.id)"
+                        ></i>
                     </div>
                 </ng-container>
 
@@ -228,14 +256,19 @@
                     <div class="content-file">
                         <i class="pi pi-file-excel" style="font-size: 2em"></i>
                     </div>
-                    <div class="mr-auto p-2"><p>{{file.name}}</p></div>
-                    <div
-                        class="p-2 cursor-pointer"
-                        style="display: flex"
-                        (click)="download(file.archive)"
-                    >
-                        <i class="pi pi-download"></i>
-                        <i class="pi pi-trash ml-3"></i>
+                    <div class="mr-auto p-2" style="word-wrap: break-word">
+                        <p>{{ file.name }}</p>
+                    </div>
+                    <div class="p-2" style="display: flex">
+                        <i
+                            class="pi pi-download cursor-pointer"
+                            (click)="download(file.archive)"
+                        ></i>
+                        <i
+                            *ngIf="tokenService.getUserTag() === file.user_id"
+                            class="pi pi-trash ml-3 cursor-pointer"
+                            (click)="deleteArchive(file.id)"
+                        ></i>
                     </div>
                 </ng-container>
 
@@ -250,20 +283,25 @@
                     <div class="content-file">
                         <i class="pi pi-file" style="font-size: 2em"></i>
                     </div>
-                    <div class="mr-auto p-2"><p>{{file.name}}</p></div>
-                    <div
-                        class="p-2 cursor-pointer"
-                        style="display: flex"
-                        (click)="download(file.archive)"
-                    >
-                        <i class="pi pi-download"></i>
-                        <i class="pi pi-trash ml-3"></i>
+                    <div class="mr-auto p-2" style="word-wrap: break-word">
+                        <p>{{ file.name }}</p>
+                    </div>
+                    <div class="p-2" style="display: flex">
+                        <i
+                            class="pi pi-download cursor-pointer"
+                            (click)="download(file.archive)"
+                        ></i>
+                        <i
+                            *ngIf="tokenService.getUserTag() === file.user_id"
+                            class="pi pi-trash ml-3 cursor-pointer"
+                            (click)="deleteArchive(file.id)"
+                        ></i>
                     </div>
                 </ng-container>
             </div>
         </div>
     </div>
-</ng-template> -->
+</ng-template>
 <ng-template #skeleton>
     <div class="col-12 grid">
         <div class="col-12 col-md-4 col-lg-2" *ngFor="let row of skeletonRows">

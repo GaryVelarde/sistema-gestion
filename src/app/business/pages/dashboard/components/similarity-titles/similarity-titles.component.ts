@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from 'src/app/services/auth.service';
 import { ThesisSimilarityService } from 'src/app/services/thesis-similarity.service';
@@ -7,7 +7,8 @@ import { ThesisSimilarityService } from 'src/app/services/thesis-similarity.serv
   selector: 'app-similarity-titles',
   templateUrl: './similarity-titles.component.html',
   styleUrls: ['./similarity-titles.component.scss'],
-  providers: [ThesisSimilarityService]
+  providers: [ThesisSimilarityService],
+  encapsulation: ViewEncapsulation.None
 })
 export class SimilarityTitlesComponent implements OnInit {
   titlesList = [];

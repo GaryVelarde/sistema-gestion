@@ -7,7 +7,7 @@
     [dismissableMask]="false"
     [draggable]="false"
     [resizable]="false"
-    [style]="{ width: '40vw' }"
+    [style]="{ width: '30vw' }"
 >
     <p>
         <i class="pi pi-exclamation-circle" style="font-size: 1rem"></i>
@@ -15,6 +15,13 @@
         <br>
     </p><b style="font-size: 1.3rem;" >{{ remainingTime }}</b> segundos.
     <p-footer>
+        <button
+        type="button"
+        pButton
+        label="Cerrar sesión"
+        severity="danger"
+        (click)="logOut()"
+    ></button>
         <button
             type="button"
             pButton
