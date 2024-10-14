@@ -38,7 +38,7 @@ input[type=file] {
 }
 
 .custom-file-input::before {
-  content: "Seleccionar el artículo de investigación";
+  content: "+ Seleccionar el artículo de investigación";
   display: block;
   color: var(--text-color);  
 }

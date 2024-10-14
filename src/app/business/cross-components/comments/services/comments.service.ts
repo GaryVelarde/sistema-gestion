@@ -38,6 +38,10 @@ export class CommentsService {
         return this.http.put(`${this.API_URL}/article/${articleId}/observations/${commentId}`, request, this.header);
     }
 
+    putPresentationCommentUpdate(articleId: string, commentId: string, request: any) {
+        return this.http.put(`${this.API_URL}/presentation/${articleId}/observations/${commentId}`, request, this.header);
+    }
+
     /**
        Eliminar comentarios
     */
@@ -62,6 +66,10 @@ export class CommentsService {
         return this.http.delete(`${this.API_URL}/meeting/${eventId}/observations/${commentId}`);
     }
 
+    deletePresentationComment(eventId: string, commentId: string) {
+        return this.http.delete(`${this.API_URL}/presentation/${eventId}/observations/${commentId}`);
+    }
+
     /**
       Listar comentarios
     */
@@ -70,12 +78,20 @@ export class CommentsService {
         return this.http.get(`${this.API_URL}/review/${id}/observations`, this.header);
     }
 
+    getCommentsByPresentation(id: string): Observable<any> {
+        return this.http.get(`${this.API_URL}/presentation/${id}/observations`, this.header);
+    }
+
     /**
       Registrar comentarios
     */
 
     postAddThesisReviewComment(id: any, request: any) {
         return this.http.post(`${this.API_URL}/review/${id}/observations`, request, this.header);
+    }
+
+    postAddPresentationComment(id: any, request: any) {
+        return this.http.post(`${this.API_URL}/presentation/${id}/observations`, request, this.header);
     }
 
 

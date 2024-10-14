@@ -10,4 +10,5 @@ export enum eModule {
   inscription = 'inscripcion',
   hotbed = 'semilleros',
   review = 'review',
+  presentation = 'sustentacion',
 }

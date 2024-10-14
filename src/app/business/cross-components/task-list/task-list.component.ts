@@ -16,7 +16,7 @@ export class TaskListComponent implements OnInit, OnDestroy {
   _visible: boolean;
   _chbDisable: boolean
   @Input() module: eModule;
-  @Input() idModule: string;
+  @Input() idModule: eModule;
   @Input()
   set visible(value: boolean) {
     this._visible = value;
@@ -146,25 +146,38 @@ export class TaskListComponent implements OnInit, OnDestroy {
     this.countTask();
   }
 
-  taskDone(inputId: string, checkbox: any): void {
+  taskDone(taskId: string, checkbox: any): void {
     if (!this._chbDisable) {
-      const labelElement = this.elRef.nativeElement.querySelector(
-        `label[for="${inputId}"]`
-      );
-      if (labelElement) {
-        labelElement.classList.add('task-done');
+      switch (this.module) {
+        case eModule.advisory:
+          this.callPutAdvisoryUpdateStatusTask(taskId, checkbox);
+          break;
+        case eModule.inscription:
+          this.callPutInscriptionUpdateStatusTask(taskId, checkbox);
+          break;
+        case eModule.eventUdi:
+          this.callPutEventUdiUpdateStatusTask(taskId, checkbox);
+          break;
       }
-      if (checkbox) {
-        checkbox.disabled = true;
-      }
-      this.countTask();
     }
+  }
 
+  confirmTaskDone(inputId: string, checkbox: any) {
+    const labelElement = this.elRef.nativeElement.querySelector(
+      `label[for="${inputId}"]`
+    );
+    if (labelElement) {
+      labelElement.classList.add('task-done');
+    }
+    if (checkbox) {
+      checkbox.disabled = true;
+    }
+    this.countTask();
   }
 
   isTaskDone(task: any): any {
     return {
-      'task-done': task.checked,
+      'task-done': task.status,
     };
   }
 
@@ -266,6 +279,51 @@ export class TaskListComponent implements OnInit, OnDestroy {
         (res: any) => {
           if (res.status) {
             this.confirmRemoveTask(taskId);
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callPutEventUdiUpdateStatusTask(taskId: string, checkbox: any) {
+    const rq = {
+      status: true,
+    }
+    this.taskService.putEventUdiUpdateStatusTask(this.idModule, taskId, rq).pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            this.confirmTaskDone(taskId, checkbox);
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callPutInscriptionUpdateStatusTask(taskId: string, checkbox: any) {
+    const rq = {
+      status: true,
+    }
+    this.taskService.putInscriptionUpdateStatusTask(this.idModule, taskId, rq).pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            this.confirmTaskDone(taskId, checkbox);
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callPutAdvisoryUpdateStatusTask(taskId: string, checkbox: any) {
+    const rq = {
+      status: true,
+    }
+    this.taskService.putAdvisoryUpdateStatusTask(this.idModule, taskId, rq).pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            this.confirmTaskDone(taskId, checkbox);
           }
         }, (error) => {
 

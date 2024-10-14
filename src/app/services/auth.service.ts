@@ -265,4 +265,35 @@ export class AuthService {
     return this.http.post(`${this.API_URL}/review/${id}/archive`, request, this.header);
   }
 
+  getPresentationList() {
+    return this.http.get(`${this.API_URL}/presentation`, this.header);
+  }
+
+  getInscriptionMonthlyReport(year: string) {
+    return this.http.get(`${this.API_URL}/monthly-inscriptions/${year}`, this.header);
+  }
+
+  getAdvisoryMonthlyReport(year: string) {
+    return this.http.get(`${this.API_URL}/monthly-advisories/${year}`, this.header);
+  }
+
+  getReviewsMonthlyReport(year: string) {
+    return this.http.get(`${this.API_URL}/monthly-reviews/${year}`, this.header);
+  }
+  
+  getPresentationMonthlyReport(year: string) {
+    return this.http.get(`${this.API_URL}/monthly-presentations/${year}`, this.header);
+  }
+
+  getArticlesMonthlyReport(year: string) {
+    return this.http.get(`${this.API_URL}/monthly-articles/${year}`, this.header);
+  }
+
+  putPresentationUpdate(presentationId: string, request: any) {
+    return this.http.put(`${this.API_URL}/presentation/${presentationId}`, request, this.header);
+  }
+
+  putPresentationUpdateStatus(presentationId: string, request: any) {
+    return this.http.put(`${this.API_URL}/presentation/${presentationId}/status`, request, this.header);
+  }
 }

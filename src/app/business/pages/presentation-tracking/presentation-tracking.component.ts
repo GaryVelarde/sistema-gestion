@@ -19,28 +19,29 @@ import { CommentsComponent } from '../../cross-components/comments/comments.comp
 import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
 
 @Component({
-    templateUrl: './thesis-review-tracking.component.html',
-    styleUrls: ['./thesis-review-tracking.component.scss'],
+    templateUrl: './presentation-tracking.component.html',
+    styleUrls: ['./presentation-tracking.component.scss'],
     providers: [MessageService, ConfirmationService],
 })
-export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
+export class PresentationTrackingComponent implements OnInit, OnDestroy {
     @ViewChild('fileList') fileList: FileListComponent;
     @ViewChild('upload') upload: UploadArchivesComponent;
     @ViewChild('comments') comments: CommentsComponent;
     @ViewChild('reviewerSelection') reviewerSelection: UserSelectionComponent;
+
 
     private destroy$ = new Subject<void>();
     products: any[] = [];
     breadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
         { label: 'Proceso de titulación' },
-        { label: 'Revisión de tesis', visible: true },
+        { label: 'Sustentación de tesis', visible: true },
     ];
     detailBreadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
         { label: 'Proceso de titulación' },
-        { label: 'Revisión de tesis', },
-        { label: 'Detalle de revisión', visible: true },
+        { label: 'Sustentación de tesis', },
+        { label: 'Detalle de sustentación', visible: true },
     ];
     rowsPerPageOptions = [5, 10, 20];
     registros = [];
@@ -50,8 +51,9 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     showDialogAddFiles = false;
     commentsVisible = true;
     showDialogCancel = false;
-    module = eModule.review;
-    reviewState = '';
+    edition = false;
+    module = eModule.presentation;
+    presentationState = '';
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     columnTitles: string[] = [
         'Título del tesis',
@@ -59,25 +61,42 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
         'Estado',
         ''
     ];
+    optionsConfirmationJury = [
+        { name: 'Pendiente', code: 'Pendiente' },
+        { name: 'Confirmado', code: 'Confirmado' },
+    ]
+    categories = [
+        { name: 'Si', key: true },
+        { name: 'No', key: false },
+    ]
     lastReviewerSelected = [];
     formData = new FormData();
-    reviewSelected: any;
-    edition = false;
+    presentationSelected: any;
+    getStudentListProcess = '';
     alertForCancelation: Message[] | undefined;
     messageError: string = 'Lo sentimos, hubo un problema al intentar cargar la lista de revisiones de tesis. Por favor, inténtelo de nuevo más tarde. Si el inconveniente persiste, contacte al soporte técnico.';
-    messageMoreInfo = [{ severity: 'info', detail: 'Es necesario completar todos los campos faltantes para continuar con la revisión de tesis.' }];
+    messageMoreInfo = [{ severity: 'info', detail: 'Es necesario completar todos los campos faltantes para continuar con la sustentación.' }];
     requiereMoreInfo: boolean = false;
     public tasksForm: FormGroup;
     public cancelattionForm: FormGroup;
     public reviewerForm: FormGroup;
     public studentForm: FormGroup;
+    public moreInfoForm: FormGroup;
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
     private _taskDescription: FormControl = new FormControl('', [
         Validators.required,
     ]);
-    private _reviewer: FormControl = new FormControl([], [Validators.required]);
+    private _jury: FormControl = new FormControl([], [Validators.required]);
     private _students: FormControl = new FormControl([], [Validators.required]);
+    private _receptionDateFaculty: FormControl = new FormControl("", [Validators.required]);
+    private _scheduledDate: FormControl = new FormControl("", [Validators.required]);
+    private _notificationDateGraduates: FormControl = new FormControl("", [Validators.required]);
+    private _juryConfirmation: FormControl = new FormControl("", [Validators.required]);
+    private _place: FormControl = new FormControl("", [Validators.required]);
+    private _formRequestDateRepository: FormControl = new FormControl("", [Validators.required]);
+    private _received: FormControl = new FormControl(false, [Validators.required]);
+    private _sentToLibrary: FormControl = new FormControl(false, [Validators.required]);
 
     get cancelationComment() {
         return this._cancelationComment;
@@ -88,11 +107,35 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     get taskDescription() {
         return this._taskDescription;
     }
-    get reviewer() {
-        return this._reviewer;
+    get jury() {
+        return this._jury;
     }
     get students() {
         return this._students;
+    }
+    get receptionDateFaculty() {
+        return this._receptionDateFaculty;
+    }
+    get scheduledDate() {
+        return this._scheduledDate;
+    }
+    get notificationDateGraduates() {
+        return this._notificationDateGraduates;
+    }
+    get juryConfirmation() {
+        return this._juryConfirmation;
+    }
+    get place() {
+        return this._place;
+    }
+    get formRequestDateRepository() {
+        return this._formRequestDateRepository;
+    }
+    get received() {
+        return this._received;
+    }
+    get sentToLibrary() {
+        return this._sentToLibrary;
     }
 
     constructor(
@@ -112,15 +155,27 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
             cancelationComment: this.cancelationComment,
         });
         this.reviewerForm = this.fb.group({
-            reviewer: this.reviewer,
+            reviewer: this.jury,
         });
         this.studentForm = this.fb.group({
             students: this.students,
         });
+
+        this.moreInfoForm = this.fb.group({
+            receptionDateFaculty: this.receptionDateFaculty,
+            scheduledDate: this.scheduledDate,
+            notificationDateGraduates: this.notificationDateGraduates,
+            juryConfirmation: this.juryConfirmation,
+            place: this.place,
+            formRequestDateRepository: this.formRequestDateRepository,
+            received: this.received,
+            sentToLibrary: this.sentToLibrary,
+        });
+
     }
 
     ngOnInit() {
-        this.getThesisReviewList();
+        this.getPresentationList();
         this.config.setTranslation({
             firstDayOfWeek: 1,
             dayNames: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
@@ -140,11 +195,12 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
         this.destroy$.complete();
     }
 
-    getThesisReviewList() {
+    getPresentationList() {
         this.getStatusList = 'charging';
-        this.service.getThesisReviewList().pipe(takeUntil(this.destroy$)).subscribe(
+        this.service.getPresentationList().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 console.log(res);
+                console.log(res.data)
                 this.registros = res.data;
                 this.getStatusList = 'complete'
             }, (error) => {
@@ -180,18 +236,19 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     viewDetailsReview(data: any) {
         this.loaderService.show();
         if (data) {
-            data.reviewer.length < 1
+            data.juries.length < 1
                 ? this.requiereMoreInfo = true
                 : this.requiereMoreInfo = false;
-            this.reviewSelected = data;
+            this.presentationSelected = data;
 
-            console.log('this.reviewSelected', this.reviewSelected)
-            this.reviewState = this.reviewSelected.status;
-            this.reviewState === 'Aprobado' || this.reviewState === 'Renuncia'
+            console.log('this.presentationSelected', this.presentationSelected)
+            this.presentationState = this.presentationSelected.status;
+            this.presentationState === 'Aprobado' || this.presentationState === 'Renuncia'
                 ? this.commentsVisible = false
                 : this.commentsVisible = true
+            console.log('data.juries', data.juries)
             this.students.setValue(data.degree_processes.graduates);
-            this.reviewer.setValue([data.reviewer]);
+            this.jury.setValue(data.juries);
         }
         setTimeout(() => {
             this.loaderService.hide();
@@ -200,118 +257,13 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
 
     backList() {
         this.loaderService.show();
-        this.getThesisReviewList();
-        this.reviewSelected = null;
+        this.getPresentationList();
+        this.presentationSelected = null;
         this.students.setValue([]);
-        this.reviewer.setValue([]);
+        this.jury.setValue([]);
         setTimeout(() => {
             this.loaderService.hide();
         }, 400);
-    }
-
-    goToCancelation() {
-        this.showDialogCancel = true;
-        this.alertForCancelation = [
-            { severity: 'warn', detail: 'Recuerda que una vez cancelada la asesoría no se podrá reabrir.' },
-        ];
-    }
-
-    confirmCancelation() {
-        this.showDialogCancel = false;
-        this.loaderService.show();
-        const rq = {
-            status: 'No aprobado',
-            description: this.cancelationComment.value,
-        }
-        this.service.putReviewStatusUpdate(this.reviewSelected.id, rq).pipe(
-            finalize(() => {
-                this.loaderService.hide();
-            }), takeUntil(this.destroy$)
-        ).subscribe(
-            (res: any) => {
-                if (res.status) {
-                    this.reviewState = 'No aprobado';
-                    this.messageService.add({
-                        key: 'tst',
-                        severity: 'info',
-                        summary: 'Conformación',
-                        detail: 'Se realizó la desaprobación de la asesoría.',
-                        life: 3000,
-                    });
-                    this.comments.getCommentsList();
-                    this.commentsVisible = false
-                }
-            }, (error) => {
-                this.messageService.add({
-                    key: 'tst',
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Se ha producido un error al actualizar el estado.',
-                    life: 3000,
-                });
-            });
-    }
-
-    hideCancelDialog() {
-        this.showDialogCancel = false;
-    }
-
-    goToApprove() {
-        this.confirmationService.confirm({
-            header: 'Aprobado',
-            message:
-                'Estás a punto de aprobar esta revisión de tesis, ¿estás seguro(a)?.',
-            acceptIcon: 'pi pi-check mr-2',
-            rejectIcon: 'pi pi-times mr-2',
-            rejectButtonStyleClass: 'p-button-sm',
-            acceptButtonStyleClass: 'p-button-outlined p-button-sm',
-            accept: () => {
-                this.loaderService.show();
-                const rq = {
-                    status: 'Aprobado',
-                }
-                this.service.putReviewStatusUpdate(this.reviewSelected.id, rq).pipe(
-                    finalize(() => {
-                        this.loaderService.hide();
-                    }), takeUntil(this.destroy$)
-                ).subscribe(
-                    (res: any) => {
-                        if (res.status) {
-                            this.reviewState = 'Aprobado';
-                            this.messageService.add({
-                                key: 'tst',
-                                severity: 'info',
-                                summary: 'Conformación',
-                                detail: 'Se ha realizado la aprobación de la revisión de tesis.',
-                                life: 3000,
-                            });
-                            this.commentsVisible = false
-                        }
-                    }, (error) => {
-                        this.messageService.add({
-                            key: 'tst',
-                            severity: 'error',
-                            summary: 'Error',
-                            detail: 'Se ha producido un error al actualizar el estado.',
-                            life: 3000,
-                        });
-                    });
-            },
-            reject: () => { },
-        });
-    }
-
-
-    formatText(text: string): string {
-        return text.replace(/\n/g, '<br>');
-    }
-
-    scrollDown(): void {
-        window.scroll({
-            top: document.body.scrollHeight,
-            left: 0,
-            behavior: 'smooth',
-        });
     }
 
     getFirstLetter(str: string): string {
@@ -325,7 +277,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     }
 
     getTeacherSelected(userSelected: any) {
-        this.reviewer.setValue(userSelected);
+        this.jury.setValue(userSelected);
     }
 
     getStudentSelected(userSelected: any) {
@@ -334,23 +286,31 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
 
     handleReload(reload: boolean) {
         if (reload) {
-            this.getThesisReviewList();
+            this.getPresentationList();
         }
     }
 
     saveMoreInfo() {
         this.loaderService.show(true);
-        const rq = {
-            user_id: this.reviewer.value[0].id,
+        const request = {
+            juries: this.extractIds(this.jury.value),
+            place: this.place.value,
+            scheduled_date: this.dateFormatService.transformDDMMYYYY(this.scheduledDate.value),
+            reception_date_faculty: this.dateFormatService.transformDDMMYYYY(this.receptionDateFaculty.value),
+            notification_date_graduates: this.dateFormatService.transformDDMMYYYY(this.notificationDateGraduates.value),
+            jury_confirmation: this.juryConfirmation.value.code,
+            form_request_date_repository: this.dateFormatService.transformDDMMYYYY(this.formRequestDateRepository.value),
+            received: this.received.value.key,
+            sent_to_library: this.sentToLibrary.value.key
         }
-        this.service.putReviewUpdate(this.reviewSelected.id, rq).pipe(
+        this.service.putPresentationUpdate(this.presentationSelected.id, request).pipe(
             finalize(() => {
                 this.loaderService.hide();
             })
         ).subscribe(
             (res: any) => {
                 if (res.status) {
-                    this.reviewerSelectedUpdate();
+                    this.presentationSelectedUpdate();
                     this.requiereMoreInfo = false;
                     this.messageService.add({
                         key: 'tst',
@@ -371,8 +331,16 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
             })
     }
 
-    reviewerSelectedUpdate(): void {
-        this.reviewSelected.reviewer = this.reviewer.value;
+    presentationSelectedUpdate(): void {
+        this.presentationSelected.reviewer = this.jury.value;
+        this.presentationSelected.reception_date_faculty = this.dateFormatService.transformDDMMYYYY(this.receptionDateFaculty.value);
+        this.presentationSelected.scheduled_date = this.dateFormatService.transformDDMMYYYY(this.scheduledDate.value);
+        this.presentationSelected.notification_date_graduates = this.dateFormatService.transformDDMMYYYY(this.notificationDateGraduates.value);
+        this.presentationSelected.jury_confirmation = this.juryConfirmation.value;
+        this.presentationSelected.place = this.place.value;
+        this.presentationSelected.form_request_date_repository = this.dateFormatService.transformDDMMYYYY(this.formRequestDateRepository.value);
+        this.presentationSelected.received = this.received.value;
+        this.presentationSelected.sent_to_library = this.sentToLibrary.value;
     }
 
     onFileChange(files: any) {
@@ -398,7 +366,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     saveFiles() {
         this.loaderService.show(true);
         this.showDialogAddFiles = false;
-        this.service.postRegisterReviewFile(this.formData, this.reviewSelected.id).pipe(
+        this.service.postRegisterReviewFile(this.formData, this.presentationSelected.id).pipe(
             finalize(() => {
                 this.upload.clearFile()
                 this.loaderService.hide();
@@ -434,48 +402,44 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     }
 
     showEdition() {
-        this.lastReviewerSelected = this.reviewer.value;
+        this.lastReviewerSelected = this.jury.value;
         this.edition = true;
     }
 
     cancelEdition() {
-        this.reviewer.setValue(this.lastReviewerSelected);
+        this.jury.setValue(this.lastReviewerSelected);
         this.reviewerSelection.userFormControl.setValue(this.lastReviewerSelected);
         this.edition = false;
-
     }
 
     saveEdition() {
-        this.loaderService.show(true);
+        this.edition = false;
+    }
+
+    extractIds(arr: Array<{ id: string }>): string[] {
+        return arr.map(item => item.id);
+    }
+
+    callPutPresentationUpdateStatus(status: string) {
         const rq = {
-            user_id: this.reviewer.value[0].id,
+            status: status
         }
-        this.service.putReviewUpdate(this.reviewSelected.id, rq).pipe(
-            finalize(() => {
-                this.loaderService.hide();
-            })
-        ).subscribe(
+        this.service.putPresentationUpdateStatus(this.presentationSelected.id, rq).pipe().subscribe(
             (res: any) => {
                 if (res.status) {
-                    this.reviewerSelectedUpdate();
-                    this.edition = false;
-                    this.messageService.add({
-                        key: 'tst',
-                        severity: 'info',
-                        summary: 'Confirmado',
-                        detail: 'Lo datos han sido guardados.',
-                        life: 3000,
-                    });
+                    this.presentationState = status;
                 }
             }, (error) => {
-                this.messageService.add({
-                    key: 'tst',
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'Se ha producido un error al guardar la información.',
-                    life: 3000,
-                });
-            })
 
+            })
     }
+
+    goToDisapproved() {
+        this.callPutPresentationUpdateStatus('No aprobado');
+    }
+
+    goToApprove() {
+        this.callPutPresentationUpdateStatus('Aprobado');
+    }
+
 }

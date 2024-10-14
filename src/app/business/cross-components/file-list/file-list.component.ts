@@ -28,31 +28,31 @@ export class FileListComponent implements OnInit, OnDestroy {
   ];
   responsiveOptions = [
     {
-        breakpoint: '1400px',
-        numVisible: 3,
-        numScroll: 3
+      breakpoint: '1400px',
+      numVisible: 3,
+      numScroll: 3
     },
     {
-        breakpoint: '1220px',
-        numVisible: 2,
-        numScroll: 2
+      breakpoint: '1220px',
+      numVisible: 2,
+      numScroll: 2
     },
     {
-        breakpoint: '1100px',
-        numVisible: 1,
-        numScroll: 1
+      breakpoint: '1100px',
+      numVisible: 1,
+      numScroll: 1
     },
     {
       breakpoint: '990px',
       numVisible: 2,
       numScroll: 1
-  },
-  {
-    breakpoint: '760px',
-    numVisible: 1,
-    numScroll: 1
-}
-];
+    },
+    {
+      breakpoint: '760px',
+      numVisible: 1,
+      numScroll: 1
+    }
+  ];
 
 
   constructor(private service: AuthService, private serviceFile: FileListService, public tokenService: TokenService) { }
@@ -99,6 +99,15 @@ export class FileListComponent implements OnInit, OnDestroy {
         break;
       case eModule.review:
         this.service.getThesisReviewFiles(this.id).pipe(takeUntil(this.destroy$)).subscribe(
+          (res: any) => {
+            this.files = res.data;
+            this.status = 'complete';
+          }, (error) => {
+            this.status = 'error';
+          })
+        break;
+      case eModule.presentation:
+        this.serviceFile.getPresentationFiles(this.id).pipe(takeUntil(this.destroy$)).subscribe(
           (res: any) => {
             this.files = res.data;
             this.status = 'complete';
@@ -166,6 +175,9 @@ export class FileListComponent implements OnInit, OnDestroy {
         break;
       case eModule.review:
         this.callDeleteReviewArchive(archiveId)
+        break;
+      case eModule.presentation:
+        this.callDeletePresentationArchive(archiveId)
         break;
     }
   }
@@ -252,6 +264,20 @@ export class FileListComponent implements OnInit, OnDestroy {
   }
 
   callDeleteEventUdiArchive(archiveId: string) {
+    this.serviceFile.deleteEventUdiArchive(this.id, archiveId).pipe(
+      takeUntil(this.destroy$)
+    ).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            this.confirmRemoveArchive(archiveId);
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callDeletePresentationArchive(archiveId: string) {
     this.serviceFile.deleteEventUdiArchive(this.id, archiveId).pipe(
       takeUntil(this.destroy$)
     ).

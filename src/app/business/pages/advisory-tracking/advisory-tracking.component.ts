@@ -337,7 +337,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
     goToReview() {
         this.loaderService.show();
         const rq = {
-            status: 'En revisión'
+            status: 'En Revisión'
         }
         this.service.putAdvisoryStatusUpdate(this.advisorySelected.id, rq).pipe(
             finalize(() => {
@@ -353,7 +353,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
                         detail: 'La asesoría pasó a Revisión.',
                         life: 3000,
                     });
-                    this.advisoryState = 'En revisión';
+                    this.advisoryState = 'En Revisión';
                 }
             }, (error) => {
                 this.messageService.add({

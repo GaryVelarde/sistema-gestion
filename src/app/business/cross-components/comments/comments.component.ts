@@ -78,6 +78,9 @@ export class CommentsComponent implements OnInit, OnDestroy {
       case eModule.review:
         this.getCommentsByThesisReview();
         break;
+      case eModule.presentation:
+        this.getCommentsByPresentation();
+        break;
     }
   }
 
@@ -187,6 +190,18 @@ export class CommentsComponent implements OnInit, OnDestroy {
             this.registerState = 'complete';
           });
         break;
+      case eModule.presentation:
+        this.commentService.postAddPresentationComment(this.id, rq).pipe(takeUntil(this.destroy$)).subscribe(
+          (res: any) => {
+            if (res.status) {
+              this.registerState = 'complete';
+              this.confirmAddEvent(res.id);
+            }
+            console.log(res);
+          }, (error) => {
+            this.registerState = 'complete';
+          });
+        break;
     }
   }
 
@@ -266,6 +281,26 @@ export class CommentsComponent implements OnInit, OnDestroy {
       })
   }
 
+  getCommentsByPresentation() {
+    this.state = 'charging';
+    this.registerState = 'charging';
+    this.commentService.getCommentsByPresentation(this.id).pipe(takeUntil(this.destroy$)).subscribe(
+      (res: any) => {
+        res.data.forEach(item => {
+          item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
+        });
+        this.comments = res.data;
+        this.updateVisibleComments();
+        this.state = 'complete';
+        this.registerState = 'complete';
+      },
+      (error) => {
+        this.state = 'error';
+        this.registerState = 'complete';
+      })
+  }
+
+
   getCommentsByAdvisory() {
     this.state = 'charging';
     this.registerState = 'charging';
@@ -290,14 +325,14 @@ export class CommentsComponent implements OnInit, OnDestroy {
     this.registerState = 'charging';
     this.service.getCommentsByEventsUDI(this.id).pipe(takeUntil(this.destroy$)).subscribe(
       (res: any) => {
-      res.data.forEach(item => {
-        item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
-      });
-      this.comments = res.data;
-      this.updateVisibleComments();
-      this.state = 'complete';
-      this.registerState = 'complete';
-    },
+        res.data.forEach(item => {
+          item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
+        });
+        this.comments = res.data;
+        this.updateVisibleComments();
+        this.state = 'complete';
+        this.registerState = 'complete';
+      },
       (error) => {
         this.state = 'error';
         this.registerState = 'complete';
@@ -364,6 +399,9 @@ export class CommentsComponent implements OnInit, OnDestroy {
       case eModule.review:
         this.callPutReviewCommentUpdate(comment);
         break;
+      case eModule.presentation:
+        this.callPutPresentationCommentUpdate(comment);
+        break;
     }
   }
 
@@ -388,6 +426,9 @@ export class CommentsComponent implements OnInit, OnDestroy {
         break;
       case eModule.review:
         this.callDeleteReviewComment(comment);
+        break;
+      case eModule.presentation:
+        this.callDeletePresentationComment(comment);
         break;
     }
   }
@@ -434,6 +475,21 @@ export class CommentsComponent implements OnInit, OnDestroy {
 
         })
   }
+
+  callPutPresentationCommentUpdate(comment: any) {
+    const request = {
+      description: comment.description
+    };
+    this.commentService.putPresentationCommentUpdate(this.id, comment.id, request).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          comment.isEditing = false;
+        }, (error) => {
+
+        })
+  }
+
   callPutEventUdiCommentUpdate(comment: any) {
     const request = {
       description: comment.description
@@ -502,6 +558,25 @@ export class CommentsComponent implements OnInit, OnDestroy {
 
   callDeleteReviewComment(comment) {
     this.commentService.deleteReviewComment(this.id, comment.id).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            const commentId = comment.id;
+            const index = this.comments.findIndex(comment => comment.id === commentId);
+            if (index !== -1) {
+              this.comments.splice(index, 1);
+              this.comments = [...this.comments];
+              this.updateVisibleComments();
+            }
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callDeletePresentationComment(comment) {
+    this.commentService.deletePresentationComment(this.id, comment.id).
       pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {

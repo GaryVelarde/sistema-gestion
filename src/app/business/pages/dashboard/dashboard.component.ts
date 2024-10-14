@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { Subject, Subscription, debounceTime, takeUntil } from 'rxjs';
+import { classByStatusReport } from 'src/app/commons/constants/app.constants';
 import { ProductService } from 'src/app/demo/service/product.service';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -14,9 +15,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     products!: any[];
 
-    chartData: any;
-
+    chartDataInscription: any;
+    chartDataAdvisory: any;
+    chartDataReview: any;
+    chartDataPresentation: any;
+    labels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Dic'];
     chartOptions: any;
+
+    statusChartInscription = '';
+    statusChartAdvisory = '';
+    statusChartReview = '';
+    statusChartPresentation = '';
+    statusChartArticles = '';
 
     subscription!: Subscription;
 
@@ -27,6 +37,34 @@ export class DashboardComponent implements OnInit, OnDestroy {
     notificationsToday = [];
     notificationsYesterday = [];
     notificationsDaysAgo = {};
+
+    dataArticles: any;
+
+    optionsArticles: any;
+
+    years = [
+        { name: '2024', code: '2024' },
+        { name: '2023', code: '2023' },
+        { name: '2022', code: '2022' },
+        { name: '2021', code: '2021' },
+        { name: '2020', code: '2020' },
+        { name: '2019', code: '2019' },
+        { name: '2018', code: '2018' },
+        { name: '2017', code: '2017' },
+        { name: '2016', code: '2016' },
+        { name: '2015', code: '2015' },
+        { name: '2014', code: '2014' },
+        { name: '2013', code: '2013' },
+        { name: '2012', code: '2012' },
+        { name: '2011', code: '2011' },
+        { name: '2010', code: '2010' }
+    ];
+    yearSelectedByInscription: any = { name: '2024', code: '2024' };
+    yearSelectedByAdvisory: any = { name: '2024', code: '2024' };
+    yearSelectedByReview: any = { name: '2024', code: '2024' };
+    yearSelectedByPresentation: any = { name: '2024', code: '2024' };
+    yearSelectedByArticles: any = { name: '2024', code: '2024' };
+
     private destroy$ = new Subject<void>();
 
     messageError = 'Ha ocurrido un error al cargar las notificaciones. Por favor, inténtalo de nuevo más tarde.'
@@ -42,8 +80,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.callGetNotificationReport();
         this.initChart();
+        this.callGetReportByArticles();
         this.productService.getProductsSmall().then(data => this.products = data);
-
         this.items = [
             { label: 'Add New', icon: 'pi pi-fw pi-plus' },
             { label: 'Remove', icon: 'pi pi-fw pi-minus' }
@@ -124,7 +162,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     getNotificationIcon(text: string): string {
-        console.log(text);
         if (text.includes("en la reunión")) {
             return "pi pi-fw pi-calendar-plus";
         } else if (text.includes("en el artículo")) {
@@ -151,35 +188,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
         const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-        this.chartData = {
-            labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Dic'],
-            datasets: [
-                {
-                    label: 'En revision',
-                    data: [65, 59, 80, 81, 56, 55, 40],
-                    fill: false,
-                    backgroundColor: documentStyle.getPropertyValue('--bluegray-700'),
-                    borderColor: documentStyle.getPropertyValue('--bluegray-700'),
-                    tension: .4
-                },
-                {
-                    label: 'Aprobado',
-                    data: [28, 48, 40, 19, 86, 27, 110],
-                    fill: false,
-                    backgroundColor: documentStyle.getPropertyValue('--green-600'),
-                    borderColor: documentStyle.getPropertyValue('--green-600'),
-                    tension: .4
-                },
-                {
-                    label: 'Cancelado',
-                    data: [0,0,0,0,0,0,1],
-                    fill: false,
-                    backgroundColor: documentStyle.getPropertyValue('--red-600'),
-                    borderColor: documentStyle.getPropertyValue('--red-600'),
-                    tension: .4
-                }
-            ]
-        };
+        this.fillChartInscription();
+
+        this.fillChartAdvisory();
+
+        this.fillChartReview();
+
+        this.fillChartPresentation();
 
         this.chartOptions = {
             plugins: {
@@ -212,11 +227,187 @@ export class DashboardComponent implements OnInit, OnDestroy {
         };
     }
 
+    fillChartInscription() {
+        this.statusChartInscription = 'charging'
+        const documentStyle = getComputedStyle(document.documentElement);
+        this.service.getInscriptionMonthlyReport(this.yearSelectedByInscription.code).pipe().
+            subscribe(
+                (res: any) => {
+                    let datasets = [];
+                    let count = 1;
+                    for (let data of res.data) {
+                        const obj = {
+                            label: data.status,
+                            data: data.total_month,
+                            fill: false,
+                            backgroundColor: documentStyle.getPropertyValue(classByStatusReport[count.toString()].class),
+                            borderColor: documentStyle.getPropertyValue(classByStatusReport[count.toString()].class),
+                            tension: .4
+                        }
+                        datasets.push(obj);
+                        count++;
+                    }
+                    this.chartDataInscription = {
+                        labels: this.labels,
+                        datasets: datasets
+                    };
+                    this.statusChartInscription = 'complete'
+                }, (error) => {
+                    this.statusChartInscription = 'error'
+                })
+    }
+
+    fillChartAdvisory() {
+        this.statusChartAdvisory = 'charging';
+        const documentStyle = getComputedStyle(document.documentElement);
+        this.service.getAdvisoryMonthlyReport(this.yearSelectedByAdvisory.code).pipe().
+            subscribe(
+                (res: any) => {
+                    let datasets = [];
+                    let count = 1;
+                    for (let data of res.data) {
+                        const obj = {
+                            label: data.status,
+                            data: data.total_month,
+                            fill: false,
+                            backgroundColor: documentStyle.getPropertyValue(classByStatusReport[count.toString()].class),
+                            borderColor: documentStyle.getPropertyValue(classByStatusReport[count.toString()].class),
+                            tension: .4
+                        }
+                        datasets.push(obj);
+                        count++;
+                    }
+
+                    this.chartDataAdvisory = {
+                        labels: this.labels,
+                        datasets: datasets
+                    };
+                    this.statusChartAdvisory = 'complete';
+                }, (error) => {
+                    this.statusChartAdvisory = 'error';
+                })
+    }
+
+    fillChartReview() {
+        this.statusChartReview = 'charging';
+        const documentStyle = getComputedStyle(document.documentElement);
+        this.service.getReviewsMonthlyReport(this.yearSelectedByReview.code).pipe().
+            subscribe(
+                (res: any) => {
+                    let datasets = [];
+                    let count = 1;
+                    for (let data of res.data) {
+                        const obj = {
+                            label: data.status,
+                            data: data.total_month,
+                            fill: false,
+                            backgroundColor: documentStyle.getPropertyValue(classByStatusReport[count.toString()].class),
+                            borderColor: documentStyle.getPropertyValue(classByStatusReport[count.toString()].class),
+                            tension: .4
+                        }
+                        datasets.push(obj);
+                        count++;
+                    }
+                    this.chartDataReview = {
+                        labels: this.labels,
+                        datasets: datasets
+                    };
+                    this.statusChartReview = 'complete';
+                }, (error) => {
+                    this.statusChartReview = 'error';
+                })
+    }
+
+    fillChartPresentation() {
+        this.statusChartPresentation = 'charging';
+        const documentStyle = getComputedStyle(document.documentElement);
+        this.service.getPresentationMonthlyReport(this.yearSelectedByPresentation.code).pipe().
+            subscribe(
+                (res: any) => {
+                    let datasets = [];
+                    let count = 1;
+                    for (let data of res.data) {
+                        const obj = {
+                            label: data.status,
+                            data: data.total_month,
+                            fill: false,
+                            backgroundColor: documentStyle.getPropertyValue(classByStatusReport[count.toString()].class),
+                            borderColor: documentStyle.getPropertyValue(classByStatusReport[count.toString()].class),
+                            tension: .4
+                        }
+                        datasets.push(obj);
+                        count++;
+                    }
+                    this.chartDataPresentation = {
+                        labels: this.labels,
+                        datasets: datasets
+                    };
+                    this.statusChartPresentation = 'complete';
+                }, (error) => {
+                    this.statusChartPresentation = 'error';
+                })
+    }
+
     ngOnDestroy() {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
         this.destroy$.next();
         this.destroy$.complete();
+    }
+
+    callGetReportByArticles() {
+        this.statusChartArticles = 'charging';
+        const documentStyle = getComputedStyle(document.documentElement);
+        const textColor = documentStyle.getPropertyValue('--text-color');
+        const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+        const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
+
+        this.service.getArticlesMonthlyReport(this.yearSelectedByArticles.code).pipe().subscribe((res: any) => {
+            console.log(res)
+
+            if(res.data) {
+                this.statusChartArticles = 'complete';
+                this.dataArticles = {
+                    labels: res.data.status,
+                    datasets: [
+                        {
+                            data: res.data.total,
+                            backgroundColor: [
+                                documentStyle.getPropertyValue('--blue-500'), 
+                                documentStyle.getPropertyValue('--yellow-500'), 
+                                documentStyle.getPropertyValue('--green-500'), 
+                                documentStyle.getPropertyValue('--orange-500'), 
+                                documentStyle.getPropertyValue('--pink-500'),
+                            ],
+                            hoverBackgroundColor: [
+                                documentStyle.getPropertyValue('--blue-400'), 
+                                documentStyle.getPropertyValue('--yellow-400'), 
+                                documentStyle.getPropertyValue('--green-400'),
+                                documentStyle.getPropertyValue('--orange-500'), 
+                                documentStyle.getPropertyValue('--pink-500'),
+                            ]
+                        }
+                    ]
+                };
+    
+                this.optionsArticles = {
+                    plugins: {
+                        legend: {
+                            labels: {
+                                usePointStyle: true,
+                                color: textColor
+                            }
+                        }
+                    }
+                };
+            }
+            
+
+
+        }, (error) => {
+            this.statusChartArticles = 'error';
+
+        })
     }
 }

@@ -29,7 +29,7 @@ export class Step1Component implements OnInit {
 	}
 
 	goToList(): void {
-		void this.router.navigate(['pages/inscription-tracking']);
+		void this.router.navigate(['pages/inscripciones']);
 	}
 
 	validateComplete() {

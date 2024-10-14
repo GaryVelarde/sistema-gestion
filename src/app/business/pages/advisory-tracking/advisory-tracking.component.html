@@ -228,7 +228,7 @@
                     />
                     <p-button
                         *ngIf="
-                            (advisoryState === 'En Asesoría' ||
+                            (advisoryState === 'En asesoría' ||
                                 advisoryState === 'Observado') &&
                             !showEdit
                         "
@@ -240,7 +240,7 @@
                         (click)="goToReview()"
                     />
                     <p-button
-                        *ngIf="advisoryState === 'En revisión' && !showEdit"
+                        *ngIf="advisoryState === 'En Revisión' && !showEdit"
                         label="Observado"
                         [outlined]="true"
                         icon="pi pi-exclamation-circle"
@@ -249,7 +249,7 @@
                         (click)="goToObserved()"
                     />
                     <p-button
-                        *ngIf="advisoryState === 'En revisión' && !showEdit"
+                        *ngIf="advisoryState === 'En Revisión' && !showEdit"
                         class="ml-3"
                         label="Aprobado"
                         [outlined]="true"
@@ -328,9 +328,9 @@
                             value="En asesoría"
                         />
                         <p-tag
-                            *ngIf="advisoryState === 'En revisión'"
+                            *ngIf="advisoryState === 'En Revisión'"
                             severity="info"
-                            value="En revisión"
+                            value="En Revisión"
                         />
                         <p-tag
                             *ngIf="advisoryState === 'Observado'"
@@ -449,9 +449,9 @@
                             value="En asesoría"
                         />
                         <p-tag
-                            *ngIf="advisoryState === 'En revisión'"
+                            *ngIf="advisoryState === 'En Revisión'"
                             severity="info"
-                            value="En revisión"
+                            value="En Revisión"
                         />
                         <p-tag
                             *ngIf="advisoryState === 'Observado'"

@@ -29,10 +29,10 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Proceso de titulación',
                 items: [
-                    { label: 'Proyecto de Tesis', icon: 'pi pi-fw pi-file', routerLink: ['/pages/inscription-tracking'] },
+                    { label: 'Proyecto de Tesis', icon: 'pi pi-fw pi-file', routerLink: ['/pages/inscripciones'] },
                     { label: 'Asesorías', icon: 'pi pi-fw pi-file-import', routerLink: ['/pages/asesorias'] },
-                    { label: 'Revisión de tesis', icon: 'pi pi-fw pi-file-export', routerLink: ['/pages/thesis-review-tracking'] },
-                    { label: 'Sustentación', icon: 'pi pi-fw pi-graduation-cap', routerLink: ['/pages/a'] },
+                    { label: 'Revisión de tesis', icon: 'pi pi-fw pi-file-export', routerLink: ['/pages/revision'] },
+                    { label: 'Sustentación', icon: 'pi pi-fw pi-graduation-cap', routerLink: ['/pages/sustentacion'] },
                 ]
             },
             {
@@ -58,6 +58,12 @@ export class AppMenuComponent implements OnInit {
                 label: 'Reuniones UDI',
                 items: [
                     { label: 'Agenda UDI', icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/pages/agenda-udi'] },
+                ]
+            },
+            {
+                label: 'Líneas y Guías',
+                items: [
+                    { label: 'Seguimiento', icon: 'pi pi-fw pi-file-check', routerLink: ['/pages/agenda-udi'] },
                 ]
             },
         ];

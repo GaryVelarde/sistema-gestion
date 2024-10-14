@@ -7,7 +7,7 @@ import { isUserAuthenticatedGuard } from 'src/app/guards/auth.guard';
         { path: '', loadChildren: () => import('./dashboard/dashboard.module').then(m => m.DashboardModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'users', loadChildren: () => import('./users/users.module').then(m => m.UsersModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'new-titulation-process', loadChildren: () => import('./inscription/insctiption.module').then(m => m.InsctiptionModule), canActivate: [isUserAuthenticatedGuard] },
-        { path: 'inscription-tracking', loadChildren: () => import('./inscription-tracking/inscription-tracking.module').then(m => m.InscriptionTrackingModule), canActivate: [isUserAuthenticatedGuard] },
+        { path: 'inscripciones', loadChildren: () => import('./inscription-tracking/inscription-tracking.module').then(m => m.InscriptionTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'events', loadChildren: () => import('./events/events.module').then(m => m.EventsModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'agenda-udi', loadChildren: () => import('./events-udi/events-udi.module').then(m => m.EventsUdiModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'asesorias', loadChildren: () => import('./advisory-tracking/advisory-tracking.module').then(m => m.AdvisoryTrackingModule), canActivate: [isUserAuthenticatedGuard] },
@@ -16,7 +16,8 @@ import { isUserAuthenticatedGuard } from 'src/app/guards/auth.guard';
         { path: 'planes', loadChildren: () => import('./plans/plans.module').then(m => m.PlansModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'registro-planes', loadChildren: () => import('./plans-register/plans-register.module').then(m => m.PlansRegisterModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'presupuestos', loadChildren: () => import('./budget/budget.module').then(m => m.BudgetModule), canActivate: [isUserAuthenticatedGuard] },
-        { path: 'thesis-review-tracking', loadChildren: () => import('./thesis-review-tracking/thesis-review-tracking.module').then(m => m.ThesisReviewTrackingModule), canActivate: [isUserAuthenticatedGuard] },
+        { path: 'revision', loadChildren: () => import('./thesis-review-tracking/thesis-review-tracking.module').then(m => m.ThesisReviewTrackingModule), canActivate: [isUserAuthenticatedGuard] },
+        { path: 'sustentacion', loadChildren: () => import('./presentation-tracking/presentation-tracking.module').then(m => m.PresentationTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: '**', redirectTo: '/notfound' }
     ])],
     exports: [RouterModule]

@@ -254,7 +254,7 @@
                         (click)="goToReview()"
                     />
                     <p-button
-                        *ngIf="inscriptionState === 'En revisión' && !showEdit"
+                        *ngIf="inscriptionState === 'En Revisión' && !showEdit"
                         label="Observado"
                         [outlined]="true"
                         icon="pi pi-exclamation-circle"
@@ -263,7 +263,7 @@
                         (click)="goToObserved()"
                     />
                     <p-button
-                        *ngIf="inscriptionState === 'En revisión' && !showEdit"
+                        *ngIf="inscriptionState === 'En Revisión' && !showEdit"
                         class="ml-3"
                         label="Aprobado"
                         [outlined]="true"
@@ -351,9 +351,9 @@
                             value="Inscrito"
                         />
                         <p-tag
-                            *ngIf="inscriptionState === 'En revisión'"
+                            *ngIf="inscriptionState === 'En Revisión'"
                             severity="info"
-                            value="En revisión"
+                            value="En Revisión"
                         />
                         <p-tag
                             *ngIf="inscriptionState === 'Observado'"
@@ -451,9 +451,9 @@
                             value="Inscrito"
                         />
                         <p-tag
-                            *ngIf="inscriptionState === 'En revisión'"
+                            *ngIf="inscriptionState === 'En Revisión'"
                             severity="info"
-                            value="En revisión"
+                            value="En Revisión"
                         />
                         <p-tag
                             *ngIf="inscriptionState === 'Observado'"
