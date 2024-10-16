@@ -3,21 +3,31 @@
     <div class="col-12">
         <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
         <div class="card px-6 py-6">
-            <div class="mr-auto mb-3">
+            <div class="flex col-12">
+                <div class="mr-auto mb-3">
+                    <p-button
+                        (click)="backList()"
+                        label="Regresar"
+                        [outlined]="true"
+                        icon="pi pi-angle-left"
+                        iconPos="left"
+                    />
+                </div>
                 <p-button
-                    (click)="backList()"
-                    label="Regresar"
-                    [outlined]="true"
-                    icon="pi pi-angle-left"
+                    class="ml-3"
+                    label="Guardar plan"
+                    icon="pi pi-save"
                     iconPos="left"
+                    (click)="savePlan()"
                 />
             </div>
+
             <div>
-                <form [formGroup]="actividadForm" (ngSubmit)="onSubmit()">
+                <form [formGroup]="actividadForm">
                     <!-- Campo para el Título General -->
                     <div class="p-field p-grid">
                         <label for="tituloGeneral" class="col-12"
-                            >Título General</label
+                            >Título del nuevo plan</label
                         >
                         <div class="col-12">
                             <input
@@ -30,11 +40,11 @@
                             />
                         </div>
                     </div>
-                    <!-- Actividades -->
-                    <div formArrayName="actividades">
+                    <!-- activities -->
+                    <div formArrayName="activities">
                         <div
                             *ngFor="
-                                let actividad of actividades.controls;
+                                let actividad of activities.controls;
                                 let i = index
                             "
                             [formGroupName]="i"
@@ -48,10 +58,8 @@
                             <div class="flex">
                                 <div class="mr-auto">
                                     <label for="tituloGeneral" class="col-12">
-                                        {{
-                                            i + 1 + ". Actividad Funcional"
-                                        }}</label
-                                    >
+                                        {{ i + 1 + ". Actividad Funcional" }}
+                                    </label>
                                 </div>
                                 <button
                                     pButton
@@ -71,7 +79,7 @@
                                         pInputText
                                         id="descripcion"
                                         style="width: 100%"
-                                        formControlName="descripcion"
+                                        formControlName="description"
                                         placeholder="Descripción de la actividad"
                                         class="p-inputtext-sm"
                                     />
@@ -84,10 +92,10 @@
                                 [toggleable]="true"
                                 class="mb-3"
                             >
-                                <div formArrayName="tareas">
+                                <div formArrayName="tasks">
                                     <div
                                         *ngFor="
-                                            let tarea of tareas(i).controls;
+                                            let tarea of tasks(i).controls;
                                             let j = index
                                         "
                                         [formGroupName]="j"
@@ -99,16 +107,23 @@
                                                 for="tarea-descripcion"
                                                 class="m-auto mr-2"
                                             >
-                                                {{
-                                                    i + 1 + "." + (j + 1)
-                                                }}</label
-                                            >
+                                                <span
+                                                    *ngIf="
+                                                        tarea.get('taskCode')
+                                                    "
+                                                    >{{
+                                                        tarea.get("taskCode")
+                                                            .value
+                                                    }}</span
+                                                >
+                                            </label>
+
                                             <div class="w-full">
                                                 <input
                                                     pInputText
                                                     id="tarea-descripcion"
                                                     style="width: 100%"
-                                                    formControlName="descripcion"
+                                                    formControlName="description"
                                                     placeholder="Descripción de la tarea"
                                                     class="p-inputtext-sm"
                                                 />
@@ -133,13 +148,13 @@
                                             >
                                             <div class="p-col-12 p-md-10">
                                                 <div
-                                                    formArrayName="meses"
+                                                    formArrayName="months"
                                                     class="p-grid p-align-center p-justify-center flex"
                                                 >
                                                     <div
                                                         *ngFor="
                                                             let mes of tarea.get(
-                                                                'meses'
+                                                                'months'
                                                             ).controls;
                                                             let k = index
                                                         "
@@ -165,7 +180,7 @@
                                             <div class="p-col-12 p-md-10">
                                                 <textarea
                                                     pInputTextarea
-                                                    formControlName="comentario"
+                                                    formControlName="comment"
                                                     placeholder="Comentario opcional"
                                                     rows="3"
                                                     autoResize="true"
@@ -189,8 +204,7 @@
                             </p-panel>
                         </div>
                     </div>
-
-                    <div class="flex">
+                    <div class="col-12">
                         <button
                             pButton
                             type="button"
@@ -198,19 +212,13 @@
                             icon="pi pi-plus"
                             class="p-button p-button-success mr-auto"
                             (click)="addActividad()"
-                        ></button>
-                        <button
-                            pButton
-                            type="submit"
-                            label="Guardar"
-                            icon="pi pi-save"
-                            class="p-button-primary"
+                            [disabled]="!actividadForm.controls['tituloGeneral'].value"
                         ></button>
                     </div>
                 </form>
             </div>
             <div class="col-12 mt-6">
-                <h3>Vista Previa de Actividades</h3>
+                <h3>Vista previa del plan</h3>
                 <p-table
                     [value]="previewData"
                     styleClass="p-datatable-gridlines"
@@ -218,7 +226,7 @@
                 >
                     <ng-template pTemplate="header">
                         <tr>
-                            <th>COD.ACT</th>
+                            <th>COD. ACT</th>
                             <th>ACTIVIDAD FUNCIONAL</th>
                             <th>COD. TAREA</th>
                             <th>TAREAS</th>
@@ -257,20 +265,20 @@
                                 {{ data.actividadFuncional }}
                             </td>
 
-                            <td>{{ data.codTarea }}</td>
+                            <td>{{ data.taskCode }}</td>
                             <td>{{ data.tarea }}</td>
-                            <td [innerHTML]="data.meses[0]"></td>
-                            <td [innerHTML]="data.meses[1]"></td>
-                            <td [innerHTML]="data.meses[2]"></td>
-                            <td [innerHTML]="data.meses[3]"></td>
-                            <td [innerHTML]="data.meses[4]"></td>
-                            <td [innerHTML]="data.meses[5]"></td>
-                            <td [innerHTML]="data.meses[6]"></td>
-                            <td [innerHTML]="data.meses[7]"></td>
-                            <td [innerHTML]="data.meses[8]"></td>
-                            <td [innerHTML]="data.meses[9]"></td>
-                            <td [innerHTML]="data.meses[10]"></td>
-                            <td [innerHTML]="data.meses[11]"></td>
+                            <td [innerHTML]="data.months[0]"></td>
+                            <td [innerHTML]="data.months[1]"></td>
+                            <td [innerHTML]="data.months[2]"></td>
+                            <td [innerHTML]="data.months[3]"></td>
+                            <td [innerHTML]="data.months[4]"></td>
+                            <td [innerHTML]="data.months[5]"></td>
+                            <td [innerHTML]="data.months[6]"></td>
+                            <td [innerHTML]="data.months[7]"></td>
+                            <td [innerHTML]="data.months[8]"></td>
+                            <td [innerHTML]="data.months[9]"></td>
+                            <td [innerHTML]="data.months[10]"></td>
+                            <td [innerHTML]="data.months[11]"></td>
                             <td>{{ data.avances }}</td>
                         </tr>
                     </ng-template>

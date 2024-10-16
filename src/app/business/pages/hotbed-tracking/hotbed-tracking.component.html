@@ -280,11 +280,13 @@
                     />
                 </div>
                 <div class="col-3">
-                    <p class="font-bold">Grupo:</p>
-                    <p>Nro. {{ articleSelected.group }}</p>
+                    <p class="font-bold">Fecha de registro:</p>
+                    <p>{{ articleSelected.created_at }}</p>
                 </div>
-                <div class="col-3"></div>
-                <div class="col-3"></div>
+                <div class="col-6">
+                    <p class="font-bold">Grupo:</p>
+                    <p>{{ articleSelected.group }}</p>
+                </div>
                 <div class="card col-3" style="max-height: 100px">
                     <p class="font-bold">Estado:</p>
                     <p-tag

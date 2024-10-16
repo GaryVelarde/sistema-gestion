@@ -315,7 +315,7 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
                     this.messageService.add({
                         key: 'tst',
                         severity: 'info',
-                        summary: 'Confirmado',
+                        summary: 'Confirmación',
                         detail: 'Lo datos han sido guardados.',
                         life: 3000,
                     });

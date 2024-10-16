@@ -296,4 +296,9 @@ export class AuthService {
   putPresentationUpdateStatus(presentationId: string, request: any) {
     return this.http.put(`${this.API_URL}/presentation/${presentationId}/status`, request, this.header);
   }
+
+  postPlanRegister(request: any) {
+    return this.http.post(`${this.API_URL}/plan`, request, this.header);
+  }
+
 }

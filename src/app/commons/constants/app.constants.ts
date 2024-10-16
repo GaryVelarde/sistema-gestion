@@ -20,6 +20,7 @@ export const classByStatusReport: { [key: string]: { class: string } } = {
     3: { class: '--red-600' },
     4: { class: '--orange-600' },
     5: { class: '--pink-600' },
+    6: { class: '--yellow-600' },
 };
 
 

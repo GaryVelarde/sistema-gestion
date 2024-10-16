@@ -230,12 +230,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     fillChartInscription() {
         this.statusChartInscription = 'charging'
         const documentStyle = getComputedStyle(document.documentElement);
-        this.service.getInscriptionMonthlyReport(this.yearSelectedByInscription.code).pipe().
+        this.service.getInscriptionMonthlyReport(this.yearSelectedByInscription.code).
+            pipe(takeUntil(this.destroy$)).
             subscribe(
                 (res: any) => {
                     let datasets = [];
                     let count = 1;
                     for (let data of res.data) {
+                        console.log(data)
                         const obj = {
                             label: data.status,
                             data: data.total_month,
@@ -260,7 +262,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     fillChartAdvisory() {
         this.statusChartAdvisory = 'charging';
         const documentStyle = getComputedStyle(document.documentElement);
-        this.service.getAdvisoryMonthlyReport(this.yearSelectedByAdvisory.code).pipe().
+        this.service.getAdvisoryMonthlyReport(this.yearSelectedByAdvisory.code).pipe(takeUntil(this.destroy$)).
             subscribe(
                 (res: any) => {
                     let datasets = [];
@@ -291,7 +293,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     fillChartReview() {
         this.statusChartReview = 'charging';
         const documentStyle = getComputedStyle(document.documentElement);
-        this.service.getReviewsMonthlyReport(this.yearSelectedByReview.code).pipe().
+        this.service.getReviewsMonthlyReport(this.yearSelectedByReview.code).pipe(takeUntil(this.destroy$)).
             subscribe(
                 (res: any) => {
                     let datasets = [];
@@ -321,7 +323,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     fillChartPresentation() {
         this.statusChartPresentation = 'charging';
         const documentStyle = getComputedStyle(document.documentElement);
-        this.service.getPresentationMonthlyReport(this.yearSelectedByPresentation.code).pipe().
+        this.service.getPresentationMonthlyReport(this.yearSelectedByPresentation.code).pipe(takeUntil(this.destroy$)).
             subscribe(
                 (res: any) => {
                     let datasets = [];
@@ -363,51 +365,52 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
         const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-        this.service.getArticlesMonthlyReport(this.yearSelectedByArticles.code).pipe().subscribe((res: any) => {
-            console.log(res)
+        this.service.getArticlesMonthlyReport(this.yearSelectedByArticles.code).pipe(takeUntil(this.destroy$)).
+            subscribe((res: any) => {
+                console.log(res)
 
-            if(res.data) {
-                this.statusChartArticles = 'complete';
-                this.dataArticles = {
-                    labels: res.data.status,
-                    datasets: [
-                        {
-                            data: res.data.total,
-                            backgroundColor: [
-                                documentStyle.getPropertyValue('--blue-500'), 
-                                documentStyle.getPropertyValue('--yellow-500'), 
-                                documentStyle.getPropertyValue('--green-500'), 
-                                documentStyle.getPropertyValue('--orange-500'), 
-                                documentStyle.getPropertyValue('--pink-500'),
-                            ],
-                            hoverBackgroundColor: [
-                                documentStyle.getPropertyValue('--blue-400'), 
-                                documentStyle.getPropertyValue('--yellow-400'), 
-                                documentStyle.getPropertyValue('--green-400'),
-                                documentStyle.getPropertyValue('--orange-500'), 
-                                documentStyle.getPropertyValue('--pink-500'),
-                            ]
-                        }
-                    ]
-                };
-    
-                this.optionsArticles = {
-                    plugins: {
-                        legend: {
-                            labels: {
-                                usePointStyle: true,
-                                color: textColor
+                if (res.data) {
+                    this.statusChartArticles = 'complete';
+                    this.dataArticles = {
+                        labels: res.data.status,
+                        datasets: [
+                            {
+                                data: res.data.total,
+                                backgroundColor: [
+                                    documentStyle.getPropertyValue('--blue-500'),
+                                    documentStyle.getPropertyValue('--yellow-500'),
+                                    documentStyle.getPropertyValue('--green-500'),
+                                    documentStyle.getPropertyValue('--orange-500'),
+                                    documentStyle.getPropertyValue('--pink-500'),
+                                ],
+                                hoverBackgroundColor: [
+                                    documentStyle.getPropertyValue('--blue-400'),
+                                    documentStyle.getPropertyValue('--yellow-400'),
+                                    documentStyle.getPropertyValue('--green-400'),
+                                    documentStyle.getPropertyValue('--orange-500'),
+                                    documentStyle.getPropertyValue('--pink-500'),
+                                ]
+                            }
+                        ]
+                    };
+
+                    this.optionsArticles = {
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    usePointStyle: true,
+                                    color: textColor
+                                }
                             }
                         }
-                    }
-                };
-            }
-            
+                    };
+                }
 
 
-        }, (error) => {
-            this.statusChartArticles = 'error';
 
-        })
+            }, (error) => {
+                this.statusChartArticles = 'error';
+
+            })
     }
 }
