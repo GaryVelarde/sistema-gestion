@@ -1,5 +1,5 @@
 <p-toast key="tst"></p-toast>
-<div class="grid">
+<div *ngIf="!planSelected" class="grid">
     <div class="col-12">
         <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
         <div class="card px-6 py-6">
@@ -17,8 +17,107 @@
                     </div>
                 </ng-template>
             </p-toolbar>
-            <p-carousel
-                [value]="products"
+            <div [ngSwitch]="statusList">
+                <ng-template [ngSwitchCase]="'charging'">
+                    <ng-container
+                        *ngTemplateOutlet="listSkeleton"
+                    ></ng-container>
+                </ng-template>
+                <ng-template [ngSwitchCase]="'error'">
+                    <ng-container *ngTemplateOutlet="listError"></ng-container>
+                </ng-template>
+                <ng-template [ngSwitchCase]="'complete'">
+                    <ng-container *ngTemplateOutlet="planList"></ng-container>
+                </ng-template>
+                <ng-template ngSwitchDefault>
+                    <p>Invalid state</p>
+                </ng-template>
+            </div>
+            <ng-template #planList>
+                <div class="card">
+                    <p-table
+                        #dt
+                        [value]="registros"
+                        responsiveLayout="scroll"
+                        [rows]="10"
+                        [globalFilterFields]="['title']"
+                        [paginator]="true"
+                        [rowsPerPageOptions]="[10, 20, 30]"
+                        [showCurrentPageReport]="true"
+                        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+                        selectionMode="multiple"
+                        [rowHover]="true"
+                        dataKey="id"
+                    >
+                        <ng-template pTemplate="caption">
+                            <div
+                                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+                            >
+                                <h5 class="m-0">Lista de planes</h5>
+                                <span
+                                    class="block mt-2 md:mt-0 p-input-icon-left"
+                                >
+                                    <i class="pi pi-search"></i>
+                                    <input
+                                        pInputText
+                                        type="text"
+                                        (input)="onGlobalFilter(dt, $event)"
+                                        placeholder="Buscar por título..."
+                                        class="w-full sm:w-auto"
+                                    />
+                                </span>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="title" style="width: 60%">
+                                    Título del plan
+                                    <p-sortIcon field="title"></p-sortIcon>
+                                </th>
+                                <th>Fecha de registro</th>
+                                <th style="width: 10%"></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-data>
+                            <tr>
+                                <td style="width: 14%; min-width: 10rem">
+                                    <span class="p-column-title"
+                                        >Título de tesis</span
+                                    >
+                                    {{ data.title }}
+                                </td>
+                                <td>
+                                    {{ data.created_at }}
+                                </td>
+                                <td>
+                                    <div class="flex">
+                                        <p-button
+                                            label="Ver detalle"
+                                            [outlined]="true"
+                                            severity="contrast"
+                                            (click)="viewDetailsPlan(data)"
+                                        />
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </ng-template>
+            <ng-template #listError>
+                <app-card-error
+                    [message]="messageError"
+                    (reload)="handleReload($event)"
+                ></app-card-error>
+            </ng-template>
+            <ng-template #listSkeleton>
+                <app-skeleton-table
+                    [columnTitles]="columnTitles"
+                    [skeletonCount]="skeletonRows"
+                ></app-skeleton-table>
+            </ng-template>
+            <!-- <p-carousel
+                [value]="data"
                 [numVisible]="1"
                 [numScroll]="1"
                 [circular]="false"
@@ -57,7 +156,6 @@
                             let-rowIndex="rowIndex"
                         >
                             <tr>
-                                <!-- Mostrar la actividad funcional sólo en la primera fila correspondiente -->
                                 <td
                                     *ngIf="shouldShowRowspan(rowIndex)"
                                     [attr.rowspan]="getRowspan(data.codAct)"
@@ -90,7 +188,455 @@
                         </ng-template>
                     </p-table>
                 </ng-template>
-            </p-carousel>
+            </p-carousel> -->
         </div>
     </div>
 </div>
+
+<div *ngIf="planSelected" class="grid">
+    <div class="col-12">
+        <app-breadcrumb [items]="breadcrumbItemsDetail"></app-breadcrumb>
+        <div class="card px-6 py-6">
+            <div class="mr-auto mb-3">
+                <p-button
+                    (click)="backList()"
+                    label="Regresar"
+                    [outlined]="true"
+                    icon="pi pi-angle-left"
+                    iconPos="left"
+                />
+                <p-button
+                    *ngIf="!edition"
+                    class="ml-3"
+                    (click)="showEdition()"
+                    label="Editar"
+                    icon="pi pi-pencil"
+                    iconPos="left"
+                />
+                <p-button
+                    *ngIf="edition"
+                    class="ml-3"
+                    (click)="cancelEdition()"
+                    label="Cancelar edición"
+                    icon="pi pi-times"
+                    iconPos="right"
+                />
+                <p-button
+                    *ngIf="edition"
+                    class="ml-3"
+                    (click)="saveEdition()"
+                    label="Guardar cambios"
+                    icon="pi pi-save"
+                    iconPos="left"
+                />
+            </div>
+            <div
+                *ngIf="!edition"
+                class="card flex justify-content-center col-12"
+            >
+                <h5 class="font-bold text-color" style="text-align: center">
+                    {{ planSelected.title }}
+                </h5>
+            </div>
+            <form *ngIf="edition" [formGroup]="actividadForm">
+                <!-- Campo para el Título General -->
+                <div class="w-full">
+                    <textarea
+                        rows="3"
+                        cols="30"
+                        pInputTextarea
+                        class="w-full font-bold text-color"
+                        style="text-align: center; font-size: 17.5px"
+                        formControlName="tituloGeneral"
+                    >
+                    </textarea>
+                </div>
+                <!-- activities -->
+                <div formArrayName="activities">
+                    <div
+                        *ngFor="
+                            let actividad of activities.controls;
+                            let i = index
+                        "
+                        [formGroupName]="i"
+                        class="mb-4"
+                        style="
+                            border: 1px dashed #d1d5db;
+                            border-radius: 5px;
+                            padding: 15px;
+                        "
+                    >
+                        <div class="flex">
+                            <div class="mr-auto">
+                                <label for="tituloGeneral" class="col-12">
+                                    {{ i + 1 + ". Actividad Funcional" }}
+                                </label>
+                            </div>
+                            <button
+                                pButton
+                                type="button"
+                                icon="pi pi-times"
+                                class="p-button-danger"
+                                [rounded]="true"
+                                [text]="true"
+                                (click)="removeActividad(i)"
+                            ></button>
+                        </div>
+
+                        <!-- Descripción de la Actividad -->
+                        <div class="p-field p-grid">
+                            <div class="col-12">
+                                <input
+                                    pInputText
+                                    id="descripcion"
+                                    style="width: 100%"
+                                    formControlName="description"
+                                    placeholder="Descripción de la actividad"
+                                    class="p-inputtext-sm"
+                                />
+                            </div>
+                        </div>
+
+                        <!-- Panel de Tareas -->
+                        <p-panel
+                            header="Tareas"
+                            [toggleable]="true"
+                            class="mb-3"
+                        >
+                            <div formArrayName="tasks">
+                                <div
+                                    *ngFor="
+                                        let tarea of tasks(i).controls;
+                                        let j = index
+                                    "
+                                    [formGroupName]="j"
+                                    class="mb-2"
+                                >
+                                    <!-- Descripción de la Tarea -->
+                                    <div class="flex mb-2">
+                                        <label
+                                            for="tarea-descripcion"
+                                            class="m-auto mr-2"
+                                        >
+                                            <span
+                                                *ngIf="tarea.get('taskCode')"
+                                                >{{
+                                                    tarea.get("taskCode").value
+                                                }}</span
+                                            >
+                                        </label>
+
+                                        <div class="w-full">
+                                            <input
+                                                pInputText
+                                                id="tarea-descripcion"
+                                                style="width: 100%"
+                                                formControlName="description"
+                                                placeholder="Descripción de la tarea"
+                                                class="p-inputtext-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <button
+                                                pButton
+                                                type="button"
+                                                icon="pi pi-trash"
+                                                [rounded]="true"
+                                                [text]="true"
+                                                class="p-button-danger ml-2"
+                                                (click)="removeTarea(i, j)"
+                                            ></button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Meses -->
+                                    <div class="p-field p-grid">
+                                        <label class="p-col-12 p-md-2"
+                                            >Meses:</label
+                                        >
+                                        <div class="p-col-12 p-md-10">
+                                            <div
+                                                formArrayName="months"
+                                                class="p-grid p-align-center p-justify-center flex"
+                                            >
+                                                <div
+                                                    *ngFor="
+                                                        let mes of tarea.get(
+                                                            'months'
+                                                        ).controls;
+                                                        let k = index
+                                                    "
+                                                    class="col-1"
+                                                >
+                                                    <p-checkbox
+                                                        formControlName="{{
+                                                            k
+                                                        }}"
+                                                        binary="true"
+                                                        label="{{
+                                                            getMesNombre(k)
+                                                        }}"
+                                                        class="p-mr-2"
+                                                    ></p-checkbox>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Comentario -->
+                                    <div class="p-field p-grid">
+                                        <div class="p-col-12 p-md-10">
+                                            <textarea
+                                                pInputTextarea
+                                                formControlName="comment"
+                                                placeholder="Comentario opcional"
+                                                rows="3"
+                                                autoResize="true"
+                                                style="width: 100%"
+                                            ></textarea>
+                                        </div>
+                                    </div>
+
+                                    <p-divider></p-divider>
+                                </div>
+                            </div>
+
+                            <button
+                                pButton
+                                type="button"
+                                label="Añadir Tarea"
+                                icon="pi pi-plus"
+                                class="p-button-sm p-button-success"
+                                (click)="addTarea(i)"
+                            ></button>
+                        </p-panel>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <button
+                        pButton
+                        type="button"
+                        label="Añadir Actividad"
+                        icon="pi pi-plus"
+                        class="p-button p-button-success mr-auto"
+                        (click)="addActividad()"
+                        [disabled]="
+                            !actividadForm.controls['tituloGeneral'].value
+                        "
+                    ></button>
+                </div>
+            </form>
+            <div *ngIf="edition && !floatingBoard" class="flex w-full">
+                <label style="font-size: 1.2rem;" class="mr-auto">Vista previa del plan</label>
+                <p-button
+                    label="Ver en ventana flotante"
+                    [text]="true"
+                    (click)="floatingBoard = true"
+                    icon="pi pi-external-link"
+                />
+            </div>
+
+            <p-table
+                *ngIf="!floatingBoard"
+                [value]="previewData"
+                styleClass="p-datatable-gridlines"
+                responsiveLayout="scroll"
+            >
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>COD. ACT</th>
+                        <th>ACTIVIDAD FUNCIONAL</th>
+                        <th>COD. TAREA</th>
+                        <th>TAREAS</th>
+                        <th>Ene.</th>
+                        <th>Feb.</th>
+                        <th>Mar.</th>
+                        <th>Abr.</th>
+                        <th>May.</th>
+                        <th>Jun.</th>
+                        <th>Jul.</th>
+                        <th>Ago.</th>
+                        <th>Sep.</th>
+                        <th>Oct.</th>
+                        <th>Nov.</th>
+                        <th>Dic.</th>
+                        <th>AVANCES</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+                    <tr>
+                        <!-- Mostrar la actividad funcional sólo en la primera fila correspondiente -->
+                        <td
+                            *ngIf="shouldShowRowspan(rowIndex)"
+                            [attr.rowspan]="getRowspan(data.codAct)"
+                        >
+                            {{ data.codAct }}
+                        </td>
+                        <td
+                            *ngIf="shouldShowRowspan(rowIndex)"
+                            [attr.rowspan]="getRowspan(data.codAct)"
+                        >
+                            {{ data.actividadFuncional }}
+                        </td>
+
+                        <td>{{ data.taskCode }}</td>
+                        <td>{{ data.tarea }}</td>
+                        <td
+                            [ngClass]="{ 'td-check': data.months[0] }"
+                            [innerHTML]="data.months[0]"
+                        ></td>
+                        <td
+                            [ngClass]="{ 'td-check': data.months[1] }"
+                            [innerHTML]="data.months[1]"
+                        ></td>
+                        <td
+                            [ngClass]="{ 'td-check': data.months[2] }"
+                            [innerHTML]="data.months[2]"
+                        ></td>
+                        <td
+                            [ngClass]="{ 'td-check': data.months[3] }"
+                            [innerHTML]="data.months[3]"
+                        ></td>
+                        <td
+                            [ngClass]="{ 'td-check': data.months[4] }"
+                            [innerHTML]="data.months[4]"
+                        ></td>
+                        <td
+                            [ngClass]="{ 'td-check': data.months[5] }"
+                            [innerHTML]="data.months[5]"
+                        ></td>
+                        <td
+                            [ngClass]="{ 'td-check': data.months[6] }"
+                            [innerHTML]="data.months[6]"
+                        ></td>
+                        <td
+                            [ngClass]="{ 'td-check': data.months[7] }"
+                            [innerHTML]="data.months[7]"
+                        ></td>
+                        <td
+                            [ngClass]="{ 'td-check': data.months[8] }"
+                            [innerHTML]="data.months[8]"
+                        ></td>
+                        <td
+                            [ngClass]="{ 'td-check': data.months[9] }"
+                            [innerHTML]="data.months[9]"
+                        ></td>
+                        <td
+                            [ngClass]="{ 'td-check': data.months[10] }"
+                            [innerHTML]="data.months[10]"
+                        ></td>
+                        <td
+                            [ngClass]="{ 'td-check': data.months[11] }"
+                            [innerHTML]="data.months[11]"
+                        ></td>
+                        <td>{{ data.avances }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+<p-dialog
+    header="Vista previa del plan"
+    [(visible)]="floatingBoard"
+    [style]="{ width: '90rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+    [resizable]="true"
+>
+    <p-table
+        [value]="previewData"
+        styleClass="p-datatable-gridlines"
+        responsiveLayout="scroll"
+    >
+        <ng-template pTemplate="header">
+            <tr>
+                <th>COD. ACT</th>
+                <th>ACTIVIDAD FUNCIONAL</th>
+                <th>COD. TAREA</th>
+                <th>TAREAS</th>
+                <th>Ene.</th>
+                <th>Feb.</th>
+                <th>Mar.</th>
+                <th>Abr.</th>
+                <th>May.</th>
+                <th>Jun.</th>
+                <th>Jul.</th>
+                <th>Ago.</th>
+                <th>Sep.</th>
+                <th>Oct.</th>
+                <th>Nov.</th>
+                <th>Dic.</th>
+                <th>AVANCES</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-data let-rowIndex="rowIndex">
+            <tr>
+                <!-- Mostrar la actividad funcional sólo en la primera fila correspondiente -->
+                <td
+                    *ngIf="shouldShowRowspan(rowIndex)"
+                    [attr.rowspan]="getRowspan(data.codAct)"
+                >
+                    {{ data.codAct }}
+                </td>
+                <td
+                    *ngIf="shouldShowRowspan(rowIndex)"
+                    [attr.rowspan]="getRowspan(data.codAct)"
+                >
+                    {{ data.actividadFuncional }}
+                </td>
+
+                <td>{{ data.taskCode }}</td>
+                <td>{{ data.tarea }}</td>
+                <td
+                    [ngClass]="{ 'td-check': data.months[0] }"
+                    [innerHTML]="data.months[0]"
+                ></td>
+                <td
+                    [ngClass]="{ 'td-check': data.months[1] }"
+                    [innerHTML]="data.months[1]"
+                ></td>
+                <td
+                    [ngClass]="{ 'td-check': data.months[2] }"
+                    [innerHTML]="data.months[2]"
+                ></td>
+                <td
+                    [ngClass]="{ 'td-check': data.months[3] }"
+                    [innerHTML]="data.months[3]"
+                ></td>
+                <td
+                    [ngClass]="{ 'td-check': data.months[4] }"
+                    [innerHTML]="data.months[4]"
+                ></td>
+                <td
+                    [ngClass]="{ 'td-check': data.months[5] }"
+                    [innerHTML]="data.months[5]"
+                ></td>
+                <td
+                    [ngClass]="{ 'td-check': data.months[6] }"
+                    [innerHTML]="data.months[6]"
+                ></td>
+                <td
+                    [ngClass]="{ 'td-check': data.months[7] }"
+                    [innerHTML]="data.months[7]"
+                ></td>
+                <td
+                    [ngClass]="{ 'td-check': data.months[8] }"
+                    [innerHTML]="data.months[8]"
+                ></td>
+                <td
+                    [ngClass]="{ 'td-check': data.months[9] }"
+                    [innerHTML]="data.months[9]"
+                ></td>
+                <td
+                    [ngClass]="{ 'td-check': data.months[10] }"
+                    [innerHTML]="data.months[10]"
+                ></td>
+                <td
+                    [ngClass]="{ 'td-check': data.months[11] }"
+                    [innerHTML]="data.months[11]"
+                ></td>
+                <td>{{ data.avances }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-dialog>

@@ -238,7 +238,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
             (event.target as HTMLInputElement).value,
             'contains'
         );
-        console.log(table.filterGlobal)
     }
 
     viewDetailsInscription(data: any) {

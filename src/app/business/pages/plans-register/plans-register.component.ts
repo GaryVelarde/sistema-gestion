@@ -11,6 +11,7 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class PlansRegisterComponent implements OnInit, OnDestroy {
     actividadForm: FormGroup;
+    floatingBoard = false;
     previewData: any[] = [];
     rowspanData: any;
     breadcrumbItems: MenuItem[] = [
@@ -61,7 +62,7 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
         this.activities.removeAt(indexActividad);
         this.updateActividadesCodigos();
     }
-    
+
     updateActividadesCodigos() {
         this.activities.controls.forEach((actividad, i) => {
             actividad.get('activityCode')?.setValue(i + 1);
@@ -86,25 +87,25 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
     addTarea(indexActividad: number) {
         this.tasks(indexActividad).push(this.newTarea(indexActividad));
     }
-    
+
     removeTarea(indexActividad: number, indexTarea: number) {
         this.tasks(indexActividad).removeAt(indexTarea);
         this.updateTareasCodigos(indexActividad);
     }
-    
+
     updateTareasCodigos(indexActividad: number) {
         const tasks = this.tasks(indexActividad);
         tasks.controls.forEach((tarea, j) => {
             tarea.get('taskCode')?.setValue(`${indexActividad + 1}.${j + 1}`);
         });
     }
-    
+
     savePlan() {
-            const formData = this.actividadForm.value;
-            console.log('Título General:', formData.tituloGeneral);
-            console.log('activities:', formData.activities);
-            console.log('rq', this.generateRequestData())
-            this.callPostPlanRegister();
+        const formData = this.actividadForm.value;
+        console.log('Título General:', formData.tituloGeneral);
+        console.log('activities:', formData.activities);
+        console.log('rq', this.generateRequestData())
+        this.callPostPlanRegister();
     }
 
     getMesNombre(index: number): string {
@@ -120,14 +121,14 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
                 return {
                     codAct: actividad.activityCode,
                     actividadFuncional: actividad.description,
-                    taskCode: tarea.taskCode, 
+                    taskCode: tarea.taskCode,
                     tarea: tarea.description,
                     avances: tarea.comment || '',
                     months: months
                 };
             });
         }).flat();
-    
+
         this.rowspanData = this.previewData.reduce((acc: any, curr: any) => {
             const codAct = curr.codAct;
             if (!acc[codAct]) {
@@ -156,14 +157,14 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
                 this.showPreview();
             })
     }
-    
+
     backList() {
         this.router.navigate(['/pages/planes'])
     }
 
     generateRequestData() {
         const formValue = this.actividadForm.value;
-    
+
         const requestData = {
             title: formValue.tituloGeneral,
             activities: formValue.activities.map((actividad: any, indexActividad: number) => ({
@@ -177,7 +178,7 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
                 }))
             }))
         };
-    
+
         return [requestData];
     }
 
@@ -185,33 +186,57 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
         const request = this.generateRequestData();
         this.service.postPlanRegister(request).pipe().subscribe(
             (res: any) => {
-            if(res.status) {
+                if (res.status) {
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Confirmación',
+                        detail: 'Lo datos han sido guardados.',
+                        life: 3000,
+                    });
+                    this.resetForm();
+                }
+            }, (error) => {
                 this.messageService.add({
                     key: 'tst',
-                    severity: 'info',
-                    summary: 'Confirmación',
-                    detail: 'Lo datos han sido guardados.',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al guardar la información.',
                     life: 3000,
                 });
-                this.resetForm();
-            }
-        }, (error) => {
-            this.messageService.add({
-                key: 'tst',
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Se ha producido un error al guardar la información.',
-                life: 3000,
-            });
-        })
+            })
     }
 
     resetForm() {
         this.actividadForm.reset({
-            tituloGeneral: '', 
-            activities: [] 
+            tituloGeneral: '',
+            activities: []
         });
         this.activities.clear();
         // this.addActividad();
+    }
+
+    populateForm(data: any) {
+        this.actividadForm.patchValue({
+            tituloGeneral: data.title,
+        });
+        this.activities.clear();
+        data.activities.forEach((actividad: any, indexActividad: number) => {
+            const actividadFormGroup = this.fb.group({
+                activityCode: [actividad.code_activity],
+                description: [actividad.description_activity, Validators.required],
+                tasks: this.fb.array([])
+            });
+            actividad.tasks.forEach((tarea: any, indexTarea: number) => {
+                const tareaFormGroup = this.fb.group({
+                    taskCode: [tarea.code_task],
+                    description: [tarea.description_task, Validators.required],
+                    months: this.fb.array(tarea.months.split(',').map((mes: string) => mes === 'true')),
+                    comment: [tarea.comment || '']
+                });
+                (actividadFormGroup.get('tasks') as FormArray).push(tareaFormGroup);
+            });
+            this.activities.push(actividadFormGroup);
+        });
     }
 }

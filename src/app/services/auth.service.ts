@@ -93,7 +93,7 @@ export class AuthService {
     return this.http.delete(`${this.API_URL}/meeting/${reunionId}/task/${taskId}`, this.header);
   }
 
-  updateTaskDetail(reunionId: string, taskId: string, request: any){
+  updateTaskDetail(reunionId: string, taskId: string, request: any) {
     return this.http.put(`${this.API_URL}/meeting/${reunionId}/task/${taskId}`, request, this.header);
   }
 
@@ -280,7 +280,7 @@ export class AuthService {
   getReviewsMonthlyReport(year: string) {
     return this.http.get(`${this.API_URL}/monthly-reviews/${year}`, this.header);
   }
-  
+
   getPresentationMonthlyReport(year: string) {
     return this.http.get(`${this.API_URL}/monthly-presentations/${year}`, this.header);
   }
@@ -299,6 +299,14 @@ export class AuthService {
 
   postPlanRegister(request: any) {
     return this.http.post(`${this.API_URL}/plan`, request, this.header);
+  }
+
+  getPlans() {
+    return this.http.get(`${this.API_URL}/plan`, this.header);
+  }
+
+  putPlansUpdate(planId: string, request: any) {
+    return this.http.put(`${this.API_URL}/plan/${planId}`, request, this.header);
   }
 
 }
