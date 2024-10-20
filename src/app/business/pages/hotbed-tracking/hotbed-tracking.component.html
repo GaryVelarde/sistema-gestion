@@ -179,11 +179,7 @@
                         iconPos="left"
                     />
                     <p-button
-                        *ngIf="
-                            !edition &&
-                            inscriptionState !== 'Cancelado' &&
-                            inscriptionState !== 'Aprobado'
-                        "
+                        *ngIf="!edition"
                         class="ml-3"
                         (click)="showEdition()"
                         label="Editar"
@@ -191,11 +187,7 @@
                         iconPos="left"
                     />
                     <p-button
-                        *ngIf="
-                            edition &&
-                            inscriptionState !== 'Cancelado' &&
-                            inscriptionState !== 'Aprobado'
-                        "
+                        *ngIf="edition"
                         class="ml-3"
                         (click)="cancelEdition()"
                         label="Cancelar edición"
@@ -203,11 +195,7 @@
                         iconPos="right"
                     />
                     <p-button
-                        *ngIf="
-                            edition &&
-                            inscriptionState !== 'Cancelado' &&
-                            inscriptionState !== 'Aprobado'
-                        "
+                        *ngIf="edition"
                         class="ml-3"
                         (click)="saveEdition()"
                         label="Guardar cambios"
@@ -217,52 +205,74 @@
                 </div>
                 <div>
                     <p-button
-                        *ngIf="
-                            inscriptionState !== 'Cancelado' &&
-                            inscriptionState !== 'Aprobado'
-                        "
-                        label="Cancelar inscripción"
+                        *ngIf="articleState === 'En desarrollo'"
+                        label="Revisado"
                         [outlined]="true"
                         class="mr-3"
-                        icon="pi pi-times"
-                        iconPos="left"
-                        severity="danger"
-                        (click)="goToCancelation()"
-                    />
-                    <p-button
-                        *ngIf="
-                            inscriptionState === 'Inscrito' ||
-                            inscriptionState === 'Observado'
-                        "
-                        label="Pasar a revisión"
-                        [outlined]="true"
-                        icon="pi pi-angle-right"
                         iconPos="right"
-                        severity="info"
-                        (click)="goToReview()"
+                        icon="pi pi-chevron-right"
+                        (click)="statusUpdate('Revisado')"
                     />
                     <p-button
-                        *ngIf="inscriptionState === 'En revisión'"
-                        label="Observado"
+                        *ngIf="articleState === 'Revisado'"
+                        label="Regresar a En desarrollo"
                         [outlined]="true"
-                        icon="pi pi-exclamation-circle"
+                        class="mr-3"
                         iconPos="left"
-                        severity="warning"
-                        (click)="goToObserved()"
+                        icon="pi pi-chevron-left"
+                        (click)="statusUpdate('En desarrollo')"
                     />
                     <p-button
-                        *ngIf="inscriptionState === 'En revisión'"
-                        class="ml-3"
-                        label="Aprobado"
+                        *ngIf="articleState === 'Revisado'"
+                        label="Enviado a revista"
                         [outlined]="true"
-                        icon="pi pi-angle-right"
+                        class="mr-3"
                         iconPos="right"
-                        severity="success"
-                        (click)="goToApprove()"
+                        icon="pi pi-chevron-right"
+                        (click)="statusUpdate('Enviado a revista')"
+                    />
+                    <p-button
+                        *ngIf="articleState === 'Enviado a revista'"
+                        label="Regresar a Revisado"
+                        [outlined]="true"
+                        class="mr-3"
+                        iconPos="left"
+                        icon="pi pi-chevron-left"
+                        (click)="statusUpdate('Revisado')"
+                    />
+                    <p-button
+                        *ngIf="articleState === 'Enviado a revista'"
+                        label="Indexado"
+                        [outlined]="true"
+                        class="mr-3"
+                        iconPos="right"
+                        icon="pi pi-chevron-right"
+                        (click)="goToIndexed('Indexado')"
+                    />
+                    <p-button
+                        *ngIf="articleState === 'Indexado'"
+                        label="Regresar a Enviado a revista"
+                        [outlined]="true"
+                        class="mr-3"
+                        iconPos="left"
+                        icon="pi pi-chevron-left"
+                        (click)="statusUpdate('Enviado a revista')"
+                    />
+                    <p-button
+                        *ngIf="articleState === 'Indexado'"
+                        label="Pagado"
+                        [outlined]="true"
+                        class="mr-3"
+                        iconPos="right"
+                        icon="pi pi-chevron-right"
+                        (click)="statusUpdate('Pagado')"
                     />
                 </div>
             </div>
-            <div class="card flex justify-content-center col-12">
+            <div
+                *ngIf="!edition"
+                class="card flex justify-content-center col-12"
+            >
                 <h5
                     class="font-bold text-color"
                     style="font-family: revert; text-align: center"
@@ -270,6 +280,17 @@
                     {{ articleSelected.title }}
                 </h5>
             </div>
+            <form *ngIf="edition" [formGroup]="titleForm" class="col-12">
+                <textarea
+                    rows="2"
+                    cols="30"
+                    pInputTextarea
+                    class="w-full font-bold text-color"
+                    style="text-align: center; font-size: 17.5px"
+                    formControlName="title"
+                >
+                </textarea>
+            </form>
             <div *ngIf="!edition" class="grid col-12">
                 <div class="col-12">
                     <p-button
@@ -289,31 +310,36 @@
                 </div>
                 <div class="card col-3" style="max-height: 100px">
                     <p class="font-bold">Estado:</p>
-                    <p-tag
-                        *ngIf="articleState === 'En desarrollo'"
-                        value="En desarrollo"
-                    />
-                    <p-tag
-                        *ngIf="articleState === 'Revisado'"
-                        severity="info"
-                        value="Revisado"
-                    />
-                    <p-tag
-                        *ngIf="articleState === 'Envió a revista'"
-                        severity="warning"
-                        value="Envió a revista"
-                    />
-                    <p-tag
-                        *ngIf="articleState === 'Cancelado'"
-                        severity="danger"
-                        value="Cancelado"
-                    />
-                    <p-tag
-                        *ngIf="articleState === 'Aprobado'"
-                        value="Aprobado"
-                    />
+                    <p-tag [value]="articleState" />
                 </div>
             </div>
+            <form *ngIf="edition" class="grid col-12" [formGroup]="editForm">
+                <div class="col-12">
+                    <p-button
+                        label="Ver línea de trabajo"
+                        icon="pi pi-history"
+                        iconPos="left"
+                        [disabled]="true"
+                    />
+                </div>
+                <div class="col-3">
+                    <p class="font-bold">Fecha de registro:</p>
+                    <p>{{ articleSelected.created_at }}</p>
+                </div>
+                <div class="col-6">
+                    <p class="font-bold">Grupo:</p>
+                    <input
+                        type="text"
+                        pInputText
+                        class="full-width"
+                        formControlName="group"
+                    />
+                </div>
+                <div class="card col-3" style="max-height: 100px">
+                    <p class="font-bold">Estado:</p>
+                    <p-tag [value]="articleState" />
+                </div>
+            </form>
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
                 <div class="col-12">
@@ -424,6 +450,41 @@
                 >
                 </app-upload-archives>
             </div>
+            <div class="footer mt-5">
+                <button
+                    pButton
+                    pRipple
+                    label="Regresar"
+                    icon="pi pi-angle-left"
+                    class="p-button-text"
+                    iconPos="left"
+                    (click)="hideAddFilesDialog()"
+                ></button>
+                <p-button
+                    label="Guardar archivos"
+                    iconPos="right"
+                    icon="pi pi-check"
+                    (click)="saveFiles()"
+                    [disabled]="!isFormDataEmpty(formData)"
+                />
+            </div>
+        </div>
+    </div>
+</p-sidebar>
+<p-sidebar
+    [(visible)]="dialogIndexed"
+    [style]="{ width: '40%' }"
+    position="right"
+>
+    <ng-template pTemplate="header">
+        <span class="font-semibold text-xl">Pasar a Indexado</span>
+    </ng-template>
+    <div class="content">
+        <div class="grid" style="height: 100%">
+            <form class="col-12">
+              <p>Por favor llene todos los campos para continuar.</p>
+
+            </form>
             <div class="footer mt-5">
                 <button
                     pButton

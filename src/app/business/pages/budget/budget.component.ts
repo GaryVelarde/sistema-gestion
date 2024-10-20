@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 
 @Component({
@@ -83,7 +84,7 @@ export class BudgetComponent implements OnInit {
     gastoForm: FormGroup;
 
 
-    constructor(private fb: FormBuilder) {
+    constructor(private fb: FormBuilder, private router: Router) {
         this.gastoForm = this.fb.group({
             gastoEspecifico: ['', Validators.required],
             meses: this.fb.array(Array(12).fill(0)), // Inicializa el array de meses como montos (0)
@@ -155,5 +156,8 @@ export class BudgetComponent implements OnInit {
         }, 0);
     }
 
+    goToBudgetRegister() {
+        this.router.navigate(['/pages/nuevo-presupuesto'])
+    }
 
 }

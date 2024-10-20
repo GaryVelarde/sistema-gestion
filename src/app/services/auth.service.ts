@@ -309,4 +309,24 @@ export class AuthService {
     return this.http.put(`${this.API_URL}/plan/${planId}`, request, this.header);
   }
 
+  getListPlans() {
+    return this.http.get(`${this.API_URL}/plans`, this.header);
+  }
+
+  getListActivityByPlan(planId: string) {
+    return this.http.get(`${this.API_URL}/activities-plan/${planId}`, this.header);
+  }
+
+  getListTaskByActivity(activityId: string) {
+    return this.http.get(`${this.API_URL}/tasks-activity/${activityId}`, this.header);
+  }
+
+  putArticleUpdate(request: any, articleId: string) {
+    return this.http.put(`${this.API_URL}/article/${articleId}`, request, this.header);
+  }
+
+  putArticleStatusUpdate(request: any, articleId: string) {
+    return this.http.put(`${this.API_URL}/article/${articleId}/status`, request, this.header);
+  }
+
 }

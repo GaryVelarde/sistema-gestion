@@ -3,59 +3,66 @@
     <div class="col-12">
         <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
         <div class="card px-6 py-6">
-            <p-toolbar styleClass="mb-4">
-                <ng-template pTemplate="left">
-                    <div class="my-2">
-                        <button
-                            pButton
-                            pRipple
-                            label="nuevo presupuesto"
-                            icon="pi pi-plus"
-                            class="mr-2"
-                            (click)="goToBudgetRegister()"
-                        ></button>
+            <div class="">
+                <p class="font-medium text-900">Selecciona un Plan:</p>
+                <form [formGroup]="planForm">
+                    <p-dropdown
+                        [options]="plans"
+                        formControlName="planSelected"
+                        [loading]="statusListPlans"
+                        optionLabel="title"
+                        placeholder="Seleccionar un plan"
+                    />
+                </form>
+
+                <div *ngIf="planSelected.value.id" class="mt-3">
+                    <p class="font-medium text-900">
+                        Selecciona una actividad:
+                    </p>
+                    <div class="flex">
+                        <div *ngFor="let activity of activities">
+                            <p-chip
+                                [label]="
+                                    activity.code_activity +
+                                    '. ' +
+                                    activity.description_activity
+                                "
+                                [icon]="
+                                    activity.selected
+                                        ? 'pi pi-circle-on'
+                                        : 'pi pi-circle-off'
+                                "
+                                class="mr-2 cursor-pointer"
+                                (click)="activitySelection(activity)"
+                            />
+                        </div>
                     </div>
-                </ng-template>
-            </p-toolbar>
-            <div>
-                <label style="font-size: 1.3rem;">Presupuesto de actividades operativas</label>
+                </div>
 
-                <p>
-                    <label>Selecciona un Plan:</label>
-                    <p-dropdown
-                        [options]="testData"
-                        [(ngModel)]="selectedPlan"
-                        [optionLabel]="'tituloGeneral'"
-                        (onChange)="onPlanChange()"
-                    >
-                    </p-dropdown>
-                </p>
-
-                <p *ngIf="selectedPlan">
-                    <label>Selecciona una Actividad:</label>
-                    <p-dropdown
-                        [options]="selectedPlan.actividades"
-                        [(ngModel)]="selectedActividad"
-                        [optionLabel]="'descripcion'"
-                        (onChange)="onActividadChange()"
-                    >
-                    </p-dropdown>
-                </p>
-
-                <div *ngIf="selectedActividad">
-                    <label>Selecciona una Tarea:</label>
-                    <p-dropdown
-                        [options]="selectedActividad.tareas"
-                        [(ngModel)]="selectedTarea"
-                        [optionLabel]="'descripcion'"
-                        (onChange)="onTareaChange()"
-                    >
-                        <!-- Asegúrate de tener este evento -->
-                    </p-dropdown>
+                <div *ngIf="activitySelected" class="my-3">
+                    <p class="font-medium text-900">Selecciona una tarea:</p>
+                    <div class="flex">
+                        <div *ngFor="let task of tasks">
+                            <p-chip
+                                [label]="
+                                    task.code_task +
+                                    '. ' +
+                                    task.description_task
+                                "
+                                [icon]="
+                                    task.selected
+                                        ? 'pi pi-circle-on'
+                                        : 'pi pi-circle-off'
+                                "
+                                class="mr-2 cursor-pointer"
+                                (click)="taskSelection(task)"
+                            />
+                        </div>
+                    </div>
                 </div>
 
                 <form
-                    *ngIf="selectedTarea"
+                    *ngIf="taskSelected"
                     [formGroup]="gastoForm"
                     (ngSubmit)="agregarGasto()"
                 >
@@ -70,7 +77,11 @@
                         <div class="flex">
                             <div class="mr-auto">
                                 <label for="tituloGeneral" class="col-12">
-                                    1.1 Tarea</label
+                                    {{
+                                        taskSelected.code_task +
+                                            ". " +
+                                            taskSelected.description_task
+                                    }}</label
                                 >
                             </div>
                             <button
@@ -130,7 +141,7 @@
                                                 class="w-full"
                                                 [placeholder]="mes"
                                             ></p-inputNumber> -->
-                                            <p>{{mes}}</p>
+                                        <p>{{ mes }}</p>
                                         <input
                                             type="number"
                                             style="
@@ -178,9 +189,10 @@
                 >
                     <ng-template pTemplate="header">
                         <tr>
-                            <th>Actividad</th>
-                            <th>Tarea</th>
-                            <th>Gasto Específico</th>
+                            <th>COD. ACT</th>
+                            <th>ACTIVIDAD FUNCIONAL</th>
+                            <th>COD. TAREA</th>
+                            <th>GASTO ESPECÍFICO</th>
                             <th
                                 *ngFor="
                                     let mes of [
@@ -207,7 +219,8 @@
                     </ng-template>
                     <ng-template pTemplate="body" let-gasto>
                         <tr>
-                            <td>{{ gasto.actividad }}</td>
+                            <td>{{ gasto.activityCode }}</td>
+                            <td>{{ gasto.taskCode }}</td>
                             <td>{{ gasto.tarea }}</td>
                             <td>{{ gasto.gastoEspecifico }}</td>
                             <td *ngFor="let monto of gasto.meses">
@@ -219,7 +232,7 @@
                     </ng-template>
                     <ng-template pTemplate="footer">
                         <tr>
-                            <td colspan="3">TOTAL</td>
+                            <td colspan="4">TOTAL</td>
                             <td *ngFor="let mes of totalMeses()">{{ mes }}</td>
                             <td>{{ calcularTotalTotal() }}</td>
                             <td></td>

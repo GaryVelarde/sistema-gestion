@@ -51,6 +51,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
   viewDetail = false;
   viewHistory = false;
   showDialogAddFiles = false;
+  dialogIndexed = false;
   module = eModule.hotbed;
   articleSelected: any;
   getArticleListProcess = '';
@@ -65,11 +66,21 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
   messageError: string = 'Se produjo un error al cargar la lista de artículos. Por favor, inténtelo de nuevo más tarde';
   edition = false;
   articleState: string;
-  studentsForm: FormGroup;
   studentsList = [];
-  private _students = new FormControl([] as IStudent[], [Validators.required])
+  studentsForm: FormGroup;
+  titleForm: FormGroup;
+  editForm: FormGroup;
+  private _title: FormControl = new FormControl('', [Validators.required]);
+  private _group: FormControl = new FormControl('', [Validators.required]);
+  private _students = new FormControl([], [Validators.required])
   get students() {
     return this._students;
+  }
+  get title() {
+    return this._title;
+  }
+  get group() {
+    return this._group;
   }
 
   constructor(private router: Router, private service: AuthService, private loaderService: LoaderService,
@@ -77,6 +88,12 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
   ) {
     this.studentsForm = this.fb.group({
       students: this.students,
+    });
+    this.titleForm = this.fb.group({
+      title: this.title,
+    });
+    this.editForm = this.fb.group({
+      group: this.group,
     });
   }
 
@@ -100,13 +117,13 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     this.studentsList = data.seedbeds;
     this.articleState = data.status;
     console.log(this.articleSelected);
+    this.fillDataInEditForm();
     setTimeout(() => {
       this.loaderService.hide();
     }, 400);
   }
 
   getArticleList() {
-
     this.getArticleListProcess = 'charging';
     this.service.getArticleList().pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res) {
@@ -130,55 +147,6 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     if (reload) {
       this.getArticleList();
     }
-  }
-
-  test() {
-    this.registros = [
-      {
-        "id": 1,
-        "title": "Titulo de prueba",
-        "group": 3,
-        "created_at": "27-08-2024 21:07:11",
-        "seedbeds": [
-          {
-            "id": 6,
-            "name": "Rodrigo Cepeda",
-            "surnames": "Lovato",
-            "email": "mgranados@example.com",
-            "phone": 399570148,
-            "code": 28681077,
-            "cycle": "X"
-          }
-        ]
-      },
-      {
-        "id": 2,
-        "title": "Titulo de prueba 2",
-        "group": 3,
-        "created_at": "27-08-2024 21:07:11",
-        "seedbeds": [
-          {
-            "id": 6,
-            "name": "Cesar Antonio",
-            "surnames": "Jauregui Saavedra",
-            "email": "mgranados@example.com",
-            "phone": 399570148,
-            "code": 28681077,
-            "cycle": "X"
-          },
-          {
-            "id": 6,
-            "name": "Gary Isaac",
-            "surnames": "Velarde Rios",
-            "email": "mgranados@example.com",
-            "phone": 399570148,
-            "code": 28681077,
-            "cycle": "X"
-          }
-        ]
-      }
-    ];
-    this.getArticleListProcess = 'complete';
   }
 
   backList() {
@@ -213,6 +181,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
   }
 
   showEdition() {
+    this.fillDataInEditForm();
     this.edition = true;
   }
 
@@ -237,7 +206,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     this.clearFile();
     this.upload.clearFile();
     this.showDialogAddFiles = true;
-}
+  }
 
   saveFiles() {
     this.loaderService.show(true);
@@ -274,4 +243,81 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
   isFormDataEmpty(formData: FormData): boolean {
     return !(formData as any).entries().next().done;
   }
+
+  fillDataInEditForm(): void {
+    this.title.setValue(this.articleSelected.title);
+    this.group.setValue(this.articleSelected.group);
+  }
+
+  callPutArticleUpdate() {
+    this.loaderService.show(true);
+    const request = {
+      title: this.title.value,
+      group: this.group.value,
+      user_ids: this.extractIds(this.students.value)
+    }
+    this.service.putArticleUpdate(request, this.articleSelected.id).pipe(
+      finalize(() => {
+        this.loaderService.hide();
+      })
+    ).
+      subscribe(
+        (res: any) => {
+          this.articleSelectedUpdate();
+          this.edition = false;
+          this.messageService.add({
+            key: 'tst',
+            severity: 'info',
+            summary: 'Confirmación',
+            detail: 'Los datos han sido actualizados.',
+            life: 3000,
+          });
+        }, (error) => {
+          this.messageService.add({
+            key: 'tst',
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Se ha producido un error al guardar la información.',
+            life: 3000,
+          });
+        })
+  }
+
+  extractIds(arr: Array<{ id: string }>): string[] {
+    return arr.map(item => item.id);
+  }
+
+  saveEdition() {
+    this.callPutArticleUpdate();
+  }
+
+  articleSelectedUpdate() {
+    this.articleSelected.title = this.title.value;
+    this.articleSelected.group = this.group.value;
+    this.articleSelected.seedbeds = this.students.value;
+  }
+
+  statusUpdate(status: string) {
+    this.loaderService.show();
+    const request = {
+      status: status
+    }
+    this.service.putArticleStatusUpdate(request, this.articleSelected.id).pipe(
+      finalize(() => {
+        this.loaderService.hide();
+      })
+    ).
+      subscribe((res: any) => {
+        if (res.status) {
+          this.articleState = status;
+        }
+      }, (error) => {
+
+      })
+  }
+
+  goToIndexed() {
+    this.dialogIndexed = true;
+  }
+
 }

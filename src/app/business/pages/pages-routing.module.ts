@@ -16,6 +16,7 @@ import { isUserAuthenticatedGuard } from 'src/app/guards/auth.guard';
         { path: 'planes', loadChildren: () => import('./plans/plans.module').then(m => m.PlansModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'registro-planes', loadChildren: () => import('./plans-register/plans-register.module').then(m => m.PlansRegisterModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'presupuestos', loadChildren: () => import('./budget/budget.module').then(m => m.BudgetModule), canActivate: [isUserAuthenticatedGuard] },
+        { path: 'nuevo-presupuesto', loadChildren: () => import('./budget-register/budget-register.module').then(m => m.BudgetRegisterModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'revision', loadChildren: () => import('./thesis-review-tracking/thesis-review-tracking.module').then(m => m.ThesisReviewTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'sustentacion', loadChildren: () => import('./presentation-tracking/presentation-tracking.module').then(m => m.PresentationTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: '**', redirectTo: '/notfound' }
