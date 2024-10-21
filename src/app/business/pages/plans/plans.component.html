@@ -242,7 +242,7 @@
                 <!-- Campo para el Título General -->
                 <div class="w-full">
                     <textarea
-                        rows="3"
+                        rows="2"
                         cols="30"
                         pInputTextarea
                         class="w-full font-bold text-color"
@@ -268,9 +268,9 @@
                     >
                         <div class="flex">
                             <div class="mr-auto">
-                                <label for="tituloGeneral" class="col-12">
+                                <p for="tituloGeneral" class="font-bold">
                                     {{ i + 1 + ". Actividad Funcional" }}
-                                </label>
+                                </p>
                             </div>
                             <button
                                 pButton
@@ -279,6 +279,7 @@
                                 class="p-button-danger"
                                 [rounded]="true"
                                 [text]="true"
+                                pTooltip="Eliminar actividad"
                                 (click)="removeActividad(i)"
                             ></button>
                         </div>
@@ -344,6 +345,7 @@
                                                 [rounded]="true"
                                                 [text]="true"
                                                 class="p-button-danger ml-2"
+                                                pTooltip="Eliminar tarea"
                                                 (click)="removeTarea(i, j)"
                                             ></button>
                                         </div>

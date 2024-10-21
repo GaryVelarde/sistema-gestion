@@ -12,3 +12,38 @@
     text-align: center;
     padding: 20px 0;
 }
+
+.container {
+    padding: 20px;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    max-width: 500px;
+    margin-bottom: 20px;
+  }
+  
+  label {
+    margin-top: 10px;
+  }
+  
+  input, button {
+    margin-top: 5px;
+  }
+  
+  .schedule-preview {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .schedule-preview th, .schedule-preview td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+  }
+  
+  .schedule-preview th {
+    background-color: #f2f2f2;
+  }

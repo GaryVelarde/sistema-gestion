@@ -331,7 +331,7 @@
                     <input
                         type="text"
                         pInputText
-                        class="full-width"
+                        class="w-full"
                         formControlName="group"
                     />
                 </div>
@@ -380,7 +380,7 @@
         <app-breadcrumb [items]="timeLineBreadcrumbItems"></app-breadcrumb>
         <div class="card">
             <div class="grid d-flex col-12">
-                <div class="mr-auto p-2">
+                <div class="mr-auto">
                     <p-button
                         (click)="backToDetail()"
                         label="Regresar"
@@ -393,11 +393,7 @@
             <p class="font-bold">
                 Línea de trabajo del artículo: "{{ articleSelected.title }}"
             </p>
-            <p-timeline
-                [value]="events"
-                align="alternate"
-                styleClass="customized-timeline"
-            >
+            <p-timeline [value]="events" align="alternate" styleClass="customized-timeline">
                 <ng-template pTemplate="marker" let-event>
                     <span
                         class="flex w-2rem h-2rem align-items-center justify-content-center text-white border-circle z-1 shadow-1"
@@ -409,23 +405,8 @@
                 <ng-template pTemplate="content" let-event>
                     <p-card>
                         <h5 class="font-bold">{{ event.status }}</h5>
-                        <p>
-                            {{
-                                event.date === "00-00-0000 00:00"
-                                    ? "--/--/--- ----"
-                                    : event.date
-                            }}
-                        </p>
-                        <p *ngIf="event.date !== '00-00-0000 00:00'">
-                            Lorem ipsum dolor sit amet, consectetur adipisicing
-                            elit. Inventore sed consequuntur error repudiandae
-                            numquam deserunt quisquam repellat libero asperiores
-                            earum nam nobis, culpa ratione quam perferendis
-                            esse, cupiditate neque quas!
-                        </p>
-                        <p *ngIf="event.date === '00-00-0000 00:00'">
-                            Aún no pasa a {{ event.status }}
-                        </p>
+                        <p>{{ event.date }}</p>
+                        <p>{{ event.description }}</p>
                     </p-card>
                 </ng-template>
             </p-timeline>
@@ -481,9 +462,31 @@
     </ng-template>
     <div class="content">
         <div class="grid" style="height: 100%">
-            <form class="col-12">
-              <p>Por favor llene todos los campos para continuar.</p>
-
+            <form class="col-12" [formGroup]="indexedForm">
+                <p class="font-bold">Nombre del journal</p>
+                <input
+                    id="username"
+                    type="text"
+                    class="w-full mb-2"
+                    pInputText
+                    formControlName="journalName"
+                />
+                <p class="font-bold">Volumen</p>
+                <input
+                    id="username"
+                    type="text"
+                    class="w-full mb-2"
+                    pInputText
+                    formControlName="volume"
+                />
+                <p class="font-bold">Fecha de publicación</p>
+                <p-calendar
+                    class="display-inline-grid"
+                    formControlName="publicationDate"
+                    [iconDisplay]="'input'"
+                    [showIcon]="true"
+                    dateFormat="dd-mm-yy"
+                ></p-calendar>
             </form>
             <div class="footer mt-5">
                 <button
@@ -493,14 +496,14 @@
                     icon="pi pi-angle-left"
                     class="p-button-text"
                     iconPos="left"
-                    (click)="hideAddFilesDialog()"
+                    (click)="hideDialogIndexed()"
                 ></button>
                 <p-button
-                    label="Guardar archivos"
+                    label="Indexado"
                     iconPos="right"
                     icon="pi pi-check"
-                    (click)="saveFiles()"
-                    [disabled]="!isFormDataEmpty(formData)"
+                    (click)="confirmGoToIndexed()"
+                    [disabled]="!indexedForm.valid"
                 />
             </div>
         </div>

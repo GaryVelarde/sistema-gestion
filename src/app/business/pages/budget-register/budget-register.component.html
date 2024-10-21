@@ -3,68 +3,179 @@
     <div class="col-12">
         <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
         <div class="card px-6 py-6">
-            <div class="">
-                <p class="font-medium text-900">Selecciona un Plan:</p>
-                <form [formGroup]="planForm">
-                    <p-dropdown
-                        [options]="plans"
-                        formControlName="planSelected"
-                        [loading]="statusListPlans"
-                        optionLabel="title"
-                        placeholder="Seleccionar un plan"
+            <div class="grid d-flex col-12">
+                <div class="mr-auto">
+                    <p-button
+                        (click)="backToList()"
+                        label="Regresar"
+                        [outlined]="true"
+                        icon="pi pi-angle-left"
+                        iconPos="left"
                     />
-                </form>
-
-                <div *ngIf="planSelected.value.id" class="mt-3">
-                    <p class="font-medium text-900">
-                        Selecciona una actividad:
-                    </p>
-                    <div class="flex">
-                        <div *ngFor="let activity of activities">
-                            <p-chip
-                                [label]="
-                                    activity.code_activity +
-                                    '. ' +
-                                    activity.description_activity
-                                "
-                                [icon]="
-                                    activity.selected
-                                        ? 'pi pi-circle-on'
-                                        : 'pi pi-circle-off'
-                                "
-                                class="mr-2 cursor-pointer"
-                                (click)="activitySelection(activity)"
-                            />
-                        </div>
-                    </div>
+                </div>
+                <div>
+                    <p-button
+                    (click)="save()"
+                    label="Guardar presupuesto"
+                    icon="pi pi-save"
+                    iconPos="left"
+                />
+                </div>
+            </div>
+            <div class="">
+                <div class="my-3">
+                    <p class="font-bold">Selecciona un Plan:</p>
+                    <form [formGroup]="planForm">
+                        <p-dropdown
+                            class="w-full display-inline-grid"
+                            [options]="plans"
+                            formControlName="planSelected"
+                            [loading]="statusListPlans"
+                            optionLabel="title"
+                            placeholder="Seleccionar un plan"
+                            [filter]="true"
+                            filterBy="title"
+                        />
+                    </form>
                 </div>
 
-                <div *ngIf="activitySelected" class="my-3">
-                    <p class="font-medium text-900">Selecciona una tarea:</p>
-                    <div class="flex">
-                        <div *ngFor="let task of tasks">
-                            <p-chip
-                                [label]="
-                                    task.code_task +
-                                    '. ' +
-                                    task.description_task
-                                "
-                                [icon]="
-                                    task.selected
-                                        ? 'pi pi-circle-on'
-                                        : 'pi pi-circle-off'
-                                "
-                                class="mr-2 cursor-pointer"
-                                (click)="taskSelection(task)"
-                            />
+                <div [ngSwitch]="statusActivity">
+                    <ng-template [ngSwitchCase]="'charging'">
+                        <ng-container
+                            *ngTemplateOutlet="skeleton"
+                        ></ng-container>
+                    </ng-template>
+                    <ng-template [ngSwitchCase]="'error'">
+                        <ng-container
+                            *ngTemplateOutlet="errorActivity"
+                        ></ng-container>
+                    </ng-template>
+                    <ng-template [ngSwitchCase]="'complete'">
+                        <ng-container
+                            *ngTemplateOutlet="selectActivity"
+                        ></ng-container>
+                    </ng-template>
+                </div>
+
+                <ng-template #selectActivity>
+                    <div *ngIf="planSelected.value.id" class="my-3">
+                        <p-divider />
+
+                        <p class="font-bold">Selecciona una actividad:</p>
+                        <!-- Ajuste para el contenedor de las actividades -->
+                        <div class="flex flex-wrap justify-content-start gap-2">
+                            <div *ngFor="let activity of activities">
+                                <p-chip
+                                    [label]="
+                                        activity.code_activity +
+                                        '. ' +
+                                        activity.description_activity
+                                    "
+                                    [icon]="
+                                        activity.selected
+                                            ? 'pi pi-circle-on'
+                                            : 'pi pi-circle-off'
+                                    "
+                                    class="mr-2 cursor-pointer"
+                                    (click)="activitySelection(activity)"
+                                />
+                            </div>
                         </div>
                     </div>
+                </ng-template>
+
+                <ng-template #errorActivity>
+                    <p-divider />
+                    <app-label-error
+                        message="Se ha producido un error al traer la información, por favor intenta seleccionando otra actividad."
+                        class="mb-3"
+                        [buttonVisible]="false"
+                    ></app-label-error>
+                </ng-template>
+
+                <div [ngSwitch]="statusTask">
+                    <ng-template [ngSwitchCase]="'charging'">
+                        <ng-container
+                            *ngTemplateOutlet="skeleton"
+                        ></ng-container>
+                    </ng-template>
+                    <ng-template [ngSwitchCase]="'error'">
+                        <ng-container
+                            *ngTemplateOutlet="errorTask"
+                        ></ng-container>
+                    </ng-template>
+                    <ng-template [ngSwitchCase]="'complete'">
+                        <ng-container
+                            *ngTemplateOutlet="selectTask"
+                        ></ng-container>
+                    </ng-template>
                 </div>
+
+                <ng-template #selectTask>
+                    <div *ngIf="activitySelected" class="my-3">
+                        <p-divider />
+                        <p class="font-bold">Selecciona una tarea:</p>
+                        <div class="flex flex-wrap justify-content-start gap-2">
+                            <div *ngFor="let task of tasks">
+                                <p-chip
+                                    [label]="
+                                        task.code_task +
+                                        '. ' +
+                                        task.description_task
+                                    "
+                                    [icon]="
+                                        task.selected
+                                            ? 'pi pi-circle-on'
+                                            : 'pi pi-circle-off'
+                                    "
+                                    class="mr-2 cursor-pointer"
+                                    (click)="taskSelection(task)"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template #skeleton>
+                    <div class="my-3 w-full">
+                        <p-divider />
+                        <p-skeleton
+                            height="1.3rem"
+                            width="160px"
+                            styleClass="mb-2"
+                        />
+                        <div class="flex">
+                            <div class="mr-2" style="width: 110px">
+                                <p-skeleton height="2rem" styleClass="mb-2" />
+                            </div>
+                            <div class="mr-2" style="width: 110px">
+                                <p-skeleton height="2rem" styleClass="mb-2" />
+                            </div>
+                            <div class="mr-2" style="width: 110px">
+                                <p-skeleton height="2rem" styleClass="mb-2" />
+                            </div>
+                            <div class="mr-2" style="width: 110px">
+                                <p-skeleton height="2rem" styleClass="mb-2" />
+                            </div>
+                            <div class="mr-2" style="width: 110px">
+                                <p-skeleton height="2rem" styleClass="mb-2" />
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template #errorTask>
+                    <p-divider />
+                    <app-label-error
+                        message="Se ha producido un error al traer la información, por favor intenta seleccionando otra actividad."
+                        class="mb-3"
+                        [buttonVisible]="false"
+                    ></app-label-error>
+                </ng-template>
 
                 <form
                     *ngIf="taskSelected"
                     [formGroup]="gastoForm"
-                    (ngSubmit)="agregarGasto()"
                 >
                     <div
                         class="mb-4"
@@ -76,13 +187,13 @@
                     >
                         <div class="flex">
                             <div class="mr-auto">
-                                <label for="tituloGeneral" class="col-12">
+                                <p for="tituloGeneral" class="font-bold">
                                     {{
                                         taskSelected.code_task +
                                             ". " +
                                             taskSelected.description_task
-                                    }}</label
-                                >
+                                    }}
+                                </p>
                             </div>
                             <button
                                 pButton
@@ -94,7 +205,6 @@
                             ></button>
                         </div>
 
-                        <!-- Descripción de la Actividad -->
                         <div class="p-field p-grid">
                             <div class="col-12">
                                 <input
@@ -109,7 +219,6 @@
                         </div>
 
                         <div class="mb-2">
-                            <!-- Meses -->
                             <div class="p-field p-grid">
                                 <label class="p-col-12 p-md-2">Meses:</label>
 
@@ -137,10 +246,6 @@
                                         "
                                         class="col-2"
                                     >
-                                        <!-- <p-inputNumber
-                                                class="w-full"
-                                                [placeholder]="mes"
-                                            ></p-inputNumber> -->
                                         <p>{{ mes }}</p>
                                         <input
                                             type="number"
@@ -168,12 +273,13 @@
                                 </div>
                             </div>
 
-                            <!-- Comentario -->
                             <div class="p-field p-grid">
                                 <div class="p-col-12 p-md-10">
                                     <p-button
                                         label="Agregar Gasto"
                                         type="submit"
+                                        [disabled]="this.gastoForm.invalid"
+                                        (click)="agregarGasto()"
                                     ></p-button>
                                 </div>
                             </div>
@@ -181,8 +287,19 @@
                     </div>
                 </form>
 
-                <h3>Vista Previa de Gastos</h3>
+                <div *ngIf="gastosIngresados.length && !floatingBoard" class="flex w-full">
+                    <label style="font-size: 1.2rem" class="mr-auto"
+                        >Vista previa del presupuesto</label
+                    >
+                    <p-button
+                        label="Ver en ventana flotante"
+                        [text]="true"
+                        (click)="floatingBoard = true"
+                        icon="pi pi-external-link"
+                    />
+                </div>
                 <p-table
+                    *ngIf="gastosIngresados.length && !floatingBoard"
                     [value]="gastosIngresados"
                     styleClass="p-datatable-gridlines"
                     responsiveLayout="scroll"
@@ -220,13 +337,13 @@
                     <ng-template pTemplate="body" let-gasto>
                         <tr>
                             <td>{{ gasto.activityCode }}</td>
+                            <td>{{ gasto.actividad }}</td>
                             <td>{{ gasto.taskCode }}</td>
-                            <td>{{ gasto.tarea }}</td>
                             <td>{{ gasto.gastoEspecifico }}</td>
                             <td *ngFor="let monto of gasto.meses">
                                 {{ monto }}
                             </td>
-                            <td>{{ calcularTotal(gasto.meses) }}</td>
+                            <td class="font-bold">{{ calcularTotal(gasto.meses) }}</td>
                             <td>{{ gasto.rubroContable }}</td>
                         </tr>
                     </ng-template>
@@ -243,3 +360,68 @@
         </div>
     </div>
 </div>
+<p-dialog
+    header="Vista previa del plan"
+    [(visible)]="floatingBoard"
+    [style]="{ width: '90rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+    [resizable]="true"
+>
+    <p-table
+        [value]="gastosIngresados"
+        styleClass="p-datatable-gridlines"
+        responsiveLayout="scroll"
+    >
+        <ng-template pTemplate="header">
+            <tr>
+                <th>COD. ACT</th>
+                <th>ACTIVIDAD FUNCIONAL</th>
+                <th>COD. TAREA</th>
+                <th>GASTO ESPECÍFICO</th>
+                <th
+                    *ngFor="
+                        let mes of [
+                            'Ene',
+                            'Feb',
+                            'Mar',
+                            'Abr',
+                            'May',
+                            'Jun',
+                            'Jul',
+                            'Ago',
+                            'Sep',
+                            'Oct',
+                            'Nov',
+                            'Dic'
+                        ]
+                    "
+                >
+                    {{ mes }}
+                </th>
+                <th>Total</th>
+                <th>Rubro Contable</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-gasto>
+            <tr>
+                <td>{{ gasto.activityCode }}</td>
+                <td>{{ gasto.actividad }}</td>
+                <td>{{ gasto.taskCode }}</td>
+                <td>{{ gasto.gastoEspecifico }}</td>
+                <td *ngFor="let monto of gasto.meses">
+                    {{ monto }}
+                </td>
+                <td class="font-bold">{{ calcularTotal(gasto.meses) }}</td>
+                <td>{{ gasto.rubroContable }}</td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <tr>
+                <td colspan="4">TOTAL</td>
+                <td *ngFor="let mes of totalMeses()">{{ mes }}</td>
+                <td>{{ calcularTotalTotal() }}</td>
+                <td></td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-dialog>

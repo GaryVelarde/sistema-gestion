@@ -6,6 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import esLocale from '@fullcalendar/core/locales/es';
 import {
+    FormArray,
     FormBuilder,
     FormControl,
     FormGroup,
@@ -21,9 +22,19 @@ import { DateFormatService } from 'src/app/services/date-format.service';
 })
 export class EventsComponent implements OnInit, AfterViewInit {
     @ViewChild('calendar') calendarComponent: FullCalendarComponent;
-    @ViewChild('calendarDetail') calendarDetailComponent: FullCalendarComponent;
     @ViewChild('cardBody') cardBody!: ElementRef;
     resizeObserver!: ResizeObserver;
+
+    // data!: FormArray;
+//   columns: string[] = ['A', 'B', 'C', 'D', 'E'];  // Definición inicial de las columnas
+//   selectedCells: { row: number, col: number }[] = [];  // Celdas seleccionadas
+//   cellStyles: { [key: string]: { backgroundColor?: string, color?: string } } = {};  // Estilos de celdas (fondo, texto)
+//   isMouseDown: boolean = false;  // Flag para controlar el estado del mouse
+//   startCell: { row: number, col: number } | null = null; // Celda de inicio para selección
+//   colorOptions: string[] = ['#FFFFFF', '#FFDDC1', '#FFABAB', '#FFC3A0', '#D9EAD3']; // Opciones de color
+
+scheduleForm: FormGroup;
+activities: any[] = [];
 
     showEventDetailDoalog = true;
     timeslots = [
@@ -32,14 +43,12 @@ export class EventsComponent implements OnInit, AfterViewInit {
         { name: '20 minutos', code: '00:20:00' },
         { name: '30 minutos', code: '00:30:00' },
     ];
-
-    // Define el arreglo de eventos
     events: EventInput[] = [
         {
             title: 'Evento 1',
             start: new Date(),
-            backgroundColor: '#FF5733', // Color de fondo del evento
-            borderColor: '#FF5733', // Color del borde del evento (opcional)
+            backgroundColor: '#FF5733',
+            borderColor: '#FF5733',
             editable: true,
             startResizable: true,
             durationEditable: true,
@@ -54,23 +63,19 @@ export class EventsComponent implements OnInit, AfterViewInit {
             durationEditable: true,
         },
     ];
-
     eventsDetail: EventInput[] = [
         {
             title: 'Reunion de profesores',
             start: new Date(),
-            backgroundColor: '#FF5733', // Color de fondo del evento
-            borderColor: '#D32F2F', // Color del borde del evento (opcional)
+            backgroundColor: '#FF5733',
+            borderColor: '#D32F2F',
             editable: true,
             startResizable: true,
             durationEditable: true,
         },
     ];
-
-    // Formulario reactivo
     eventForm: FormGroup;
     newEventDialog: boolean = false;
-
     calendarOptions: CalendarOptions = {
         plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
         initialView: 'dayGridMonth',
@@ -172,6 +177,16 @@ export class EventsComponent implements OnInit, AfterViewInit {
             end: this.end,
             color: this.color,
         });
+
+        this.scheduleForm = this.fb.group({
+            time: [''],
+            title: [''],
+            moderator: [''],
+            speaker: [''],
+            room: [''],
+            posterNumber: [''],
+            color: ['#ffffff'] // Default color white
+          });
     }
 
     ngOnInit() {
@@ -190,7 +205,146 @@ export class EventsComponent implements OnInit, AfterViewInit {
             dateFormat: 'dd/mm/yy',
             weekHeader: 'Sm'
         });
+        // this.data = new FormArray(this.createRows(5));  // 5 filas por defecto
+
     }
+
+    addActivity() {
+        const newActivity: any = this.scheduleForm.value;
+        this.activities.push(newActivity);
+        this.scheduleForm.reset(); // Limpiar el formulario
+      }
+    
+
+//    // Función para crear filas
+//   createRows(numRows: number): FormGroup[] {
+//     const rows: FormGroup[] = [];
+//     for (let i = 0; i < numRows; i++) {
+//       const row = new FormGroup(this.createColumns());
+//       rows.push(row);
+//     }
+//     return rows;
+//   }
+
+//   // Función para crear columnas como FormControls
+//   createColumns(): { [key: string]: FormControl } {
+//     const cols: { [key: string]: FormControl } = {};
+//     for (let i = 0; i < this.columns.length; i++) {
+//       cols[i] = new FormControl('');  // Inicializa cada celda vacía
+//     }
+//     return cols;
+//   }
+
+//   // Función para manejar el evento mouse down
+//   onMouseDown(row: number, col: number, event: MouseEvent) {
+//     this.isMouseDown = true;  // Activa el estado de mouse presionado
+//     this.startCell = { row, col }; // Guarda la celda de inicio
+//     this.clearSelectedCells(); // Limpia la selección previa
+//     this.selectCell(row, col); // Selecciona la celda inicial
+//     event.preventDefault(); // Evita el comportamiento predeterminado
+//   }
+
+//   // Función para manejar el evento mouse over para selección múltiple
+//   onMouseOver(row: number, col: number) {
+//     if (this.isMouseDown) {
+//       if (this.startCell) {
+//         const startRow = this.startCell.row;
+//         const startCol = this.startCell.col;
+//         this.selectRange(startRow, startCol, row, col); // Selecciona un rango
+//       }
+//     }
+//   }
+
+//   // Función para manejar el evento mouse up
+//   onMouseUp() {
+//     this.isMouseDown = false;  // Desactiva el estado de mouse presionado
+//     this.startCell = null; // Resetea la celda de inicio
+//   }
+
+//   // Función para seleccionar un rango de celdas
+//   selectRange(startRow: number, startCol: number, endRow: number, endCol: number) {
+//     const rowMin = Math.min(startRow, endRow);
+//     const rowMax = Math.max(startRow, endRow);
+//     const colMin = Math.min(startCol, endCol);
+//     const colMax = Math.max(startCol, endCol);
+
+//     for (let row = rowMin; row <= rowMax; row++) {
+//       for (let col = colMin; col <= colMax; col++) {
+//         this.selectCell(row, col);  // Selecciona cada celda en el rango
+//       }
+//     }
+//   }
+
+//   // Función para seleccionar una celda
+//   selectCell(row: number, col: number) {
+//     const cellIndex = this.selectedCells.findIndex(c => c.row === row && c.col === col);
+//     if (cellIndex === -1) {
+//       // Si la celda no está ya seleccionada, se agrega a la selección
+//       this.selectedCells.push({ row, col });
+//     } else {
+//       // Si la celda ya estaba seleccionada, se elimina de la selección
+//       this.selectedCells.splice(cellIndex, 1);
+//     }
+//   }
+
+//   // Función para aplicar color de fondo a las celdas seleccionadas
+//   applyBackgroundColor(color: string) {
+//     this.selectedCells.forEach(cell => {
+//       const key = `${cell.row}-${cell.col}`;
+//       if (!this.cellStyles[key]) this.cellStyles[key] = {};
+//       this.cellStyles[key].backgroundColor = color;  // Cambia el fondo
+//     });
+//   }
+
+//   // Función para aplicar color de texto a las celdas seleccionadas
+//   applyTextColor(color: string) {
+//     this.selectedCells.forEach(cell => {
+//       const key = `${cell.row}-${cell.col}`;
+//       if (!this.cellStyles[key]) this.cellStyles[key] = {};
+//       this.cellStyles[key].color = color;  // Cambia el color de texto
+//     });
+//   }
+
+//   // Función para obtener el estilo de una celda
+//   getCellStyle(row: number, col: number) {
+//     const key = `${row}-${col}`;
+//     return this.cellStyles[key] || {}; // Retorna el estilo guardado para la celda
+//   }
+
+//   // Función para verificar si una celda está seleccionada
+//   isCellSelected(row: number, col: number) {
+//     return this.selectedCells.some(c => c.row === row && c.col === col);
+//   }
+
+//   // Función para agregar una nueva fila
+//   addRow() {
+//     const newRow = new FormGroup(this.createColumns());
+//     this.data.push(newRow);
+//   }
+
+//   // Función para agregar una nueva columna
+//   addColumn() {
+//     const newColIndex = this.columns.length;
+//     this.columns.push(this.getColumnLetter(newColIndex));
+//     this.data.controls.forEach(row => {
+//       (row as FormGroup).addControl(newColIndex.toString(), new FormControl(''));
+//     });
+//   }
+
+//   // Función auxiliar para generar el nombre de la nueva columna (F, G, H, etc.)
+//   getColumnLetter(index: number): string {
+//     return String.fromCharCode(65 + index);  // 65 es 'A' en ASCII
+//   }
+
+//   // Función para desmarcar celdas seleccionadas
+//   clearSelectedCells() {
+//     this.selectedCells = [];  // Limpiar selección
+//   }
+
+
+
+
+
 
     ngAfterViewInit(): void {
         this.showEventDetailDoalog = false;
@@ -249,13 +403,7 @@ export class EventsComponent implements OnInit, AfterViewInit {
 
     handleEventClick(arg) {
         this.showEventDetailDoalog = true;
-        this.calendarDetailComponent
-            .getApi()
-            .setOption('events', this.eventsDetail);
-    }
 
-    renderizeCalendarDetails() {
-        this.calendarDetailComponent.getApi().render();
     }
 
     handleEventDrop(eventDropInfo) {

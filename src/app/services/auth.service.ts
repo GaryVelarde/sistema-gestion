@@ -329,4 +329,8 @@ export class AuthService {
     return this.http.put(`${this.API_URL}/article/${articleId}/status`, request, this.header);
   }
 
+  postRegisterBudget(request: any) {
+    return this.http.post(`${this.API_URL}/budget`, request, this.header);
+  }
+
 }

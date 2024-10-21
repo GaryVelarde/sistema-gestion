@@ -16,6 +16,7 @@ import { TimelineModule } from 'primeng/timeline';
 import { CardModule } from 'primeng/card';
 import { TagModule } from 'primeng/tag';
 import { SidebarModule } from 'primeng/sidebar';
+import { CalendarModule } from 'primeng/calendar';
 
 @NgModule({
   imports: [
@@ -36,6 +37,7 @@ import { SidebarModule } from 'primeng/sidebar';
     CardModule,
     TagModule,
     SidebarModule,
+    CalendarModule,
   ],
   declarations: [HotbedTrackingComponent]
 })

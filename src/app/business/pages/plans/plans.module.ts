@@ -34,6 +34,7 @@ import { PlansRoutingModule } from './plans-routing.module';
 import { PlansComponent } from './plans.component';
 import { PanelModule } from 'primeng/panel';
 import { CarouselModule } from 'primeng/carousel';
+import { TooltipModule } from 'primeng/tooltip';
 
 @NgModule({
     imports: [
@@ -70,6 +71,7 @@ import { CarouselModule } from 'primeng/carousel';
         SidebarModule,
         PanelModule,
         CarouselModule,
+        TooltipModule,
     ],
     declarations: [PlansComponent],
     providers: [
