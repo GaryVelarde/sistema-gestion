@@ -1,0 +1,41 @@
+.card-user {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 250px;
+    overflow: hidden;
+}
+.card-user-header {
+    //background-color: #1e366d;
+    color: white;
+    padding: 10px;
+    text-align: center;
+}
+.card-user-body {
+    padding: 10px;
+}
+h2 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: bold;
+}
+.info {
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.user-info {
+    text-align: center;
+  }
+  
+  .user-info p {
+    margin: 5px 0;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .user-info i {
+    margin-right: 5px;
+    color: #007bff;
+  }

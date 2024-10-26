@@ -34,6 +34,7 @@ import { PanelModule } from 'primeng/panel';
 import { BudgetComponent } from './budget.component';
 import { BudgetRoutingModule } from './budget-routing.module';
 import { KeyFilterModule } from 'primeng/keyfilter';
+import { ChipModule } from 'primeng/chip';
 
 @NgModule({
     imports: [
@@ -70,6 +71,7 @@ import { KeyFilterModule } from 'primeng/keyfilter';
         SidebarModule,
         PanelModule,
         KeyFilterModule,
+        ChipModule,
     ],
     declarations: [BudgetComponent],
     providers: [

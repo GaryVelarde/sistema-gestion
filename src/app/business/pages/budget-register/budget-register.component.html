@@ -15,11 +15,11 @@
                 </div>
                 <div>
                     <p-button
-                    (click)="save()"
-                    label="Guardar presupuesto"
-                    icon="pi pi-save"
-                    iconPos="left"
-                />
+                        (click)="save()"
+                        label="Guardar presupuesto"
+                        icon="pi pi-save"
+                        iconPos="left"
+                    />
                 </div>
             </div>
             <div class="">
@@ -124,12 +124,20 @@
                                         task.description_task
                                     "
                                     [icon]="
-                                        task.selected
+                                        task.done
+                                            ? 'pi pi-check'
+                                            : task.selected
                                             ? 'pi pi-circle-on'
                                             : 'pi pi-circle-off'
                                     "
-                                    class="mr-2 cursor-pointer"
-                                    (click)="taskSelection(task)"
+                                    [class]="
+                                        task.done
+                                            ? 'mr-2'
+                                            : 'mr-2 cursor-pointer'
+                                    "
+                                    (click)="
+                                        !task.done ? taskSelection(task) : null
+                                    "
                                 />
                             </div>
                         </div>
@@ -173,10 +181,7 @@
                     ></app-label-error>
                 </ng-template>
 
-                <form
-                    *ngIf="taskSelected"
-                    [formGroup]="gastoForm"
-                >
+                <form *ngIf="taskSelected" [formGroup]="gastoForm">
                     <div
                         class="mb-4"
                         style="
@@ -202,6 +207,7 @@
                                 class="p-button-danger"
                                 [rounded]="true"
                                 [text]="true"
+                                (click)="clearTaskSelection()"
                             ></button>
                         </div>
 
@@ -287,7 +293,10 @@
                     </div>
                 </form>
 
-                <div *ngIf="gastosIngresados.length && !floatingBoard" class="flex w-full">
+                <div
+                    *ngIf="gastosIngresados.length && !floatingBoard"
+                    class="flex w-full"
+                >
                     <label style="font-size: 1.2rem" class="mr-auto"
                         >Vista previa del presupuesto</label
                     >
@@ -343,8 +352,19 @@
                             <td *ngFor="let monto of gasto.meses">
                                 {{ monto }}
                             </td>
-                            <td class="font-bold">{{ calcularTotal(gasto.meses) }}</td>
+                            <td class="font-bold">
+                                {{ calcularTotal(gasto.meses) }}
+                            </td>
                             <td>{{ gasto.rubroContable }}</td>
+                            <td>
+                                <p-button
+                                    icon="pi pi-trash"
+                                    [rounded]="true"
+                                    [text]="true"
+                                    severity="danger"
+                                    (click)="deleteGasto(gasto)"
+                                />
+                            </td>
                         </tr>
                     </ng-template>
                     <ng-template pTemplate="footer">
@@ -361,7 +381,7 @@
     </div>
 </div>
 <p-dialog
-    header="Vista previa del plan"
+    header="Vista previa del presupuesto"
     [(visible)]="floatingBoard"
     [style]="{ width: '90rem' }"
     [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
@@ -413,6 +433,15 @@
                 </td>
                 <td class="font-bold">{{ calcularTotal(gasto.meses) }}</td>
                 <td>{{ gasto.rubroContable }}</td>
+                <td>
+                    <p-button
+                        icon="pi pi-trash"
+                        [rounded]="true"
+                        [text]="true"
+                        severity="danger"
+                        (click)="deleteGasto(gasto)"
+                    />
+                </td>
             </tr>
         </ng-template>
         <ng-template pTemplate="footer">

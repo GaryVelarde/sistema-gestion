@@ -12,12 +12,12 @@ import { UploadArchivesComponent } from '../../cross-components/upload-archives/
 import { DateFormatService } from 'src/app/services/date-format.service';
 
 @Component({
-  selector: 'app-hotbed-tracking',
-  templateUrl: './hotbed-tracking.component.html',
-  styleUrls: ['./hotbed-tracking.component.scss'],
+  selector: 'app-guide-tracking',
+  templateUrl: './guide-tracking.component.html',
+  styleUrls: ['./guide-tracking.component.scss'],
   providers: [MessageService],
 })
-export class HotbedTrackingComponent implements OnInit, OnDestroy {
+export class GuideTrackingComponent implements OnInit, OnDestroy {
   @ViewChild('upload') upload: UploadArchivesComponent;
   @ViewChild('fileList') fileList: FileListComponent;
   registros = [];
@@ -54,7 +54,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
   dialogIndexed = false;
   module = eModule.hotbed;
   articleSelected: any;
-  getArticleListProcess = '';
+  getListProcess = '';
   skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
   columnTitles: string[] = [
     'Título del artículo',
@@ -121,7 +121,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.getArticleList();
+    this.getGuideList();
   }
 
   ngOnDestroy() {
@@ -136,8 +136,8 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     this.articleSelected = {};
   }
 
-  goToRegisterHotbed() {
-    this.router.navigate(['pages/registrar-semilleros']);
+  goToRegisterGuide() {
+    this.router.navigate(['pages/lineas-guias-registro']);
   }
 
   viewDetailsHotbed(data: any) {
@@ -153,16 +153,16 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     }, 400);
   }
 
-  getArticleList() {
-    this.getArticleListProcess = 'charging';
-    this.service.getArticleList().pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
+  getGuideList() {
+    this.getListProcess = 'charging';
+    this.service.getGuides().pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res) {
         this.registros = res.data;
-        this.getArticleListProcess = 'complete';
+        this.getListProcess = 'complete';
       }
     },
       (error) => {
-        this.getArticleListProcess = 'error';
+        this.getListProcess = 'error';
       })
   }
 
@@ -175,7 +175,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
 
   handleReload(reload: boolean) {
     if (reload) {
-      this.getArticleList();
+      this.getGuideList();
     }
   }
 
@@ -183,7 +183,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     this.loaderService.show();
     this.viewDetail = false;
     this.articleSelected = {};
-    this.getArticleList();
+    this.getGuideList();
     setTimeout(() => {
       this.loaderService.hide();
     }, 400);

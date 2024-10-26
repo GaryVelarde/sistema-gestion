@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, ElementRef, Renderer2 } from '@angular/core';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -12,30 +12,24 @@ import {
     FormGroup,
     Validators,
 } from '@angular/forms';
-import { PrimeNGConfig } from 'primeng/api';
+import { MessageService, PrimeNGConfig } from 'primeng/api';
 import { DateFormatService } from 'src/app/services/date-format.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
     selector: 'app-events',
     templateUrl: './events.component.html',
     styleUrls: ['./events.component.scss'],
+    providers: [MessageService]
 })
 export class EventsComponent implements OnInit, AfterViewInit {
     @ViewChild('calendar') calendarComponent: FullCalendarComponent;
     @ViewChild('cardBody') cardBody!: ElementRef;
     resizeObserver!: ResizeObserver;
-
-    // data!: FormArray;
-//   columns: string[] = ['A', 'B', 'C', 'D', 'E'];  // Definición inicial de las columnas
-//   selectedCells: { row: number, col: number }[] = [];  // Celdas seleccionadas
-//   cellStyles: { [key: string]: { backgroundColor?: string, color?: string } } = {};  // Estilos de celdas (fondo, texto)
-//   isMouseDown: boolean = false;  // Flag para controlar el estado del mouse
-//   startCell: { row: number, col: number } | null = null; // Celda de inicio para selección
-//   colorOptions: string[] = ['#FFFFFF', '#FFDDC1', '#FFABAB', '#FFC3A0', '#D9EAD3']; // Opciones de color
-
-scheduleForm: FormGroup;
-activities: any[] = [];
-
+    scheduleForm: FormGroup;
+    activities: any[] = [];
+    roomForm: FormGroup;
+    titles: any[] = [];
     showEventDetailDoalog = true;
     timeslots = [
         { name: '10 minutos', code: '00:10:00' },
@@ -132,7 +126,7 @@ activities: any[] = [];
     private _slotDuration: FormControl = new FormControl('', [
         Validators.required,
     ]);
-    private _title: FormControl = new FormControl('', [Validators.required]);
+    private _eventTitle: FormControl = new FormControl('', [Validators.required]);
     private _start: FormControl = new FormControl('', [Validators.required]);
     private _end: FormControl = new FormControl('', [Validators.required]);
     private _color: FormControl = new FormControl('#ff0000', [
@@ -146,8 +140,8 @@ activities: any[] = [];
     get slotDuration() {
         return this._slotDuration;
     }
-    get title() {
-        return this._title;
+    get eventTitle() {
+        return this._eventTitle;
     }
     get start() {
         return this._start;
@@ -165,12 +159,20 @@ activities: any[] = [];
         return this._description;
     }
 
-    constructor(private fb: FormBuilder, private config: PrimeNGConfig, private dateFormatService: DateFormatService,) {
+    constructor(
+        private fb: FormBuilder,
+        private config: PrimeNGConfig,
+        private dateFormatService: DateFormatService,
+        private service: AuthService,
+        private messageService: MessageService,
+        private renderer: Renderer2,
+        private el: ElementRef
+    ) {
         this.slotDurationForm = this.fb.group({
             slotDuration: this.slotDuration,
         });
         this.eventForm = this.fb.group({
-            title: this.title,
+            title: this.eventTitle,
             description: this.description,
             eventLink: this.eventLink,
             start: this.start,
@@ -186,10 +188,16 @@ activities: any[] = [];
             room: [''],
             posterNumber: [''],
             color: ['#ffffff'] // Default color white
-          });
+        });
+        this.roomForm = this.fb.group({
+            rooms: this.fb.array([this.createRoom()])
+        });
+
     }
 
     ngOnInit() {
+        this.callGetTitlesEvents();
+        this.listenToTopicTitleChanges();
         this.slotDuration.setValue(this.timeslots[this.timeslots.length - 1]);
         this.watchSlotDuration();
         this.color.setValue('#ff0000');
@@ -205,146 +213,13 @@ activities: any[] = [];
             dateFormat: 'dd/mm/yy',
             weekHeader: 'Sm'
         });
-        // this.data = new FormArray(this.createRows(5));  // 5 filas por defecto
-
     }
 
     addActivity() {
         const newActivity: any = this.scheduleForm.value;
         this.activities.push(newActivity);
         this.scheduleForm.reset(); // Limpiar el formulario
-      }
-    
-
-//    // Función para crear filas
-//   createRows(numRows: number): FormGroup[] {
-//     const rows: FormGroup[] = [];
-//     for (let i = 0; i < numRows; i++) {
-//       const row = new FormGroup(this.createColumns());
-//       rows.push(row);
-//     }
-//     return rows;
-//   }
-
-//   // Función para crear columnas como FormControls
-//   createColumns(): { [key: string]: FormControl } {
-//     const cols: { [key: string]: FormControl } = {};
-//     for (let i = 0; i < this.columns.length; i++) {
-//       cols[i] = new FormControl('');  // Inicializa cada celda vacía
-//     }
-//     return cols;
-//   }
-
-//   // Función para manejar el evento mouse down
-//   onMouseDown(row: number, col: number, event: MouseEvent) {
-//     this.isMouseDown = true;  // Activa el estado de mouse presionado
-//     this.startCell = { row, col }; // Guarda la celda de inicio
-//     this.clearSelectedCells(); // Limpia la selección previa
-//     this.selectCell(row, col); // Selecciona la celda inicial
-//     event.preventDefault(); // Evita el comportamiento predeterminado
-//   }
-
-//   // Función para manejar el evento mouse over para selección múltiple
-//   onMouseOver(row: number, col: number) {
-//     if (this.isMouseDown) {
-//       if (this.startCell) {
-//         const startRow = this.startCell.row;
-//         const startCol = this.startCell.col;
-//         this.selectRange(startRow, startCol, row, col); // Selecciona un rango
-//       }
-//     }
-//   }
-
-//   // Función para manejar el evento mouse up
-//   onMouseUp() {
-//     this.isMouseDown = false;  // Desactiva el estado de mouse presionado
-//     this.startCell = null; // Resetea la celda de inicio
-//   }
-
-//   // Función para seleccionar un rango de celdas
-//   selectRange(startRow: number, startCol: number, endRow: number, endCol: number) {
-//     const rowMin = Math.min(startRow, endRow);
-//     const rowMax = Math.max(startRow, endRow);
-//     const colMin = Math.min(startCol, endCol);
-//     const colMax = Math.max(startCol, endCol);
-
-//     for (let row = rowMin; row <= rowMax; row++) {
-//       for (let col = colMin; col <= colMax; col++) {
-//         this.selectCell(row, col);  // Selecciona cada celda en el rango
-//       }
-//     }
-//   }
-
-//   // Función para seleccionar una celda
-//   selectCell(row: number, col: number) {
-//     const cellIndex = this.selectedCells.findIndex(c => c.row === row && c.col === col);
-//     if (cellIndex === -1) {
-//       // Si la celda no está ya seleccionada, se agrega a la selección
-//       this.selectedCells.push({ row, col });
-//     } else {
-//       // Si la celda ya estaba seleccionada, se elimina de la selección
-//       this.selectedCells.splice(cellIndex, 1);
-//     }
-//   }
-
-//   // Función para aplicar color de fondo a las celdas seleccionadas
-//   applyBackgroundColor(color: string) {
-//     this.selectedCells.forEach(cell => {
-//       const key = `${cell.row}-${cell.col}`;
-//       if (!this.cellStyles[key]) this.cellStyles[key] = {};
-//       this.cellStyles[key].backgroundColor = color;  // Cambia el fondo
-//     });
-//   }
-
-//   // Función para aplicar color de texto a las celdas seleccionadas
-//   applyTextColor(color: string) {
-//     this.selectedCells.forEach(cell => {
-//       const key = `${cell.row}-${cell.col}`;
-//       if (!this.cellStyles[key]) this.cellStyles[key] = {};
-//       this.cellStyles[key].color = color;  // Cambia el color de texto
-//     });
-//   }
-
-//   // Función para obtener el estilo de una celda
-//   getCellStyle(row: number, col: number) {
-//     const key = `${row}-${col}`;
-//     return this.cellStyles[key] || {}; // Retorna el estilo guardado para la celda
-//   }
-
-//   // Función para verificar si una celda está seleccionada
-//   isCellSelected(row: number, col: number) {
-//     return this.selectedCells.some(c => c.row === row && c.col === col);
-//   }
-
-//   // Función para agregar una nueva fila
-//   addRow() {
-//     const newRow = new FormGroup(this.createColumns());
-//     this.data.push(newRow);
-//   }
-
-//   // Función para agregar una nueva columna
-//   addColumn() {
-//     const newColIndex = this.columns.length;
-//     this.columns.push(this.getColumnLetter(newColIndex));
-//     this.data.controls.forEach(row => {
-//       (row as FormGroup).addControl(newColIndex.toString(), new FormControl(''));
-//     });
-//   }
-
-//   // Función auxiliar para generar el nombre de la nueva columna (F, G, H, etc.)
-//   getColumnLetter(index: number): string {
-//     return String.fromCharCode(65 + index);  // 65 es 'A' en ASCII
-//   }
-
-//   // Función para desmarcar celdas seleccionadas
-//   clearSelectedCells() {
-//     this.selectedCells = [];  // Limpiar selección
-//   }
-
-
-
-
-
+    }
 
     ngAfterViewInit(): void {
         this.showEventDetailDoalog = false;
@@ -358,6 +233,13 @@ activities: any[] = [];
         }
     }
 
+    test() {
+        const elementos = this.el.nativeElement.querySelectorAll('div.p-overlay.p-component.ng-star-inserted');
+        elementos.forEach((elemento: HTMLElement) => {
+            this.renderer.setStyle(elemento, 'width', '90%');
+            this.renderer.setStyle(elemento, 'max-width', '90%');
+        });
+    }
 
     renderizeCalendar() {
         this.calendarComponent.getApi().render();
@@ -417,7 +299,7 @@ activities: any[] = [];
     addEvent() {
         if (this.eventForm.valid) {
             const newEvent: EventInput = {
-                title: this.title.value,
+                title: this.eventTitle.value,
                 start: this.dateFormatService.formatDateToISO(this.start.value),
                 end: this.dateFormatService.formatDateToISO(this.end.value),
                 allDay: false,
@@ -433,4 +315,116 @@ activities: any[] = [];
             this.newEventDialog = false;
         }
     }
+
+    callGetEvents() {
+        this.service.getEvents().pipe().subscribe(
+            (res: any) => {
+                console.log(res);
+            }, (error) => {
+
+            })
+    }
+
+    callGetTitlesEvents() {
+        this.service.getTitleEvents().pipe().subscribe(
+            (res: any) => {
+                if (res.data) {
+                    this.titles = res.data;
+                }
+
+                console.log(res);
+            }, (error) => {
+
+            })
+    }
+
+    createRoom(): FormGroup {
+        return this.fb.group({
+            moderator_id: ['', Validators.required],
+            room_number: ['', Validators.required],
+            start_time: ['', Validators.required],
+            end_time: ['', Validators.required],
+            description: ['', Validators.required],
+            topics: this.fb.array([this.createTopic()])
+        });
+    }
+
+    createTopic(): FormGroup {
+        return this.fb.group({
+            title: ['', Validators.required],
+            start_time: ['', Validators.required],
+            end_time: ['', Validators.required],
+            authors: this.fb.array([this.createAuthor()])
+        });
+    }
+
+    createAuthor(): FormGroup {
+        return this.fb.group({
+            author_id: ['', Validators.required]
+        });
+    }
+
+    get rooms(): FormArray {
+        return this.roomForm.get('rooms') as FormArray;
+    }
+
+    addRoom() {
+        this.rooms.push(this.createRoom());
+    }
+
+    removeRoom(index: number) {
+        this.rooms.removeAt(index);
+    }
+
+    addTopic(roomIndex: number) {
+        const topics = this.rooms.at(roomIndex).get('topics') as FormArray;
+        topics.push(this.createTopic());
+    }
+
+    removeTopic(roomIndex: number, topicIndex: number) {
+        const topics = this.rooms.at(roomIndex).get('topics') as FormArray;
+        topics.removeAt(topicIndex);
+    }
+
+    addAuthor(roomIndex: number, topicIndex: number) {
+        const topics = this.rooms.at(roomIndex).get('topics') as FormArray;
+        const authors = topics.at(topicIndex).get('authors') as FormArray;
+        authors.push(this.createAuthor());
+    }
+
+    removeAuthor(roomIndex: number, topicIndex: number, authorIndex: number) {
+        const topics = this.rooms.at(roomIndex).get('topics') as FormArray;
+        const authors = topics.at(topicIndex).get('authors') as FormArray;
+        authors.removeAt(authorIndex);
+    }
+
+    submitForm() {
+        console.log(this.roomForm.value);
+    }
+
+    listenToTopicTitleChanges() {
+        const roomsArray = this.roomForm.get('rooms') as FormArray;
+      
+        roomsArray.controls.forEach((roomGroup: FormGroup, roomIndex: number) => {
+          const topicsArray = roomGroup.get('topics') as FormArray;
+      
+          topicsArray.controls.forEach((topicGroup: FormGroup, topicIndex: number) => {
+            const titleControl = topicGroup.get('title');
+      
+            // Suscribirse a los cambios del campo 'title' de cada 'topic'
+            titleControl?.valueChanges.subscribe((newTitleValue) => {
+              console.log(`Cambio en Room ${roomIndex + 1}, Topic ${topicIndex + 1}:`, newTitleValue);
+              
+              // Llama a una función personalizada para manejar los cambios
+              this.onTitleChange(roomIndex, topicIndex, newTitleValue);
+            });
+          });
+        });
+      }
+      
+      onTitleChange(roomIndex: number, topicIndex: number, newTitleValue: string) {
+        // Aquí puedes manejar el cambio de 'title', por ejemplo, actualizando otros campos
+        console.log(`Title actualizado en Room ${roomIndex + 1}, Topic ${topicIndex + 1}: ${newTitleValue}`);
+      }
+      
 }

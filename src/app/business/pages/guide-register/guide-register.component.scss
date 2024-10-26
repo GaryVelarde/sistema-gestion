@@ -38,7 +38,12 @@ input[type=file] {
 }
 
 .custom-file-input::before {
-  content: "+ Seleccionar archivos";
+  content: "Seleccionar el artículo de investigación";
   display: block;
   color: var(--text-color);  
+}
+
+.label-porcantaje {
+  padding-top: 12px; 
+  padding-left: 5px;
 }

@@ -31,6 +31,7 @@ import { CarouselModule } from 'primeng/carousel';
 import { MessagesModule } from 'primeng/messages';
 import { LabelErrorComponent } from './label-error/label-error.component';
 import { MenuModule } from 'primeng/menu';
+import { UserCardDetailComponent } from './user-card-detail/user-card-detail.component';
 
 @NgModule({
   imports: [
@@ -70,6 +71,7 @@ import { MenuModule } from 'primeng/menu';
     UploadArchivesComponent,
     FileListComponent,
     LabelErrorComponent,
+    UserCardDetailComponent,
   ],
   exports: [
     CommentsComponent,
@@ -82,6 +84,7 @@ import { MenuModule } from 'primeng/menu';
     UploadArchivesComponent,
     FileListComponent,
     LabelErrorComponent,
+    UserCardDetailComponent,
   ]
 })
 export class CrossComponentsModule { }

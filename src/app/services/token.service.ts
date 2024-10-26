@@ -37,4 +37,12 @@ export class TokenService {
 
     return false;
   }
+
+  getMode() {
+    return localStorage.getItem('mode');
+  }
+
+  setMode(value: any) {
+    localStorage.setItem('mode', value);
+  }
 }

@@ -20,7 +20,7 @@ export class AppTopBarComponent {
                     label: 'Modo oscuro',
                     icon: 'pi pi-moon',
                     command: () => {
-                        this.darMode();
+                        this.darkMode();
                     }
                 }
             ]
@@ -100,12 +100,14 @@ export class AppTopBarComponent {
         this.router.navigate(['/auth/login']);
     }
 
-    darMode() {
+    darkMode() {
+        this.tokenService.setMode('dark');
         this.changeTheme('md-dark-indigo', 'dark');
         this.validateScheme();
     }
 
     lightMode() {
+        this.tokenService.setMode('light');
         this.changeTheme('lara-light-indigo', 'light');
         this.validateScheme();
     }
@@ -116,6 +118,11 @@ export class AppTopBarComponent {
     }
 
     validateScheme() {
+        if(this.tokenService.getMode() === 'light') {
+            this.changeTheme('lara-light-indigo', 'light');
+        } else {
+            this.changeTheme('md-dark-indigo', 'dark');
+        }
         if (this.colorScheme === 'light') {
             this.items[0] = {
                 label: 'Configuración',
@@ -124,7 +131,7 @@ export class AppTopBarComponent {
                         label: 'Modo oscuro',
                         icon: 'pi pi-moon',
                         command: () => {
-                            this.darMode();
+                            this.darkMode();
                         }
                     }
                 ]

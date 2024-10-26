@@ -81,6 +81,9 @@ export class CommentsComponent implements OnInit, OnDestroy {
       case eModule.presentation:
         this.getCommentsByPresentation();
         break;
+        case eModule.guide:
+        this.getCommentsByGuide();
+        break;
     }
   }
 
@@ -202,6 +205,18 @@ export class CommentsComponent implements OnInit, OnDestroy {
             this.registerState = 'complete';
           });
         break;
+        case eModule.guide:
+        this.commentService.postAddGuideComment(this.id, rq).pipe(takeUntil(this.destroy$)).subscribe(
+          (res: any) => {
+            if (res.status) {
+              this.registerState = 'complete';
+              this.confirmAddEvent(res.id);
+            }
+            console.log(res);
+          }, (error) => {
+            this.registerState = 'complete';
+          });
+        break;
     }
   }
 
@@ -300,6 +315,25 @@ export class CommentsComponent implements OnInit, OnDestroy {
       })
   }
 
+  getCommentsByGuide() {
+    this.state = 'charging';
+    this.registerState = 'charging';
+    this.commentService.getCommentsByGuide(this.id).pipe(takeUntil(this.destroy$)).subscribe(
+      (res: any) => {
+        res.data.forEach(item => {
+          item.created_at = this.dateFormatService.formatCustomDateByFrontComment(item.created_at);
+        });
+        this.comments = res.data;
+        this.updateVisibleComments();
+        this.state = 'complete';
+        this.registerState = 'complete';
+      },
+      (error) => {
+        this.state = 'error';
+        this.registerState = 'complete';
+      })
+  }
+
 
   getCommentsByAdvisory() {
     this.state = 'charging';
@@ -340,20 +374,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
   }
 
   handleReload() {
-    switch (this.module) {
-      case eModule.eventUdi:
-        this.getCommentsByEventsUDI();
-        break;
-      case eModule.advisory:
-        this.getCommentsByAdvisory();
-        break;
-      case eModule.inscription:
-        this.getCommentsByInscription();
-        break;
-      case eModule.hotbed:
-        this.getCommentsByHotbed();
-        break;
-    }
+    this.getCommentsList();
   }
 
   openMenu(menu: Menu, event: Event) {
@@ -402,6 +423,9 @@ export class CommentsComponent implements OnInit, OnDestroy {
       case eModule.presentation:
         this.callPutPresentationCommentUpdate(comment);
         break;
+        case eModule.guide:
+        this.callPutPresentationCommentUpdate(comment);
+        break;
     }
   }
 
@@ -428,6 +452,9 @@ export class CommentsComponent implements OnInit, OnDestroy {
         this.callDeleteReviewComment(comment);
         break;
       case eModule.presentation:
+        this.callDeletePresentationComment(comment);
+        break;
+        case eModule.guide:
         this.callDeletePresentationComment(comment);
         break;
     }
@@ -481,6 +508,20 @@ export class CommentsComponent implements OnInit, OnDestroy {
       description: comment.description
     };
     this.commentService.putPresentationCommentUpdate(this.id, comment.id, request).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          comment.isEditing = false;
+        }, (error) => {
+
+        })
+  }
+
+  callPutGuideCommentUpdate(comment: any) {
+    const request = {
+      description: comment.description
+    };
+    this.commentService.putGuideCommentUpdate(this.id, comment.id, request).
       pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {
@@ -615,6 +656,25 @@ export class CommentsComponent implements OnInit, OnDestroy {
 
   callDeleteAdvisoryComment(comment) {
     this.commentService.deleteAdvisoryComment(this.id, comment.id).
+      pipe(takeUntil(this.destroy$)).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            const commentId = comment.id;
+            const index = this.comments.findIndex(comment => comment.id === commentId); // Buscar índice por id
+            if (index !== -1) {
+              this.comments.splice(index, 1); // Eliminar el comentario del array
+              this.comments = [...this.comments]; // Crear nueva referencia al array
+              this.updateVisibleComments();
+            }
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callDeleteGuideComment(comment) {
+    this.commentService.deleteGuideComment(this.id, comment.id).
       pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {

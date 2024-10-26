@@ -42,6 +42,10 @@ export class CommentsService {
         return this.http.put(`${this.API_URL}/presentation/${articleId}/observations/${commentId}`, request, this.header);
     }
 
+    putGuideCommentUpdate(guideId: string, commentId: string, request: any) {
+        return this.http.put(`${this.API_URL}/guide/${guideId}/observations/${commentId}`, request, this.header);
+    }
+
     /**
        Eliminar comentarios
     */
@@ -66,8 +70,12 @@ export class CommentsService {
         return this.http.delete(`${this.API_URL}/meeting/${eventId}/observations/${commentId}`);
     }
 
-    deletePresentationComment(eventId: string, commentId: string) {
-        return this.http.delete(`${this.API_URL}/presentation/${eventId}/observations/${commentId}`);
+    deletePresentationComment(presentationId: string, commentId: string) {
+        return this.http.delete(`${this.API_URL}/presentation/${presentationId}/observations/${commentId}`);
+    }
+    
+    deleteGuideComment(guideId: string, commentId: string) {
+        return this.http.delete(`${this.API_URL}/guide/${guideId}/observations/{idObservation}/${commentId}`);
     }
 
     /**
@@ -82,6 +90,10 @@ export class CommentsService {
         return this.http.get(`${this.API_URL}/presentation/${id}/observations`, this.header);
     }
 
+    getCommentsByGuide(id: string): Observable<any> {
+        return this.http.get(`${this.API_URL}/guide/${id}/observations`, this.header);
+    }
+
     /**
       Registrar comentarios
     */
@@ -94,5 +106,8 @@ export class CommentsService {
         return this.http.post(`${this.API_URL}/presentation/${id}/observations`, request, this.header);
     }
 
+    postAddGuideComment(id: any, request: any) {
+        return this.http.post(`${this.API_URL}/guide/${id}/observations`, request, this.header);
+    }
 
 }

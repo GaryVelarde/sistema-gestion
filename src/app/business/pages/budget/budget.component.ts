@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { Subject, takeUntil } from 'rxjs';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
     templateUrl: './budget.component.html',
@@ -14,150 +16,200 @@ export class BudgetComponent implements OnInit {
         { label: 'Programa 3' },
         { label: 'Presupuesto', visible: true },
     ];
-    testData: any[] = [
-        {
-            tituloGeneral: 'Plan de Actividades 2024',
-            actividades: [
-                {
-                    descripcion: 'Desarrollo de la plataforma web',
-                    tareas: [
-                        {
-                            descripcion: 'Crear la estructura del frontend',
-                            meses: [true, false, false, true, false, false, false, false, false, false, false, false],
-                            comentario: 'La estructura básica está completa.'
-                        },
-                        {
-                            descripcion: 'Implementar autenticación',
-                            meses: [false, false, true, true, true, false, false, false, false, false, false, false],
-                            comentario: 'Autenticación implementada, falta testing.'
-                        }
-                    ]
-                },
-                {
-                    descripcion: 'Pruebas de calidad y despliegue',
-                    tareas: [
-                        {
-                            descripcion: 'Escribir pruebas unitarias',
-                            meses: [false, false, false, false, true, true, false, false, false, false, false, false],
-                            comentario: 'Pruebas unitarias en progreso.'
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            tituloGeneral: 'Plan de Mejoras 2024',
-            actividades: [
-                {
-                    descripcion: 'Optimización del backend',
-                    tareas: [
-                        {
-                            descripcion: 'Mejorar la eficiencia de las consultas SQL',
-                            meses: [false, true, true, false, false, false, true, false, false, false, false, false],
-                            comentario: 'Consultas SQL optimizadas en un 50%.'
-                        },
-                        {
-                            descripcion: 'Implementar caching',
-                            meses: [false, false, false, false, true, true, true, false, false, false, false, false],
-                            comentario: 'Falta implementar la capa de caching.'
-                        }
-                    ]
-                },
-                {
-                    descripcion: 'Mejoras de seguridad',
-                    tareas: [
-                        {
-                            descripcion: 'Auditar las políticas de seguridad',
-                            meses: [false, false, false, false, false, true, true, false, false, false, false, false],
-                            comentario: 'Auditoría de seguridad en progreso.'
-                        }
-                    ]
-                }
-            ]
-        }
+    private destroy$ = new Subject<void>();
+    messageError: string = 'Se produjo un error al cargar la lista de planes. Por favor, inténtelo de nuevo más tarde';
+    statusList = '';
+    registros = [];
+    budgetSelected: any;
+    floatingBoard = false;
+    previewData = [];
+    breadcrumbItemsDetail: MenuItem[] = [
+        { icon: 'pi pi-home', route: '/pages' },
+        { label: 'Programa 3' },
+        { label: 'Presupuesto' },
+        { label: 'Detalle del Presupuesto', visible: true },
     ];
+    skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
+    columnTitles: string[] = [
+        'Presupuesto',
+        ''
+    ];
+    gastosIngresados: any[] = [];
+    edition = false;
+    activities: any[] = [];
+    tasks: any[] = [];
+    statusActivity = '';
+    activitySelected: any;
+    statusTask = '';
+    taskSelected: any;
+    completedTaskIds: string[] = [];
 
-    selectedPlan: any;
-    selectedActividad: any;
-    selectedTarea: any;
-    gastosIngresados: any[] = []; // Arreglo para almacenar los gastos ingresados
-    gastoForm: FormGroup;
-
-
-    constructor(private fb: FormBuilder, private router: Router) {
-        this.gastoForm = this.fb.group({
-            gastoEspecifico: ['', Validators.required],
-            meses: this.fb.array(Array(12).fill(0)), // Inicializa el array de meses como montos (0)
-            rubroContable: ['', Validators.required]
-        });
-
+    constructor(private fb: FormBuilder, private router: Router, private service: AuthService) {
     }
 
-    ngOnInit(): void { }
-
-    onPlanChange() {
-        this.selectedActividad = null;
-        this.selectedTarea = null;
-    }
-
-    onActividadChange() {
-        this.selectedTarea = null;
-    }
-
-    onTareaChange() {
-        // Este método puede estar vacío, pero lo puedes usar para acciones adicionales si es necesario
-    }
-
-    agregarGasto() {
-        if (!this.selectedTarea) {
-            alert("Por favor, selecciona una tarea antes de agregar un gasto.");
-            return;
-        }
-
-        const newGasto = {
-            gastoEspecifico: this.gastoForm.value.gastoEspecifico,
-            meses: this.gastoForm.value.meses, // Ahora guarda los montos
-            rubroContable: this.gastoForm.value.rubroContable,
-            tarea: this.selectedTarea.descripcion,
-            actividad: this.selectedActividad.descripcion
-        };
-
-        // Agregar el nuevo gasto al array de gastos ingresados
-        this.gastosIngresados.push(newGasto);
-        console.log('this.gastosIngresados', this.gastosIngresados);
-
-        // Limpiar el formulario
-        this.gastoForm.reset();
-        this.gastoForm.setControl('meses', this.fb.array(Array(12).fill(0))); // Reinicia los meses a 0
-        this.selectedTarea = null; // Reinicia la tarea seleccionada
-
-    }
-
-
-    calcularTotal(meses: number[]): number {
-        return meses.reduce((acc, monto) => acc + monto, 0); // Sumar todos los montos ingresados en los meses
-    }
-
-    totalMeses(): number[] {
-        const totalPorMes = new Array(12).fill(0);
-        this.gastosIngresados.forEach(gasto => {
-          gasto.meses.forEach((monto, index) => {
-            totalPorMes[index] += monto; // Sumar los montos
-          });
-        });
-        return totalPorMes;
-      }
-    
-
-
-    calcularTotalTotal(): number {
-        return this.gastosIngresados.reduce((acc, gasto) => {
-            return acc + gasto.meses.reduce((sum, monto) => sum + monto, 0); // Sumar todos los montos ingresados
-        }, 0);
+    ngOnInit(): void {
+        this.calGetBudgetList();
     }
 
     goToBudgetRegister() {
         this.router.navigate(['/pages/nuevo-presupuesto'])
     }
 
+    calGetBudgetList() {
+        this.statusList = 'charging';
+        this.service.getBudget().pipe().subscribe(
+            (res: any) => {
+                if (res.data) {
+                    this.registros = res.data;
+                    this.statusList = 'complete';
+                }
+
+            }, (error) => {
+                this.statusList = 'error';
+            })
+    }
+
+    viewDetailsBudget(data: any) {
+        console.log('data', data)
+        this.gastosIngresados = this.formatData(data.expenses);
+        this.budgetSelected = data;
+    }
+
+    formatData(expenses: any[]): any[] {
+        return expenses.map(expense => ({
+            activityCode: expense.code_activity,
+            actividad: expense.description_activity,
+            taskCode: expense.code_task,
+            gastoEspecifico: expense.specific_expense,
+            meses: expense.month_amount.split(',').map(Number),
+            rubroContable: expense.accounting_item
+        }));
+    }
+
+    calcularTotal(meses: number[]): number {
+        return meses.reduce((acc, mes) => acc + mes, 0);
+    }
+
+    totalMeses(): number[] {
+        const mesesTotales = Array(12).fill(0);
+        this.gastosIngresados.forEach(gasto => {
+            gasto.meses.forEach((monto: number, index: number) => {
+                mesesTotales[index] += monto;
+            });
+        });
+        return mesesTotales;
+    }
+
+    calcularTotalTotal(): number {
+        return this.totalMeses().reduce((acc, mes) => acc + mes, 0);
+    }
+
+    backList() {
+        this.calGetBudgetList();
+        this.budgetSelected = null;
+    }
+
+    showEdition() {
+        this.edition = true;
+        this.callGetListActivitybyPlan(this.budgetSelected.plan_id);
+    }
+
+    cancelEdition() {
+        this.edition = false;
+        this.tasks = null;
+        this.activities = null;
+        this.completedTaskIds = null;
+        this.activitySelected = null;
+    }
+
+    callGetListActivitybyPlan(id: string) {
+        this.statusActivity = 'charging';
+        this.service.getListActivityByPlan(id).pipe(takeUntil(this.destroy$)).subscribe(
+            (res: any) => {
+                if (res.data) {
+                    this.activities = res.data;
+                    this.statusActivity = 'complete';
+                }
+            }, (error) => {
+                this.statusActivity = 'error';
+            })
+    }
+
+    activitySelection(activity: any): void {
+        this.activities.forEach(a => a.selected = false);
+        activity.selected = true;
+        this.activitySelected = activity;
+        this.callgetListTaskByActivity(activity.id);
+        this.taskSelected = null;
+        console.log(activity)
+    }
+
+    callgetListTaskByActivity(id: string) {
+        this.statusTask = 'charging';
+        this.service.getListTaskByActivity(id).pipe(takeUntil(this.destroy$)).subscribe(
+            (res: any) => {
+                if (res.data) {
+                    this.tasks = res.data;
+                    this.setTasksAsCompleted();
+                    this.statusTask = 'complete';
+                }
+            }, (error) => {
+                this.statusTask = 'error';
+            })
+    }
+
+    setTasksAsCompleted(): void {
+        this.tasks.forEach(task => {
+            if (this.completedTaskIds.includes(task.id)) {
+                task.done = true;
+            }
+        });
+
+        console.log('this.tasks', this.tasks)
+    }
+
+    taskSelection(task: any): void {
+        this.tasks.forEach(a => a.selected = false);
+        task.selected = true;
+        this.taskSelected = task;
+        console.log(task)
+    }
+
+    deleteGasto(gasto: any): void {
+        const index = this.gastosIngresados.findIndex(
+            item => item.activity_id === gasto.activity_id && item.task_id === gasto.task_id
+        );
+        if (index !== -1) {
+            this.gastosIngresados.splice(index, 1);
+            this.markTaskAsNotDone(gasto.task_id);
+            this.removeTaskFromCompleted(gasto.task_id)
+            this.clearTaskSelection();
+        }
+    }
+
+    markTaskAsNotDone(taskId: string): void {
+        const task = this.tasks.find(
+            (task) => task.id === taskId
+        );
+        if (task) {
+            task.done = false;
+        }
+    }
+
+    addTaskFromCompleted(taskId: string): void {
+        this.completedTaskIds.push(taskId);
+        console.log('taskId', taskId);
+    }
+
+    removeTaskFromCompleted(taskId: string): void {
+        const index = this.completedTaskIds.indexOf(taskId);
+        if (index !== -1) {
+            this.completedTaskIds.splice(index, 1);
+        }
+    }
+
+    clearTaskSelection(): void {
+        this.tasks.forEach(task => task.selected = false);
+        this.taskSelected = null;
+    }
 }

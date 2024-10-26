@@ -30,6 +30,9 @@ import { PanelModule } from 'primeng/panel';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { ColorPickerModule } from 'primeng/colorpicker';
 import { SidebarModule } from 'primeng/sidebar';
+import { AvatarModule } from 'primeng/avatar';
+import { CrossComponentsModule } from '../../cross-components/Cross.module';
+import { AccordionModule } from 'primeng/accordion';
 
 @NgModule({
     imports: [
@@ -63,7 +66,10 @@ import { SidebarModule } from 'primeng/sidebar';
         PanelModule,
         FloatLabelModule,
         ColorPickerModule,
-        SidebarModule
+        SidebarModule,
+        AvatarModule,
+        CrossComponentsModule,
+        AccordionModule,
     ],
     declarations: [EventsComponent],
 })

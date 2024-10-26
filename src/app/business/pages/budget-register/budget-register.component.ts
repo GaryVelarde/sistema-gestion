@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
-import { pipe } from 'rxjs';
+import { pipe, Subject, takeUntil } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
@@ -10,10 +10,12 @@ import { AuthService } from 'src/app/services/auth.service';
     styleUrls: ['./budget-register.component.scss'],
     providers: [MessageService, ConfirmationService],
 })
-export class BudgetRegisterComponent implements OnInit {
+export class BudgetRegisterComponent implements OnInit, OnDestroy {
+    private destroy$ = new Subject<void>();
     plans: any[] = [];
     activities: any[] = [];
     tasks: any[] = [];
+    completedTaskIds: string[] = [];
     statusTask = '';
     statusActivity = '';
     statusListPlans = false;
@@ -48,12 +50,17 @@ export class BudgetRegisterComponent implements OnInit {
         this.planForm = this.fb.group({
             planSelected: this.planSelected,
         });
-
     }
 
     ngOnInit(): void {
         this.callGetListPlans();
         this.watchPlanSelected();
+    }
+
+    ngOnDestroy() {
+        this.destroy$.next();
+        this.destroy$.complete();
+        this.clearValues();
     }
 
     onPlanChange() {
@@ -74,7 +81,7 @@ export class BudgetRegisterComponent implements OnInit {
             alert("Por favor, selecciona una tarea antes de agregar un gasto.");
             return;
         }
-
+        this.markTaskAsDone();
         const newGasto = {
             gastoEspecifico: this.gastoForm.value.gastoEspecifico,
             meses: this.gastoForm.value.meses,
@@ -94,37 +101,34 @@ export class BudgetRegisterComponent implements OnInit {
 
         // Limpiar el formulario
         this.gastoForm.reset();
-        this.gastoForm.setControl('meses', this.fb.array(Array(12).fill(0))); // Reinicia los meses a 0
-        this.taskSelected = null; // Reinicia la tarea seleccionada
+        this.gastoForm.setControl('meses', this.fb.array(Array(12).fill(0)));
+        this.taskSelected = null;
 
     }
 
-
     calcularTotal(meses: number[]): number {
-        return meses.reduce((acc, monto) => acc + monto, 0); // Sumar todos los montos ingresados en los meses
+        return meses.reduce((acc, monto) => acc + monto, 0);
     }
 
     totalMeses(): number[] {
         const totalPorMes = new Array(12).fill(0);
         this.gastosIngresados.forEach(gasto => {
             gasto.meses.forEach((monto, index) => {
-                totalPorMes[index] += monto; // Sumar los montos
+                totalPorMes[index] += monto;
             });
         });
         return totalPorMes;
     }
 
-
-
     calcularTotalTotal(): number {
         return this.gastosIngresados.reduce((acc, gasto) => {
-            return acc + gasto.meses.reduce((sum, monto) => sum + monto, 0); // Sumar todos los montos ingresados
+            return acc + gasto.meses.reduce((sum, monto) => sum + monto, 0);
         }, 0);
     }
 
     callGetListPlans() {
         this.statusListPlans = true;
-        this.service.getListPlans().pipe().subscribe(
+        this.service.getListPlans().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 if (res.data) {
                     this.statusListPlans = false;
@@ -137,7 +141,7 @@ export class BudgetRegisterComponent implements OnInit {
     }
 
     watchPlanSelected() {
-        this.planSelected.valueChanges.pipe().subscribe(
+        this.planSelected.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(
             (plan: any) => {
                 if (plan.id) {
                     this.taskSelected = null;
@@ -150,7 +154,7 @@ export class BudgetRegisterComponent implements OnInit {
 
     callGetListActivitybyPlan(id: string) {
         this.statusActivity = 'charging';
-        this.service.getListActivityByPlan(id).pipe().subscribe(
+        this.service.getListActivityByPlan(id).pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 if (res.data) {
                     this.activities = res.data;
@@ -174,10 +178,11 @@ export class BudgetRegisterComponent implements OnInit {
 
     callgetListTaskByActivity(id: string) {
         this.statusTask = 'charging';
-        this.service.getListTaskByActivity(id).pipe().subscribe(
+        this.service.getListTaskByActivity(id).pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 if (res.data) {
                     this.tasks = res.data;
+                    this.setTasksAsCompleted();
                     this.statusTask = 'complete';
                 }
             }, (error) => {
@@ -192,19 +197,22 @@ export class BudgetRegisterComponent implements OnInit {
         console.log(task)
     }
 
-    generateRequest(tasks: any[]) {
-        const planId = this.planSelected.value.id; // plan_id fijo
+    clearTaskSelection(): void {
+        this.tasks.forEach(task => task.selected = false);
+        this.taskSelected = null;
+    }
 
-        // Transformamos las tareas
+    generateRequest(tasks: any[]) {
+        const planId = this.planSelected.value.id;
+
         const transformedExpenses: any[] = tasks.map((task) => ({
             specific_expense: task.gastoEspecifico,
-            month_amount: task.meses.join(","), // Convertimos el arreglo de meses a una cadena separada por comas
+            month_amount: task.meses.join(","),
             accounting_item: task.rubroContable ? task.rubroContable : '',
             task_id: task.task_id,
             activity_id: task.activity_id
         }));
 
-        // Devolvemos el objeto con la estructura solicitada
         return {
             plan_id: planId,
             expenses: transformedExpenses
@@ -214,7 +222,7 @@ export class BudgetRegisterComponent implements OnInit {
     callPostRegisterBudget() {
         const request = this.generateRequest(this.gastosIngresados);
         console.log('request', request)
-        this.service.postRegisterBudget([request]).pipe().
+        this.service.postRegisterBudget([request]).pipe(takeUntil(this.destroy$)).
             subscribe(
                 (res: any) => {
                     if (res.status) {
@@ -252,4 +260,59 @@ export class BudgetRegisterComponent implements OnInit {
         this.taskSelected = null;
         this.gastosIngresados = [];
     }
+
+    markTaskAsDone(): void {
+        if (!this.taskSelected) {
+            alert("No hay una tarea seleccionada para marcar como hecha.");
+            return;
+        }
+        this.taskSelected.done = true;
+        this.addTaskFromCompleted(this.taskSelected.id);
+        console.log(`Tarea ${this.taskSelected.code_task} marcada como hecha.`);
+    }
+
+    deleteGasto(gasto: any): void {
+        const index = this.gastosIngresados.findIndex(
+            item => item.activity_id === gasto.activity_id && item.task_id === gasto.task_id
+        );
+        if (index !== -1) {
+            this.gastosIngresados.splice(index, 1);
+            this.markTaskAsNotDone(gasto.task_id);
+            this.removeTaskFromCompleted(gasto.task_id)
+            this.clearTaskSelection();
+        }
+    }
+
+    markTaskAsNotDone(taskId: string): void {
+        const task = this.tasks.find(
+            (task) => task.id === taskId
+        );
+        if (task) {
+            task.done = false;
+        }
+    }
+
+    addTaskFromCompleted(taskId: string): void {
+        this.completedTaskIds.push(taskId);
+        console.log('taskId', taskId);
+    }
+
+    removeTaskFromCompleted(taskId: string): void {
+        const index = this.completedTaskIds.indexOf(taskId);
+        if (index !== -1) {
+            this.completedTaskIds.splice(index, 1);
+        }
+    }
+
+    setTasksAsCompleted(): void {
+        this.tasks.forEach(task => {
+            if (this.completedTaskIds.includes(task.id)) {
+                task.done = true;
+            }
+        });
+
+        console.log('this.tasks', this.tasks)
+    }
+
+
 }

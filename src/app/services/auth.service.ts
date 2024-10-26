@@ -109,6 +109,10 @@ export class AuthService {
     return this.http.post(`${this.API_URL}/article/${id}/archive`, request, this.header);
   }
 
+  postRegisterGuideFile(request: any, id: string) {
+    return this.http.post(`${this.API_URL}/guide/${id}/archive`, request, this.header);
+  }
+
   getArticleList(): Observable<any> {
     return this.http.get(`${this.API_URL}/article`, this.header);
   }
@@ -331,6 +335,30 @@ export class AuthService {
 
   postRegisterBudget(request: any) {
     return this.http.post(`${this.API_URL}/budget`, request, this.header);
+  }
+
+  getArticleById(articleId: string) {
+    return this.http.get(`${this.API_URL}/article/${articleId}`, this.header);
+  }
+
+  getEvents() {
+    return this.http.get(`${this.API_URL}/event`, this.header);
+  }
+
+  getTitleEvents() {
+    return this.http.get(`${this.API_URL}/titles-events`, this.header);
+  }
+
+  getBudget() {
+    return this.http.get(`${this.API_URL}/budget`, this.header);
+  }
+
+  postRegisterGuide(request: any) {
+    return this.http.post(`${this.API_URL}/guide`, request, this.header);
+  }
+
+  getGuides() {
+    return this.http.get(`${this.API_URL}/guide`, this.header);
   }
 
 }

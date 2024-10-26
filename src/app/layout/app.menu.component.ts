@@ -63,7 +63,7 @@ export class AppMenuComponent implements OnInit {
             {
                 label: 'Líneas y Guías',
                 items: [
-                    { label: 'Seguimiento', icon: 'pi pi-fw pi-file-check', routerLink: ['/pages/agenda-udi'] },
+                    { label: 'Seguimiento', icon: 'pi pi-fw pi-file-check', routerLink: ['/pages/lineas-guias'] },
                 ]
             },
         ];
