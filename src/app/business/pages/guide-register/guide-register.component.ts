@@ -9,6 +9,7 @@ import { MessageService } from 'primeng/api';
 import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
 import { IStudent } from '../../cross-interfaces/comments-interfaces';
 import { ThesisSimilarityService } from 'src/app/services/thesis-similarity.service';
+import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
 
 @Component({
   selector: 'app-hotbed-register',
@@ -24,6 +25,7 @@ import { ThesisSimilarityService } from 'src/app/services/thesis-similarity.serv
 })
 export class GuideRegisterComponent implements OnInit, OnDestroy {
   @ViewChild('userSelection') userSelection: UserSelectionComponent;
+  @ViewChild('upload') upload: UploadArchivesComponent;
 
   private destroy$ = new Subject<void>();
   filteredItems: any[] | undefined;
@@ -76,11 +78,11 @@ export class GuideRegisterComponent implements OnInit, OnDestroy {
   }
 
   backToList() {
-    this.router.navigate(['pages/articulos-semilleros']);
+    this.router.navigate(['pages/lineas-guias']);
   }
 
   nextStep() {
-    this.loaderService.show();
+    this.loaderService.show(true);
     const rq = {
       title: this.title.value,
       description: this.description.value,
@@ -102,14 +104,12 @@ export class GuideRegisterComponent implements OnInit, OnDestroy {
               }
             }, (error) => {
               this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ha ocurrido un error al guardar los archivos.' });
-              console.log('error 2', error);
             })
         }
       },
       (error) => {
         this.loaderService.hide();
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ha ocurrido un error al registrar la información.' });
-        console.log('error 1', error);
       });
   }
 
@@ -146,10 +146,10 @@ export class GuideRegisterComponent implements OnInit, OnDestroy {
     this.articleForm.reset();
     this.clearFile();
     this.userSelection.clearComponent();
+    this.upload.clearFile();
   }
 
   getUserSelected(userSelected: any) {
-    console.log('userSelected', userSelected)
     this.students.setValue(userSelected);
   }
 

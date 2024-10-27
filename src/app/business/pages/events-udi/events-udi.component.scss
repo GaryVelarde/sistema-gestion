@@ -37,6 +37,19 @@
   .finalize-column {
     background-color: #f9e7eb;
   }
+
+  /* Modo oscuro */
+  .pending-column-dark {
+    background-color: #1e2a32;
+  }
+
+  .in-course-column-dark {
+    background-color: #2e2a1f;
+  }
+
+  .finalize-column-dark {
+    background-color: #3a2024;
+  }
   
   .pending-column-header {
     color: #3699ff;
@@ -71,8 +84,21 @@
     transition: background-color 0.2s;
   }
   
+  
+  .task-card-dark {
+    background-color: #393939;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: move;
+    transition: background-color 0.2s;
+  }
+  
   .task-card:hover {
     background-color: #f1f1f1;
+  }
+
+  .task-card-dark:hover {
+    background-color: #1e1e1e;
   }
   
   .drop-column {
@@ -116,15 +142,19 @@
     padding: 20px 0;
 }
 
-.d-none {
-  display: none;
-}
+  .d-none {
+    display: none;
+  }
 
-.text-align-center {
-  text-align: center;
-}
+  .text-align-center {
+    text-align: center;
+  }
 
-.p-url {
-  color: var(--primary-color);
-  cursor: pointer;
-}
+  .p-url {
+    color: var(--primary-color);
+    cursor: pointer;
+  }
+
+  .display-grid {
+    display: grid;
+  }

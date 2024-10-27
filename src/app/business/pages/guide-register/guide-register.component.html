@@ -30,6 +30,7 @@
                         </p-floatLabel>
                     </div>
                     <app-upload-archives
+                        #upload
                         (onFileChangeEmitter)="onFileChange($event)"
                         (clearFilesEmitter)="clearFile()"
                     ></app-upload-archives>

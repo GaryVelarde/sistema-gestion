@@ -15,6 +15,7 @@ import { DateFormatService } from 'src/app/services/date-format.service';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
 import { FileListComponent } from '../../cross-components/file-list/file-list.component';
+import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
 
 @Component({
     templateUrl: './advisory-tracking.component.html',
@@ -24,6 +25,7 @@ import { FileListComponent } from '../../cross-components/file-list/file-list.co
 export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
     @ViewChild('upload') upload: UploadArchivesComponent;
     @ViewChild('fileList') fileList : FileListComponent;
+    @ViewChild('advisorySelection') advisorySelection : UserSelectionComponent;
 
     private destroy$ = new Subject<void>();
     products: any[] = [];
@@ -79,7 +81,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
     filteredStudents: any[];
     filteredSecondStudents: any[];
     getStudentListProcess = '';
-    studentsList = [];
+    lastTeachersSelected = [];
     alertForCancelation: Message[] | undefined;
     messageError: string = 'Lo sentimos, hubo un problema al intentar cargar la lista de asesorías. Por favor, inténtelo de nuevo más tarde. Si el inconveniente persiste, contacte al soporte técnico.';
     messageMoreInfo = [{ severity: 'info', detail: 'Es necesario completar todos los campos faltantes para continuar con la asesoría.' }];
@@ -286,10 +288,13 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
 
     showEdition() {
         this.fillDataInEditForm();
+        this.lastTeachersSelected = this.advisory.value;
         this.showEdit = true;
     }
 
     cancelEdition() {
+        this.advisory.setValue(this.lastTeachersSelected);
+        this.advisorySelection.userFormControl.setValue(this.lastTeachersSelected);
         this.showEdit = false;
     }
 

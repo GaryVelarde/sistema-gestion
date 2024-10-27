@@ -1,5 +1,5 @@
 <p-toast key="tst"></p-toast>
-<div  *ngIf="!showEventDetail">
+<div *ngIf="!showEventDetail">
     <div class="grid" #cardBody>
         <div class="col-12">
             <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
@@ -82,7 +82,7 @@
                         "
                         class="ml-3"
                         (click)="saveEdition()"
-                        label="Guardar cambios"
+                        label="aaaaaaaaaaaaa"
                         icon="pi pi-save"
                         iconPos="left"
                     />
@@ -103,11 +103,22 @@
                     />
                 </div>
             </div>
-            <div class="card flex justify-content-center col-12">
-                <h4 class="font-bold">
+            <div *ngIf="!edition" class="card flex justify-content-center col-12">
+                <h5 class="font-bold text-color" style="text-align: center">
                     {{ eventSelected.event.title }}
-                </h4>
+                </h5>
             </div>
+            <form *ngIf="edition" [formGroup]="titleForm" class="col-12">
+                <textarea
+                    rows="2"
+                    cols="30"
+                    pInputTextarea
+                    class="w-full font-bold text-color"
+                    style="text-align: center; font-size: 17.5px"
+                    formControlName="titleEdit"
+                >
+                </textarea>
+            </form>
             <div *ngIf="!edition" class="grid col-12">
                 <div class="col-12">
                     <p class="font-bold">Descripción de la reunión:</p>
@@ -176,7 +187,7 @@
                     <p class="font-bold">Inicio:</p>
                     <p-calendar
                         formControlName="startEdit"
-                        class="w-full"
+                        class="display-grid"
                         [iconDisplay]="'input'"
                         [showIcon]="true"
                         [showTime]="true"
@@ -188,7 +199,7 @@
                     <p class="font-bold">Fin:</p>
                     <p-calendar
                         formControlName="endEdit"
-                        class="w-full"
+                        class="display-grid"
                         [iconDisplay]="'input'"
                         [showIcon]="true"
                         [showTime]="true"
@@ -312,6 +323,12 @@
                     <div class="board-container">
                         <div
                             class="board-column pending-column"
+                            [ngClass]="{
+                                'pending-column':
+                                    tokenService.getMode() !== 'dark',
+                                'pending-column-dark':
+                                    tokenService.getMode() === 'dark'
+                            }"
                             pDroppable
                             (onDrop)="drop($event, 'pending')"
                         >
@@ -346,7 +363,11 @@
                                     </div>
                                     <li
                                         *ngFor="let task of pendingTasks"
-                                        class="task-card"
+                                        [class]="
+                                            tokenService.getMode() === 'dark'
+                                                ? 'task-card-dark'
+                                                : 'task-card'
+                                        "
                                         pDraggable
                                         (onDragStart)="dragStart(task)"
                                         (onDragEnd)="dragEnd()"
@@ -405,6 +426,12 @@
 
                         <div
                             class="board-column in-course-column"
+                            [ngClass]="{
+                                'in-course-column':
+                                    tokenService.getMode() !== 'dark',
+                                'in-course-column-dark':
+                                    tokenService.getMode() === 'dark'
+                            }"
                             pDroppable
                             (onDrop)="drop($event, 'inProgress')"
                         >
@@ -442,7 +469,11 @@
                                     </div>
                                     <li
                                         *ngFor="let task of inProgressTasks"
-                                        class="task-card"
+                                        [class]="
+                                            tokenService.getMode() === 'dark'
+                                                ? 'task-card-dark'
+                                                : 'task-card'
+                                        "
                                         pDraggable
                                         (onDragStart)="dragStart(task)"
                                         (onDragEnd)="dragEnd()"
@@ -464,7 +495,9 @@
                                                         task.user.surnames
                                                 }}</b
                                             >
-                                            <p class="ml-auto mt-2 task-description">
+                                            <p
+                                                class="ml-auto mt-2 task-description"
+                                            >
                                                 {{ task.dateEnd }}
                                             </p>
                                         </div>
@@ -488,6 +521,12 @@
 
                         <div
                             class="board-column finalize-column"
+                            [ngClass]="{
+                                'finalize-column':
+                                    tokenService.getMode() !== 'dark',
+                                'finalize-column-dark':
+                                    tokenService.getMode() === 'dark'
+                            }"
                             pDroppable
                             (onDrop)="drop($event, 'completed')"
                         >
@@ -515,7 +554,11 @@
                                 <ul class="task-list">
                                     <li
                                         *ngFor="let task of completedTasks"
-                                        class="task-card"
+                                        [class]="
+                                            tokenService.getMode() === 'dark'
+                                                ? 'task-card-dark'
+                                                : 'task-card'
+                                        "
                                         pDraggable
                                         (onDragStart)="dragStart(task)"
                                         (onDragEnd)="dragEnd()"
@@ -537,7 +580,9 @@
                                                         task.user.surnames
                                                 }}</b
                                             >
-                                            <p class="ml-auto mt-2 task-description">
+                                            <p
+                                                class="ml-auto mt-2 task-description"
+                                            >
                                                 {{ task.dateEnd }}
                                             </p>
                                         </div>

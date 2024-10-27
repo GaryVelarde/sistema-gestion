@@ -43,12 +43,20 @@ export class FileListService {
         return this.http.delete(`${this.API_URL}/presentation/${eventId}/observations/${archiveId}`);
     }
 
+    deleteGuideArchive(guideId: string, archiveId: string) {
+        return this.http.delete(`${this.API_URL}/guide/${guideId}/archive/${archiveId}`);
+    }
+
     /**
-      Eliminar archivos
+      Obtener archivos
    */
 
     getPresentationFiles(id: string) {
         return this.http.get(`${this.API_URL}/presentation/${id}/archive`, this.header);
+    }
+
+    getGuideFiles(id: string) {
+        return this.http.get(`${this.API_URL}/guide/${id}/archive`, this.header);
     }
 
 }

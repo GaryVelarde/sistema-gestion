@@ -25,7 +25,7 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
         { label: 'Programa 3' },
         { label: 'Nuevo presupuesto', visible: true },
     ];
-    gastosIngresados: any[] = []; // Arreglo para almacenar los gastos ingresados
+    gastosIngresados: any[] = [];
     activitySelected: any;
     taskSelected: any;
     gastoForm: FormGroup;
@@ -44,7 +44,7 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
     ) {
         this.gastoForm = this.fb.group({
             gastoEspecifico: new FormControl('', Validators.required),
-            meses: this.fb.array(Array(12).fill(0)), // Inicializa el array de meses como montos (0)
+            meses: this.fb.array(Array(12).fill(0)),
             rubroContable: new FormControl('', Validators.required),
         });
         this.planForm = this.fb.group({
@@ -310,7 +310,6 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
                 task.done = true;
             }
         });
-
         console.log('this.tasks', this.tasks)
     }
 

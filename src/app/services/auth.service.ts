@@ -361,4 +361,20 @@ export class AuthService {
     return this.http.get(`${this.API_URL}/guide`, this.header);
   }
 
+  putGuideUpdate(guideId: string, request: any) {
+    return this.http.put(`${this.API_URL}/guide/${guideId}`, request, this.header);
+  }
+  
+  putGuideStatusUpdate(guideId: string, request: any) {
+    return this.http.put(`${this.API_URL}/guide/${guideId}/status`, request, this.header);
+  }
+
+  putEventUdiStatusUpdate(meetingId: string, request: any) {
+    return this.http.put(`${this.API_URL}/meeting/${meetingId}/status`, request, this.header);
+  }
+  
+  putEventUdiUpdate(meetingId: string, request: any) {
+    return this.http.post(`${this.API_URL}/meeting/${meetingId}`, request, this.header);
+  }
+
 }

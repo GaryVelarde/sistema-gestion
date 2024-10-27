@@ -6,10 +6,11 @@ import { Table } from 'primeng/table';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { AuthService } from 'src/app/services/auth.service';
 import { finalize, Subject, takeUntil } from 'rxjs';
-import { eModule } from 'src/app/commons/enums/app,enum';
+import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { FileListComponent } from '../../cross-components/file-list/file-list.component';
 import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
 import { DateFormatService } from 'src/app/services/date-format.service';
+import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
 
 @Component({
   selector: 'app-guide-tracking',
@@ -20,6 +21,8 @@ import { DateFormatService } from 'src/app/services/date-format.service';
 export class GuideTrackingComponent implements OnInit, OnDestroy {
   @ViewChild('upload') upload: UploadArchivesComponent;
   @ViewChild('fileList') fileList: FileListComponent;
+  @ViewChild('reviewerSelection') reviewerSelection: UserSelectionComponent;
+
   registros = [];
   events = [
     { status: 'En desarrollo', date: '15-10-2020 10:30', icon: 'pi pi-pencil', color: '#6366f1', message: 'El artículo pasó a desarrollo el día ' },
@@ -32,59 +35,51 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
   breadcrumbItems: MenuItem[] = [
     { icon: 'pi pi-home', route: '/' },
     { label: 'Semillero' },
-    { label: 'Artículos', visible: true },
+    { label: 'Líneas y Guías', visible: true },
   ];
   detailsBreadcrumbItems: MenuItem[] = [
     { icon: 'pi pi-home', route: '/' },
     { label: 'Semillero' },
-    { label: 'Artículos' },
-    { label: 'Detalle del artículo', visible: true },
-  ];
-  timeLineBreadcrumbItems: MenuItem[] = [
-    { icon: 'pi pi-home', route: '/' },
-    { label: 'Semillero' },
-    { label: 'Artículos' },
-    { label: 'Detalle del artículo' },
-    { label: 'Línea de tiempo', visible: true },
+    { label: 'Líneas y Guías' },
+    { label: 'Detalle', visible: true },
   ];
   private destroy$ = new Subject<void>();
   viewDetail = false;
-  viewHistory = false;
   showDialogAddFiles = false;
-  dialogIndexed = false;
-  module = eModule.hotbed;
-  articleSelected: any;
+  module = eModule.guide;
+  reviewerType = userType.teacher;
+  guideSelected: any;
   getListProcess = '';
   skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
   columnTitles: string[] = [
-    'Título del artículo',
-    'Estudiante(s)',
+    'Título',
+    'Docente(s)',
     'Estado',
     ''
   ];
   formData = new FormData();
   messageError: string = 'Se produjo un error al cargar la lista de artículos. Por favor, inténtelo de nuevo más tarde';
   edition = false;
-  articleState: string;
-  studentsList = [];
-  studentsForm: FormGroup;
+  lastTeachersSelected = [];
+  guideState: string;
+  teacherForm: FormGroup;
   titleForm: FormGroup;
   editForm: FormGroup;
   indexedForm: FormGroup;
   private _title: FormControl = new FormControl('', [Validators.required]);
-  private _group: FormControl = new FormControl('', [Validators.required]);
+  private _description: FormControl = new FormControl('', [Validators.required]);
   private _journalName: FormControl = new FormControl('', [Validators.required]);
   private _publicationDate: FormControl = new FormControl('', [Validators.required]);
   private _volume: FormControl = new FormControl('', [Validators.required]);
-  private _students = new FormControl([], [Validators.required])
-  get students() {
-    return this._students;
+  private _teachers = new FormControl([], [Validators.required])
+  get teachers() {
+    return this._teachers;
   }
   get title() {
     return this._title;
   }
-  get group() {
-    return this._group;
+  get description() {
+    return this._description;
   }
   get journalName() {
     return this._journalName;
@@ -104,14 +99,14 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private dateFormatService: DateFormatService
   ) {
-    this.studentsForm = this.fb.group({
-      students: this.students,
+    this.teacherForm = this.fb.group({
+      teachers: this.teachers,
     });
     this.titleForm = this.fb.group({
       title: this.title,
     });
     this.editForm = this.fb.group({
-      group: this.group,
+      description: this.description,
     });
     this.indexedForm = this.fb.group({
       journalName: this.journalName,
@@ -133,20 +128,19 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
   clearValues() {
     this.indexedForm.reset();
     this.viewDetail = false;
-    this.articleSelected = {};
+    this.guideSelected = {};
   }
 
   goToRegisterGuide() {
     this.router.navigate(['pages/lineas-guias-registro']);
   }
 
-  viewDetailsHotbed(data: any) {
+  viewDetailsGuide(data: any) {
     this.loaderService.show();
     this.viewDetail = true;
-    this.articleSelected = data;
-    this.studentsList = data.seedbeds;
-    this.articleState = data.status;
-    console.log(this.articleSelected);
+    this.guideSelected = data;
+    this.teachers.setValue(data.teachers);
+    this.guideState = data.status;
     this.fillDataInEditForm();
     setTimeout(() => {
       this.loaderService.hide();
@@ -182,7 +176,7 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
   backList() {
     this.loaderService.show();
     this.viewDetail = false;
-    this.articleSelected = {};
+    this.guideSelected = {};
     this.getGuideList();
     setTimeout(() => {
       this.loaderService.hide();
@@ -192,32 +186,24 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
   backToDetail() {
     this.loaderService.show();
     this.viewDetail = true;
-    this.viewHistory = false;
-    setTimeout(() => {
-      this.loaderService.hide();
-    }, 400);
-  }
-
-  goToHistory() {
-    this.loaderService.show();
-    this.viewHistory = true;
-    this.fillDataTimeLine();
     setTimeout(() => {
       this.loaderService.hide();
     }, 400);
   }
 
   getUserSelected(userSelected: any) {
-    console.log('userSelected', userSelected)
-    this.students.setValue(userSelected);
+    this.teachers.setValue(userSelected);
   }
 
   showEdition() {
     this.fillDataInEditForm();
+    this.lastTeachersSelected = this.teachers.value;
     this.edition = true;
   }
 
   cancelEdition() {
+    this.teachers.setValue(this.lastTeachersSelected);
+    this.reviewerSelection.userFormControl.setValue(this.lastTeachersSelected);
     this.edition = false;
   }
 
@@ -243,7 +229,7 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
   saveFiles() {
     this.loaderService.show(true);
     this.showDialogAddFiles = false;
-    this.service.postRegisterHotbedFile(this.formData, this.articleSelected.id).pipe(
+    this.service.postRegisterGuideFile(this.formData, this.guideSelected.id).pipe(
       finalize(() => {
         this.upload.clearFile()
         this.loaderService.hide();
@@ -277,25 +263,25 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
   }
 
   fillDataInEditForm(): void {
-    this.title.setValue(this.articleSelected.title);
-    this.group.setValue(this.articleSelected.group);
+    this.title.setValue(this.guideSelected.title);
+    this.description.setValue(this.guideSelected.description);
   }
 
-  callPutArticleUpdate() {
+  callPutGuideUpdate() {
     this.loaderService.show(true);
     const request = {
       title: this.title.value,
-      group: this.group.value,
-      user_ids: this.extractIds(this.students.value)
+      description: this.description.value,
+      user_ids: this.extractIds(this.teachers.value)
     }
-    this.service.putArticleUpdate(request, this.articleSelected.id).pipe(
+    this.service.putGuideUpdate(this.guideSelected.id, request).pipe(
       finalize(() => {
         this.loaderService.hide();
       })
     ).
       subscribe(
         (res: any) => {
-          this.articleSelectedUpdate();
+          this.guideSelectedUpdate();
           this.edition = false;
           this.messageService.add({
             key: 'tst',
@@ -320,13 +306,13 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
   }
 
   saveEdition() {
-    this.callPutArticleUpdate();
+    this.callPutGuideUpdate();
   }
 
-  articleSelectedUpdate() {
-    this.articleSelected.title = this.title.value;
-    this.articleSelected.group = this.group.value;
-    this.articleSelected.seedbeds = this.students.value;
+  guideSelectedUpdate() {
+    this.guideSelected.title = this.title.value;
+    this.guideSelected.description = this.description.value;
+    this.guideSelected.teachers = this.teachers.value;
   }
 
   statusUpdate(status: string) {
@@ -334,112 +320,24 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
     const request = {
       status: status
     }
-    this.service.putArticleStatusUpdate(request, this.articleSelected.id).pipe(
+    this.service.putGuideStatusUpdate(this.guideSelected.id, request).pipe(
       finalize(() => {
         this.loaderService.hide();
       })
     ).
       subscribe((res: any) => {
         if (res.status) {
-          this.articleState = status;
-          this.updateArticleSelected();
+          this.guideState = status;
         }
       }, (error) => {
-
+        this.messageService.add({
+          key: 'tst',
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Se ha producido un error al actualizar el estado.',
+          life: 3000,
+        });
       })
-  }
-
-  goToIndexed() {
-    this.dialogIndexed = true;
-    this.indexedForm.reset();
-  }
-
-  hideDialogIndexed() {
-    this.dialogIndexed = false;
-  }
-
-  confirmGoToIndexed() {
-    if (this.indexedForm.valid) {
-      this.loaderService.show();
-      this.hideDialogIndexed();
-      const request = {
-        status: 'Indexado',
-        journal_name: this.journalName.value,
-        volume: this.volume.value,
-        publication_date: this.dateFormatService.formatDateDDMMYYYY(this.publicationDate.value)
-      }
-      this.service.putArticleStatusUpdate(request, this.articleSelected.id).pipe(
-        finalize(() => {
-          this.loaderService.hide();
-        })
-      ).
-        subscribe((res: any) => {
-          if (res.status) {
-            this.articleState = 'Indexado';
-            this.indexedForm.reset();
-            this.updateArticleSelected();
-          }
-        }, (error) => {
-
-        })
-    }
-  }
-
-  fillDataTimeLine() {
-    const timelineData = this.articleSelected.status_timeline;
-    console.log('timelineData', timelineData)
-
-    this.events = timelineData.map(item => ({
-      status: item.status,
-      date: this.dateFormatService.formatCustomDateByFrontComment(item.changed_at),
-      description: item.description,
-      icon: this.getIcon(item.status),
-      color: this.getColor(item.status)
-    }));
-  }
-
-  getIcon(status: string): string {
-    switch (status) {
-      case "En desarrollo":
-        return "pi pi-pencil";
-      case "Revisado":
-        return "pi pi-check";
-      case "Enviado a revista":
-        return "pi pi-envelope";
-      case "Indexado":
-        return "pi pi-list";
-      case "Pagado":
-        return "pi pi-dollar";
-      default:
-        return "pi pi-info-circle";
-    }
-  }
-
-  getColor(status: string): string {
-    switch (status) {
-      case "En desarrollo":
-        return "#98b0e3";
-      case "Revisado":
-        return "#6c8ad3";
-      case "Enviado a revista":
-        return "#4765b5";
-      case "Indexado":
-        return "#2a4a92";
-      case "Pagado":
-        return "#1e366d";
-      default:
-        return "#c3d0f0";
-    }
-  }
-
-  updateArticleSelected() {
-    this.service.getArticleById(this.articleSelected.id).pipe().
-      subscribe(
-        (res: any) => {
-          this.articleSelected = res.data;
-        }, (error) => {
-
-        })
   }
 
 }

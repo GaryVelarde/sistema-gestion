@@ -424,7 +424,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
         this.callPutPresentationCommentUpdate(comment);
         break;
         case eModule.guide:
-        this.callPutPresentationCommentUpdate(comment);
+        this.callPutGuideCommentUpdate(comment);
         break;
     }
   }
@@ -661,10 +661,10 @@ export class CommentsComponent implements OnInit, OnDestroy {
         (res: any) => {
           if (res.status) {
             const commentId = comment.id;
-            const index = this.comments.findIndex(comment => comment.id === commentId); // Buscar índice por id
+            const index = this.comments.findIndex(comment => comment.id === commentId);
             if (index !== -1) {
-              this.comments.splice(index, 1); // Eliminar el comentario del array
-              this.comments = [...this.comments]; // Crear nueva referencia al array
+              this.comments.splice(index, 1);
+              this.comments = [...this.comments];
               this.updateVisibleComments();
             }
           }
@@ -680,10 +680,10 @@ export class CommentsComponent implements OnInit, OnDestroy {
         (res: any) => {
           if (res.status) {
             const commentId = comment.id;
-            const index = this.comments.findIndex(comment => comment.id === commentId); // Buscar índice por id
+            const index = this.comments.findIndex(comment => comment.id === commentId);
             if (index !== -1) {
-              this.comments.splice(index, 1); // Eliminar el comentario del array
-              this.comments = [...this.comments]; // Crear nueva referencia al array
+              this.comments.splice(index, 1);
+              this.comments = [...this.comments];
               this.updateVisibleComments();
             }
           }

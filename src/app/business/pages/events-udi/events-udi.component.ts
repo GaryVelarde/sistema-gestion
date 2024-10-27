@@ -29,6 +29,7 @@ import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { finalize, Subject, takeUntil } from 'rxjs';
+import { TokenService } from 'src/app/services/token.service';
 interface Task {
     id: string;
     title: string;
@@ -143,6 +144,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     public managerFormEdit: FormGroup;
     public participantsFormEdit: FormGroup;
     public editForm: FormGroup;
+    public titleForm: FormGroup;
     private _slotDuration: FormControl = new FormControl('', [
         Validators.required,
     ]);
@@ -260,6 +262,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         private service: AuthService,
         private loaderService: LoaderService,
         private messageService: MessageService,
+        private tokenService: TokenService,
     ) {
         this.slotDurationForm = this.fb.group({
             slotDuration: this.slotDuration,
@@ -273,7 +276,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
             color: this.color,
         });
         this.editForm = this.fb.group({
-            titleEdit: this.titleEdit,
             descriptionEdit: this.descriptionEdit,
             eventLinkEdit: this.eventLinkEdit,
             startEdit: this.startEdit,
@@ -297,6 +299,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         this.participantsFormEdit = this.fb.group({
             usersParticipantsEdit: this.usersParticipantsEdit,
         });
+        this.titleForm = this.fb.group({
+            titleEdit: this.titleEdit,
+          });
     }
 
     ngOnInit() {
@@ -422,7 +427,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         this.usersParticipantsEdit.setValue(this.addFullNameProperty(this.eventSelected.event._def.extendedProps.event_udi.participants));
         this.getTask(this.eventSelected.event._def.extendedProps.event_udi.id);
         this.showEventDetail = true;
-        this.fillFormEdition(this.eventSelected.event._def.extendedProps.event_udi);
         setTimeout(() => {
             this.loaderService.hide();
         }, 400);
@@ -432,11 +436,10 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         this.titleEdit.setValue(data.title);
         this.descriptionEdit.setValue(data.description);
         this.eventLinkEdit.setValue(data.meeting_url);
-        const dateInfo = this.dateFormatService.formatDateWithEndTime(data.start_date)
-        console.log('data.start_date', data.start_date)
-        console.log('dateInfo', dateInfo)
-        this.startEdit.setValue(data.start_date);
-        this.endEdit.setValue(this.dateFormatService.formatDateCalendar(data.due_date));
+        const startDate = this.dateFormatService.formatDate(data.start_date)
+        const endDate = this.dateFormatService.formatDate(data.due_date)
+        this.startEdit.setValue(startDate);
+        this.endEdit.setValue(endDate);
     }
 
     addFullNameProperty(data: any[]): any[] {
@@ -913,6 +916,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     showEdition() {
         this.lasManagersList = this.usersManagerEdit.value
         this.lasParticipantsList = this.usersParticipantsEdit.value;
+        this.fillFormEdition(this.eventSelected.event._def.extendedProps.event_udi);
         this.usersManagerEdit.enable();
         this.usersParticipantsEdit.enable();
         this.edition = true;
@@ -928,5 +932,26 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
 
     showNewEventDialog() {
         this.newEventDialog = true;
+    }
+
+    saveEdition() {
+        const request =  {
+            "title": "Otra reunión de prueba",
+            "description": "Es otra descripcion de prueba",
+            "managers_ids": ["9d1418a4-9aa1-48af-a98e-b49baf4c691e"],
+            "users_ids": ["9d1448a1-9ca1-48af-a98a-b49baf2c695e"],
+            "start_date": "10-10-2024 12:00:00",
+            "due_date": "10-10-2024 12:30:00",
+            "color": "#0dbf6c",
+            "meeting_url": "https://domain/pages/events-udi"
+          }
+
+        this.service.putEventUdiUpdate(this.eventSelected.id, request).pipe().
+        subscribe(
+            (res: any) => {
+
+            }, (error) => {
+
+            })
     }
 }

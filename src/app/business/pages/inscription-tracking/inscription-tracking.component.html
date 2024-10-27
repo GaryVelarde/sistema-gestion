@@ -280,19 +280,18 @@
             >
                 <h5
                     class="font-bold text-color"
-                    style="font-family: revert; text-align: center"
+                    style="text-align: center"
                 >
                     {{ inscriptionSelected.thesis_project_title }}
                 </h5>
             </div>
             <form *ngIf="showEdit" [formGroup]="titleForm">
                 <textarea
-                    rows="3"
+                    rows="2"
                     cols="30"
                     pInputTextarea
                     class="w-full font-bold text-color"
                     style="
-                        font-family: revert;
                         text-align: center;
                         font-size: 17.5px;
                     "
@@ -479,7 +478,7 @@
                     <p>Revisor</p>
                     <app-user-selection
                         class="w-full"
-                        #userSelection1
+                        #reviewerSelection
                         [typeUserList]="teacherL"
                         maxUsersAllow="1"
                         (userSelected)="getTeacherSelected($event)"
@@ -492,7 +491,7 @@
                     <p>Estudiante(s)</p>
                     <app-user-selection
                         class="w-full"
-                        #userSelection
+                        #studentSelection
                         [typeUserList]="studentL"
                         maxUsersAllow="2"
                         (userSelected)="getStudentSelected($event)"

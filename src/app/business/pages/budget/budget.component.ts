@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { Subject, takeUntil } from 'rxjs';
@@ -43,8 +43,14 @@ export class BudgetComponent implements OnInit {
     statusTask = '';
     taskSelected: any;
     completedTaskIds: string[] = [];
+    gastoForm: FormGroup;
 
     constructor(private fb: FormBuilder, private router: Router, private service: AuthService) {
+        this.gastoForm = this.fb.group({
+            gastoEspecifico: new FormControl('', Validators.required),
+            meses: this.fb.array(Array(12).fill(0)),
+            rubroContable: new FormControl('', Validators.required),
+        });
     }
 
     ngOnInit(): void {
@@ -73,6 +79,7 @@ export class BudgetComponent implements OnInit {
         console.log('data', data)
         this.gastosIngresados = this.formatData(data.expenses);
         this.budgetSelected = data;
+        this.extractTaskIdsByDoneTasks(data.expenses)
     }
 
     formatData(expenses: any[]): any[] {
@@ -82,7 +89,8 @@ export class BudgetComponent implements OnInit {
             taskCode: expense.code_task,
             gastoEspecifico: expense.specific_expense,
             meses: expense.month_amount.split(',').map(Number),
-            rubroContable: expense.accounting_item
+            rubroContable: expense.accounting_item,
+            task_id: expense.task_id
         }));
     }
 
@@ -176,6 +184,8 @@ export class BudgetComponent implements OnInit {
     }
 
     deleteGasto(gasto: any): void {
+        console.log('gasto', gasto)
+        console.log('this.gastosIngresados', this.gastosIngresados)
         const index = this.gastosIngresados.findIndex(
             item => item.activity_id === gasto.activity_id && item.task_id === gasto.task_id
         );
@@ -212,4 +222,46 @@ export class BudgetComponent implements OnInit {
         this.tasks.forEach(task => task.selected = false);
         this.taskSelected = null;
     }
+
+    extractTaskIdsByDoneTasks(data: any[]) {
+        this.completedTaskIds = data.map(item => item.task_id);
+    }
+
+    agregarGasto() {
+        if (!this.taskSelected) {
+            alert("Por favor, selecciona una tarea antes de agregar un gasto.");
+            return;
+        }
+        this.markTaskAsDone();
+        const newGasto = {
+            gastoEspecifico: this.gastoForm.value.gastoEspecifico,
+            meses: this.gastoForm.value.meses,
+            rubroContable: this.gastoForm.value.rubroContable,
+            taskCode: this.taskSelected.code_task,
+            actividad: this.activitySelected.description_activity,
+            activityCode: this.activitySelected.code_activity,
+            activity_id: this.activitySelected.id,
+            task_id: this.taskSelected.id,
+        };
+
+        console.log('newGasto', newGasto)
+
+        this.gastosIngresados.push(newGasto);
+        console.log('this.gastosIngresados', this.gastosIngresados);
+
+        this.gastoForm.reset();
+        this.gastoForm.setControl('meses', this.fb.array(Array(12).fill(0)));
+        this.taskSelected = null;
+    }
+
+    markTaskAsDone(): void {
+        if (!this.taskSelected) {
+            alert("No hay una tarea seleccionada para marcar como hecha.");
+            return;
+        }
+        this.taskSelected.done = true;
+        this.addTaskFromCompleted(this.taskSelected.id);
+        console.log(`Tarea ${this.taskSelected.code_task} marcada como hecha.`);
+    }
+
 }

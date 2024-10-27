@@ -25,7 +25,7 @@ export class DateFormatService {
     hours = hours ? hours : 12; // La hora 0 debería ser 12
     const strTime = ('0' + hours).slice(-2) + ':' + minutes + ' ' + ampm;
 
-    return `${day}/${month}/${year} ${strTime}`;
+    return `${day}-${month}-${year} ${strTime}`;
   }
 
   formatDateDDMMYYYY(date: Date | string): string {

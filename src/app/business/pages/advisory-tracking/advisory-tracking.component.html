@@ -262,7 +262,7 @@
             <div class="card flex justify-content-center col-12">
                 <h5
                     class="font-bold text-color"
-                    style="font-family: revert; text-align: center"
+                    style="text-align: center"
                 >
                     {{ advisorySelected.degree_processes.thesis_project_title }}
                 </h5>
@@ -554,7 +554,7 @@
                     <div>
                         <p>Asesor de tesis</p>
                         <app-user-selection
-                            #userSelection
+                            #advisorySelection
                             [typeUserList]="reviewerType"
                             maxUsersAllow="1"
                             [usersPreSelected]="advisory.value"
@@ -568,7 +568,6 @@
                     <div>
                         <p>Estudiante(s)</p>
                         <app-user-selection
-                            #userSelection
                             [typeUserList]="studentType"
                             maxUsersAllow="2"
                             (userSelected)="getStudentSelected($event)"

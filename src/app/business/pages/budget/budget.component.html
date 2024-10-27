@@ -370,6 +370,117 @@
                         [buttonVisible]="false"
                     ></app-label-error>
                 </ng-template>
+                <form *ngIf="taskSelected" [formGroup]="gastoForm">
+                    <div
+                        class="mb-4"
+                        style="
+                            border: 1px dashed #d1d5db;
+                            border-radius: 5px;
+                            padding: 15px;
+                        "
+                    >
+                        <div class="flex">
+                            <div class="mr-auto">
+                                <p for="tituloGeneral" class="font-bold">
+                                    {{
+                                        taskSelected.code_task +
+                                            ". " +
+                                            taskSelected.description_task
+                                    }}
+                                </p>
+                            </div>
+                            <button
+                                pButton
+                                type="button"
+                                icon="pi pi-times"
+                                class="p-button-danger"
+                                [rounded]="true"
+                                [text]="true"
+                                (click)="clearTaskSelection()"
+                            ></button>
+                        </div>
+
+                        <div class="p-field p-grid">
+                            <div class="col-12">
+                                <input
+                                    pInputText
+                                    id="descripcion"
+                                    style="width: 100%"
+                                    placeholder="Gasto específico"
+                                    formControlName="gastoEspecifico"
+                                    class="p-inputtext-sm"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="p-field p-grid">
+                                <label class="p-col-12 p-md-2">Meses:</label>
+
+                                <div
+                                    formArrayName="meses"
+                                    class="grid col-12 p-align-center p-justify-center flex"
+                                >
+                                    <div
+                                        *ngFor="
+                                            let mes of [
+                                                'Ene',
+                                                'Feb',
+                                                'Mar',
+                                                'Abr',
+                                                'May',
+                                                'Jun',
+                                                'Jul',
+                                                'Ago',
+                                                'Sep',
+                                                'Oct',
+                                                'Nov',
+                                                'Dic'
+                                            ];
+                                            let i = index
+                                        "
+                                        class="col-2"
+                                    >
+                                        <p>{{ mes }}</p>
+                                        <input
+                                            type="number"
+                                            style="
+                                                width: -webkit-fill-available;
+                                            "
+                                            [placeholder]="mes"
+                                            pInputText
+                                            [formControlName]="i"
+                                            pKeyFilter="int"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <div class="col-12">
+                                        <input
+                                            pInputText
+                                            id="descripcion"
+                                            style="width: 100%"
+                                            placeholder="Rubro Contable"
+                                            formControlName="rubroContable"
+                                            class="p-inputtext-sm"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="p-field p-grid">
+                                <div class="p-col-12 p-md-10">
+                                    <p-button
+                                        label="Agregar Gasto"
+                                        type="submit"
+                                        [disabled]="this.gastoForm.invalid"
+                                        (click)="agregarGasto()"
+                                    ></p-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
             <div *ngIf="edition && !floatingBoard" class="flex w-full">
                 <label style="font-size: 1.2rem" class="mr-auto"

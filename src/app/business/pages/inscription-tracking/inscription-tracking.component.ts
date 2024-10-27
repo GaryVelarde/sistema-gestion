@@ -15,6 +15,7 @@ import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { DateFormatService } from 'src/app/services/date-format.service';
 import { FileListComponent } from '../../cross-components/file-list/file-list.component';
 import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
+import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
 
 @Component({
     templateUrl: './inscription-tracking.component.html',
@@ -24,6 +25,8 @@ import { UploadArchivesComponent } from '../../cross-components/upload-archives/
 export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     @ViewChild('fileList') fileList: FileListComponent;
     @ViewChild('upload') upload: UploadArchivesComponent;
+    @ViewChild('reviewerSelection') reviewerSelection: UserSelectionComponent;
+    @ViewChild('studentSelection') studentSelection: UserSelectionComponent;
 
     products: any[] = [];
 
@@ -37,8 +40,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     getInscriptionListProcess: string;
     filteredItems: any[] | undefined;
     private destroy$ = new Subject<void>();
-    graduatesList: [] = [];
-    reviewerList: [] = [];
     commentsVisible = true;
     showDialogCancel = false;
     showDialogAprobation = false;
@@ -47,9 +48,8 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     showEditSudents = false;
     showDialogAddFiles = false;
     inscriptionState = '';
-    totalTask = 0;
-    totalTaskIncomplete = 0;
-    totalTaskComplete = 0;
+    lasReviewerSelected = [];
+    lastStudentsSelected = [];
 
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     columnTitles: string[] = [
@@ -245,10 +245,8 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         if (data) {
             this.inscriptionSelected = data;
             console.log('this.inscriptionSelected', this.inscriptionSelected)
-            this.graduatesList = data.graduates;
-            this.reviewerList = data.inscriptions[0].teachers;
-            this.teacher.setValue(data.inscriptions[0].teachers);
             this.students.setValue(data.graduates);
+            this.teacher.setValue(data.inscriptions[0].teachers)
             this.inscriptionState = data.inscriptions[0].status;
             this.inscriptionState === 'Aprobado' || this.inscriptionState === 'Renuncia'
                 ? this.commentsVisible = false
@@ -264,8 +262,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         this.callGetInscriptions();
         this.loaderService.show();
         this.inscriptionSelected = null;
-        this.graduatesList = [];
-        this.reviewerList = [];
         this.inscriptionState = null;
         this.showEdit = false;
         this.studentsForm.reset();
@@ -293,11 +289,8 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
 
     showEdition() {
         this.showEdit = true;
-        console.log('this.graduatesList', this.graduatesList);
-        const arrStudents = this.addFullNameProperty(this.graduatesList);
-        const arrTeacher = this.addFullNameProperty(this.reviewerList);
-        this.students.setValue(arrStudents);
-        this.teacher.setValue(arrTeacher);
+        this.lastStudentsSelected = this.students.value;
+        this.lasReviewerSelected = this.teacher.value;
     }
 
     test() {
@@ -312,14 +305,14 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     }
 
     cancelEdition() {
-        this.studentsForm.reset();
-        this.teacherForm.reset();
+        this.students.setValue(this.lastStudentsSelected);
+        this.teacher.setValue(this.lasReviewerSelected);
+        this.reviewerSelection.userFormControl.setValue(this.lasReviewerSelected);
+        this.studentSelection.userFormControl.setValue(this.lastStudentsSelected);
         this.showEdit = false;
     }
 
     saveEdition() {
-        this.graduatesList = this.students.value;
-        this.reviewerList = this.teacher.value;
         const request = {
             file: this.caseNumber.value,
             professional_school: this.professionalSchool.value,
