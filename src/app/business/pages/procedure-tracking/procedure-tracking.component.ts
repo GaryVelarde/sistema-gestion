@@ -47,6 +47,9 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
   getListProcess = '';
   getTypeListProcess = '';
   newProcedureText = '';
+  statusProcedureTypeSave = 'pi pi-save';
+  statusProcedureTypeDelete = 'pi pi-trash';
+  statusProcedureTypeAdd = 'pi pi-plus';
   skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
   columnTitles: string[] = [
     'Trámite',
@@ -63,7 +66,7 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
   editForm: FormGroup;
   private _description: FormControl = new FormControl('', [Validators.required]);
   private _student = new FormControl([], [Validators.required])
-  private _procedureType = new FormControl({}, [Validators.required])
+  private _procedureType = new FormControl({} as any, [Validators.required])
 
   get student() {
     return this._student;
@@ -93,6 +96,7 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.getProcedureList();
+    this.getProcedureTypesList();
   }
 
   ngOnDestroy() {
@@ -113,6 +117,7 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
   viewDetailsGuide(data: any) {
     this.loaderService.show();
     this.viewDetail = true;
+    this.edition = false;
     this.procedureSelected = data;
     console.log('procedureSelected', this.procedureSelected);
     this.student.setValue([data.applicant]);
@@ -141,6 +146,8 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
     this.service.getProcedureTypesList().pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res) {
         this.types = res.data;
+        this.statusProcedureTypeDelete = 'pi pi-trash';
+        this.statusProcedureTypeAdd = 'pi pi-plus'
         this.getTypeListProcess = 'complete';
       }
     },
@@ -165,6 +172,7 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
   backList() {
     this.loaderService.show();
     this.viewDetail = false;
+    this.edition = false;
     this.procedureSelected = {};
     this.getProcedureList();
     setTimeout(() => {
@@ -211,6 +219,7 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
     this.loaderService.show(true);
     this.showDialogAddFiles = false;
     this.service.postRegisterProcedureFile(this.formData, this.procedureSelected.id).pipe(
+      takeUntil(this.destroy$),
       finalize(() => {
         this.upload.clearFile()
         this.loaderService.hide();
@@ -247,9 +256,17 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
     return arr.map(item => item.id);
   }
 
+  getIds(arr: any[]) {
+    return arr.map(item => item.id);
+  }
+
   fillDataInEditForm() {
     this.description.setValue(this.procedureSelected.description);
-    this.procedureType.setValue(this.procedureSelected.procedureType);
+    this.procedureType.setValue(
+      {
+        id: this.procedureSelected.procedure_type_id,
+        procedure_type: this.procedureSelected.procedure_type
+      },);
   }
 
   procedureSelectedUpdate() {
@@ -259,22 +276,73 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
   }
 
   showDialogProcedure() {
-    this.getProcedureTypesList();
     this.showDialogProcedureType = true;
   }
 
   saveTypeProcedure(item: any) {
     console.log('Tipo de trámite guardado:', item.procedure_type);
     console.log('Tipo de trámite guardado:', item.id);
+    this.statusProcedureTypeSave = 'pi pi-spin pi-spinner';
+    const request = {
+      procedure_type: item.procedure_type
+    }
+    this.service.putUpdateProcedureType(request, item.id).pipe(
+      takeUntil(this.destroy$),
+      finalize(() => {
+        this.statusProcedureTypeSave = 'pi pi-save';
+      })
+    ).subscribe(
+      (res: any) => {
+        if (res.status) {
+          this.messageService.add({
+            key: 'tst',
+            severity: 'info',
+            summary: 'Confirmación',
+            detail: 'La información se ha guardado.',
+            life: 3000,
+          });
+        }
+      }, (error) => {
+        this.messageService.add({
+          key: 'tst',
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Se ha producido un error al guardar la información.',
+          life: 3000,
+        });
+      })
+  }
+
+  deleteProcedureType(item: any) {
+    this.statusProcedureTypeDelete = 'pi pi-spin pi-spinner';
+    this.service.deleteProcedureType(item.id).pipe(
+      takeUntil(this.destroy$)
+    ).
+      subscribe((res: any) => {
+        if (res.status) {
+          this.getProcedureTypesList();
+        }
+      }, (error) => {
+        this.messageService.add({
+          key: 'tst',
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Se ha producido un error al procesar la información.',
+          life: 3000,
+        });
+      })
   }
 
   postRegisterProcedureType() {
+    this.statusProcedureTypeAdd = 'pi pi-spin pi-spinner';
     const text = this.newProcedureText;
     if (text) {
       const request = {
         procedure_type: text
       }
-      this.service.postRegisterProcedureType(request).pipe().
+      this.service.postRegisterProcedureType(request).pipe(
+        takeUntil(this.destroy$)
+      ).
         subscribe((res: any) => {
           if (res.status) {
             this.getProcedureTypesList();
@@ -298,6 +366,7 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
       status: status
     }
     this.service.putProcedureStatusUpdate(request, this.procedureSelected.id).pipe(
+      takeUntil(this.destroy$),
       finalize(() => {
         this.loaderService.hide();
       })
@@ -315,5 +384,51 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
           life: 3000,
         });
       })
+  }
+
+  saveEdition() {
+    this.procedureUpdate();
+  }
+
+  procedureUpdate() {
+    this.loaderService.show(true);
+    const request = {
+      procedure_type_id: this.getIds([this.procedureType.value])[0],
+      user_id: this.getIds(this.student.value)[0],
+      description: this.description.value
+    }
+    this.service.putProcedureUpdate(request, this.procedureSelected.id).pipe(
+      takeUntil(this.destroy$),
+      finalize(() => {
+        this.loaderService.hide();
+      })
+    ).
+      subscribe((res: any) => {
+        if (res.status) {
+          this.edition = false;
+          this.confirmProcedureUpdate();
+          this.messageService.add({
+            key: 'tst',
+            severity: 'info',
+            summary: 'Confirmación',
+            detail: 'La información se ha guardado.',
+            life: 3000,
+          });
+        }
+      }, (error) => {
+        this.messageService.add({
+          key: 'tst',
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Se ha producido un error al guardar la información.',
+          life: 3000,
+        });
+      })
+  }
+
+  confirmProcedureUpdate() {
+    this.procedureSelected.description = this.description.value;
+    this.procedureSelected.procedure_type = this.procedureType.value.procedure_type;
+    this.procedureSelected.procedure_type_id = this.procedureType.value.id;
   }
 }

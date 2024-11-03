@@ -102,10 +102,12 @@ export class ProcedureRegisterComponent implements OnInit, OnDestroy {
       user_id: this.getIds(this.students.value)[0]
     }
     this.service.postRegisterProcedure(rq).pipe(
+      takeUntil(this.destroy$),
     ).subscribe(
       (res: any) => {
         if (res.status) {
           this.service.postRegisterProcedureFile(this.formData, res.id).pipe(
+            takeUntil(this.destroy$),
             finalize(() => {
               this.loaderService.hide();
             })

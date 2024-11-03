@@ -13,10 +13,10 @@ import { allowedUrlsByAuth } from './commons/constants/app.constants';
   templateUrl: './app.component.html'
 })
 export class AppComponent implements OnInit, OnDestroy {
-  displayModal: boolean = false; // Controla la visibilidad del modal
-  remainingTime: number = 0; // Tiempo restante del temporizador en segundos
+  displayModal: boolean = false;
+  remainingTime: number = 0;
   private alertSubscription!: Subscription;
-  private alertTimerStarted: boolean = false; // Flag para evitar múltiples inicios del temporizador de alerta
+  private alertTimerStarted: boolean = false;
 
   constructor(private primengConfig: PrimeNGConfig, private router: Router, private loaderService: LoaderService,
     private userActivityService: UserActivityService, private service: AuthService, private tokenService: TokenService
@@ -29,32 +29,32 @@ export class AppComponent implements OnInit, OnDestroy {
   showModal() {
     this.displayModal = true;
     if (!this.alertTimerStarted) {
-      this.startAlertCountdown(); // Inicia el temporizador de cuenta regresiva
-      this.alertTimerStarted = true; // Marca el temporizador como iniciado
+      this.startAlertCountdown();
+      this.alertTimerStarted = true;
     }
   }
 
   hideModal() {
     this.displayModal = false;
     if (this.alertSubscription) {
-      this.alertSubscription.unsubscribe(); // Detiene la cuenta regresiva cuando se cierra el modal
+      this.alertSubscription.unsubscribe();
     }
-    this.alertTimerStarted = false; // Reinicia el flag al cerrar el modal
+    this.alertTimerStarted = false;
   }
 
   keepConnected() {
-    this.userActivityService.restartInactivityTimer(); // Reinicia el temporizador de inactividad
-    this.hideModal(); // Cierra el modal
+    this.userActivityService.restartInactivityTimer();
+    this.hideModal();
   }
 
   startAlertCountdown() {
-    this.remainingTime = 60; // Tiempo inicial en segundos
+    this.remainingTime = 60;
 
     this.alertSubscription = interval(1000).subscribe(() => {
       this.remainingTime--;
       if (this.remainingTime <= 0) {
         this.alertSubscription.unsubscribe();
-        this.showAlert(); // Muestra la alerta cuando termina la cuenta regresiva
+        this.showAlert();
       }
     });
   }
@@ -66,7 +66,7 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.userActivityService.stopListeningForUserActivity();
     if (this.alertSubscription) {
-      this.alertSubscription.unsubscribe(); // Limpia la suscripción al destruir el componente
+      this.alertSubscription.unsubscribe();
     }
   }
 
@@ -98,7 +98,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   secondValidatonByDataLocalStorage() {
-    const currentUrl = this.router.url;
+    const currentUrl = this.router.url.split('?')[0];
+    console.log('currentUrl', currentUrl)
+    console.log('!allowedUrlsByAuth.includes(currentUrl)', allowedUrlsByAuth.includes(currentUrl))
     if (!allowedUrlsByAuth.includes(currentUrl)) {
       const userName = this.tokenService.getDR2LP2();
       if (userName === null) {

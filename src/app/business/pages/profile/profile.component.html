@@ -64,14 +64,16 @@
                 label="Cancelar edición"
                 icon="pi pi-times"
                 iconPos="right"
+                [disabled]="statusUpdate !== 'pi pi-save'"
             />
             <p-button
                 *ngIf="edition"
                 class="ml-3"
                 (click)="saveEdition()"
                 label="Guardar cambios"
-                icon="pi pi-save"
+                [icon]="statusUpdate"
                 iconPos="left"
+                [disabled]="statusUpdate !== 'pi pi-save'"
             />
         </div>
     </div>
@@ -255,9 +257,12 @@
                         <p-button
                             *ngIf="!edition"
                             label="Actualizar contraseña"
-                            icon="pi pi-save"
+                            [icon]="changePassStatus"
                             styleClass="p-button-rounded p-button-outlined p-button-secondary w-full mt-3"
-                            [disabled]="!changePasswordForm.valid"
+                            [disabled]="
+                                !changePasswordForm.valid ||
+                                changePassStatus !== 'pi pi-save'
+                            "
                             (click)="resetPassword()"
                         ></p-button>
                     </form>

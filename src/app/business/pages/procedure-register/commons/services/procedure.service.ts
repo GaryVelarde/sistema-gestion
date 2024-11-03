@@ -24,6 +24,6 @@ export class ProcedureRegisterService {
   }
 
   getProcedureTypesList(): Observable<any> {
-    return this.http.get(`${this.API_URL}/allprocedure-types`, this.header);
+    return this.http.get(`${this.API_URL}/procedure-type`, this.header);
   }
 }

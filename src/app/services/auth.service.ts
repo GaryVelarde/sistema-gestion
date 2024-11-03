@@ -22,11 +22,11 @@ export class AuthService {
   }
 
   forgotPassword(request: any): Observable<any> {
-    return this.http.post(`${this.API_URL}/auth/reset-password`, request, this.header);
+    return this.http.post(`${this.API_URL}/forgot-password`, request, this.header);
   }
 
   resetPassword(request: any, token: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/auth/reset-password/${token}`, request, this.header);
+    return this.http.post(`${this.API_URL}/reset-password?token=${token}&email=${request.email}`, request, this.header);
   }
 
   postInscription(rq: any): Observable<any> {

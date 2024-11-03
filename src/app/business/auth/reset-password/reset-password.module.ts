@@ -9,6 +9,7 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { ResetPasswordComponent } from './reset-password.component';
 import { ResetPasswordRoutingModule } from './reset-password-routing.module';
+import { MessagesModule } from 'primeng/messages';
 
 @NgModule({
     imports: [
@@ -21,6 +22,7 @@ import { ResetPasswordRoutingModule } from './reset-password-routing.module';
         PasswordModule,
         ReactiveFormsModule,
         ToastModule,
+        MessagesModule,
     ],
     declarations: [ResetPasswordComponent],
     providers: [MessageService]

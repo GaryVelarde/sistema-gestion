@@ -18,6 +18,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { ProcedureTrackingComponent } from './procedure-tracking.component';
 import { ProcedureTrackingRoutingModule } from './procedure-tracking-routing.module';
 import { TooltipModule } from 'primeng/tooltip';
+import { DropdownModule } from 'primeng/dropdown';
 
 @NgModule({
   imports: [
@@ -40,6 +41,7 @@ import { TooltipModule } from 'primeng/tooltip';
     SidebarModule,
     CalendarModule,
     TooltipModule,
+    DropdownModule,
   ],
   declarations: [ProcedureTrackingComponent]
 })

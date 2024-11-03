@@ -87,9 +87,7 @@ export class LoginComponent implements OnInit {
                     localStorage.setItem('dr2lp2', JSON.stringify(res));
                     this.router.navigate(['/pages/']);
                 }
-                console.log(res);
             }, (error) => {
-                console.log(error)
                 let msg = '';
                 switch (error.error.message) {
                     case 'Unauthorized':

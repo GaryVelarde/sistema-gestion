@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
+import { Message, MessageService } from 'primeng/api';
 import { finalize } from 'rxjs';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { AuthService } from 'src/app/services/auth.service';
@@ -55,9 +55,9 @@ export class ForgotPasswordComponent implements OnInit {
             });
             return;
         }
-        this.loaderService.show();
+        this.loaderService.show(true);
         const request: any = {
-            email: this.email.value,
+            email: this.email.value.trim(),
         }
         this.service.forgotPassword(request).pipe(
             finalize(() => {
@@ -66,28 +66,21 @@ export class ForgotPasswordComponent implements OnInit {
             })
         ).subscribe(
             (res: any) => {
-                if (res) {
-                    //mostrar alerta indicando que se la ha enviado un link a su correo
+                if (res.status) {
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Confirmación',
+                        detail: res.status,
+                        life: 20000
+                    });
                 }
-                console.log(res);
             }, (error) => {
-                console.log(error)
-                let msg = '';
-                switch (error.error.message) {
-                    case 'Record not found.':
-                        msg = 'El correo ingresado no está registrado.';
-                        break;
-                    case 'El valor seleccionado email no es válido.':
-                        msg = 'El usuario y/o la contraseña son incorrectos.';
-                        break;
-                    default:
-                        msg = error.error.message;
-                }
                 this.messageService.add({
                     key: 'tst',
                     severity: 'error',
                     summary: 'Error',
-                    detail: msg,
+                    detail: error.error.message,
                     life: 7000,
                 });
             })

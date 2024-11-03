@@ -3,6 +3,7 @@ import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidatorFn, Vali
 import { TokenService } from 'src/app/services/token.service';
 import { ProfileService } from './commons/services/profile.service';
 import { MessageService } from 'primeng/api';
+import { finalize } from 'rxjs';
 
 @Component({
   templateUrl: './profile.component.html',
@@ -14,6 +15,8 @@ export class ProfileComponent implements OnInit {
   user: any;
   statusCallUser = false;
   edition = false;
+  changePassStatus = 'pi pi-save';
+  statusUpdate = 'pi pi-save';
   userForm: FormGroup;
   changePasswordForm: FormGroup;
 
@@ -178,8 +181,13 @@ export class ProfileComponent implements OnInit {
   }
 
   saveEdition() {
+    this.statusUpdate = 'pi pi-spin pi-spinner';
     const request = this.generateRequest();
-    this.service.putUserUpdate(request, this.user.id).pipe().
+    this.service.putUserUpdate(request, this.user.id).pipe(
+      finalize(() => {
+        this.statusUpdate = 'pi pi-save';
+      })
+    ).
       subscribe((res: any) => {
         if (res.status) {
           this.updateUserDate();
@@ -207,6 +215,11 @@ export class ProfileComponent implements OnInit {
     this.user.name = this.name.value;
     this.user.surnames = this.surnames.value;
     this.user.phone = this.phone.value;
+    this.user.career = this.career.value;
+    this.user.line = this.line.value;
+    this.user.sublines = this.sublines.value;
+    this.user.orcid = this.orcid.value;
+    this.user.cip = this.cip.value;
     this.edition = false;
   }
 
@@ -224,22 +237,40 @@ export class ProfileComponent implements OnInit {
 
   generateRequest() {
     return this.user.role === 'UDI' ? {
+      role: 'UDI',
       name: this.name.value,
       surnames: this.surnames.value,
       phone: this.phone.value,
       email: this.user.email,
-    } : {};
+    } : {
+      role: 'Docente',
+      name: this.name.value,
+      surnames: this.surnames.value,
+      phone: this.phone.value,
+      email: this.user.email,
+      career: this.career.value,
+      line: this.line.value,
+      sublines: this.sublines.value,
+      orcid: this.orcid.value,
+      cip: this.cip.value,
+    };
   }
 
   resetPassword() {
+    this.changePassStatus = 'pi pi-spin pi-spinner';
     const request = {
       current_password: this.oldPassword.value,
       password: this.newPassword.value,
       password_confirmation: this.repeatNewPassword.value
     }
-    this.service.postResetPassword(request, this.user.id).pipe().
+    this.service.postResetPassword(request, this.user.id).pipe(
+      finalize(() => {
+        this.changePassStatus = 'pi pi-save';
+      })
+    ).
       subscribe((res: any) => {
         if (res.status) {
+          this.changePasswordForm.reset();
           this.messageService.add({
             key: 'tst',
             severity: 'info',
