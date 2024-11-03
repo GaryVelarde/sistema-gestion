@@ -69,6 +69,10 @@ export class AuthService {
     return this.http.get(`${this.API_URL}/teachers`, this.header);
   }
 
+  getUdiAndTeachersList(): Observable<any> {
+    return this.http.get(`${this.API_URL}/teacher-udi`, this.header);
+  }
+
   getStudentsList(): Observable<any> {
     return this.http.get(`${this.API_URL}/graduates-students`, this.header);
   }
@@ -374,7 +378,11 @@ export class AuthService {
   }
   
   putEventUdiUpdate(meetingId: string, request: any) {
-    return this.http.post(`${this.API_URL}/meeting/${meetingId}`, request, this.header);
+    return this.http.put(`${this.API_URL}/meeting/${meetingId}`, request, this.header);
+  }
+  
+  putBudgetUpdate(budgetId: string, request: any) {
+    return this.http.put(`${this.API_URL}/budget/${budgetId}`, request, this.header);
   }
 
 }

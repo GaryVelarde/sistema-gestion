@@ -50,6 +50,9 @@ export class UserSelectionComponent implements OnInit, OnDestroy {
       case userType.teacher:
         this.callTeachersList();
         break;
+      case userType.teacherAndUdi:
+        this.callTeachersAndUdiList();
+        break;
     }
     this.watchUser();
     this.userFormControl.setValue(this.addFullNameProperty(this.usersPreSelected));
@@ -112,6 +115,18 @@ export class UserSelectionComponent implements OnInit, OnDestroy {
         this.studentsList = res.data;
       }
 
+    }, (error) => {
+      this.getStudentListProcess = 'error';
+    });
+  }
+
+  callTeachersAndUdiList() {
+    this.getStudentListProcess = 'charging';
+    this.service.getUdiAndTeachersList().pipe(takeUntil(this.destroy$)).subscribe((res) => {
+      if (res.data) {
+        this.getStudentListProcess = 'complete';
+        this.studentsList = res.data;
+      }
     }, (error) => {
       this.getStudentListProcess = 'error';
     });

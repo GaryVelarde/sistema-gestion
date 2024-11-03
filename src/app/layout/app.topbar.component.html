@@ -25,7 +25,8 @@
         <div class="flex justify-content-center">
             <p-menu #menuO class="test" [model]="items" [popup]="true" styleClass="w-full md:w-15rem" >
                 <ng-template pTemplate="end">
-                    <button pRipple class="relative overflow-hidden w-full p-link flex align-items-center p-2 pl-3 text-color hover:surface-200 border-noround">
+                    <button pRipple class="relative overflow-hidden w-full p-link flex align-items-center p-2 pl-3 text-color hover:surface-200 border-noround"
+                    (click)="goToProfile()">
                         <p-avatar 
                             [label]="getInitialName()" 
                             size="large" />

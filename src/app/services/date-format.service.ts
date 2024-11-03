@@ -8,10 +8,29 @@ export class DateFormatService {
   constructor() { }
 
   formatDate(dateString: string): string {
-    const date = new Date(dateString);
+    let date: Date;
+
+    // Verificar si la fecha está en el formato 'dd-mm-yyyy hh:mm:ss'
+    const regex = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2}:\d{2}$/;
+    if (regex.test(dateString)) {
+        const parts = dateString.split(' ');
+        const dateParts = parts[0].split('-');
+        const timeParts = parts[1].split(':');
+
+        const day = parseInt(dateParts[0], 10);
+        const month = parseInt(dateParts[1], 10) - 1; // Ajustar porque los meses son 0-indexed
+        const year = parseInt(dateParts[2], 10);
+        const hours = parseInt(timeParts[0], 10);
+        const minutes = parseInt(timeParts[1], 10);
+        const seconds = parseInt(timeParts[2], 10);
+
+        date = new Date(year, month, day, hours, minutes, seconds);
+    } else {
+        date = new Date(dateString);
+    }
 
     if (isNaN(date.getTime())) {
-      throw new Error('Invalid date string');
+        throw new Error('Invalid date string');
     }
 
     const day = ('0' + date.getDate()).slice(-2);
@@ -26,7 +45,7 @@ export class DateFormatService {
     const strTime = ('0' + hours).slice(-2) + ':' + minutes + ' ' + ampm;
 
     return `${day}-${month}-${year} ${strTime}`;
-  }
+}
 
   formatDateDDMMYYYY(date: Date | string): string {
     let dateObj: Date;

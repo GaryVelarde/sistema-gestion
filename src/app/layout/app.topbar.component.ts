@@ -4,6 +4,7 @@ import { LayoutService } from "./service/app.layout.service";
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { TokenService } from '../services/token.service';
+import { Menu } from 'primeng/menu';
 
 @Component({
     selector: 'app-topbar',
@@ -47,6 +48,8 @@ export class AppTopBarComponent {
     @ViewChild('topbarmenubutton') topbarMenuButton!: ElementRef;
 
     @ViewChild('topbarmenu') menu!: ElementRef;
+
+    @ViewChild('menuO') menuO!: Menu;
 
     set theme(val: string) {
         this.layoutService.config.update((config) => ({
@@ -157,9 +160,12 @@ export class AppTopBarComponent {
             {
                 separator: true
             }
-
         }
+    }
 
+    goToProfile() {
+        this.menuO.hide()
+        this.router.navigate(['./pages/perfil']);
     }
 
 }

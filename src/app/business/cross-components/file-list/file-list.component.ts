@@ -124,6 +124,15 @@ export class FileListComponent implements OnInit, OnDestroy {
             this.status = 'error';
           })
         break;
+      case eModule.procedure:
+        this.serviceFile.getProcedureFiles(this.id).pipe(takeUntil(this.destroy$)).subscribe(
+          (res: any) => {
+            this.files = res.data;
+            this.status = 'complete';
+          }, (error) => {
+            this.status = 'error';
+          })
+        break;
     }
   }
 
@@ -190,6 +199,9 @@ export class FileListComponent implements OnInit, OnDestroy {
         break;
       case eModule.guide:
         this.callDeleteGuideArchive(archiveId)
+        break;
+      case eModule.procedure:
+        this.callDeleteProcedureArchive(archiveId)
         break;
     }
   }
@@ -305,6 +317,20 @@ export class FileListComponent implements OnInit, OnDestroy {
 
   callDeleteGuideArchive(archiveId: string) {
     this.serviceFile.deleteGuideArchive(this.id, archiveId).pipe(
+      takeUntil(this.destroy$)
+    ).
+      subscribe(
+        (res: any) => {
+          if (res.status) {
+            this.confirmRemoveArchive(archiveId);
+          }
+        }, (error) => {
+
+        })
+  }
+
+  callDeleteProcedureArchive(archiveId: string) {
+    this.serviceFile.deleteProcedureArchive(this.id, archiveId).pipe(
       takeUntil(this.destroy$)
     ).
       subscribe(

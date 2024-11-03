@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { AppLayoutComponent } from "./layout/app.layout.component";
 import { NotfoundComponent } from './business/notfound/notfound.component';
 import { isUserAuthenticatedGuard } from './guards/auth.guard';
+import { ProfileComponent } from './business/pages/profile/profile.component';
 
 @NgModule({
     imports: [

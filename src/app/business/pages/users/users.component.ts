@@ -241,6 +241,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     }
 
     openNew() {
+        this.userDetailSelected = null;
         this.name.reset();
         this.lastName.reset();
         this.email.reset();
@@ -337,11 +338,12 @@ export class UsersComponent implements OnInit, OnDestroy {
     }
 
     handleInsertOrUpdateUser() {
-        this.userDetailSelected.id ? this.callPutUser()
+        this.userDetailSelected && this.userDetailSelected.id ? this.callPutUser()
             : this.callPostNewUser()
     }
 
     callPostNewUser() {
+        this.modalNewUser = false;
         this.loaderService.show();
         let rq = this.createRequest();
         console.log(rq);
@@ -354,6 +356,7 @@ export class UsersComponent implements OnInit, OnDestroy {
         ).subscribe(
             (res) => {
                 if (res.status) {
+                    this.callGetUserList();
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Mensaje',

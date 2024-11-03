@@ -21,6 +21,9 @@ import { isUserAuthenticatedGuard } from 'src/app/guards/auth.guard';
         { path: 'sustentacion', loadChildren: () => import('./presentation-tracking/presentation-tracking.module').then(m => m.PresentationTrackingModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'lineas-guias-registro', loadChildren: () => import('./guide-register/guide-register.module').then(m => m.GuideRegisterModule), canActivate: [isUserAuthenticatedGuard] },
         { path: 'lineas-guias', loadChildren: () => import('./guide-tracking/guide-tracking.module').then(m => m.GuideTrackingModule), canActivate: [isUserAuthenticatedGuard] },
+        { path: 'tramites', loadChildren: () => import('./procedure-tracking/procedure-tracking.module').then(m => m.ProcedureTrackingModule), canActivate: [isUserAuthenticatedGuard] },
+        { path: 'registro-tramites', loadChildren: () => import('./procedure-register/procedure-register.module').then(m => m.ProcedureRegisterModule), canActivate: [isUserAuthenticatedGuard] },
+        { path: 'perfil', loadChildren: () => import('../pages/profile/profile.module').then(m => m.ProfileModule) },
         { path: '**', redirectTo: '/notfound' }
     ])],
     exports: [RouterModule]

@@ -47,6 +47,10 @@ export class FileListService {
         return this.http.delete(`${this.API_URL}/guide/${guideId}/archive/${archiveId}`);
     }
 
+    deleteProcedureArchive(guideId: string, archiveId: string) {
+        return this.http.delete(`${this.API_URL}/procedure/${guideId}/archive/${archiveId}`);
+    }
+
     /**
       Obtener archivos
    */
@@ -57,6 +61,10 @@ export class FileListService {
 
     getGuideFiles(id: string) {
         return this.http.get(`${this.API_URL}/guide/${id}/archive`, this.header);
+    }
+
+    getProcedureFiles(id: string) {
+        return this.http.get(`${this.API_URL}/procedure/${id}/archive`, this.header);
     }
 
 }

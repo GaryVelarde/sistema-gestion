@@ -58,7 +58,7 @@
                 </div>
 
                 <ng-template #selectActivity>
-                    <div *ngIf="planSelected.value.id" class="my-3">
+                    <div *ngIf="planSelected.value && planSelected.value.id" class="my-3">
                         <p-divider />
 
                         <p class="font-bold">Selecciona una actividad:</p>

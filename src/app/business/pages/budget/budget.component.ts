@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
+import { MenuItem, MessageService } from 'primeng/api';
 import { Subject, takeUntil } from 'rxjs';
+import { LoaderService } from 'src/app/layout/service/loader.service';
 import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
     templateUrl: './budget.component.html',
     styleUrls: ['./budget.component.scss'],
-    providers: [MessageService, ConfirmationService],
+    providers: [MessageService],
 })
 export class BudgetComponent implements OnInit {
     breadcrumbItems: MenuItem[] = [
@@ -45,7 +46,9 @@ export class BudgetComponent implements OnInit {
     completedTaskIds: string[] = [];
     gastoForm: FormGroup;
 
-    constructor(private fb: FormBuilder, private router: Router, private service: AuthService) {
+    constructor(private fb: FormBuilder, private router: Router, private service: AuthService,
+        private messageService: MessageService, private loaderServide: LoaderService,
+    ) {
         this.gastoForm = this.fb.group({
             gastoEspecifico: new FormControl('', Validators.required),
             meses: this.fb.array(Array(12).fill(0)),
@@ -90,7 +93,9 @@ export class BudgetComponent implements OnInit {
             gastoEspecifico: expense.specific_expense,
             meses: expense.month_amount.split(',').map(Number),
             rubroContable: expense.accounting_item,
-            task_id: expense.task_id
+            task_id: expense.task_id,
+            activity_id: expense.activity_id,
+            id: expense.id
         }));
     }
 
@@ -233,6 +238,7 @@ export class BudgetComponent implements OnInit {
             return;
         }
         this.markTaskAsDone();
+        console.log('this.activitySelected.code_activity', this.activitySelected.code_activity)
         const newGasto = {
             gastoEspecifico: this.gastoForm.value.gastoEspecifico,
             meses: this.gastoForm.value.meses,
@@ -263,5 +269,50 @@ export class BudgetComponent implements OnInit {
         this.addTaskFromCompleted(this.taskSelected.id);
         console.log(`Tarea ${this.taskSelected.code_task} marcada como hecha.`);
     }
+
+    saveEdition() {
+        this.loaderServide.show(true);
+        const request = this.generateRequest(this.gastosIngresados);
+        this.service.putBudgetUpdate(this.budgetSelected.id, request).pipe().
+            subscribe((res: any) => {
+                if (res.status) {
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Confirmación',
+                        detail: 'Los datos han sido actualizados.',
+                        life: 3000,
+                      });
+                      this.edition = false;
+                }
+            }, (error) => {
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al guardar la información.',
+                    life: 3000,
+                  });
+            })
+    }
+
+    generateRequest(data: any[]): any[] {
+        const planId = this.budgetSelected.plan_id;
+
+        const transformedData = {
+            plan_id: planId,
+            expenses: data.map(item => ({
+                id: item.id,
+                activity_id: item.activity_id,
+                task_id: item.task_id,
+                accounting_item: item.rubroContable,
+                specific_expense: item.gastoEspecifico,
+                month_amount: item.meses.join(",")
+            }))
+        };
+
+        return [transformedData];
+    }
+
 
 }

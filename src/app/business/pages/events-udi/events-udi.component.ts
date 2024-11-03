@@ -24,12 +24,13 @@ import {
 import { DateFormatService } from 'src/app/services/date-format.service';
 import { MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { AuthService } from 'src/app/services/auth.service';
-import { Router } from '@angular/router';
 import { AutoCompleteCompleteEvent } from 'primeng/autocomplete';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { TokenService } from 'src/app/services/token.service';
+import listPlugin from '@fullcalendar/list';
+
 interface Task {
     id: string;
     title: string;
@@ -70,6 +71,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     showEventDetail = false;
     newEventDialog = false;
     newTaskDialog = false;
+    eventStatus = '';
     taskSelectedId: string;
     breadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
@@ -88,6 +90,16 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         { name: '20 minutos', code: '00:20:00' },
         { name: '30 minutos', code: '00:30:00' },
     ];
+    colors = [
+        { name: 'Azul Oscuro', code: '#1e366d' },
+        { name: 'Azul Claro', code: '#4a6fa5' },
+        { name: 'Amarillo Mostaza', code: '#f5a623' },
+        { name: 'Gris Claro', code: '#e0e6ed' },
+        { name: 'Verde Esmeralda', code: '#2a9d8f' },
+        { name: 'Naranja Suave', code: '#f4a261' },
+        { name: 'Beige Claro', code: '#f1e9d2' }
+    ];
+
 
     rowsSkeletonTask = ['1', '2', '3'];
     statusTask = 'charging';
@@ -96,19 +108,19 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     events: EventInput[] = [];
 
     calendarOptions: CalendarOptions = {
-        plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin],
+        plugins: [dayGridPlugin, interactionPlugin, timeGridPlugin, listPlugin],
         initialView: 'dayGridMonth',
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay',
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listMonth', // Añade aquí listMonth
         },
         buttonText: {
             today: 'Hoy',
             month: 'Mes',
             week: 'Semana',
             day: 'Día',
-            list: 'Lista',
+            list: 'Lista', // Texto para la vista de lista
         },
         locale: esLocale,
         dateClick: this.handleDateClick.bind(this),
@@ -124,9 +136,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         slotLabelFormat: {
             hour: 'numeric',
             minute: '2-digit',
-            hour12: true // Esto establece el formato de 12 horas con AM/PM
-        }
-
+            hour12: true
+        },
+        eventDisplay: 'block'
     };
     lasParticipantsList = [];
     lasManagersList = [];
@@ -152,7 +164,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     private _description: FormControl = new FormControl('', [
         Validators.required,
     ]);
-    private _eventLink: FormControl = new FormControl('');
+    private _eventLink: FormControl = new FormControl('', [
+        Validators.required,
+    ]);
     private _titleTask: FormControl = new FormControl('', [
         Validators.required,
     ]);
@@ -163,7 +177,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     private _descriptionTask: FormControl = new FormControl('', [
         Validators.required,
     ]);
-    private _color: FormControl = new FormControl('#ff0000', [
+    private _color: FormControl = new FormControl(null, [
         Validators.required,
     ]);
     private _usersManager: FormControl = new FormControl([], [
@@ -187,6 +201,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     private _eventLinkEdit: FormControl = new FormControl('');
     private _startEdit: FormControl = new FormControl('', [Validators.required]);
     private _endEdit: FormControl = new FormControl('', [Validators.required]);
+    private _colorEdit: FormControl = new FormControl('', [Validators.required]);
 
     get slotDuration() {
         return this._slotDuration;
@@ -248,6 +263,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     get endEdit() {
         return this._endEdit;
     }
+    get colorEdit() {
+        return this._colorEdit;
+    }
     selectedItems: Usuario[] | undefined;
 
     usuarios: any[] = [];
@@ -280,6 +298,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
             eventLinkEdit: this.eventLinkEdit,
             startEdit: this.startEdit,
             endEdit: this.endEdit,
+            colorEdit: this.colorEdit,
         });
         this.taskForm = this.fb.group({
             titleTask: this.titleTask,
@@ -301,7 +320,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         });
         this.titleForm = this.fb.group({
             titleEdit: this.titleEdit,
-          });
+        });
     }
 
     ngOnInit() {
@@ -310,10 +329,11 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         this.watchUsersParticipants();
         this.watchUsersManagerEdit();
         this.watchUsersParticipantsEdit();
-        this.getTeachersList();
+        this.getUdiAndTeachersList();
         this.slotDuration.setValue(this.timeslots[this.timeslots.length - 1]);
+        this.color.setValue({ name: 'Azul Oscuro', code: '#1e366d' });
+        console.log(this.color.value)
         this.watchSlotDuration();
-        this.color.setValue('#ff0000');
         this.config.setTranslation({
             firstDayOfWeek: 1,
             dayNames: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
@@ -335,7 +355,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         this.destroy$.next();
         this.destroy$.complete();
     }
-
+ 
     ngAfterViewInit(): void {
         this.resizeObserver = new ResizeObserver((entries) => {
             for (let entry of entries) {
@@ -372,10 +392,13 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
                         end: this.dateFormatService.formatDateCalendar(event.due_date),
                         backgroundColor: event.color,
                         borderColor: event.color,
+                        color: event.color,
+                        textColor: '#000000',
                         editable: true,
                         startResizable: true,
                         durationEditable: true,
-                        event_udi: event
+                        event_udi: event,
+                        display: 'block'
                     }
                     this.events = [...this.events, ev];
                 }
@@ -383,8 +406,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
                     ...this.calendarOptions,
                     events: this.events
                 };
-
+                console.log(this.events)
             })
+
     }
 
     watchSlotDuration() {
@@ -415,13 +439,13 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         }
         this.start.setValue(dateInfo.day + ' ' + dateInfo.start);
         this.end.setValue(dateInfo.day + ' ' + dateInfo.end);
-        this.color.setValue('#ff0000');
         this.newEventDialog = true;
     }
 
     handleEventClick(arg) {
         this.loaderService.show();
         this.eventSelected = arg;
+        this.eventStatus = arg.event._def.extendedProps.event_udi.status;
         console.log('this.eventSelected.event._def.extendedProps.event_udi', this.eventSelected.event._def.extendedProps.event_udi);
         this.usersManagerEdit.setValue(this.addFullNameProperty(this.eventSelected.event._def.extendedProps.event_udi.managers));
         this.usersParticipantsEdit.setValue(this.addFullNameProperty(this.eventSelected.event._def.extendedProps.event_udi.participants));
@@ -440,6 +464,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         const endDate = this.dateFormatService.formatDate(data.due_date)
         this.startEdit.setValue(startDate);
         this.endEdit.setValue(endDate);
+        const colorObject = this.colors.find(color => color.code === data.color);
+        this.colorEdit.setValue(colorObject);
     }
 
     addFullNameProperty(data: any[]): any[] {
@@ -466,12 +492,33 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     }
 
     handleEventDrop(eventDropInfo) {
+        const nuevaFechaInicio = eventDropInfo.event.start;
+        const fechaFinOriginalStr = eventDropInfo.event.extendedProps.event_udi.due_date;
+
+        const [day, month, yearTime] = fechaFinOriginalStr.split('-');
+        const [year, time] = yearTime.split(' ');
+        const fechaFinOriginal = new Date(`${year}-${month}-${day}T${time}`);
+        const fechaInicioOriginal = new Date(eventDropInfo.oldEvent.start as string);
+        const diferenciaTiempo = fechaFinOriginal.getTime() - fechaInicioOriginal.getTime();
+        const nuevaFechaFin = new Date(nuevaFechaInicio.getTime() + diferenciaTiempo);
+
+        console.log('eventDropInfo', eventDropInfo)
+        console.log('eventDropInfo.event.extendedProps.event_udi.due_date', eventDropInfo.event.extendedProps.event_udi.due_date)
+        console.log('Nueva fecha de inicio:', this.dateFormatService.formatDateCalendarToBack(nuevaFechaInicio));
+        console.log('Nueva fecha de fin:', this.dateFormatService.formatDateCalendarToBack(nuevaFechaFin));
     }
 
     handleEventResize(eventResizeInfo) {
+        const nuevaFechaInicio = eventResizeInfo.event.start;
+        const nuevaFechaFin = eventResizeInfo.event.end;
+
+        // Imprimir o usar las constantes como prefieras
+        console.log('Nueva fecha de inicio:', this.dateFormatService.formatDateCalendarToBack(nuevaFechaInicio));
+        console.log('Nueva fecha de fin:', this.dateFormatService.formatDateCalendarToBack(nuevaFechaFin));
     }
 
     addEvent() {
+        console.log('this.eventForm.valid', this.color.value)
         if (this.eventForm.valid) {
             this.loaderService.show(true);
             this.newEventDialog = false;
@@ -479,8 +526,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
                 title: this.title.value,
                 description: this.description.value,
                 start_date: this.dateFormatService.formatDateCalendarToBack(this.start.value.toString()),
-                due_date: this.dateFormatService.formatDateCalendarToBack(this.start.value.toString()),
-                color: this.color.value,
+                due_date: this.dateFormatService.formatDateCalendarToBack(this.end.value.toString()),
+                color: this.color.value.code,
                 meeting_url: this.eventLink.value,
                 managers_ids: this.extractIds(this.usersManager.value),
                 users_ids: this.extractIds(this.usersParticipants.value)
@@ -507,8 +554,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
                             editable: true,
                             startResizable: true,
                             durationEditable: true,
-                            backgroundColor: this.color.value,
-                            borderColor: this.color.value,
+                            backgroundColor: this.color.value.code,
+                            // borderColor: this.color.value.code,
+                            textColor: '#000000',
                             event_udi: this.event(res.id)
                         };
                         this.events.push(newEvent);
@@ -535,7 +583,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
             description: this.description.value,
             start_date: this.dateFormatService.formatDateCalendarToBack(this.start.value.toString()),
             due_date: this.dateFormatService.formatDateCalendarToBack(this.start.value.toString()),
-            color: this.color.value,
+            color: this.color.value.code,
             status: "En Progreso",
             meeting_url: this.eventLink.value,
             created_at: "25-09-2024 19:55:13",
@@ -892,8 +940,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
             })
     }
 
-    getTeachersList() {
-        this.service.getTeachersList().pipe(takeUntil(this.destroy$)).subscribe(
+    getUdiAndTeachersList() {
+        this.service.getUdiAndTeachersList().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 if (res) {
                     this.usuarios = res.data;
@@ -935,23 +983,70 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     }
 
     saveEdition() {
-        const request =  {
-            "title": "Otra reunión de prueba",
-            "description": "Es otra descripcion de prueba",
-            "managers_ids": ["9d1418a4-9aa1-48af-a98e-b49baf4c691e"],
-            "users_ids": ["9d1448a1-9ca1-48af-a98a-b49baf2c695e"],
-            "start_date": "10-10-2024 12:00:00",
-            "due_date": "10-10-2024 12:30:00",
-            "color": "#0dbf6c",
-            "meeting_url": "https://domain/pages/events-udi"
-          }
+        this.loaderService.show(true);
+        const request = {
+            title: this.titleEdit.value,
+            description: this.descriptionEdit.value,
+            managers_ids: this.extractIds(this.usersManagerEdit.value),
+            users_ids: this.extractIds(this.usersParticipantsEdit.value),
+            start_date: this.dateFormatService.formatDateCalendarToBack(this.startEdit.value),
+            due_date: this.dateFormatService.formatDateCalendarToBack(this.endEdit.value),
+            color: this.colorEdit.value.code,
+            meeting_url: this.eventLinkEdit.value
+        }
 
-        this.service.putEventUdiUpdate(this.eventSelected.id, request).pipe().
-        subscribe(
-            (res: any) => {
+        this.service.putEventUdiUpdate(this.eventSelected.event._def.extendedProps.event_udi.id, request).pipe(
+            finalize(() => {
+                this.loaderService.hide();
+            })
+        ).
+            subscribe(
+                (res: any) => {
+                    if (res.status) {
 
+                    }
+                }, (error) => {
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Se ha producido un error al guardar la información.',
+                        life: 3000,
+                    })
+                })
+    }
+
+    confirmEventUpdate() {
+        this.edition = false;
+        this.eventSelected.event._def.extendedProps.event_udi.title = this.titleEdit.value;
+        this.eventSelected.event._def.extendedProps.event_udi.description = this.descriptionEdit.value;
+        this.eventSelected.event._def.extendedProps.event_udi.color = this.colorEdit.value.code;
+        this.eventSelected.event._def.extendedProps.event_udi.meeting_url = this.eventLinkEdit.value;
+    }
+
+    goToCancelation() {
+        const request = {
+            status: 'Finalizado'
+        }
+
+        this.service.putEventUdiStatusUpdate(this.eventSelected.event._def.extendedProps.event_udi.id, request).
+            pipe().subscribe((res: any) => {
+                this.eventStatus = 'Finalizado';
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'info',
+                    summary: 'Confirmación',
+                    detail: 'Los ha cancelado la reunión.',
+                    life: 3000,
+                });
             }, (error) => {
-
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al actualizar el estado.',
+                    life: 3000,
+                })
             })
     }
 }

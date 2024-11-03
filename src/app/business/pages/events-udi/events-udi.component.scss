@@ -158,3 +158,12 @@
   .display-grid {
     display: grid;
   }
+
+  .color-option {
+    display: flex;
+    align-items: center;
+    padding: 1px;
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+  }

@@ -256,10 +256,13 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
 
     clearValues() {
         this.gastoForm.reset();
+        this.planSelected.setValue(null);
         this.activitySelected = null;
         this.taskSelected = null;
         this.gastosIngresados = [];
     }
+
+    
 
     markTaskAsDone(): void {
         if (!this.taskSelected) {

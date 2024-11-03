@@ -53,8 +53,7 @@
                     <p-button
                         *ngIf="
                             !edition &&
-                            inscriptionState !== 'Cancelado' &&
-                            inscriptionState !== 'Aprobado'
+                            eventStatus !== 'Finalizado'
                         "
                         class="ml-3"
                         (click)="showEdition()"
@@ -65,8 +64,7 @@
                     <p-button
                         *ngIf="
                             edition &&
-                            inscriptionState !== 'Cancelado' &&
-                            inscriptionState !== 'Aprobado'
+                            eventStatus !== 'Finalizado'
                         "
                         class="ml-3"
                         (click)="cancelEdition()"
@@ -77,12 +75,11 @@
                     <p-button
                         *ngIf="
                             edition &&
-                            inscriptionState !== 'Cancelado' &&
-                            inscriptionState !== 'Aprobado'
+                            eventStatus !== 'Finalizado'
                         "
                         class="ml-3"
                         (click)="saveEdition()"
-                        label="aaaaaaaaaaaaa"
+                        label="Guardar cambios"
                         icon="pi pi-save"
                         iconPos="left"
                     />
@@ -90,11 +87,10 @@
                 <div>
                     <p-button
                         *ngIf="
-                            inscriptionState !== 'Cancelado' &&
-                            inscriptionState !== 'Aprobado' &&
+                            eventStatus !== 'Finalizado' &&
                             !edition
                         "
-                        label="Cancelar reunión"
+                        label="Finalizar reunión"
                         [outlined]="true"
                         icon="pi pi-times"
                         iconPos="left"
@@ -103,7 +99,10 @@
                     />
                 </div>
             </div>
-            <div *ngIf="!edition" class="card flex justify-content-center col-12">
+            <div
+                *ngIf="!edition"
+                class="card flex justify-content-center col-12"
+            >
                 <h5 class="font-bold text-color" style="text-align: center">
                     {{ eventSelected.event.title }}
                 </h5>
@@ -120,7 +119,7 @@
                 </textarea>
             </form>
             <div *ngIf="!edition" class="grid col-12">
-                <div class="col-12">
+                <div class="col-12 col-md-9">
                     <p class="font-bold">Descripción de la reunión:</p>
                     <p>
                         {{
@@ -129,7 +128,11 @@
                         }}
                     </p>
                 </div>
-                <div class="col-6">
+                <div class="card col-12 col-md-3" style="max-height: 100px">
+                    <p class="font-bold">Estado:</p>
+                    <p-tag [value]="eventStatus" />
+                </div>
+                <div class="col-12 col-md-6">
                     <p class="font-bold">Url de la reunión:</p>
                     <p class="p-url" (click)="redirectToUrl()">
                         <i class="pi pi-link" style="font-size: 1rem"></i>
@@ -139,24 +142,24 @@
                         }}
                     </p>
                 </div>
-                <div class="col-3">
+                <div class="col-12 col-md-3">
                     <p class="font-bold">Inicio:</p>
                     <p>
                         <i class="pi pi-clock" style="font-size: 1rem"></i>
                         {{
                             dateFormatService.formatDate(
-                                eventSelected.event.start
+                                eventSelected.event._def.extendedProps.event_udi.start_date
                             )
                         }}
                     </p>
                 </div>
-                <div class="col-3">
+                <div class="col-12 col-md-3">
                     <p class="font-bold">Fin:</p>
                     <p>
                         <i class="pi pi-clock" style="font-size: 1rem"></i>
                         {{
                             dateFormatService.formatDate(
-                                eventSelected.event.end
+                                eventSelected.event._def.extendedProps.event_udi.due_date
                             )
                         }}
                     </p>
@@ -164,7 +167,7 @@
             </div>
 
             <form *ngIf="edition" class="grid col-12" [formGroup]="editForm">
-                <div class="col-12">
+                <div class="col-12 col-md-9">
                     <p class="font-bold">Descripción de la reunión:</p>
                     <textarea
                         rows="3"
@@ -174,7 +177,33 @@
                     >
                     </textarea>
                 </div>
-                <div class="col-6">
+                <div class="col-12 col-md-3">
+                    <p class="font-bold">Color:</p>
+                    <p-dropdown
+                    formControlName="colorEdit"
+                        [options]="colors"
+                        optionLabel="name"
+                        placeholder="Color"
+                    >
+                        <ng-template let-color pTemplate="selectedItem">
+                            <div
+                                class="color-option"
+                                [style.background]="color?.code"
+                            >
+                                <span>{{ color?.name }}</span>
+                            </div>
+                        </ng-template>
+                        <ng-template let-color pTemplate="item">
+                            <div
+                                class="color-option"
+                                [style.background]="color?.code"
+                            >
+                                <span>{{ color?.name }}</span>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
+                </div>
+                <div class="col-12 col-md-6">
                     <p class="font-bold">Url de la reunión:</p>
                     <input
                         type="text"
@@ -183,7 +212,7 @@
                         class="w-full"
                     />
                 </div>
-                <div class="col-3">
+                <div class="col-12 col-md-3">
                     <p class="font-bold">Inicio:</p>
                     <p-calendar
                         formControlName="startEdit"
@@ -195,7 +224,7 @@
                         dateFormat="dd-mm-yy"
                     ></p-calendar>
                 </div>
-                <div class="col-3">
+                <div class="col-12 col-md-3">
                     <p class="font-bold">Fin:</p>
                     <p-calendar
                         formControlName="endEdit"
@@ -636,12 +665,33 @@
                     <label for="title">Título</label>
                 </p-floatLabel>
                 <div class="col-4 d-flex m-auto">
-                    <p-colorPicker formControlName="color" />
-                    <p class="m-auto">Color del evento</p>
+                    <p-dropdown
+                    formControlName="color"
+                        [options]="colors"
+                        optionLabel="name"
+                        placeholder="Color"
+                    >
+                        <ng-template let-color pTemplate="selectedItem">
+                            <div
+                                class="color-option"
+                                [style.background]="color?.code"
+                            >
+                                <span>{{ color?.name }}</span>
+                            </div>
+                        </ng-template>
+                        <ng-template let-color pTemplate="item">
+                            <div
+                                class="color-option"
+                                [style.background]="color?.code"
+                            >
+                                <span>{{ color?.name }}</span>
+                            </div>
+                        </ng-template>
+                    </p-dropdown>
                 </div>
             </div>
             <div class="p-fluid grid field mt-5">
-                <div class="field col-12 md:col-12">
+                <div class="field col-12">
                     <span class="p-float-label">
                         <textarea
                             formControlName="description"
@@ -662,7 +712,7 @@
                         pInputText
                         formControlName="eventLink"
                     />
-                    <label for="title">Url de la reunión (opcional)</label>
+                    <label for="title">Url de la reunión</label>
                 </p-floatLabel>
             </div>
             <div class="grid p-fluid field mt-1">
