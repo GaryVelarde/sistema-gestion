@@ -242,23 +242,10 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     openNew() {
         this.userDetailSelected = null;
-        this.name.reset();
-        this.lastName.reset();
-        this.email.reset();
-        this.number.reset();
-        this.code.reset();
-        this.egressDate.reset();
-        this.cycle.reset();
-        this.career.reset();
-        this.line.reset();
-        this.subLine.reset();
-        this.reviewer.reset();
-        this.adviser.reset();
-        this.jury.reset();
-        this.cip.reset();
-        this.orcid.reset(); 
+        this.clearValues();
         this.submitted = false;
         this.modalNewUser = true;
+        this.role.setValue({ name: 'UDI', code: 'UDI' });
     }
 
     hideDialog() {
@@ -274,13 +261,13 @@ export class UsersComponent implements OnInit, OnDestroy {
     }
 
     openModalUserDetail(user: any) {
-        this.titleModalDetailIserSelected = 'Detalle de ' + user.nombre;
         this.userDetailSelected = user;
         this.modalNewUser = true;
         this.setUserDataDetails(user);
     }
 
     setUserDataDetails(user: any) {
+        this.clearValues();
         console.log(this.adviser.value);
         console.log(user)
         if (user.role) {
@@ -304,6 +291,12 @@ export class UsersComponent implements OnInit, OnDestroy {
                     this.removeControlForEgresado();
                     this.line.setValue(user.line);
                     this.subLine.setValue(user.sublines);
+                    this.cip.setValue(user.cip);
+                    this.orcid.setValue(user.orcid);
+                    this.career.setValue(user.career);
+                    this.reviewer.setValue(user.is_reviewer ? true : false);
+                    this.jury.setValue(user.is_jury ? true : false);
+                    this.adviser.setValue(user.is_advisor ? true : false);
                     break;
                 case 'Egresado':
                     this.addControlForEgresado();
@@ -344,7 +337,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     callPostNewUser() {
         this.modalNewUser = false;
-        this.loaderService.show();
+        this.loaderService.show(true);
         let rq = this.createRequest();
         console.log(rq);
         this.service.postCreateNewUser(rq).pipe(
@@ -482,6 +475,20 @@ export class UsersComponent implements OnInit, OnDestroy {
     }
 
     clearValues() {
-
+        this.name.reset();
+        this.lastName.reset();
+        this.email.reset();
+        this.number.reset();
+        this.code.reset();
+        this.egressDate.reset();
+        this.cycle.reset();
+        this.career.reset();
+        this.line.reset();
+        this.subLine.reset();
+        this.reviewer.reset();
+        this.adviser.reset();
+        this.jury.reset();
+        this.cip.reset();
+        this.orcid.reset();
     }
 }

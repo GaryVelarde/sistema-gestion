@@ -1,7 +1,6 @@
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from 'src/app/services/auth.service';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { MessageService } from 'primeng/api';
@@ -141,7 +140,6 @@ export class ProcedureRegisterComponent implements OnInit, OnDestroy {
     this.filesSelected = [];
     this.formData = new FormData();
   }
-
 
   getIds(arr: any[]) {
     return arr.map(item => item.id);
