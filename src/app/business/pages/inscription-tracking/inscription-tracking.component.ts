@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MenuItem, Message, MessageService, PrimeNGConfig } from 'primeng/api';
 import { Table } from 'primeng/table';
 import {
@@ -16,6 +16,7 @@ import { DateFormatService } from 'src/app/services/date-format.service';
 import { FileListComponent } from '../../cross-components/file-list/file-list.component';
 import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
 import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
+import { TokenService } from 'src/app/services/token.service';
 
 @Component({
     templateUrl: './inscription-tracking.component.html',
@@ -50,7 +51,10 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     inscriptionState = '';
     lasReviewerSelected = [];
     lastStudentsSelected = [];
-
+    payments = [
+        { name: 'Si', code: 'Si' },
+        { name: 'No', code: 'No' },
+    ];
     skeletonRows = Array.from({ length: 10 }).map((_, i) => `Item #${i}`);
     columnTitles: string[] = [
         'Título de tesis',
@@ -58,6 +62,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         'Estado',
         ''
     ];
+    isUdi = this.tokenService.userIsUDI();
     reviewersList = [];
     filteredReviewers: any;
     inscriptionSelected: any;
@@ -104,6 +109,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     private _facultyReceptionDate: FormControl = new FormControl('', [Validators.required]);
     private _udiApprovalDate: FormControl = new FormControl('', [Validators.required]);
     private _title: FormControl = new FormControl('', [Validators.required]);
+    private _reviewerWasPayed: FormControl = new FormControl('', [Validators.required]);
 
     get cancelationComment() {
         return this._cancelationComment;
@@ -141,16 +147,19 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     get title() {
         return this._title;
     }
+    get reviewerWasPayed() {
+        return this._reviewerWasPayed;
+    }
 
     constructor(
         private messageService: MessageService,
         private fb: FormBuilder,
         private service: AuthService,
-        private elRef: ElementRef,
         private router: Router,
         private config: PrimeNGConfig,
         private loaderService: LoaderService,
         private dateFormat: DateFormatService,
+        private tokenService: TokenService,
     ) {
         this.cancelattionForm = this.fb.group({
             cancelationComment: this.cancelationComment,
@@ -175,6 +184,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
             resolutionNumber: this.resolutionNumber,
             facultyReceptionDate: this.facultyReceptionDate,
             udiApprovalDate: this.udiApprovalDate,
+            reviewerWasPayed: this.reviewerWasPayed,
         });
         this.titleForm = this.fb.group({
             title: this.title,
@@ -213,7 +223,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
                 }
             }, (error) => {
                 this.getInscriptionListProcess = 'error';
-                console.log(error)
             })
     }
 
@@ -244,7 +253,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         this.loaderService.show();
         if (data) {
             this.inscriptionSelected = data;
-            console.log('this.inscriptionSelected', this.inscriptionSelected)
             this.students.setValue(data.graduates);
             this.teacher.setValue(data.inscriptions[0].teachers)
             this.inscriptionState = data.inscriptions[0].status;
@@ -291,6 +299,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         this.showEdit = true;
         this.lastStudentsSelected = this.students.value;
         this.lasReviewerSelected = this.teacher.value;
+        this.fillDataInEditForm();
     }
 
     test() {
@@ -313,6 +322,8 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     }
 
     saveEdition() {
+        this.loaderService.show(true);
+        const wasPayed = this.reviewerWasPayed.value.code === 'Si' ? true : false;
         const request = {
             file: this.caseNumber.value,
             professional_school: this.professionalSchool.value,
@@ -323,11 +334,12 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
             approval_date_udi: this.dateFormat.formatDateDDMMYYYY(this.udiApprovalDate.value),
             user_id: this.extractIds(this.teacher.value),
             user_ids: this.extractIds(this.students.value),
-            reviewer_was_paid: false //default: false
+            reviewer_was_paid: wasPayed
         }
         this.service.putInscriptionUpdate(this.inscriptionSelected.inscriptions[0].id, request).pipe(
             finalize(() => {
                 this.showEdit = false;
+                this.loaderService.hide();
             })
         ).subscribe(
             (res: any) => {
@@ -362,6 +374,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         this.inscriptionSelected.inscriptions[0].approval_date_udi = this.dateFormat.formatDateDDMMYYYY(this.udiApprovalDate.value);
         this.inscriptionSelected.inscriptions[0].teachers = this.teacher.value;
         this.inscriptionSelected.graduates = this.students.value;
+        this.inscriptionSelected.inscriptions[0].reviewer_was_paid = this.reviewerWasPayed.value.code === 'Si' ? true : false;
     }
 
     extractIds(arr: Array<{ id: string }>): string[] {
@@ -400,7 +413,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
                     detail: 'Se ha producido un error al actualizar el estado.',
                     life: 3000,
                 });
-                console.log(error)
             });
     }
 
@@ -436,7 +448,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
                     detail: 'Se ha producido un error al actualizar el estado.',
                     life: 3000,
                 });
-                console.log(error)
             });
     }
 
@@ -450,7 +461,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     confirmCancelation() {
         this.showDialogCancel = false;
         this.loaderService.show();
-        console.log('dateCancelationReception', this.dateCancelationReception.value)
         const rq = {
             status: 'Renuncia',
             description: this.cancelationComment.value,
@@ -482,7 +492,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
                     detail: 'Se ha producido un error al actualizar el estado.',
                     life: 3000,
                 });
-                console.log(error)
             });
     }
 
@@ -508,7 +517,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     callGetTeachersList() {
         this.service.getTeachersList().pipe(takeUntil(this.destroy$)).subscribe((res) => {
             this.reviewersList = res.teachers;
-            console.log(res);
         });
     }
 
@@ -529,7 +537,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
                 student.name.toLowerCase().includes(query) ||
                 student.surnames.toLowerCase().includes(query)
         );
-        console.log('filteredCountries', this.filteredStudents);
     }
 
     filterSecondStudents(event: { query: string }) {
@@ -539,7 +546,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
                 student.name.toLowerCase().includes(query) ||
                 student.surnames.toLowerCase().includes(query)
         );
-        console.log('filteredCountries', this.filteredSecondStudents);
     }
 
     callGetStudentList() {
@@ -554,7 +560,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
 
     getFirstLetter(str: string): string {
         if (!str) {
-            console.error('The string is empty');
             return '';
         }
         const firstLetter = str.charAt(0);
@@ -576,12 +581,10 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     }
 
     getTeacherSelected(userSelected: any) {
-        console.log('teacher', userSelected)
         this.teacher.setValue(userSelected);
     }
 
     getStudentSelected(userSelected: any) {
-        console.log('students', userSelected)
         this.students.setValue(userSelected);
     }
 
@@ -602,7 +605,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
             }), takeUntil(this.destroy$)
         ).subscribe(
             (res: any) => {
-                console.log(res)
                 if (res.status) {
                     this.commentsVisible = false
                     this.inscriptionState = 'Aprobado';
@@ -622,7 +624,6 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
                     detail: 'Se ha producido un error al actualizar el estado.',
                     life: 3000,
                 });
-                console.log(error)
             })
         // this.addNotificationForChangeState(
         //     'La inscripción del proyecto de Tesis pasó a Aprobado por Cesar Jauregui Saavedra'
@@ -693,5 +694,11 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         this.facultyReceptionDate.setValue(this.inscriptionSelected.inscriptions[0].reception_date_faculty);
         this.udiApprovalDate.setValue(this.inscriptionSelected.inscriptions[0].approval_date_udi);
         this.title.setValue(this.inscriptionSelected.thesis_project_title);
+        if(this.inscriptionSelected.inscriptions[0].reviewer_was_paid) {
+            this.reviewerWasPayed.setValue({ name: 'Si', code: 'Si' });
+        } else {
+            this.reviewerWasPayed.setValue({ name: 'No', code: 'No' });
+        }
+        
     }
 }

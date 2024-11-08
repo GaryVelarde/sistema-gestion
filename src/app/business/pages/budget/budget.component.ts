@@ -83,10 +83,8 @@ export class BudgetComponent implements OnInit {
     }
 
     viewDetailsBudget(data: any) {
-        console.log('data', data)
         this.gastosIngresados = this.formatData(data.expenses);
         this.budgetSelected = data;
-        console.log('this.gastosIngresados', this.gastosIngresados)
         this.extractTaskIdsByDoneTasks(data.expenses)
     }
 
@@ -136,6 +134,7 @@ export class BudgetComponent implements OnInit {
     }
 
     cancelEdition() {
+        this.gastosIngresados = this.formatData(this.budgetSelected.expenses);
         this.edition = false;
         this.floatingBoard = false;
         this.tasks = null;
@@ -163,7 +162,6 @@ export class BudgetComponent implements OnInit {
         this.activitySelected = activity;
         this.callgetListTaskByActivity(activity.id);
         this.taskSelected = null;
-        console.log(activity)
     }
 
     callgetListTaskByActivity(id: string) {
@@ -186,20 +184,15 @@ export class BudgetComponent implements OnInit {
                 task.done = true;
             }
         });
-
-        console.log('this.tasks', this.tasks)
     }
 
     taskSelection(task: any): void {
         this.tasks.forEach(a => a.selected = false);
         task.selected = true;
         this.taskSelected = task;
-        console.log(task)
     }
 
     deleteGasto(gasto: any): void {
-        console.log('gasto', gasto)
-        console.log('this.gastosIngresados', this.gastosIngresados)
         const index = this.gastosIngresados.findIndex(
             item => item.activity_id === gasto.activity_id && item.task_id === gasto.task_id
         );
@@ -222,7 +215,6 @@ export class BudgetComponent implements OnInit {
 
     addTaskFromCompleted(taskId: string): void {
         this.completedTaskIds.push(taskId);
-        console.log('taskId', taskId);
     }
 
     removeTaskFromCompleted(taskId: string): void {
@@ -247,7 +239,6 @@ export class BudgetComponent implements OnInit {
             return;
         }
         this.markTaskAsDone();
-        console.log('this.activitySelected.code_activity', this.activitySelected.code_activity)
         const newGasto = {
             gastoEspecifico: this.gastoForm.value.gastoEspecifico,
             meses: this.gastoForm.value.meses,
@@ -261,12 +252,7 @@ export class BudgetComponent implements OnInit {
             activity_id: this.activitySelected.id,
             task_id: this.taskSelected.id,
         };
-
-        console.log('newGasto', newGasto)
-
         this.gastosIngresados.push(newGasto);
-        console.log('this.gastosIngresados', this.gastosIngresados);
-
         this.gastoForm.reset();
         this.gastoForm.setControl('meses', this.fb.array(Array(12).fill(0)));
         this.taskSelected = null;
@@ -279,7 +265,6 @@ export class BudgetComponent implements OnInit {
         }
         this.taskSelected.done = true;
         this.addTaskFromCompleted(this.taskSelected.id);
-        console.log(`Tarea ${this.taskSelected.code_task} marcada como hecha.`);
     }
 
     saveEdition() {

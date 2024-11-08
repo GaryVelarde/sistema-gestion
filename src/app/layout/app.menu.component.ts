@@ -1,6 +1,8 @@
 import { OnInit } from '@angular/core';
 import { Component } from '@angular/core';
 import { LayoutService } from './service/app.layout.service';
+import { TokenService } from '../services/token.service';
+import { teacherOptions, udiOptions } from '../commons/constants/app.constants';
 
 @Component({
     selector: 'app-menu',
@@ -10,69 +12,10 @@ export class AppMenuComponent implements OnInit {
 
     model: any[] = [];
 
-    constructor(public layoutService: LayoutService) { }
+    constructor(public layoutService: LayoutService, private tokenService: TokenService) { }
 
     ngOnInit() {
-        this.model = [
-            {
-                label: 'Home',
-                items: [
-                    { label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/pages/'] }
-                ]
-            },
-            {
-                label: 'Gestión de usuarios',
-                items: [
-                    { label: 'Usuarios', icon: 'pi pi-fw pi-user', routerLink: ['/pages/users'] }
-                ]
-            },
-            {
-                label: 'Proceso de titulación',
-                items: [
-                    { label: 'Proyecto de Tesis', icon: 'pi pi-fw pi-file', routerLink: ['/pages/inscripciones'] },
-                    { label: 'Asesorías', icon: 'pi pi-fw pi-file-import', routerLink: ['/pages/asesorias'] },
-                    { label: 'Revisión de tesis', icon: 'pi pi-fw pi-file-export', routerLink: ['/pages/revision'] },
-                    { label: 'Sustentación', icon: 'pi pi-fw pi-graduation-cap', routerLink: ['/pages/sustentacion'] },
-                ]
-            },
-            {
-                label: 'SEMILLERO',
-                items: [
-                    { label: 'Artículos', icon: 'pi pi-fw pi-book', routerLink: ['/pages/articulos-semilleros'] },
-                ]
-            },
-            {
-                label: 'Programa 3',
-                items: [
-                    { label: 'Planes', icon: 'pi pi-fw pi-list-check', routerLink: ['/pages/planes'] },
-                    { label: 'Presupuestos', icon: 'pi pi-fw pi-calculator', routerLink: ['/pages/presupuestos'] },
-                ]
-            },
-            // {
-            //     label: 'Eventos',
-            //     items: [
-            //         { label: 'Calendario', icon: 'pi pi-fw pi-calendar', routerLink: ['/pages/events'] },
-            //     ]
-            // },
-            {
-                label: 'Reuniones UDI',
-                items: [
-                    { label: 'Agenda UDI', icon: 'pi pi-fw pi-calendar-plus', routerLink: ['/pages/agenda-udi'] },
-                ]
-            },
-            {
-                label: 'Líneas y Guías',
-                items: [
-                    { label: 'Seguimiento', icon: 'pi pi-fw pi-file-check', routerLink: ['/pages/lineas-guias'] },
-                ]
-            },
-            {
-                label: 'Trámites',
-                items: [
-                    { label: 'Seguimiento', icon: 'pi pi-fw pi-file-check', routerLink: ['/pages/tramites'] },
-                ]
-            },
-        ];
+        this.model = this.tokenService.userIsUDI() ? udiOptions : teacherOptions;
     }
 
     getUserFullName(): string {

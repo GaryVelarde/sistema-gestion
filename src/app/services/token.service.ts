@@ -23,6 +23,11 @@ export class TokenService {
     return this.getDR2LP2().user.id ? this.getDR2LP2().user.id : '';
   }
 
+  userIsUDI(): boolean {
+    const user = JSON.parse(localStorage.getItem('dr2lp2'));
+    return user.user.role === 'UDI' ? true : false;
+  }
+
   revokeToken(): void {
     localStorage.removeItem('access_token');
   }

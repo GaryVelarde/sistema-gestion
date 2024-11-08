@@ -108,14 +108,12 @@ export class HotbedRegisterComponent implements OnInit, OnDestroy {
               }
             }, (error) => {
               this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ha ocurrido un error al guardar los archivos.' });
-              console.log('error 2', error);
             })
         }
       },
       (error) => {
         this.loaderService.hide();
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ha ocurrido un error al registrar el artículo.' });
-        console.log('error 1', error);
       });
   }
 
@@ -155,7 +153,6 @@ export class HotbedRegisterComponent implements OnInit, OnDestroy {
   }
 
   getUserSelected(userSelected: any) {
-    console.log('userSelected', userSelected)
     this.students.setValue(userSelected);
   }
 

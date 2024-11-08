@@ -43,7 +43,6 @@ export class Step3Component implements OnInit {
 	callGetTeachersList() {
 		this.service.getTeachersList().subscribe((res) => {
 			this.data = res.data;
-			console.log(res);
 		});
 	}
 }

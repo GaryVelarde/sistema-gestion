@@ -1,18 +1,27 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MenuItem } from 'primeng/api';
+import { Router } from '@angular/router';
 import { Subject, Subscription, debounceTime, takeUntil } from 'rxjs';
 import { classByStatusReport } from 'src/app/commons/constants/app.constants';
 import { ProductService } from 'src/app/demo/service/product.service';
 import { LayoutService } from 'src/app/layout/service/app.layout.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { TokenService } from 'src/app/services/token.service';
 
 @Component({
     templateUrl: './dashboard.component.html',
+    styles: [`
+        :host ::ng-deep .p-card {
+          border-radius: 10px;
+        }
+        :host ::ng-deep .p-card .p-card-body {
+          padding: 1.5rem;
+        }
+        :host ::ng-deep .p-card .p-card-footer {
+          padding-top: 1rem;
+        }
+      `]
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-
-    items!: MenuItem[];
-
     products!: any[];
 
     chartDataInscription: any;
@@ -67,9 +76,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     private destroy$ = new Subject<void>();
 
+    isUdi = this.tokenService.userIsUDI();
+
     messageError = 'Ha ocurrido un error al cargar las notificaciones. Por favor, inténtalo de nuevo más tarde.'
 
-    constructor(private productService: ProductService, public layoutService: LayoutService, private service: AuthService) {
+    constructor(private productService: ProductService, public layoutService: LayoutService, private service: AuthService,
+        public tokenService: TokenService, private router: Router,
+    ) {
         this.subscription = this.layoutService.configUpdate$
             .pipe(debounceTime(25))
             .subscribe((config) => {
@@ -78,14 +91,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.callGetNotificationReport();
-        this.initChart();
-        this.callGetReportByArticles();
-        this.productService.getProductsSmall().then(data => this.products = data);
-        this.items = [
-            { label: 'Add New', icon: 'pi pi-fw pi-plus' },
-            { label: 'Remove', icon: 'pi pi-fw pi-minus' }
-        ];
+        if (this.tokenService.userIsUDI()) {
+            this.callGetNotificationReport();
+            this.initChart();
+            this.callGetReportByArticles();
+            this.productService.getProductsSmall().then(data => this.products = data);
+        }
     }
 
     callGetNotificationReport() {
@@ -237,7 +248,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
                     let datasets = [];
                     let count = 1;
                     for (let data of res.data) {
-                        console.log(data)
                         const obj = {
                             label: data.status,
                             data: data.total_month,
@@ -367,8 +377,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         this.service.getArticlesMonthlyReport(this.yearSelectedByArticles.code).pipe(takeUntil(this.destroy$)).
             subscribe((res: any) => {
-                console.log(res)
-
                 if (res.data) {
                     this.statusChartArticles = 'complete';
                     this.dataArticles = {
@@ -393,7 +401,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
                             }
                         ]
                     };
-
                     this.optionsArticles = {
                         plugins: {
                             legend: {
@@ -405,12 +412,25 @@ export class DashboardComponent implements OnInit, OnDestroy {
                         }
                     };
                 }
-
-
-
             }, (error) => {
                 this.statusChartArticles = 'error';
 
             })
+    }
+
+    goToProfile() {
+        this.router.navigate(['/pages/perfil']);
+    }
+
+    goToTitulationProcess() {
+        this.router.navigate(['/pages/inscripciones']);
+    }
+
+    goToEventsUdi() {
+        this.router.navigate(['/pages/agenda-udi']);
+    }
+
+    goToGuide() {
+        this.router.navigate(['/pages/lineas-guias']);
     }
 }

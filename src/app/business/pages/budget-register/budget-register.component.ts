@@ -99,13 +99,7 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
             task_id: this.taskSelected.id,
         };
 
-        console.log('newGasto', newGasto)
-
-        // Agregar el nuevo gasto al array de gastos ingresados
         this.gastosIngresados.push(newGasto);
-        console.log('this.gastosIngresados', this.gastosIngresados);
-
-        // Limpiar el formulario
         this.gastoForm.reset();
         this.gastoForm.setControl('meses', this.fb.array(Array(12).fill(0)));
         this.taskSelected = null;
@@ -154,7 +148,6 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
                     this.activitySelected = null;
                     this.callGetListActivitybyPlan(plan.id);
                 }
-                console.log(plan)
             })
     }
 
@@ -179,7 +172,6 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
         this.activitySelected = activity;
         this.callgetListTaskByActivity(activity.id);
         this.taskSelected = null;
-        console.log(activity)
     }
 
     callgetListTaskByActivity(id: string) {
@@ -200,7 +192,6 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
         this.tasks.forEach(a => a.selected = false);
         task.selected = true;
         this.taskSelected = task;
-        console.log(task)
     }
 
     clearTaskSelection(): void {
@@ -230,7 +221,6 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
 
     callPostRegisterBudget() {
         const request = this.generateRequest(this.gastosIngresados);
-        console.log('request', request)
         this.service.postRegisterBudget([request]).pipe(takeUntil(this.destroy$)).
             subscribe(
                 (res: any) => {
@@ -278,7 +268,6 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
         }
         this.taskSelected.done = true;
         this.addTaskFromCompleted(this.taskSelected.id);
-        console.log(`Tarea ${this.taskSelected.code_task} marcada como hecha.`);
     }
 
     deleteGasto(gasto: any): void {
@@ -304,7 +293,6 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
 
     addTaskFromCompleted(taskId: string): void {
         this.completedTaskIds.push(taskId);
-        console.log('taskId', taskId);
     }
 
     removeTaskFromCompleted(taskId: string): void {
@@ -320,7 +308,6 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
                 task.done = true;
             }
         });
-        console.log('this.tasks', this.tasks)
     }
 
 

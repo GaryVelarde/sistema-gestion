@@ -105,9 +105,6 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
 
     savePlan() {
         const formData = this.actividadForm.value;
-        console.log('Título General:', formData.tituloGeneral);
-        console.log('activities:', formData.activities);
-        console.log('rq', this.generateRequestData())
         this.callPostPlanRegister();
     }
 
@@ -118,7 +115,6 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
 
     showPreview() {
         const formValue = this.actividadForm.value;
-        console.log('formValue', formValue)
         this.previewData = formValue.activities.map((actividad: any, i: number) => {
             return actividad.tasks.map((tarea: any, j: number) => {
                 const months = tarea.months.map((mes: boolean) => (mes ? '<i class="pi pi-times"></i>' : ''));
@@ -144,8 +140,6 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
             }
             return acc;
         }, {});
-
-        console.log('this.previewData', this.previewData)
     }
 
     shouldShowRowspan(rowIndex: number): boolean {

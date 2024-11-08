@@ -152,7 +152,6 @@ export class ProfileComponent implements OnInit {
               this.user = res.user;
               this.statusCallUser = true;
             }
-            console.log('res', res);
           }, (error) => {
             this.statusCallUser = false;
           })

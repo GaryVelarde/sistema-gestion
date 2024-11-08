@@ -22,6 +22,7 @@ import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { DropdownModule } from 'primeng/dropdown';
+import { CardModule } from 'primeng/card';
 
 @NgModule({
     imports: [
@@ -47,6 +48,7 @@ import { DropdownModule } from 'primeng/dropdown';
         InputTextareaModule,
         FloatLabelModule,
         DropdownModule,
+        CardModule,
     ],
     declarations: [DashboardComponent, DegreeProcessCardsComponent, SimilarityTitlesComponent]
 })

@@ -3,7 +3,7 @@
     <div class="col-12">
         <app-breadcrumb [items]="items"></app-breadcrumb>
         <div class="card px-6 py-6">
-            <p-toolbar styleClass="mb-4">
+            <p-toolbar *ngIf="isUdi" styleClass="mb-4">
                 <ng-template pTemplate="left">
                     <div class="my-2">
                         <button
@@ -192,7 +192,8 @@
                         *ngIf="
                             !showEdit &&
                             inscriptionState !== 'Renuncia' &&
-                            inscriptionState !== 'Aprobado'
+                            inscriptionState !== 'Aprobado' &&
+                            isUdi
                         "
                         class="ml-3"
                         (click)="showEdition()"
@@ -254,7 +255,7 @@
                         (click)="goToReview()"
                     />
                     <p-button
-                        *ngIf="inscriptionState === 'En Revisión' && !showEdit"
+                        *ngIf="inscriptionState === 'En revisión' && !showEdit"
                         label="Observado"
                         [outlined]="true"
                         icon="pi pi-exclamation-circle"
@@ -263,7 +264,7 @@
                         (click)="goToObserved()"
                     />
                     <p-button
-                        *ngIf="inscriptionState === 'En Revisión' && !showEdit"
+                        *ngIf="inscriptionState === 'En revisión' && !showEdit"
                         class="ml-3"
                         label="Aprobado"
                         [outlined]="true"
@@ -278,10 +279,7 @@
                 *ngIf="!showEdit"
                 class="card flex justify-content-center col-12"
             >
-                <h5
-                    class="font-bold text-color"
-                    style="text-align: center"
-                >
+                <h5 class="font-bold text-color" style="text-align: center">
                     {{ inscriptionSelected.thesis_project_title }}
                 </h5>
             </div>
@@ -291,10 +289,7 @@
                     cols="30"
                     pInputTextarea
                     class="w-full font-bold text-color"
-                    style="
-                        text-align: center;
-                        font-size: 17.5px;
-                    "
+                    style="text-align: center; font-size: 17.5px"
                     formControlName="title"
                 >
                 </textarea>
@@ -341,7 +336,17 @@
                             }}
                         </p>
                     </div>
-                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <p class="font-bold">El revisor ha sido pagado:</p>
+                        <p>
+                            {{
+                                inscriptionSelected.inscriptions[0]
+                                    .reviewer_was_paid
+                                    ? "Si"
+                                    : "No"
+                            }}
+                        </p>
+                    </div>
                     <div class="card col-3" style="max-height: 100px">
                         <p class="font-bold">Estado:</p>
                         <p-tag
@@ -349,7 +354,7 @@
                             value="Inscrito"
                         />
                         <p-tag
-                            *ngIf="inscriptionState === 'En Revisión'"
+                            *ngIf="inscriptionState === 'En revisión'"
                             severity="info"
                             value="En Revisión"
                         />
@@ -441,7 +446,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <p class="font-bold">El revisor ha sido pagado:</p>
+                        <p-dropdown
+                            styleClass="w-full"
+                            [options]="payments"
+                            formControlName="reviewerWasPayed"
+                            optionLabel="name"
+                            placeholder="Seleccione"
+                        />
+                    </div>
                     <div class="card col-3" style="max-height: 100px">
                         <p class="font-bold">Estado:</p>
                         <p-tag
@@ -449,9 +463,9 @@
                             value="Inscrito"
                         />
                         <p-tag
-                            *ngIf="inscriptionState === 'En Revisión'"
+                            *ngIf="inscriptionState === 'En revisión'"
                             severity="info"
-                            value="En Revisión"
+                            value="En revisión"
                         />
                         <p-tag
                             *ngIf="inscriptionState === 'Observado'"

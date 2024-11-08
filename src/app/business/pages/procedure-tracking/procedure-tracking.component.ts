@@ -119,7 +119,6 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
     this.viewDetail = true;
     this.edition = false;
     this.procedureSelected = data;
-    console.log('procedureSelected', this.procedureSelected);
     this.student.setValue([data.applicant]);
     this.procedureState = data.status;
     this.fillDataInEditForm();
@@ -271,7 +270,6 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
 
   procedureSelectedUpdate() {
     this.procedureSelected.description = this.description.value;
-    console.log('this.student.value', this.student.value);
     this.procedureSelected.applicant = this.student.value;
   }
 
@@ -280,8 +278,6 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
   }
 
   saveTypeProcedure(item: any) {
-    console.log('Tipo de trámite guardado:', item.procedure_type);
-    console.log('Tipo de trámite guardado:', item.id);
     this.statusProcedureTypeSave = 'pi pi-spin pi-spinner';
     const request = {
       procedure_type: item.procedure_type

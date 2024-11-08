@@ -146,7 +146,6 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     this.articleSelected = data;
     this.studentsList = data.seedbeds;
     this.articleState = data.status;
-    console.log(this.articleSelected);
     this.fillDataInEditForm();
     setTimeout(() => {
       this.loaderService.hide();
@@ -208,7 +207,6 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
   }
 
   getUserSelected(userSelected: any) {
-    console.log('userSelected', userSelected)
     this.students.setValue(userSelected);
   }
 
@@ -387,8 +385,6 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
 
   fillDataTimeLine() {
     const timelineData = this.articleSelected.status_timeline;
-    console.log('timelineData', timelineData)
-
     this.events = timelineData.map(item => ({
       status: item.status,
       date: this.dateFormatService.formatCustomDateByFrontComment(item.changed_at),

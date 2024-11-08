@@ -1,4 +1,112 @@
-<div class="grid">
+<div *ngIf="!isUdi"  class="grid">
+    <div class="col-12">
+        <p-card styleClass="mb-4">
+            <h2>
+                Bienvenido de nuevo,
+                {{
+                    tokenService.getDR2LP2().user.name +
+                        " " +
+                        tokenService.getDR2LP2().user.surnames
+                }}
+            </h2>
+            <p>¿Qué deseas hacer hoy?</p>
+        </p-card>
+    </div>
+    <div class="col-12 md:col-6 lg:col-3">
+        <p-card styleClass="mb-4">
+            <ng-template pTemplate="header">
+                <div
+                    class="flex align-items-center justify-content-center bg-primary"
+                    style="height: 100px"
+                >
+                    <i class="pi pi-user text-5xl"></i>
+                </div>
+            </ng-template>
+            <h3>Perfil</h3>
+            <p>Actualiza tu información personal</p>
+            <ng-template pTemplate="footer">
+                <p-button
+                    [text]="true"
+                    label="Ir al perfil"
+                    icon="pi pi-user"
+                    styleClass="p-button-outlined"
+                    (click)="goToProfile()"
+                ></p-button>
+            </ng-template>
+        </p-card>
+    </div>
+    <div class="col-12 md:col-6 lg:col-3">
+        <p-card styleClass="mb-4">
+            <ng-template pTemplate="header">
+                <div
+                    class="flex align-items-center justify-content-center bg-success"
+                    style="height: 100px"
+                >
+                    <i class="pi pi-calendar text-5xl"></i>
+                </div>
+            </ng-template>
+            <h3>Calendario</h3>
+            <p>Revisa tus próximos eventos</p>
+            <ng-template pTemplate="footer">
+                <p-button
+                    [text]="true"
+                    label="Ver calendario"
+                    icon="pi pi-calendar"
+                    styleClass="p-button-outlined"
+                    (click)="goToEventsUdi()"
+                ></p-button>
+            </ng-template>
+        </p-card>
+    </div>
+    <div class="col-12 md:col-6 lg:col-3">
+        <p-card styleClass="mb-4">
+            <ng-template pTemplate="header">
+                <div
+                    class="flex align-items-center justify-content-center bg-info"
+                    style="height: 100px"
+                >
+                    <i class="pi pi-graduation-cap text-5xl"></i>
+                </div>
+            </ng-template>
+            <h3>Tesis</h3>
+            <p>Gestiona los proyectos de tesis</p>
+            <ng-template pTemplate="footer">
+                <p-button
+                    [text]="true"
+                    label="Ir a mensajes"
+                    icon="pi pi-graduation-cap"
+                    styleClass="p-button-outlined"
+                    (click)="goToTitulationProcess()"
+                ></p-button>
+            </ng-template>
+        </p-card>
+    </div>
+    <div class="col-12 md:col-6 lg:col-3">
+        <p-card styleClass="mb-4">
+            <ng-template pTemplate="header">
+                <div
+                    class="flex align-items-center justify-content-center bg-warning"
+                    style="height: 100px"
+                >
+                    <i class="pi pi-file-check text-5xl"></i>
+                </div>
+            </ng-template>
+            <h3>Líneas y guías</h3>
+            <p>Revisa tus documentos asignados</p>
+            <ng-template pTemplate="footer">
+                <p-button
+                    [text]="true"
+                    label="Configurar"
+                    icon="pi pi-file-check"
+                    styleClass="p-button-outlined"
+                    (click)="goToGuide()"
+                ></p-button>
+            </ng-template>
+        </p-card>
+    </div>
+</div>
+
+<div *ngIf="isUdi" class="grid">
     <app-degree-process-cards
         class="w-full"
         style="justify-content: center; display: flex; flex-wrap: wrap"

@@ -51,7 +51,6 @@ export class Step2Component implements OnInit {
                 student.name.toLowerCase().includes(query) ||
                 student.surnames.toLowerCase().includes(query)
         );
-        console.log('filteredCountries', this.filteredStudents);
     }
 
     filterSecondStudents(event: { query: string }) {
@@ -61,7 +60,6 @@ export class Step2Component implements OnInit {
                 student.name.toLowerCase().includes(query) ||
                 student.surnames.toLowerCase().includes(query)
         );
-        console.log('filteredCountries', this.filteredSecondStudents);
     }
 
     callGetStudentList() {

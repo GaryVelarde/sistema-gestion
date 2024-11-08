@@ -179,7 +179,8 @@
                         *ngIf="
                             !edition &&
                             reviewState !== 'No aprobado' &&
-                            reviewState !== 'Aprobado'
+                            reviewState !== 'Aprobado' &&
+                            isUdi
                         "
                         class="ml-3"
                         (click)="showEdition()"

@@ -17,6 +17,7 @@ import { UploadArchivesComponent } from '../../cross-components/upload-archives/
 import { FileListComponent } from '../../cross-components/file-list/file-list.component';
 import { CommentsComponent } from '../../cross-components/comments/comments.component';
 import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
+import { TokenService } from 'src/app/services/token.service';
 
 @Component({
     templateUrl: './presentation-tracking.component.html',
@@ -69,6 +70,7 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
         { name: 'Si', key: true },
         { name: 'No', key: false },
     ]
+    isUdi = this.tokenService.userIsUDI();
     lastReviewerSelected = [];
     formData = new FormData();
     presentationSelected: any;
@@ -146,7 +148,8 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
         private router: Router,
         private config: PrimeNGConfig,
         private loaderService: LoaderService,
-        private dateFormatService: DateFormatService
+        private dateFormatService: DateFormatService,
+        private tokenService: TokenService,
     ) {
         this.tasksForm = this.fb.group({
             taskDescription: this.taskDescription,
@@ -199,8 +202,6 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
         this.getStatusList = 'charging';
         this.service.getPresentationList().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
-                console.log(res);
-                console.log(res.data)
                 this.registros = res.data;
                 this.getStatusList = 'complete'
             }, (error) => {
@@ -229,7 +230,6 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
             (event.target as HTMLInputElement).value,
             'contains'
         );
-        console.log(table.filterGlobal)
     }
 
 
@@ -241,12 +241,10 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
                 : this.requiereMoreInfo = false;
             this.presentationSelected = data;
 
-            console.log('this.presentationSelected', this.presentationSelected)
             this.presentationState = this.presentationSelected.status;
             this.presentationState === 'Aprobado' || this.presentationState === 'Renuncia'
                 ? this.commentsVisible = false
                 : this.commentsVisible = true
-            console.log('data.juries', data.juries)
             this.students.setValue(data.degree_processes.graduates);
             this.jury.setValue(data.juries);
         }
@@ -268,7 +266,6 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
 
     getFirstLetter(str: string): string {
         if (!str) {
-            console.error('The string is empty');
             return '';
         }
         const firstLetter = str.charAt(0);
@@ -442,4 +439,10 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
         this.callPutPresentationUpdateStatus('Aprobado');
     }
 
+    getJurorNames(juries: Array<{ name: string, surnames: string }>): string {
+        return juries.slice(0, 3)
+          .map(jury => `${jury.name} ${jury.surnames}`)
+          .join(', '); 
+      }
+      
 }

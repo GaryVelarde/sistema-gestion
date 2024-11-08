@@ -268,8 +268,6 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     setUserDataDetails(user: any) {
         this.clearValues();
-        console.log(this.adviser.value);
-        console.log(user)
         if (user.role) {
             this.role.patchValue({ name: user.role, code: user.role })
             this.name.setValue(user.name);
@@ -322,7 +320,6 @@ export class UsersComponent implements OnInit, OnDestroy {
             (res) => {
                 this.getUserProcess = 'complete';
                 this.userData = res;
-                console.log(res);
             },
             (error) => {
                 this.getUserProcess = 'error';
@@ -339,7 +336,6 @@ export class UsersComponent implements OnInit, OnDestroy {
         this.modalNewUser = false;
         this.loaderService.show(true);
         let rq = this.createRequest();
-        console.log(rq);
         this.service.postCreateNewUser(rq).pipe(
             finalize(() => {
                 setTimeout(() => {
@@ -357,7 +353,6 @@ export class UsersComponent implements OnInit, OnDestroy {
                         life: 3000,
                     });
                 }
-                console.log(res);
             }, (error) => {
                 this.messageService.add({
                     severity: 'success',
@@ -463,7 +458,6 @@ export class UsersComponent implements OnInit, OnDestroy {
                     });
                     this.callGetUserList();
                 }
-                console.log(res);
             }, (error) => {
                 this.messageService.add({
                     severity: 'success',

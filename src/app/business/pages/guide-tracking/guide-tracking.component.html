@@ -3,7 +3,7 @@
     <div class="col-12">
         <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
         <div class="card px-6 py-6">
-            <p-toolbar styleClass="mb-4">
+            <p-toolbar *ngIf="isUdi" styleClass="mb-4">
                 <ng-template pTemplate="left">
                     <div class="my-2">
                         <button
@@ -179,7 +179,7 @@
                         iconPos="left"
                     />
                     <p-button
-                        *ngIf="!edition"
+                        *ngIf="!edition && isUdi"
                         class="ml-3"
                         (click)="showEdition()"
                         label="Editar"

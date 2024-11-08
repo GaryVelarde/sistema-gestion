@@ -17,6 +17,7 @@ import { UploadArchivesComponent } from '../../cross-components/upload-archives/
 import { FileListComponent } from '../../cross-components/file-list/file-list.component';
 import { CommentsComponent } from '../../cross-components/comments/comments.component';
 import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
+import { TokenService } from 'src/app/services/token.service';
 
 @Component({
     templateUrl: './thesis-review-tracking.component.html',
@@ -42,6 +43,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
         { label: 'Revisión de tesis', },
         { label: 'Detalle de revisión', visible: true },
     ];
+    isUdi = this.tokenService.userIsUDI();
     rowsPerPageOptions = [5, 10, 20];
     registros = [];
     getStatusList = '';
@@ -103,7 +105,8 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
         private router: Router,
         private config: PrimeNGConfig,
         private loaderService: LoaderService,
-        private dateFormatService: DateFormatService
+        private dateFormatService: DateFormatService,
+        private tokenService: TokenService,
     ) {
         this.tasksForm = this.fb.group({
             taskDescription: this.taskDescription,
@@ -144,7 +147,6 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
         this.getStatusList = 'charging';
         this.service.getThesisReviewList().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
-                console.log(res);
                 this.registros = res.data;
                 this.getStatusList = 'complete'
             }, (error) => {
@@ -173,7 +175,6 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
             (event.target as HTMLInputElement).value,
             'contains'
         );
-        console.log(table.filterGlobal)
     }
 
 
@@ -185,7 +186,6 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
                 : this.requiereMoreInfo = false;
             this.reviewSelected = data;
 
-            console.log('this.reviewSelected', this.reviewSelected)
             this.reviewState = this.reviewSelected.status;
             this.reviewState === 'Aprobado' || this.reviewState === 'Renuncia'
                 ? this.commentsVisible = false
@@ -316,7 +316,6 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
 
     getFirstLetter(str: string): string {
         if (!str) {
-            console.error('The string is empty');
             return '';
         }
         const firstLetter = str.charAt(0);

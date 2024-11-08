@@ -99,18 +99,7 @@
                                     </div>
                                     <div *ngIf="data.juries[0]">
                                         {{
-                                            data.juries[0].name +
-                                                " " +
-                                                data.juries[0].surnames +
-                                                ", " +
-                                                data.juries[1].name +
-                                                " " +
-                                                data.juries[1].surnames +
-                                                ", " +
-                                                data.juries[2].name +
-                                                " " +
-                                                data.juries[2].surnames +
-                                                ", "
+                                            getJurorNames(data.juries)
                                         }}
                                     </div>
                                 </td>
@@ -188,7 +177,8 @@
                         *ngIf="
                             !edition &&
                             inscriptionState !== 'No aprobado' &&
-                            inscriptionState !== 'Aprobado'
+                            inscriptionState !== 'Aprobado' &&
+                            isUdi
                         "
                         class="ml-3"
                         (click)="showEdition()"
@@ -223,9 +213,7 @@
                 </div>
                 <div class="p-2">
                     <p-button
-                        *ngIf="
-                            presentationState !== 'Culminado'
-                        "
+                        *ngIf="presentationState !== 'Culminado'"
                         label="Desaprobado"
                         [outlined]="true"
                         class="mr-3"
@@ -235,9 +223,7 @@
                         (click)="goToDisapproved()"
                     />
                     <p-button
-                        *ngIf="
-                            presentationState !== 'Culminado'
-                        "
+                        *ngIf="presentationState !== 'Culminado'"
                         label="Aprobado"
                         [outlined]="true"
                         icon="pi pi-angle-right"

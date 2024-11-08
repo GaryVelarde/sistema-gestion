@@ -11,6 +11,7 @@ import { FileListComponent } from '../../cross-components/file-list/file-list.co
 import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
 import { DateFormatService } from 'src/app/services/date-format.service';
 import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
+import { TokenService } from 'src/app/services/token.service';
 
 @Component({
   selector: 'app-guide-tracking',
@@ -57,6 +58,7 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
     'Estado',
     ''
   ];
+  isUdi = this.tokenService.userIsUDI();
   formData = new FormData();
   messageError: string = 'Se produjo un error al cargar la lista de líneas y guías. Por favor, inténtelo de nuevo más tarde';
   edition = false;
@@ -97,7 +99,8 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
     private loaderService: LoaderService,
     private fb: FormBuilder,
     private messageService: MessageService,
-    private dateFormatService: DateFormatService
+    private dateFormatService: DateFormatService,
+    private tokenService: TokenService,
   ) {
     this.teacherForm = this.fb.group({
       teachers: this.teachers,

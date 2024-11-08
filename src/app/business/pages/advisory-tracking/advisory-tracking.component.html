@@ -178,7 +178,8 @@
                         *ngIf="
                             !showEdit &&
                             advisoryState !== 'Cancelado' &&
-                            advisoryState !== 'Aprobado'
+                            advisoryState !== 'Aprobado' &&
+                            isUdi
                         "
                         class="ml-3"
                         (click)="showEdition()"
@@ -324,11 +325,11 @@
                     <div class="card col-12 col-md-3" style="max-height: 100px">
                         <p class="font-bold">Estado:</p>
                         <p-tag
-                            *ngIf="advisoryState === 'En Asesoría'"
+                            *ngIf="advisoryState === 'En asesoría'"
                             value="En asesoría"
                         />
                         <p-tag
-                            *ngIf="advisoryState === 'En Revisión'"
+                            *ngIf="advisoryState === 'En revisión'"
                             severity="info"
                             value="En Revisión"
                         />
@@ -445,11 +446,11 @@
                     <div class="card col-12 col-md-3" style="max-height: 100px">
                         <p class="font-bold">Estado:</p>
                         <p-tag
-                            *ngIf="advisoryState === 'En Asesoría'"
+                            *ngIf="advisoryState === 'En asesoría'"
                             value="En asesoría"
                         />
                         <p-tag
-                            *ngIf="advisoryState === 'En Revisión'"
+                            *ngIf="advisoryState === 'En revisión'"
                             severity="info"
                             value="En Revisión"
                         />

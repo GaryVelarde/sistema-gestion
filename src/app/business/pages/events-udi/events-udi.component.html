@@ -7,6 +7,7 @@
                 <p-toolbar class="mt-3">
                     <div class="p-toolbar-group-left">
                         <button
+                            *ngIf="isUdi"
                             type="button"
                             pButton
                             icon="pi pi-plus"
@@ -51,10 +52,7 @@
                         iconPos="left"
                     />
                     <p-button
-                        *ngIf="
-                            !edition &&
-                            eventStatus !== 'Finalizado'
-                        "
+                        *ngIf="!edition && eventStatus !== 'Finalizado' && isUdi"
                         class="ml-3"
                         (click)="showEdition()"
                         label="Editar"
@@ -62,10 +60,7 @@
                         iconPos="left"
                     />
                     <p-button
-                        *ngIf="
-                            edition &&
-                            eventStatus !== 'Finalizado'
-                        "
+                        *ngIf="edition && eventStatus !== 'Finalizado'"
                         class="ml-3"
                         (click)="cancelEdition()"
                         label="Cancelar edición"
@@ -73,10 +68,7 @@
                         iconPos="right"
                     />
                     <p-button
-                        *ngIf="
-                            edition &&
-                            eventStatus !== 'Finalizado'
-                        "
+                        *ngIf="edition && eventStatus !== 'Finalizado'"
                         class="ml-3"
                         (click)="saveEdition()"
                         label="Guardar cambios"
@@ -84,12 +76,9 @@
                         iconPos="left"
                     />
                 </div>
-                <div>
+                <div *ngIf="isUdi">
                     <p-button
-                        *ngIf="
-                            eventStatus !== 'Finalizado' &&
-                            !edition
-                        "
+                        *ngIf="eventStatus !== 'Finalizado' && !edition"
                         label="Finalizar reunión"
                         [outlined]="true"
                         icon="pi pi-times"
@@ -148,7 +137,8 @@
                         <i class="pi pi-clock" style="font-size: 1rem"></i>
                         {{
                             dateFormatService.formatDate(
-                                eventSelected.event._def.extendedProps.event_udi.start_date
+                                eventSelected.event._def.extendedProps.event_udi
+                                    .start_date
                             )
                         }}
                     </p>
@@ -159,7 +149,8 @@
                         <i class="pi pi-clock" style="font-size: 1rem"></i>
                         {{
                             dateFormatService.formatDate(
-                                eventSelected.event._def.extendedProps.event_udi.due_date
+                                eventSelected.event._def.extendedProps.event_udi
+                                    .due_date
                             )
                         }}
                     </p>
@@ -180,7 +171,7 @@
                 <div class="col-12 col-md-3">
                     <p class="font-bold">Color:</p>
                     <p-dropdown
-                    formControlName="colorEdit"
+                        formControlName="colorEdit"
                         [options]="colors"
                         optionLabel="name"
                         placeholder="Color"
@@ -666,7 +657,7 @@
                 </p-floatLabel>
                 <div class="col-4 d-flex m-auto">
                     <p-dropdown
-                    formControlName="color"
+                        formControlName="color"
                         [options]="colors"
                         optionLabel="name"
                         placeholder="Color"

@@ -100,7 +100,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         { name: 'Beige Claro', code: '#f1e9d2' }
     ];
 
-
+    isUdi = this.tokenService.userIsUDI();
     rowsSkeletonTask = ['1', '2', '3'];
     statusTask = 'charging';
     data = []
@@ -332,7 +332,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         this.getUdiAndTeachersList();
         this.slotDuration.setValue(this.timeslots[this.timeslots.length - 1]);
         this.color.setValue({ name: 'Azul Oscuro', code: '#1e366d' });
-        console.log(this.color.value)
         this.watchSlotDuration();
         this.config.setTranslation({
             firstDayOfWeek: 1,
@@ -381,7 +380,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         }
     }
 
-
     async callGetEventsUdi() {
         await this.service.getEventsUdiList().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
@@ -406,7 +404,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
                     ...this.calendarOptions,
                     events: this.events
                 };
-                console.log(this.events)
             })
 
     }
@@ -429,24 +426,25 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     }
 
     handleDateClick(arg) {
-        this.eventForm.reset();
-        this.managerForm.reset();
-        this.participantsForm.reset();
-        const dateInfo = this.dateFormatService.formatDateWithEndTime(arg.dateStr);
-        if (dateInfo.start === "00:00") {
-            dateInfo.start = "07:00 AM"
-            dateInfo.end = "08:00 AM"
+        if(this.isUdi) {
+            this.eventForm.reset();
+            this.managerForm.reset();
+            this.participantsForm.reset();
+            const dateInfo = this.dateFormatService.formatDateWithEndTime(arg.dateStr);
+            if (dateInfo.start === "00:00") {
+                dateInfo.start = "07:00 AM"
+                dateInfo.end = "08:00 AM"
+            }
+            this.start.setValue(dateInfo.day + ' ' + dateInfo.start);
+            this.end.setValue(dateInfo.day + ' ' + dateInfo.end);
+            this.newEventDialog = true;
         }
-        this.start.setValue(dateInfo.day + ' ' + dateInfo.start);
-        this.end.setValue(dateInfo.day + ' ' + dateInfo.end);
-        this.newEventDialog = true;
     }
 
     handleEventClick(arg) {
         this.loaderService.show();
         this.eventSelected = arg;
         this.eventStatus = arg.event._def.extendedProps.event_udi.status;
-        console.log('this.eventSelected.event._def.extendedProps.event_udi', this.eventSelected.event._def.extendedProps.event_udi);
         this.usersManagerEdit.setValue(this.addFullNameProperty(this.eventSelected.event._def.extendedProps.event_udi.managers));
         this.usersParticipantsEdit.setValue(this.addFullNameProperty(this.eventSelected.event._def.extendedProps.event_udi.participants));
         this.getTask(this.eventSelected.event._def.extendedProps.event_udi.id);
@@ -501,24 +499,14 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         const fechaInicioOriginal = new Date(eventDropInfo.oldEvent.start as string);
         const diferenciaTiempo = fechaFinOriginal.getTime() - fechaInicioOriginal.getTime();
         const nuevaFechaFin = new Date(nuevaFechaInicio.getTime() + diferenciaTiempo);
-
-        console.log('eventDropInfo', eventDropInfo)
-        console.log('eventDropInfo.event.extendedProps.event_udi.due_date', eventDropInfo.event.extendedProps.event_udi.due_date)
-        console.log('Nueva fecha de inicio:', this.dateFormatService.formatDateCalendarToBack(nuevaFechaInicio));
-        console.log('Nueva fecha de fin:', this.dateFormatService.formatDateCalendarToBack(nuevaFechaFin));
     }
 
     handleEventResize(eventResizeInfo) {
         const nuevaFechaInicio = eventResizeInfo.event.start;
         const nuevaFechaFin = eventResizeInfo.event.end;
-
-        // Imprimir o usar las constantes como prefieras
-        console.log('Nueva fecha de inicio:', this.dateFormatService.formatDateCalendarToBack(nuevaFechaInicio));
-        console.log('Nueva fecha de fin:', this.dateFormatService.formatDateCalendarToBack(nuevaFechaFin));
     }
 
     addEvent() {
-        console.log('this.eventForm.valid', this.color.value)
         if (this.eventForm.valid) {
             this.loaderService.show(true);
             this.newEventDialog = false;
@@ -677,7 +665,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     }
 
     editTask(task: any) {
-        console.log(task)
         this.taskForm.reset();
         this.titleTask.setValue(task.title);
         this.descriptionTask.setValue(task.description);
@@ -727,8 +714,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
                         };
                         if (taskIndex !== -1) {
                             this.pendingTasks[taskIndex] = { ...this.pendingTasks[taskIndex], ...updateTask };
-                        } else {
-                            console.error(`Task with id ${id} not found.`);
                         }
                         this.taskForm.reset();
                         this.statusTask = 'complete';
@@ -759,12 +744,9 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
                             //user_name: this.assignedUser.value.fullName
                         };
 
-                        console.log('newTask', newTask)
                         if (!this.isTaskInPending(res.id)) {
                             this.pendingTasks = [...this.pendingTasks, newTask];
                             this.taskForm.reset();
-                        } else {
-                            console.log('Task with this ID already exists.');
                         }
                         this.statusTask = 'complete';
 
@@ -883,7 +865,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
 
     getFirstLetter(str: string): string {
         if (!str) {
-            console.error('The string is empty');
             return '';
         }
         const firstLetter = str.charAt(0);

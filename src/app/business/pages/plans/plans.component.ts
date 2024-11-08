@@ -78,7 +78,6 @@ export class PlansComponent implements OnInit {
                     this.statusList = 'complete';
                     this.registros = res.data;
                 }
-                console.log(res.data)
             }, (error) => {
                 this.statusList = 'error';
             })
@@ -90,9 +89,7 @@ export class PlansComponent implements OnInit {
 
     viewDetailsPlan(data: any) {
         this.loaderService.show();
-        console.log(data);
         this.planSelected = data;
-        console.log('planSelected', this.planSelected)
         this.planSelectedId = data.id;
         this.populateForm(this.planSelected);
         setTimeout(() => {
@@ -202,7 +199,6 @@ export class PlansComponent implements OnInit {
     watchActivities(): void {
         this.actividadForm.valueChanges.pipe().subscribe(
             () => {
-                console.log('this.actividadForm', this.actividadForm.value)
                 this.showPreview();
             })
     }
@@ -304,7 +300,6 @@ export class PlansComponent implements OnInit {
     callPutPlansUpdate() {
         this.loaderService.show(true);
         const request = this.generateRequest();
-        console.log(request)
         this.service.putPlansUpdate(this.planSelected.id, [request]).pipe(
             finalize(() => {
                 this.loaderService.hide();

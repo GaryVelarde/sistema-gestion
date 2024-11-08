@@ -16,6 +16,7 @@ import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
 import { FileListComponent } from '../../cross-components/file-list/file-list.component';
 import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
+import { TokenService } from 'src/app/services/token.service';
 
 @Component({
     templateUrl: './advisory-tracking.component.html',
@@ -74,6 +75,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
         'Estado',
         ''
     ];
+    isUdi = this.tokenService.userIsUDI();
     formData = new FormData();
     advisorySelected: any;
     showEdit = false;
@@ -160,7 +162,8 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
         private router: Router,
         private config: PrimeNGConfig,
         private loaderService: LoaderService,
-        private dateFormatService: DateFormatService
+        private dateFormatService: DateFormatService,
+        private tokenService: TokenService
     ) {
         this.moreInfoForm = this.fb.group({
             advisoryReceptionDateToFacultyMI: this.advisoryReceptionDateToFacultyMI,
@@ -258,8 +261,6 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
                 ? this.requiereMoreInfo = true
                 : this.requiereMoreInfo = false;
             this.advisorySelected = data;
-
-            console.log('this.advisorySelected', this.advisorySelected)
             this.advisoryState = this.advisorySelected.status;
             this.advisoryState === 'Aprobado' || this.advisoryState === 'Renuncia'
                 ? this.commentsVisible = false
@@ -518,7 +519,6 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
 
     getFirstLetter(str: string): string {
         if (!str) {
-            console.error('The string is empty');
             return '';
         }
         const firstLetter = str.charAt(0);

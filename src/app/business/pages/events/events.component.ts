@@ -331,8 +331,6 @@ export class EventsComponent implements OnInit, AfterViewInit {
                 if (res.data) {
                     this.titles = res.data;
                 }
-
-                console.log(res);
             }, (error) => {
 
             })
@@ -399,7 +397,6 @@ export class EventsComponent implements OnInit, AfterViewInit {
     }
 
     submitForm() {
-        console.log(this.roomForm.value);
     }
 
     listenToTopicTitleChanges() {
@@ -412,10 +409,7 @@ export class EventsComponent implements OnInit, AfterViewInit {
             const titleControl = topicGroup.get('title');
       
             // Suscribirse a los cambios del campo 'title' de cada 'topic'
-            titleControl?.valueChanges.subscribe((newTitleValue) => {
-              console.log(`Cambio en Room ${roomIndex + 1}, Topic ${topicIndex + 1}:`, newTitleValue);
-              
-              // Llama a una función personalizada para manejar los cambios
+            titleControl?.valueChanges.subscribe((newTitleValue) => {             
               this.onTitleChange(roomIndex, topicIndex, newTitleValue);
             });
           });
@@ -423,8 +417,6 @@ export class EventsComponent implements OnInit, AfterViewInit {
       }
       
       onTitleChange(roomIndex: number, topicIndex: number, newTitleValue: string) {
-        // Aquí puedes manejar el cambio de 'title', por ejemplo, actualizando otros campos
-        console.log(`Title actualizado en Room ${roomIndex + 1}, Topic ${topicIndex + 1}: ${newTitleValue}`);
       }
       
 }
