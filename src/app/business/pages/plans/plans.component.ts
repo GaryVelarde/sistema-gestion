@@ -7,6 +7,7 @@ import { finalize } from 'rxjs';
 import { ProductService } from 'src/app/demo/service/product.service';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { AuthService } from 'src/app/services/auth.service';
+import * as XLSX from 'xlsx';
 
 @Component({
     templateUrl: './plans.component.html',
@@ -91,6 +92,7 @@ export class PlansComponent implements OnInit {
         this.loaderService.show();
         console.log(data);
         this.planSelected = data;
+        console.log('planSelected', this.planSelected)
         this.planSelectedId = data.id;
         this.populateForm(this.planSelected);
         setTimeout(() => {
@@ -139,6 +141,8 @@ export class PlansComponent implements OnInit {
                 id: [actividad.id],
                 activityCode: [actividad.code_activity],
                 description: [actividad.description_activity, Validators.required],
+                strategic_objective: [actividad.strategic_objective || ''],
+                strategic_action: [actividad.strategic_action || ''],
                 tasks: this.fb.array([])
             });
             actividad.tasks.forEach((tarea: any, indexTarea: number) => {
@@ -176,6 +180,8 @@ export class PlansComponent implements OnInit {
                     actividadFuncional: actividad.description,
                     taskCode: tarea.taskCode,
                     tarea: tarea.description,
+                    strategic_objective: actividad.strategic_objective,
+                    strategic_action: actividad.strategic_action,
                     avances: tarea.comment || '',
                     months: months
                 };
@@ -220,6 +226,8 @@ export class PlansComponent implements OnInit {
         return this.fb.group({
             activityCode: [actividadIndex],
             description: ['', Validators.required],
+            strategic_objective: ['', Validators.required],
+            strategic_action: ['', Validators.required],
             tasks: this.fb.array([])
         });
     }
@@ -270,6 +278,8 @@ export class PlansComponent implements OnInit {
                 ...(actividad.id && { id: actividad.id }),
                 code_activity: actividad.activityCode,
                 description_activity: actividad.description,
+                strategic_objective: actividad.strategic_objective,
+                strategic_action: actividad.strategic_action,
                 tasks: actividad.tasks.map((tarea: any) => {
                     return {
                         ...(tarea.id && { id: tarea.id }),
@@ -328,5 +338,83 @@ export class PlansComponent implements OnInit {
         this.planSelected = data;
         this.planSelected.id = this.planSelectedId;
     }
+
+    exportarAExcel(): void {
+        const datosExcel: any[] = [
+            {
+                'COD. ACT': 'COD. ACT', 'ACTIVIDAD FUNCIONAL': 'ACTIVIDAD FUNCIONAL', 'COD. TAREA': 'COD. TAREA', 'TAREAS': 'TAREAS',
+                'Ene.': 'Ene.', 'Feb.': 'Feb.', 'Mar.': 'Mar.', 'Abr.': 'Abr.', 'May.': 'May.', 'Jun.': 'Jun.',
+                'Jul.': 'Jul.', 'Ago.': 'Ago.', 'Sep.': 'Sep.', 'Oct.': 'Oct.', 'Nov.': 'Nov.', 'Dic.': 'Dic.', 'OBJ. EST. DEL PEI 2025-2029 AL QUE CONTRIBUYE LAS ACT. OPERATIVAS': 'OBJ. EST. DEL PEI 2025-2029 AL QUE CONTRIBUYE LAS ACT. OPERATIVAS',
+                'LIN. EST. O ACCIÓN ESTRATÉGICA DEL PEI 2025-2029 EN EL QUE SE INSCRIBE LAS ACT. OPERATIVAS': 'LIN. EST. O ACCIÓN ESTRATÉGICA DEL PEI 2025-2029 EN EL QUE SE INSCRIBE LAS ACT. OPERATIVAS' 
+            }
+        ];
+
+        this.planSelected.activities.forEach(activity => {
+            activity.tasks.forEach(task => {
+                const meses = task.months.split(',').map(m => m === 'true' ? 'X' : '');
+                datosExcel.push({
+                    'COD. ACT': activity.code_activity,
+                    'ACTIVIDAD FUNCIONAL': activity.description_activity,
+                    'COD. TAREA': task.code_task,
+                    'TAREAS': task.description_task,
+                    'Ene.': meses[0],
+                    'Feb.': meses[1],
+                    'Mar.': meses[2],
+                    'Abr.': meses[3],
+                    'May.': meses[4],
+                    'Jun.': meses[5],
+                    'Jul.': meses[6],
+                    'Ago.': meses[7],
+                    'Sep.': meses[8],
+                    'Oct.': meses[9],
+                    'Nov.': meses[10],
+                    'Dic.': meses[11],
+                    'OBJ. EST. DEL PEI 2025-2029 AL QUE CONTRIBUYE LAS ACT. OPERATIVAS': activity.strategic_objective,
+                    'LIN. EST. O ACCIÓN ESTRATÉGICA DEL PEI 2025-2029 EN EL QUE SE INSCRIBE LAS ACT. OPERATIVAS': activity.strategic_action
+                });
+            });
+        });
+
+        const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(datosExcel, { skipHeader: true });
+
+        ws['!cols'] = [
+            { wch: 10 },  // COD. ACT
+            { wch: 25 },  // ACTIVIDAD FUNCIONAL
+            { wch: 10 },  // COD. TAREA
+            { wch: 20 },  // TAREAS
+            { wch: 5 },   // Ene.
+            { wch: 5 },   // Feb.
+            { wch: 5 },   // Mar.
+            { wch: 5 },   // Abr.
+            { wch: 5 },   // May.
+            { wch: 5 },   // Jun.
+            { wch: 5 },   // Jul.
+            { wch: 5 },   // Ago.
+            { wch: 5 },   // Sep.
+            { wch: 5 },   // Oct.
+            { wch: 5 },   // Nov.
+            { wch: 5 },   // Dic.
+            { wch: 25 }   // AVANCES
+        ];
+
+        Object.keys(ws).forEach(cell => {
+            if (cell[0] !== '!') {
+                ws[cell].s = { alignment: { wrapText: true } };
+            }
+        });
+
+        const wb: XLSX.WorkBook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, this.planSelected.title);
+
+        // Establecer una fila de título en la primera fila
+        //   XLSX.utils.sheet_add_aoa(ws, [
+        //     [`Programa: ${this.planSelected.title}`],
+        //     [`Objetivo Estratégico: ${this.planSelected.strategic_objective}`],
+        //     []  // Deja una fila vacía entre el encabezado y los datos
+        //   ], { origin: 'A1' });
+
+        XLSX.writeFile(wb, `${this.planSelected.title}.xlsx`);
+    }
+
 
 }

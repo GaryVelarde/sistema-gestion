@@ -50,9 +50,12 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
         return this.fb.group({
             activityCode: [actividadIndex],
             description: ['', Validators.required],
+            strategic_objective: ['', Validators.required],
+            strategic_action: ['', Validators.required],
             tasks: this.fb.array([])
         });
     }
+    
 
     addActividad() {
         this.activities.push(this.newActividad());
@@ -115,6 +118,7 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
 
     showPreview() {
         const formValue = this.actividadForm.value;
+        console.log('formValue', formValue)
         this.previewData = formValue.activities.map((actividad: any, i: number) => {
             return actividad.tasks.map((tarea: any, j: number) => {
                 const months = tarea.months.map((mes: boolean) => (mes ? '<i class="pi pi-times"></i>' : ''));
@@ -123,6 +127,8 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
                     actividadFuncional: actividad.description,
                     taskCode: tarea.taskCode,
                     tarea: tarea.description,
+                    strategic_objective: actividad.strategic_objective,
+                    strategic_action: actividad.strategic_action,
                     avances: tarea.comment || '',
                     months: months
                 };
@@ -138,6 +144,8 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
             }
             return acc;
         }, {});
+
+        console.log('this.previewData', this.previewData)
     }
 
     shouldShowRowspan(rowIndex: number): boolean {
@@ -164,12 +172,14 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
 
     generateRequestData() {
         const formValue = this.actividadForm.value;
-
+    
         const requestData = {
             title: formValue.tituloGeneral,
             activities: formValue.activities.map((actividad: any, indexActividad: number) => ({
                 code_activity: `${actividad.activityCode}`,
                 description_activity: actividad.description,
+                strategic_objective: actividad.strategic_objective,
+                strategic_action: actividad.strategic_action,
                 tasks: actividad.tasks.map((tarea: any) => ({
                     code_task: tarea.taskCode,
                     description_task: tarea.description,
@@ -178,7 +188,7 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
                 }))
             }))
         };
-
+    
         return [requestData];
     }
 
@@ -225,6 +235,8 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
             const actividadFormGroup = this.fb.group({
                 activityCode: [actividad.code_activity],
                 description: [actividad.description_activity, Validators.required],
+                strategic_objective: [actividad.strategic_objective, Validators.required],
+                strategic_action: [actividad.strategic_action, Validators.required],
                 tasks: this.fb.array([])
             });
             actividad.tasks.forEach((tarea: any, indexTarea: number) => {
@@ -239,4 +251,5 @@ export class PlansRegisterComponent implements OnInit, OnDestroy {
             this.activities.push(actividadFormGroup);
         });
     }
+    
 }

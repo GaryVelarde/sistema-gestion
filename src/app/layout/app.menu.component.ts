@@ -48,12 +48,12 @@ export class AppMenuComponent implements OnInit {
                     { label: 'Presupuestos', icon: 'pi pi-fw pi-calculator', routerLink: ['/pages/presupuestos'] },
                 ]
             },
-            {
-                label: 'Eventos',
-                items: [
-                    { label: 'Calendario', icon: 'pi pi-fw pi-calendar', routerLink: ['/pages/events'] },
-                ]
-            },
+            // {
+            //     label: 'Eventos',
+            //     items: [
+            //         { label: 'Calendario', icon: 'pi pi-fw pi-calendar', routerLink: ['/pages/events'] },
+            //     ]
+            // },
             {
                 label: 'Reuniones UDI',
                 items: [
