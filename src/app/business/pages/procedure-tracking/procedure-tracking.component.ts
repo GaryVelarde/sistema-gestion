@@ -58,7 +58,7 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
     ''
   ];
   formData = new FormData();
-  messageError: string = 'Se produjo un error al cargar la lista de artículos. Por favor, inténtelo de nuevo más tarde';
+  messageError: string = 'Se produjo un error al cargar la lista de trámites. Por favor, inténtelo de nuevo más tarde';
   edition = false;
   lastStudentSelected = [];
   procedureState: string;

@@ -46,6 +46,9 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
             gastoEspecifico: new FormControl('', Validators.required),
             meses: this.fb.array(Array(12).fill(0)),
             rubroContable: new FormControl('', Validators.required),
+            executing_area: new FormControl('', Validators.required),
+            responsible_area: new FormControl('', Validators.required),
+            activity_type: new FormControl('', Validators.required),
         });
         this.planForm = this.fb.group({
             planSelected: this.planSelected,
@@ -86,6 +89,9 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
             gastoEspecifico: this.gastoForm.value.gastoEspecifico,
             meses: this.gastoForm.value.meses,
             rubroContable: this.gastoForm.value.rubroContable,
+            executing_area: this.gastoForm.value.executing_area,
+            responsible_area: this.gastoForm.value.responsible_area,
+            activity_type: this.gastoForm.value.activity_type,
             taskCode: this.taskSelected.code_task,
             actividad: this.activitySelected.description_activity,
             activityCode: this.activitySelected.code_activity,
@@ -209,8 +215,11 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
             specific_expense: task.gastoEspecifico,
             month_amount: task.meses.join(","),
             accounting_item: task.rubroContable ? task.rubroContable : '',
+            executing_area: task.executing_area,
+            responsible_area: task.responsible_area,
+            activity_type: task.activity_type,
             task_id: task.task_id,
-            activity_id: task.activity_id
+            activity_id: task.activity_id,
         }));
 
         return {
@@ -261,8 +270,6 @@ export class BudgetRegisterComponent implements OnInit, OnDestroy {
         this.taskSelected = null;
         this.gastosIngresados = [];
     }
-
-    
 
     markTaskAsDone(): void {
         if (!this.taskSelected) {

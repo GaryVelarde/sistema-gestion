@@ -193,39 +193,52 @@
     <div class="col-12">
         <app-breadcrumb [items]="breadcrumbItemsDetail"></app-breadcrumb>
         <div class="card px-6 py-6">
-            <div class="mr-auto mb-3">
-                <p-button
-                    (click)="backList()"
-                    label="Regresar"
-                    [outlined]="true"
-                    icon="pi pi-angle-left"
-                    iconPos="left"
-                />
-                <p-button
-                    *ngIf="!edition"
-                    class="ml-3"
-                    (click)="showEdition()"
-                    label="Editar"
-                    icon="pi pi-pencil"
-                    iconPos="left"
-                />
-                <p-button
-                    *ngIf="edition"
-                    class="ml-3"
-                    (click)="cancelEdition()"
-                    label="Cancelar edición"
-                    icon="pi pi-times"
-                    iconPos="right"
-                />
-                <p-button
-                    *ngIf="edition"
-                    class="ml-3"
-                    (click)="saveEdition()"
-                    label="Guardar cambios"
-                    icon="pi pi-save"
-                    iconPos="left"
-                />
+            <div class="grid d-flex col-12">
+                <div class="mr-auto mb-3">
+                    <p-button
+                        (click)="backList()"
+                        label="Regresar"
+                        [outlined]="true"
+                        icon="pi pi-angle-left"
+                        iconPos="left"
+                    />
+                    <p-button
+                        *ngIf="!edition"
+                        class="ml-3"
+                        (click)="showEdition()"
+                        label="Editar"
+                        icon="pi pi-pencil"
+                        iconPos="left"
+                    />
+                    <p-button
+                        *ngIf="edition"
+                        class="ml-3"
+                        (click)="cancelEdition()"
+                        label="Cancelar edición"
+                        icon="pi pi-times"
+                        iconPos="right"
+                    />
+                    <p-button
+                        *ngIf="edition"
+                        class="ml-3"
+                        (click)="saveEdition()"
+                        label="Guardar cambios"
+                        icon="pi pi-save"
+                        iconPos="left"
+                    />
+                </div>
+                <div>
+                    <p-button
+                        icon="pi pi-download"
+                        [rounded]="true"
+                        [text]="true"
+                        label="Exportar a excel"
+                        severity="success"
+                        (click)="exportToExcel()"
+                    />
+                </div>
             </div>
+            
             <div class="card flex justify-content-center col-12">
                 <h5 class="font-bold text-color" style="text-align: center">
                     {{ budgetSelected.plan }}
@@ -402,13 +415,14 @@
 
                         <div class="p-field p-grid">
                             <div class="col-12">
+                                <label>Gasto específico:</label>
                                 <input
                                     pInputText
                                     id="descripcion"
                                     style="width: 100%"
                                     placeholder="Gasto específico"
                                     formControlName="gastoEspecifico"
-                                    class="p-inputtext-sm"
+                                    class="p-inputtext-sm mt-3"
                                 />
                             </div>
                         </div>
@@ -456,18 +470,57 @@
                                 </div>
                                 <div class="p-field p-grid">
                                     <div class="col-12">
+                                        <label>Rubro Contable:</label>
                                         <input
                                             pInputText
                                             id="descripcion"
                                             style="width: 100%"
                                             placeholder="Rubro Contable"
                                             formControlName="rubroContable"
-                                            class="p-inputtext-sm"
+                                            class="p-inputtext-sm mt-3"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <div class="col-12">
+                                        <label>Área ejecutante del gasto específico:</label>
+                                        <input
+                                            pInputText
+                                            id="descripcion"
+                                            style="width: 100%"
+                                            placeholder="Área ejecutante del gasto específico"
+                                            formControlName="executing_area"
+                                            class="p-inputtext-sm mt-3"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <div class="col-12">
+                                        <label>Área responsable (asignación del pto):</label>
+                                        <input
+                                            pInputText
+                                            id="descripcion"
+                                            style="width: 100%"
+                                            placeholder="Área responsable (asignación del pto)"
+                                            formControlName="responsible_area"
+                                            class="p-inputtext-sm mt-3"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <div class="col-12">
+                                        <label>Tipo de actividad:</label>
+                                        <input
+                                            pInputText
+                                            id="descripcion"
+                                            style="width: 100%"
+                                            placeholder="Tipo de actividad"
+                                            formControlName="activity_type"
+                                            class="p-inputtext-sm mt-3"
                                         />
                                     </div>
                                 </div>
                             </div>
-
                             <div class="p-field p-grid">
                                 <div class="p-col-12 p-md-10">
                                     <p-button
@@ -527,7 +580,10 @@
                             {{ mes }}
                         </th>
                         <th>Total</th>
-                        <th>Rubro Contable</th>
+                        <th>ÁREA EJECUTANTE DEL GASTO ESPECÍFICO</th>
+                        <th>ÁREA RESPONSABLE (ASIGNACION DEL PTO )</th>
+                        <th>TIPO DE ACTIVIDAD</th>
+                        <th>RUBRO CONTABLE</th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-gasto>
@@ -542,6 +598,9 @@
                         <td class="font-bold">
                             {{ calcularTotal(gasto.meses) }}
                         </td>
+                        <td>{{ gasto.executing_area }}</td>
+                        <td>{{ gasto.responsible_area }}</td>
+                        <td>{{ gasto.activity_type }}</td>
                         <td>{{ gasto.rubroContable }}</td>
                         <td *ngIf="edition">
                             <p-button
@@ -559,7 +618,7 @@
                         <td colspan="4">TOTAL</td>
                         <td *ngFor="let mes of totalMeses()">{{ mes }}</td>
                         <td>{{ calcularTotalTotal() }}</td>
-                        <td></td>
+                        <td colspan="4"></td>
                     </tr>
                 </ng-template>
             </p-table>
@@ -605,7 +664,10 @@
                     {{ mes }}
                 </th>
                 <th>Total</th>
-                <th>Rubro Contable</th>
+                <th>ÁREA EJECUTANTE DEL GASTO ESPECÍFICO</th>
+                <th>ÁREA RESPONSABLE (ASIGNACION DEL PTO )</th>
+                <th>TIPO DE ACTIVIDAD</th>
+                <th>RUBRO CONTABLE</th>
             </tr>
         </ng-template>
         <ng-template pTemplate="body" let-gasto>
@@ -620,6 +682,9 @@
                 <td class="font-bold">
                     {{ calcularTotal(gasto.meses) }}
                 </td>
+                <td>{{ gasto.executing_area }}</td>
+                <td>{{ gasto.responsible_area }}</td>
+                <td>{{ gasto.activity_type }}</td>
                 <td>{{ gasto.rubroContable }}</td>
                 <td *ngIf="edition">
                     <p-button
@@ -637,7 +702,7 @@
                 <td colspan="4">TOTAL</td>
                 <td *ngFor="let mes of totalMeses()">{{ mes }}</td>
                 <td>{{ calcularTotalTotal() }}</td>
-                <td></td>
+                <td colspan="4"></td>
             </tr>
         </ng-template>
     </p-table>

@@ -58,7 +58,10 @@
                 </div>
 
                 <ng-template #selectActivity>
-                    <div *ngIf="planSelected.value && planSelected.value.id" class="my-3">
+                    <div
+                        *ngIf="planSelected.value && planSelected.value.id"
+                        class="my-3"
+                    >
                         <p-divider />
 
                         <p class="font-bold">Selecciona una actividad:</p>
@@ -213,13 +216,14 @@
 
                         <div class="p-field p-grid">
                             <div class="col-12">
+                                <label>Gasto específico:</label>
                                 <input
                                     pInputText
                                     id="descripcion"
                                     style="width: 100%"
                                     placeholder="Gasto específico"
                                     formControlName="gastoEspecifico"
-                                    class="p-inputtext-sm"
+                                    class="p-inputtext-sm mt-3"
                                 />
                             </div>
                         </div>
@@ -267,27 +271,66 @@
                                 </div>
                                 <div class="p-field p-grid">
                                     <div class="col-12">
+                                        <label>Rubro contable:</label>
                                         <input
                                             pInputText
                                             id="descripcion"
                                             style="width: 100%"
                                             placeholder="Rubro Contable"
                                             formControlName="rubroContable"
-                                            class="p-inputtext-sm"
+                                            class="p-inputtext-sm mt-3"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <div class="col-12">
+                                        <label>Área ejecutante del gasto específico:</label>
+                                        <input
+                                            pInputText
+                                            id="descripcion"
+                                            style="width: 100%"
+                                            placeholder="Área ejecutante del gasto específico"
+                                            formControlName="executing_area"
+                                            class="p-inputtext-sm mt-3"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <div class="col-12">
+                                        <label>Área responsable (asignación del pto):</label>
+                                        <input
+                                            pInputText
+                                            id="descripcion"
+                                            style="width: 100%"
+                                            placeholder="Área responsable (asignación del pto)"
+                                            formControlName="responsible_area"
+                                            class="p-inputtext-sm mt-3"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <div class="col-12">
+                                        <label>Tipo de actividad:</label>
+                                        <input
+                                            pInputText
+                                            id="descripcion"
+                                            style="width: 100%"
+                                            placeholder="Tipo de actividad"
+                                            formControlName="activity_type"
+                                            class="p-inputtext-sm mt-3"
                                         />
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="p-field p-grid">
-                                <div class="p-col-12 p-md-10">
-                                    <p-button
-                                        label="Agregar Gasto"
-                                        type="submit"
-                                        [disabled]="this.gastoForm.invalid"
-                                        (click)="agregarGasto()"
-                                    ></p-button>
-                                </div>
+                        </div>
+                        <div class="p-field p-grid">
+                            <div class="p-col-12 p-md-10">
+                                <p-button
+                                    label="Agregar Gasto"
+                                    type="submit"
+                                    [disabled]="this.gastoForm.invalid"
+                                    (click)="agregarGasto()"
+                                ></p-button>
                             </div>
                         </div>
                     </div>

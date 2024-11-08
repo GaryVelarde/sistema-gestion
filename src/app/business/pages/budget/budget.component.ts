@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
-import { Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import { LoaderService } from 'src/app/layout/service/loader.service';
 import { AuthService } from 'src/app/services/auth.service';
+import * as XLSX from 'xlsx';
 
 @Component({
     templateUrl: './budget.component.html',
@@ -53,6 +54,9 @@ export class BudgetComponent implements OnInit {
             gastoEspecifico: new FormControl('', Validators.required),
             meses: this.fb.array(Array(12).fill(0)),
             rubroContable: new FormControl('', Validators.required),
+            executing_area: new FormControl('', Validators.required),
+            responsible_area: new FormControl('', Validators.required),
+            activity_type: new FormControl('', Validators.required),
         });
     }
 
@@ -82,6 +86,7 @@ export class BudgetComponent implements OnInit {
         console.log('data', data)
         this.gastosIngresados = this.formatData(data.expenses);
         this.budgetSelected = data;
+        console.log('this.gastosIngresados', this.gastosIngresados)
         this.extractTaskIdsByDoneTasks(data.expenses)
     }
 
@@ -93,6 +98,9 @@ export class BudgetComponent implements OnInit {
             gastoEspecifico: expense.specific_expense,
             meses: expense.month_amount.split(',').map(Number),
             rubroContable: expense.accounting_item,
+            executing_area: expense.executing_area,
+            responsible_area: expense.responsible_area,
+            activity_type: expense.activity_type,
             task_id: expense.task_id,
             activity_id: expense.activity_id,
             id: expense.id
@@ -129,6 +137,7 @@ export class BudgetComponent implements OnInit {
 
     cancelEdition() {
         this.edition = false;
+        this.floatingBoard = false;
         this.tasks = null;
         this.activities = null;
         this.completedTaskIds = null;
@@ -243,6 +252,9 @@ export class BudgetComponent implements OnInit {
             gastoEspecifico: this.gastoForm.value.gastoEspecifico,
             meses: this.gastoForm.value.meses,
             rubroContable: this.gastoForm.value.rubroContable,
+            executing_area: this.gastoForm.value.executing_area,
+            responsible_area: this.gastoForm.value.responsible_area,
+            activity_type: this.gastoForm.value.activity_type,
             taskCode: this.taskSelected.code_task,
             actividad: this.activitySelected.description_activity,
             activityCode: this.activitySelected.code_activity,
@@ -273,7 +285,11 @@ export class BudgetComponent implements OnInit {
     saveEdition() {
         this.loaderServide.show(true);
         const request = this.generateRequest(this.gastosIngresados);
-        this.service.putBudgetUpdate(this.budgetSelected.id, request).pipe().
+        this.service.putBudgetUpdate(this.budgetSelected.id, request).pipe(
+            finalize(() => {
+                this.loaderServide.hide();
+            })
+        ).
             subscribe((res: any) => {
                 if (res.status) {
                     this.messageService.add({
@@ -282,8 +298,8 @@ export class BudgetComponent implements OnInit {
                         summary: 'Confirmación',
                         detail: 'Los datos han sido actualizados.',
                         life: 3000,
-                      });
-                      this.edition = false;
+                    });
+                    this.edition = false;
                 }
             }, (error) => {
                 this.messageService.add({
@@ -292,7 +308,7 @@ export class BudgetComponent implements OnInit {
                     summary: 'Error',
                     detail: 'Se ha producido un error al guardar la información.',
                     life: 3000,
-                  });
+                });
             })
     }
 
@@ -307,11 +323,121 @@ export class BudgetComponent implements OnInit {
                 task_id: item.task_id,
                 accounting_item: item.rubroContable,
                 specific_expense: item.gastoEspecifico,
-                month_amount: item.meses.join(",")
+                month_amount: item.meses.join(","),
+                executing_area: item.executing_area,
+                responsible_area: item.responsible_area,
+                activity_type: item.activity_type,
             }))
         };
 
         return [transformedData];
+    }
+
+    private getAllBorders() {
+        return {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" }
+        };
+    }
+
+    // Ancho de las columnas
+    private getColumnWidths() {
+        return [
+            { wch: 10 },
+            { wch: 30 },
+            { wch: 10 },
+            { wch: 20 },
+            { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 },
+            { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 },
+            { wch: 10 }, { wch: 10 }, { wch: 10 },
+            { wch: 25 },
+            { wch: 30 },
+            { wch: 20 },
+            { wch: 20 },
+        ];
+    }
+
+    exportToExcel(): void {
+        const fileName = 'presupuesto_de_actividades_operativas.xlsx';
+        
+        const excelData = [
+            [{ v: 'PRESUPUESTO DE ACTIVIDADES OPERATIVAS 2025', s: { font: { bold: true, sz: 14 }, alignment: { horizontal: 'center' } } }],
+            [],
+            [
+                { v: 'COD. ACT', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'ACTIVIDAD FUNCIONAL', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'COD. TAREA', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'GASTO ESPECIFICO', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'ENE', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'FEB', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'MAR', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'ABR', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'MAY', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'JUN', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'JUL', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'AGO', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'SET', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'OCT', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'NOV', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'DIC', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'TOTAL', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'ÁREA EJECUTANTE DEL GASTO ESPECÍFICO', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'ÁREA RESPONSABLE (ASIGNACIÓN DEL PTO)', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'TIPO DE ACTIVIDAD', s: { font: { bold: true }, border: this.getAllBorders() } },
+                { v: 'RUBRO CONTABLE', s: { font: { bold: true }, border: this.getAllBorders() } },
+            ],
+        ];
+
+        this.gastosIngresados.forEach(item => {
+            const totalMeses = item.meses.reduce((a, b) => a + b, 0);
+
+            excelData.push([
+                { v: item.activityCode, s: { font: { bold: false }, border: this.getAllBorders() } },
+                { v: item.actividad, s: { font: { bold: false }, border: this.getAllBorders() } },
+                { v: item.taskCode, s: { font: { bold: false }, border: this.getAllBorders() } },
+                { v: item.gastoEspecifico, s: { font: { bold: false }, border: this.getAllBorders() } },
+                ...item.meses.map(m => ({ v: m, s: { font: { bold: false }, border: this.getAllBorders() } })),
+                { v: totalMeses, s: { font: { bold: false }, border: this.getAllBorders() } },
+                { v: item.executing_area, s: { font: { bold: false }, border: this.getAllBorders() } },
+                { v: item.responsible_area, s: { font: { bold: false }, border: this.getAllBorders() } },
+                { v: item.activity_type, s: { font: { bold: false }, border: this.getAllBorders() } },
+                { v: item.rubroContable, s: { font: { bold: false }, border: this.getAllBorders() } },
+            ]);
+        });
+
+        const totalPorMes = Array(12).fill(0);
+        this.gastosIngresados.forEach(item => {
+            item.meses.forEach((mes, index) => {
+                totalPorMes[index] += mes;
+            });
+        });
+        const totalGeneral = totalPorMes.reduce((a, b) => a + b, 0);
+
+        excelData.push([
+            { v: 'TOTAL', s: { font: { bold: true }, border: this.getAllBorders() } },
+            { v: '', s: { font: { bold: false }, border: this.getAllBorders() } },
+            { v: '', s: { font: { bold: false }, border: this.getAllBorders() } },
+            { v: '', s: { font: { bold: false }, border: this.getAllBorders() } },
+            ...totalPorMes.map(total => ({ v: total, s: { font: { bold: true }, border: this.getAllBorders() } })),
+            { v: totalGeneral, s: { font: { bold: true }, border: this.getAllBorders() } },
+            { v: '', s: { font: { bold: false }, border: this.getAllBorders() } },
+            { v: '', s: { font: { bold: false }, border: this.getAllBorders() } },
+            { v: '', s: { font: { bold: false }, border: this.getAllBorders() } },
+            { v: '', s: { font: { bold: false }, border: this.getAllBorders() } },
+        ]);
+
+        const worksheet: XLSX.WorkSheet = XLSX.utils.aoa_to_sheet(excelData);
+        worksheet['!cols'] = this.getColumnWidths();
+        worksheet['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 20 } }];
+
+        const workbook: XLSX.WorkBook = {
+            Sheets: { 'Presupuesto': worksheet },
+            SheetNames: ['Presupuesto']
+        };
+
+        XLSX.writeFile(workbook, fileName);
     }
 
 

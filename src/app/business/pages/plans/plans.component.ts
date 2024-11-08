@@ -339,7 +339,7 @@ export class PlansComponent implements OnInit {
         this.planSelected.id = this.planSelectedId;
     }
 
-    exportarAExcel(): void {
+    exportToExcel(): void {
         const datosExcel: any[] = [
             {
                 'COD. ACT': 'COD. ACT', 'ACTIVIDAD FUNCIONAL': 'ACTIVIDAD FUNCIONAL', 'COD. TAREA': 'COD. TAREA', 'TAREAS': 'TAREAS',
