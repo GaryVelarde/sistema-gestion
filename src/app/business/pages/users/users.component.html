@@ -139,6 +139,11 @@
                                 </td>
                             </tr>
                         </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="6" class="text-center">No se encontraron registros</td>
+                            </tr>
+                        </ng-template>
                     </p-table>
                 </div>
             </ng-template>
@@ -434,6 +439,24 @@
                         class="pl-2 text-error"
                         *ngIf="subLine.dirty && subLine.errors">Las sub
                         líneas son requeridas.</small>
+                </div>
+            </div>
+            <div class="formgrid grid mt-3">
+                <div class="field col">
+                    <p>Selecciona la opción para habilitar o deshabilitar el usuario</p>
+                    <p-toggleButton
+                        formControlName="status"
+                        onLabel="Habilitado" 
+                        offLabel="Deshabilitado" 
+                        [onIcon]="chargingChangeStatus ? 'pi pi-spin pi-spinner' : 'pi pi-check'" 
+                        [offIcon]="chargingChangeStatus ? 'pi pi-spin pi-spinner' : 'pi pi-times'" 
+                        [onIcon]="chargingChangeStatus ? 'pi pi-spin pi-spinner' : 'pi pi-lock'" 
+                        [offIcon]="chargingChangeStatus ? 'pi pi-spin pi-spinner' : 'pi pi-lock-open'" 
+                        styleClass=""
+                        ariaLabel="Estado"
+                        [disabled]="chargingChangeStatus"
+                        (click)="changeStatus()" />
+
                 </div>
             </div>
             <div class="footer">

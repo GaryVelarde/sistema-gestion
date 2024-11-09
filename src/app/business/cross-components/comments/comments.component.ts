@@ -32,6 +32,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
   state = '';
   registerState = '';
   messageError = 'Ha ocurrido un error al cargar los comentarios. Por favor, inténtalo de nuevo más tarde.';
+  iconUpdate = 'pi pi-check cursor-pointer';
 
   get comment() {
     return this._comment;
@@ -81,7 +82,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
       case eModule.presentation:
         this.getCommentsByPresentation();
         break;
-        case eModule.guide:
+      case eModule.guide:
         this.getCommentsByGuide();
         break;
     }
@@ -205,7 +206,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
             this.registerState = 'complete';
           });
         break;
-        case eModule.guide:
+      case eModule.guide:
         this.commentService.postAddGuideComment(this.id, rq).pipe(takeUntil(this.destroy$)).subscribe(
           (res: any) => {
             if (res.status) {
@@ -397,35 +398,36 @@ export class CommentsComponent implements OnInit, OnDestroy {
   }
 
   editComment(comment: any) {
-    console.log('entra')
     comment.isEditing = true;
     comment.originalDescription = comment.description;
   }
 
   saveComment(comment: any) {
-    console.log('comment', comment)
-    switch (this.module) {
-      case eModule.eventUdi:
-        this.callPutEventUdiCommentUpdate(comment);
-        break;
-      case eModule.advisory:
-        this.callPutAdvisoryCommentUpdate(comment);
-        break;
-      case eModule.inscription:
-        this.callPutInscriptionCommentUpdate(comment);
-        break;
-      case eModule.hotbed:
-        this.callPutArticleCommentUpdate(comment);
-        break;
-      case eModule.review:
-        this.callPutReviewCommentUpdate(comment);
-        break;
-      case eModule.presentation:
-        this.callPutPresentationCommentUpdate(comment);
-        break;
+    if (this.iconUpdate === 'pi pi-check cursor-pointer') {
+      this.iconUpdate = 'pi pi-spin pi-spinner';
+      switch (this.module) {
+        case eModule.eventUdi:
+          this.callPutEventUdiCommentUpdate(comment);
+          break;
+        case eModule.advisory:
+          this.callPutAdvisoryCommentUpdate(comment);
+          break;
+        case eModule.inscription:
+          this.callPutInscriptionCommentUpdate(comment);
+          break;
+        case eModule.hotbed:
+          this.callPutArticleCommentUpdate(comment);
+          break;
+        case eModule.review:
+          this.callPutReviewCommentUpdate(comment);
+          break;
+        case eModule.presentation:
+          this.callPutPresentationCommentUpdate(comment);
+          break;
         case eModule.guide:
-        this.callPutGuideCommentUpdate(comment);
-        break;
+          this.callPutGuideCommentUpdate(comment);
+          break;
+      }
     }
   }
 
@@ -454,7 +456,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
       case eModule.presentation:
         this.callDeletePresentationComment(comment);
         break;
-        case eModule.guide:
+      case eModule.guide:
         this.callDeletePresentationComment(comment);
         break;
     }
@@ -469,6 +471,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
       pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {
+          this.iconUpdate = 'pi pi-check cursor-pointer';
           comment.isEditing = false;
         }, (error) => {
 
@@ -483,6 +486,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
       pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {
+          this.iconUpdate = 'pi pi-check cursor-pointer';
           comment.isEditing = false;
         }, (error) => {
 
@@ -497,6 +501,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
       pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {
+          this.iconUpdate = 'pi pi-check cursor-pointer';
           comment.isEditing = false;
         }, (error) => {
 
@@ -511,6 +516,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
       pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {
+          this.iconUpdate = 'pi pi-check cursor-pointer';
           comment.isEditing = false;
         }, (error) => {
 
@@ -525,6 +531,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
       pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {
+          this.iconUpdate = 'pi pi-check cursor-pointer';
           comment.isEditing = false;
         }, (error) => {
 
@@ -539,6 +546,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
       pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {
+          this.iconUpdate = 'pi pi-check cursor-pointer';
           comment.isEditing = false;
         }, (error) => {
 
@@ -553,6 +561,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
       pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {
+          this.iconUpdate = 'pi pi-check cursor-pointer';
           comment.isEditing = false;
         }, (error) => {
 

@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
-import { ProductService } from 'src/app/demo/service/product.service';
 import {
     FormBuilder,
     FormControl,
@@ -70,6 +69,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     userDetailSelected: any;
     titleModalDetailIserSelected: string = '';
     getUserProcess = '';
+    chargingChangeStatus = false;
     messageError = 'No se ha podido cargar la lista de usuarios. Por favor vuelva a intentarlo más tarde.'
     public userForm: FormGroup;
     private _role: FormControl = new FormControl('', [Validators.required]);
@@ -90,6 +90,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     private _jury: FormControl = new FormControl(false);
     private _cip: FormControl = new FormControl('', [Validators.required]);
     private _orcid: FormControl = new FormControl('', [Validators.required]);
+    private _status: FormControl = new FormControl('', [Validators.required]);
 
     get role() {
         return this._role;
@@ -139,6 +140,9 @@ export class UsersComponent implements OnInit, OnDestroy {
     get orcid() {
         return this._orcid;
     }
+    get status() {
+        return this._status;
+    }
 
     constructor(
         private messageService: MessageService,
@@ -153,6 +157,7 @@ export class UsersComponent implements OnInit, OnDestroy {
             email: this.email,
             number: this.number,
             code: this.code,
+            status: this.status,
         });
     }
 
@@ -275,7 +280,9 @@ export class UsersComponent implements OnInit, OnDestroy {
             this.code.setValue(user.code);
             this.number.setValue(user.phone);
             this.email.setValue(user.email);
-
+            let st = true;
+            user.status === 'Habilitado' ? st = true : st = false;
+            this.status.setValue(st);
             switch (user.role) {
                 case 'UDI':
                     this.removeControlForDocente();
@@ -355,7 +362,7 @@ export class UsersComponent implements OnInit, OnDestroy {
                 }
             }, (error) => {
                 this.messageService.add({
-                    severity: 'success',
+                    severity: 'error',
                     summary: 'Error',
                     detail: 'Se ha producido un error al guardar la información.',
                     life: 3000,
@@ -460,7 +467,7 @@ export class UsersComponent implements OnInit, OnDestroy {
                 }
             }, (error) => {
                 this.messageService.add({
-                    severity: 'success',
+                    severity: 'error',
                     summary: 'Error',
                     detail: 'Se ha producido un error al guardar la información.',
                     life: 3000,
@@ -484,5 +491,37 @@ export class UsersComponent implements OnInit, OnDestroy {
         this.jury.reset();
         this.cip.reset();
         this.orcid.reset();
+    }
+
+    changeStatus() {
+        this.chargingChangeStatus = true;
+        console.log('value', this.status.value);
+        const rq = {
+            email: this.email.value,
+            status: this.status.value ? 'Habilitado' : 'Deshabilitado',
+        };
+        this.service.putUser(this.userDetailSelected.id, rq).pipe(
+            finalize(() => {
+                this.chargingChangeStatus = false;
+            }), takeUntil(this.destroy$)
+        ).subscribe(
+            (res: any) => {
+                if (res.status) {
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Mensaje',
+                        detail: 'Se actualizó la información del usuario.',
+                        life: 3000,
+                    });
+                    this.callGetUserList();
+                }
+            }, (error) => {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al guardar la información.',
+                    life: 3000,
+                });
+            })
     }
 }

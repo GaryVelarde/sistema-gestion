@@ -154,7 +154,7 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
     this.getListProcess = 'charging';
     this.service.getGuides().pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res) {
-        this.registros = res.data;
+        // this.registros = res.data;
         this.getListProcess = 'complete';
       }
     },

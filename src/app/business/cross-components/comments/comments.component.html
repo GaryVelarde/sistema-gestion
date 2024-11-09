@@ -109,7 +109,7 @@
                                 [(ngModel)]="comment.description"
                             />
                             <i
-                                class="pi pi-check cursor-pointer ml-2 mt-1"
+                                [class]="iconUpdate + ' ml-2 mt-1'"
                                 (click)="saveComment(comment)"
                             ></i>
                             <i

@@ -385,4 +385,8 @@ export class AuthService {
     return this.http.put(`${this.API_URL}/budget/${budgetId}`, request, this.header);
   }
 
+  deleteUser(userId: any) {
+    return this.http.delete(`${this.API_URL}/users/${userId}`, this.header);
+  }
+
 }

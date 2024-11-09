@@ -22,6 +22,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { SidebarModule } from 'primeng/sidebar';
 import { CrossComponentsModule } from "../../cross-components/Cross.module";
 import { KeyFilterModule } from 'primeng/keyfilter';
+import { ToggleButtonModule } from 'primeng/togglebutton';
 
 @NgModule({
     imports: [
@@ -48,6 +49,7 @@ import { KeyFilterModule } from 'primeng/keyfilter';
     SidebarModule,
     CrossComponentsModule,
     KeyFilterModule,
+    ToggleButtonModule,
 ],
     declarations: [UsersComponent]
 })
