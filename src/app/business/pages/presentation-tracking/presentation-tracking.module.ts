@@ -33,6 +33,8 @@ import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { SidebarModule } from 'primeng/sidebar';
 import { PresentationTrackingComponent } from './presentation-tracking.component';
 import { PresentationTrackingRoutingModule } from './presentation-tracking-routing.module';
+import { ToggleButtonModule } from 'primeng/togglebutton';
+import { TooltipModule } from 'primeng/tooltip';
 
 @NgModule({
     imports: [
@@ -68,6 +70,8 @@ import { PresentationTrackingRoutingModule } from './presentation-tracking-routi
         CrossComponentsModule,
         BreadcrumbModule,
         SidebarModule,
+        ToggleButtonModule,
+        TooltipModule,
     ],
     declarations: [PresentationTrackingComponent],
     providers: [

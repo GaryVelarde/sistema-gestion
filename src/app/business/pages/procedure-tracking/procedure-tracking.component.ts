@@ -39,6 +39,7 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
   ];
   private destroy$ = new Subject<void>();
   viewDetail = false;
+  chargingEdition = false;
   showDialogAddFiles = false;
   showDialogProcedureType = false;
   module = eModule.procedure;
@@ -387,7 +388,7 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
   }
 
   procedureUpdate() {
-    this.loaderService.show(true);
+    this.chargingEdition = true;
     const request = {
       procedure_type_id: this.getIds([this.procedureType.value])[0],
       user_id: this.getIds(this.student.value)[0],
@@ -396,7 +397,7 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
     this.service.putProcedureUpdate(request, this.procedureSelected.id).pipe(
       takeUntil(this.destroy$),
       finalize(() => {
-        this.loaderService.hide();
+        this.chargingEdition = false;
       })
     ).
       subscribe((res: any) => {

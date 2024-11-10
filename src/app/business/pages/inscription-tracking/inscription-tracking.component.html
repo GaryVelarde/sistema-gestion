@@ -217,6 +217,7 @@
                         label="Cancelar edición"
                         icon="pi pi-times"
                         iconPos="right"
+                        [disabled]="chargingEdition"
                     />
                     <p-button
                         *ngIf="
@@ -227,8 +228,9 @@
                         class="ml-3"
                         (click)="saveEdition()"
                         label="Guardar cambios"
-                        icon="pi pi-save"
+                        [icon]="chargingEdition ? 'pi pi-spin pi-spinner' : 'pi pi-save'"
                         iconPos="left"
+                        [disabled]="chargingEdition"
                     />
                 </div>
                 <div class="p-2">

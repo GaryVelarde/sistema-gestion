@@ -30,7 +30,7 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
     @ViewChild('comments') comments: CommentsComponent;
     @ViewChild('reviewerSelection') reviewerSelection: UserSelectionComponent;
 
-
+    chargingEdition = false;
     private destroy$ = new Subject<void>();
     products: any[] = [];
     breadcrumbItems: MenuItem[] = [
@@ -84,6 +84,7 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
     public reviewerForm: FormGroup;
     public studentForm: FormGroup;
     public moreInfoForm: FormGroup;
+    public editForm: FormGroup;
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
     private _taskDescription: FormControl = new FormControl('', [
@@ -163,7 +164,6 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
         this.studentForm = this.fb.group({
             students: this.students,
         });
-
         this.moreInfoForm = this.fb.group({
             receptionDateFaculty: this.receptionDateFaculty,
             scheduledDate: this.scheduledDate,
@@ -174,7 +174,16 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
             received: this.received,
             sentToLibrary: this.sentToLibrary,
         });
-
+        this.editForm = this.fb.group({
+            receptionDateFaculty: this.receptionDateFaculty,
+            scheduledDate: this.scheduledDate,
+            notificationDateGraduates: this.notificationDateGraduates,
+            juryConfirmation: this.juryConfirmation,
+            place: this.place,
+            formRequestDateRepository: this.formRequestDateRepository,
+            received: this.received,
+            sentToLibrary: this.sentToLibrary,
+        });
     }
 
     ngOnInit() {
@@ -235,12 +244,13 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
 
     viewDetailsReview(data: any) {
         this.loaderService.show();
+        console.log('data', data)
         if (data) {
             data.juries.length < 1
                 ? this.requiereMoreInfo = true
                 : this.requiereMoreInfo = false;
             this.presentationSelected = data;
-
+            this.chargingEdition = false;
             this.presentationState = this.presentationSelected.status;
             this.presentationState === 'Aprobado' || this.presentationState === 'Renuncia'
                 ? this.commentsVisible = false
@@ -257,6 +267,8 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
         this.loaderService.show();
         this.getPresentationList();
         this.presentationSelected = null;
+        this.edition = false;
+        this.editForm.reset();
         this.students.setValue([]);
         this.jury.setValue([]);
         setTimeout(() => {
@@ -333,7 +345,7 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
         this.presentationSelected.reception_date_faculty = this.dateFormatService.transformDDMMYYYY(this.receptionDateFaculty.value);
         this.presentationSelected.scheduled_date = this.dateFormatService.transformDDMMYYYY(this.scheduledDate.value);
         this.presentationSelected.notification_date_graduates = this.dateFormatService.transformDDMMYYYY(this.notificationDateGraduates.value);
-        this.presentationSelected.jury_confirmation = this.juryConfirmation.value;
+        this.presentationSelected.jury_confirmation = this.juryConfirmation.value.code;
         this.presentationSelected.place = this.place.value;
         this.presentationSelected.form_request_date_repository = this.dateFormatService.transformDDMMYYYY(this.formRequestDateRepository.value);
         this.presentationSelected.received = this.received.value;
@@ -399,6 +411,7 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
     }
 
     showEdition() {
+        this.fillEditForm();
         this.lastReviewerSelected = this.jury.value;
         this.edition = true;
     }
@@ -410,7 +423,44 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
     }
 
     saveEdition() {
-        this.edition = false;
+        this.chargingEdition = true;
+        const request = {
+            juries: this.extractIds(this.jury.value), //ID jurados
+            place: this.place.value,
+            scheduled_date: this.dateFormatService.transformDDMMYYYY(this.scheduledDate.value),
+            reception_date_faculty: this.dateFormatService.transformDDMMYYYY(this.receptionDateFaculty.value),
+            notification_date_graduates: this.dateFormatService.transformDDMMYYYY(this.notificationDateGraduates.value),
+            jury_confirmation: this.juryConfirmation.value.code,
+            form_request_date_repository: this.dateFormatService.transformDDMMYYYY(this.formRequestDateRepository.value),
+            received: this.received.value,
+            sent_to_library: this.sentToLibrary.value
+        }
+        this.service.putPresentationUpdate(this.presentationSelected.id, request).pipe(
+            finalize(() => {
+                this.chargingEdition = false;
+            })
+        ).
+            subscribe((res: any) => {
+                if (res.status) {
+                    this.presentationSelectedUpdate();
+                    this.edition = false;
+                    this.messageService.add({
+                        key: 'tst',
+                        severity: 'info',
+                        summary: 'Confirmación',
+                        detail: 'Se actualizó la información.',
+                        life: 3000,
+                    });
+                }
+            }, () => {
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al guardar la información.',
+                    life: 3000,
+                });
+            })
     }
 
     extractIds(arr: Array<{ id: string }>): string[] {
@@ -427,7 +477,13 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
                     this.presentationState = status;
                 }
             }, (error) => {
-
+                this.messageService.add({
+                    key: 'tst',
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'Se ha producido un error al guardar la información.',
+                    life: 3000,
+                });
             })
     }
 
@@ -441,8 +497,19 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
 
     getJurorNames(juries: Array<{ name: string, surnames: string }>): string {
         return juries.slice(0, 3)
-          .map(jury => `${jury.name} ${jury.surnames}`)
-          .join(', '); 
-      }
-      
+            .map(jury => `${jury.name} ${jury.surnames}`)
+            .join(', ');
+    }
+
+    fillEditForm() {
+        this.receptionDateFaculty.setValue(this.presentationSelected.reception_date_faculty);
+        this.scheduledDate.setValue(this.presentationSelected.scheduled_date);
+        this.notificationDateGraduates.setValue(this.presentationSelected.notification_date_graduates);
+        this.juryConfirmation.setValue({ code: this.presentationSelected.jury_confirmation, name: this.presentationSelected.jury_confirmation });
+        this.place.setValue(this.presentationSelected.place);
+        this.formRequestDateRepository.setValue(this.presentationSelected.form_request_date_repository);
+        this.received.setValue(this.presentationSelected.received === 1 ? true : false);
+        this.sentToLibrary.setValue(this.presentationSelected.sent_to_library === 1 ? true : false);
+    }
+
 }

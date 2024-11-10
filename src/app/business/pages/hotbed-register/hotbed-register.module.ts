@@ -15,6 +15,7 @@ import { DialogModule } from 'primeng/dialog';
 import { SliderModule } from 'primeng/slider';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { DividerModule } from 'primeng/divider';
 
 @NgModule({
   imports: [
@@ -35,6 +36,7 @@ import { TagModule } from 'primeng/tag';
     SliderModule,
     TableModule,
     TagModule,
+    DividerModule,
   ],
   declarations: [HotbedRegisterComponent]
 })

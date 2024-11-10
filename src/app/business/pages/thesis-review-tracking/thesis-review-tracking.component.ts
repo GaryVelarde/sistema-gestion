@@ -32,6 +32,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
 
     private destroy$ = new Subject<void>();
     products: any[] = [];
+    chargingEdition = false;
     breadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
         { label: 'Proceso de titulación' },
@@ -185,7 +186,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
                 ? this.requiereMoreInfo = true
                 : this.requiereMoreInfo = false;
             this.reviewSelected = data;
-
+            this.chargingEdition = false;
             this.reviewState = this.reviewSelected.status;
             this.reviewState === 'Aprobado' || this.reviewState === 'Renuncia'
                 ? this.commentsVisible = false
@@ -445,13 +446,13 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     }
 
     saveEdition() {
-        this.loaderService.show(true);
+        this.chargingEdition = true;
         const rq = {
             user_id: this.reviewer.value[0].id,
         }
         this.service.putReviewUpdate(this.reviewSelected.id, rq).pipe(
             finalize(() => {
-                this.loaderService.hide();
+                this.chargingEdition = true;
             })
         ).subscribe(
             (res: any) => {

@@ -189,6 +189,7 @@ export class GuideTrackingComponent implements OnInit, OnDestroy {
   backToDetail() {
     this.loaderService.show();
     this.viewDetail = true;
+    this.edition = false;
     setTimeout(() => {
       this.loaderService.hide();
     }, 400);

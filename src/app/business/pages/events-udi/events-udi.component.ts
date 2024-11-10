@@ -62,6 +62,8 @@ interface Usuario {
 export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
     @ViewChild('calendar') calendarComponent: FullCalendarComponent;
     @ViewChild('cardBody') cardBody!: ElementRef;
+
+    chargingEdition = false;
     resizeObserver!: ResizeObserver;
     private destroy$ = new Subject<void>();
     pendingTasks: Task[] = [];
@@ -381,6 +383,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     }
 
     async callGetEventsUdi() {
+        this.events = [];
         await this.service.getEventsUdiList().pipe(takeUntil(this.destroy$)).subscribe(
             (res: any) => {
                 for (let event of res.data) {
@@ -444,6 +447,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     handleEventClick(arg) {
         this.loaderService.show();
         this.eventSelected = arg;
+        console.log('this.eventSelected.event._def.extendedProps.event_udi', this.eventSelected.event._def.extendedProps.event_udi);
         this.eventStatus = arg.event._def.extendedProps.event_udi.status;
         this.usersManagerEdit.setValue(this.addFullNameProperty(this.eventSelected.event._def.extendedProps.event_udi.managers));
         this.usersParticipantsEdit.setValue(this.addFullNameProperty(this.eventSelected.event._def.extendedProps.event_udi.participants));
@@ -478,6 +482,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         this.showEventDetail = false;
         this.edition = false;
         this.eventSelected = null;
+        this.callGetEventsUdi();
         setTimeout(() => {
             this.loaderService.hide();
         }, 400);
@@ -964,7 +969,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     }
 
     saveEdition() {
-        this.loaderService.show(true);
+        this.chargingEdition = true;
         const request = {
             title: this.titleEdit.value,
             description: this.descriptionEdit.value,
@@ -978,13 +983,13 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
 
         this.service.putEventUdiUpdate(this.eventSelected.event._def.extendedProps.event_udi.id, request).pipe(
             finalize(() => {
-                this.loaderService.hide();
+                this.chargingEdition = false;
             })
         ).
             subscribe(
                 (res: any) => {
                     if (res.status) {
-
+                        this.confirmEventUpdate();
                     }
                 }, (error) => {
                     this.messageService.add({

@@ -98,9 +98,7 @@
                                         sin asignar
                                     </div>
                                     <div *ngIf="data.juries[0]">
-                                        {{
-                                            getJurorNames(data.juries)
-                                        }}
+                                        {{ getJurorNames(data.juries) }}
                                     </div>
                                 </td>
                                 <td style="width: 14%; min-width: 10rem">
@@ -133,7 +131,9 @@
                         </ng-template>
                         <ng-template pTemplate="emptymessage">
                             <tr>
-                                <td colspan="4" class="text-center">No se encontraron registros</td>
+                                <td colspan="4" class="text-center">
+                                    No se encontraron registros
+                                </td>
                             </tr>
                         </ng-template>
                     </p-table>
@@ -181,8 +181,8 @@
                     <p-button
                         *ngIf="
                             !edition &&
-                            inscriptionState !== 'No aprobado' &&
-                            inscriptionState !== 'Aprobado' &&
+                            presentationState !== 'No aprobado' &&
+                            presentationState !== 'Aprobado' &&
                             isUdi
                         "
                         class="ml-3"
@@ -194,31 +194,37 @@
                     <p-button
                         *ngIf="
                             edition &&
-                            inscriptionState !== 'No aprobado' &&
-                            inscriptionState !== 'Aprobado'
+                            presentationState !== 'No aprobado' &&
+                            presentationState !== 'Aprobado'
                         "
                         class="ml-3"
                         (click)="cancelEdition()"
                         label="Cancelar edición"
                         icon="pi pi-times"
                         iconPos="right"
+                        [disabled]="chargingEdition"
                     />
                     <p-button
                         *ngIf="
                             edition &&
-                            inscriptionState !== 'No aprobado' &&
-                            inscriptionState !== 'Aprobado'
+                            presentationState !== 'No aprobado' &&
+                            presentationState !== 'Aprobado'
                         "
                         class="ml-3"
                         (click)="saveEdition()"
                         label="Guardar cambios"
-                        icon="pi pi-save"
+                        [icon]="
+                            chargingEdition
+                                ? 'pi pi-spin pi-spinner'
+                                : 'pi pi-save'
+                        "
                         iconPos="left"
+                        [disabled]="chargingEdition"
                     />
                 </div>
                 <div class="p-2">
                     <p-button
-                        *ngIf="presentationState !== 'Culminado'"
+                        *ngIf="presentationState !== 'Culminado' && !edition"
                         label="Desaprobado"
                         [outlined]="true"
                         class="mr-3"
@@ -228,7 +234,7 @@
                         (click)="goToDisapproved()"
                     />
                     <p-button
-                        *ngIf="presentationState !== 'Culminado'"
+                        *ngIf="presentationState !== 'Culminado' && !edition"
                         label="Aprobado"
                         [outlined]="true"
                         icon="pi pi-angle-right"
@@ -304,7 +310,155 @@
                     />
                 </div>
             </div>
-            <div>
+            <form *ngIf="edition" [formGroup]="editForm">
+                <div class="grid col-12">
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Fecha de recepción a facultad:</p>
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="receptionDateFaculty"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Fecha programada:</p>
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="scheduledDate"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">
+                            Fecha de notificación a estudiantes:
+                        </p>
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="notificationDateGraduates"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card col-12 col-md-3" style="max-height: 100px">
+                        <p class="font-bold">Estado:</p>
+                        <p-tag
+                            *ngIf="
+                                presentationState === 'En proceso' &&
+                                presentationSelected.first_presentation !==
+                                    'No aprobado'
+                            "
+                            value="En proceso - 1era sustentación "
+                        />
+                        <p-tag
+                            *ngIf="
+                                presentationState === 'En proceso' &&
+                                presentationSelected.second_presentation
+                            "
+                            value="En proceso - 2da sustentación "
+                        />
+                        <p-tag
+                            *ngIf="presentationState === 'No aprobado'"
+                            severity="danger"
+                            value="Desaprobado"
+                        />
+                        <p-tag
+                            *ngIf="presentationState === 'Aprobado'"
+                            value="Aprobado"
+                        />
+                        <p-tag
+                            *ngIf="presentationState === 'Culminado'"
+                            value="Culminado"
+                        />
+                    </div>
+                </div>
+                <div class="grid col-12">
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Confirmación de jurados:</p>
+                        <p-dropdown
+                            styleClass="w-full"
+                            [options]="optionsConfirmationJury"
+                            formControlName="juryConfirmation"
+                            optionLabel="name"
+                            placeholder="Selecciona una opción"
+                        />
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Lugar de sustentación:</p>
+                        <input
+                            type="text"
+                            class="w-full"
+                            pInputText
+                            formControlName="place"
+                        />
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">
+                            Fecha de envío de formulario a biblioteca:
+                        </p>
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="formRequestDateRepository"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Recibido:</p>
+                        <p-toggleButton
+                            formControlName="received"
+                            disabled="true"
+                            onIcon="pi pi-check"
+                            offIcon="pi pi-times"
+                            onLabel="Si"
+                            offLabel="No"
+                            pTooltip="Click para cambiar a Si o No"
+                        />
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Se envió a bilioteca:</p>
+                        <p-toggleButton
+                            formControlName="sentToLibrary"
+                            disabled="true"
+                            onIcon="pi pi-check"
+                            offIcon="pi pi-times"
+                            onLabel="Si"
+                            offLabel="No"
+                            pTooltip="Click para cambiar a Si o No"
+                        />
+                    </div>
+                </div>
+            </form>
+            <div *ngIf="!edition">
                 <div class="grid col-12">
                     <div class="col-12 col-md-3">
                         <p class="font-bold">Fecha de recepción a facultad:</p>
@@ -385,23 +539,25 @@
                     </div>
                     <div class="col-12 col-md-3">
                         <p class="font-bold">Recibido:</p>
-                        <p>
-                            {{
-                                presentationSelected.received === 1
-                                    ? "Si"
-                                    : "No"
-                            }}
-                        </p>
+                        <p-toggleButton
+                            [(ngModel)]="presentationSelected.received"
+                            disabled="true"
+                            onIcon="pi pi-check"
+                            offIcon="pi pi-times"
+                            onLabel="Si"
+                            offLabel="No"
+                        />
                     </div>
                     <div class="col-12 col-md-3">
                         <p class="font-bold">Se envió a bilioteca:</p>
-                        <p>
-                            {{
-                                presentationSelected.sent_to_library === 1
-                                    ? "Si"
-                                    : "No"
-                            }}
-                        </p>
+                        <p-toggleButton
+                            [(ngModel)]="presentationSelected.sent_to_library"
+                            disabled="true"
+                            onIcon="pi pi-check"
+                            offIcon="pi pi-times"
+                            onLabel="Si"
+                            offLabel="No"
+                        />
                     </div>
                 </div>
             </div>
@@ -574,7 +730,7 @@
                     <div class="col-12 col-md-3">
                         <p class="font-bold">Confirmación de jurados:</p>
                         <p-dropdown
-                            class="w-full"
+                            styleClass="w-full"
                             [options]="optionsConfirmationJury"
                             formControlName="juryConfirmation"
                             optionLabel="name"

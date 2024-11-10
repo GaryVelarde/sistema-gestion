@@ -30,6 +30,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
 
     private destroy$ = new Subject<void>();
     products: any[] = [];
+    chargingEdition = false;
     breadcrumbItems: MenuItem[] = [
         { icon: 'pi pi-home', route: '/' },
         { label: 'Proceso de titulación' },
@@ -300,7 +301,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
     }
 
     saveEdition() {
-        this.loaderService.show();
+        this.chargingEdition = true;
         const rq = {
             user_id: this.advisory.value[0].id,
             reception_date_faculty: this.dateFormatService.transformDDMMYYYY(this.advisoryReceptionDateToFacultyMI.value),
@@ -314,7 +315,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
         }
         this.service.putAdvisoryUpdate(this.advisorySelected.id, rq).pipe(
             finalize(() => {
-                this.loaderService.hide();
+                this.chargingEdition = false;
             })
         ).subscribe(
             (res: any) => {

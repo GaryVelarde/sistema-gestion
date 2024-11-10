@@ -36,7 +36,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     registros = [];
     teacherL = userType.teacher;
     studentL = userType.student;
-
+    chargingEdition = false; 
     module = eModule.inscription;
     getInscriptionListProcess: string;
     filteredItems: any[] | undefined;
@@ -322,7 +322,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
     }
 
     saveEdition() {
-        this.loaderService.show(true);
+        this.chargingEdition = true;
         const wasPayed = this.reviewerWasPayed.value.code === 'Si' ? true : false;
         const request = {
             file: this.caseNumber.value,
@@ -339,7 +339,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         this.service.putInscriptionUpdate(this.inscriptionSelected.inscriptions[0].id, request).pipe(
             finalize(() => {
                 this.showEdit = false;
-                this.loaderService.hide();
+                this.chargingEdition = false;
             })
         ).subscribe(
             (res: any) => {

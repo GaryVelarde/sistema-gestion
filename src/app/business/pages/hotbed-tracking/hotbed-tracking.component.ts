@@ -21,6 +21,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
   @ViewChild('upload') upload: UploadArchivesComponent;
   @ViewChild('fileList') fileList: FileListComponent;
   registros = [];
+  chargingEdition = false;
   events = [
     { status: 'En desarrollo', date: '15-10-2020 10:30', icon: 'pi pi-pencil', color: '#6366f1', message: 'El artículo pasó a desarrollo el día ' },
     { status: 'Revisado', date: '15-10-2020 14:00', icon: 'pi pi-check', color: '#6366f1' },
@@ -192,6 +193,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     this.loaderService.show();
     this.viewDetail = true;
     this.viewHistory = false;
+    this.edition = false;
     setTimeout(() => {
       this.loaderService.hide();
     }, 400);
@@ -280,7 +282,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
   }
 
   callPutArticleUpdate() {
-    this.loaderService.show(true);
+    this.chargingEdition = true;
     const request = {
       title: this.title.value,
       group: this.group.value,
@@ -288,7 +290,7 @@ export class HotbedTrackingComponent implements OnInit, OnDestroy {
     }
     this.service.putArticleUpdate(request, this.articleSelected.id).pipe(
       finalize(() => {
-        this.loaderService.hide();
+        this.chargingEdition = false;
       })
     ).
       subscribe(
