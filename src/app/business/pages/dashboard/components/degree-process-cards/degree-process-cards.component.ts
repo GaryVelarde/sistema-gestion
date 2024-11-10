@@ -26,7 +26,6 @@ export class DegreeProcessCardsComponent implements OnInit, OnDestroy {
   callgetCounterReport() {
     this.statusGet = 'charging';
     this.service.getCounterReport().pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
-      console.log('getCounterReportr', res);
       if (res.data) {
         this.data = res.data;
         this.statusGet = 'complete';

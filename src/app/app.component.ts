@@ -99,8 +99,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   secondValidatonByDataLocalStorage() {
     const currentUrl = this.router.url.split('?')[0];
-    console.log('currentUrl', currentUrl)
-    console.log('!allowedUrlsByAuth.includes(currentUrl)', allowedUrlsByAuth.includes(currentUrl))
     if (!allowedUrlsByAuth.includes(currentUrl)) {
       const userName = this.tokenService.getDR2LP2();
       if (userName === null) {

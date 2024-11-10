@@ -50,7 +50,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log(this.disabled)
     if (this.disabled) {
       this.comment.disable();
     }
@@ -141,7 +140,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
               this.registerState = 'complete';
               this.confirmAddEvent(res.id);
             }
-            console.log(res);
           }, (error) => {
             this.registerState = 'complete';
           });
@@ -153,7 +151,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
               this.registerState = 'complete';
               this.confirmAddEvent(res.id);
             }
-            console.log(res);
           }, (error) => {
             this.registerState = 'complete';
           });
@@ -165,7 +162,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
               this.registerState = 'complete';
               this.confirmAddEvent(res.id);
             }
-            console.log(res);
           }, (error) => {
             this.registerState = 'complete';
           });
@@ -177,7 +173,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
               this.registerState = 'complete';
               this.confirmAddEvent(res.id);
             }
-            console.log(res);
           }, (error) => {
             this.registerState = 'complete';
           });
@@ -189,7 +184,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
               this.registerState = 'complete';
               this.confirmAddEvent(res.id);
             }
-            console.log(res);
           }, (error) => {
             this.registerState = 'complete';
           });
@@ -201,7 +195,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
               this.registerState = 'complete';
               this.confirmAddEvent(res.id);
             }
-            console.log(res);
           }, (error) => {
             this.registerState = 'complete';
           });
@@ -213,7 +206,6 @@ export class CommentsComponent implements OnInit, OnDestroy {
               this.registerState = 'complete';
               this.confirmAddEvent(res.id);
             }
-            console.log(res);
           }, (error) => {
             this.registerState = 'complete';
           });

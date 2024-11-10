@@ -270,7 +270,6 @@ export class EventsComponent implements OnInit, AfterViewInit {
         this.start.setValue(dateInfo.day + ' ' + dateInfo.start);
         this.end.setValue(dateInfo.day + ' ' + dateInfo.end);
         this.color.setValue('#ff0000');
-        console.log('this.color.value', this.color.value)
         this.newEventDialog = true;
     }
 
@@ -319,7 +318,6 @@ export class EventsComponent implements OnInit, AfterViewInit {
     callGetEvents() {
         this.service.getEvents().pipe().subscribe(
             (res: any) => {
-                console.log(res);
             }, (error) => {
 
             })

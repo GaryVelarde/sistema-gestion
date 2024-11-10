@@ -59,7 +59,6 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
         this.route.queryParamMap.subscribe(params => {
             this.token = params.get('token')!;
             this.emailUrl = params.get('email')!;
-            console.log(`Token: ${this.token}, emailUrl: ${this.emailUrl}`);
         });
         if (!this.token || this.token === null || !this.emailUrl || this.emailUrl === null) {
             this.router.navigate(['/auth/login']);
@@ -104,7 +103,6 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
                     this.result = true;
                     this.clearValues();
                 }
-                console.log(res);
             }, (error) => {
                 this.messageService.add({
                     key: 'tst',

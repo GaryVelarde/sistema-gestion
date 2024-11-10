@@ -173,7 +173,6 @@ export class InscriptionPresenter {
             if (data.code) {
                 this.reviewerIsValid = true;
                 this.reviewerSelected = data;
-                console.log(data);
             } else {
                 this.reviewerIsValid = false;
                 this.reviewerSelected = {};
@@ -198,7 +197,6 @@ export class InscriptionPresenter {
             user_ids: studentsArray,
             description: this.comments.value,
         };
-        console.log(request);
         return request;
     }
 

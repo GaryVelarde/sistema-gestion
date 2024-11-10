@@ -114,7 +114,6 @@ export class LoginComponent implements OnInit {
     }
 
     redirectToForgotPassword(){
-        console.log('aaaaa')
         this.router.navigate(['/auth/forgot-password'])
     }
 

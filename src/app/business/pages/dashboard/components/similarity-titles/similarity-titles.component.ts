@@ -40,7 +40,6 @@ export class SimilarityTitlesComponent implements OnInit {
       subscribe((value: string) => {
         this.results = this.thesisSimilarity.compareWithThesisTitles(value, this.titlesList, this.minimumPercentage)
           .sort((a, b) => b.similarity - a.similarity);
-        console.log('this.results', this.results)
       })
   }
 

@@ -495,7 +495,6 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     changeStatus() {
         this.chargingChangeStatus = true;
-        console.log('value', this.status.value);
         const rq = {
             email: this.email.value,
             status: this.status.value ? 'Habilitado' : 'Deshabilitado',

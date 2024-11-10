@@ -94,7 +94,6 @@ export class TaskListComponent implements OnInit, OnDestroy {
   addTask(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
       event.preventDefault();
-      console.log(this.taskDescription.value); // Asegúrate de que esto no sea null
       if (this.taskDescription.value) {
         this.statusRegister = 'charging';
         const rq = {
@@ -114,7 +113,6 @@ export class TaskListComponent implements OnInit, OnDestroy {
               this.statusRegister = 'complete';
               this.confirmRegister(res.id);
             }
-            console.log(res);
           }, (error) => {
             this.statusRegister = 'complete';
           })
@@ -128,7 +126,6 @@ export class TaskListComponent implements OnInit, OnDestroy {
               this.statusRegister = 'complete';
               this.confirmRegister(res.id);
             }
-            console.log(res);
           }, (error) => {
             this.statusRegister = 'complete';
           })

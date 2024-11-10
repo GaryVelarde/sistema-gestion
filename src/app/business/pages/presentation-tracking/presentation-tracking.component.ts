@@ -244,7 +244,6 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
 
     viewDetailsReview(data: any) {
         this.loaderService.show();
-        console.log('data', data)
         if (data) {
             data.juries.length < 1
                 ? this.requiereMoreInfo = true

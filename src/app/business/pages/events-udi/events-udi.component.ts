@@ -447,7 +447,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
     handleEventClick(arg) {
         this.loaderService.show();
         this.eventSelected = arg;
-        console.log('this.eventSelected.event._def.extendedProps.event_udi', this.eventSelected.event._def.extendedProps.event_udi);
         this.eventStatus = arg.event._def.extendedProps.event_udi.status;
         this.usersManagerEdit.setValue(this.addFullNameProperty(this.eventSelected.event._def.extendedProps.event_udi.managers));
         this.usersParticipantsEdit.setValue(this.addFullNameProperty(this.eventSelected.event._def.extendedProps.event_udi.participants));

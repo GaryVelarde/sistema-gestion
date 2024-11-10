@@ -180,7 +180,6 @@ export class FileListComponent implements OnInit, OnDestroy {
   }
 
   deleteArchive(archiveId: string) {
-    console.log('archiveId', archiveId)
     switch (this.module) {
       case eModule.advisory:
         this.callDeleteAdvisoryArchive(archiveId);
