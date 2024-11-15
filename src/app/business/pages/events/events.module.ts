@@ -33,6 +33,9 @@ import { SidebarModule } from 'primeng/sidebar';
 import { AvatarModule } from 'primeng/avatar';
 import { CrossComponentsModule } from '../../cross-components/Cross.module';
 import { AccordionModule } from 'primeng/accordion';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { AutoCompleteModule } from 'primeng/autocomplete';
+import { ChipModule } from 'primeng/chip';
 
 @NgModule({
     imports: [
@@ -70,6 +73,9 @@ import { AccordionModule } from 'primeng/accordion';
         AvatarModule,
         CrossComponentsModule,
         AccordionModule,
+        MultiSelectModule,
+        AutoCompleteModule,
+        ChipModule,
     ],
     declarations: [EventsComponent],
 })
