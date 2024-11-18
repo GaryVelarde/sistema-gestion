@@ -1,4 +1,5 @@
-<div class="grid" #cardBody>
+<p-toast key="tst"></p-toast>
+<div *ngIf="!eventDetail" class="grid" #cardBody>
     <div class="col-12">
         <p-card>
             <p-toolbar class="mt-3">
@@ -32,38 +33,600 @@
         </p-card>
     </div>
 </div>
+<div *ngIf="eventDetail">
+    <div class="col-12">
+        <app-breadcrumb [items]="detailsBreadcrumbItems"></app-breadcrumb>
+        <div class="card">
+            <div class="d-flex w-full mb-3">
+                <div class="mr-auto">
+                    <p-button
+                        (click)="backCalendar()"
+                        label="Regresar"
+                        [outlined]="true"
+                        icon="pi pi-angle-left"
+                        iconPos="left"
+                    />
+                    <p-button
+                        *ngIf="!edition"
+                        class="ml-3"
+                        (click)="showEdition()"
+                        label="Editar"
+                        icon="pi pi-pencil"
+                        iconPos="left"
+                    />
+                    <p-button
+                        *ngIf="edition"
+                        class="ml-3"
+                        (click)="cancelEdition()"
+                        label="Cancelar edición"
+                        icon="pi pi-times"
+                        iconPos="right"
+                        [disabled]="chargingEdition"
+                    />
+                    <p-button
+                        *ngIf="edition"
+                        class="ml-3"
+                        (click)="saveEdition()"
+                        label="Guardar cambios"
+                        [icon]="
+                            chargingEdition
+                                ? 'pi pi-spin pi-spinner'
+                                : 'pi pi-save'
+                        "
+                        iconPos="left"
+                        [disabled]="chargingEdition"
+                    />
+                </div>
+            </div>
+            <div
+                *ngIf="!edition"
+                class="card flex justify-content-center col-12"
+            >
+                <h5 class="font-bold text-color" style="text-align: center">
+                    {{
+                        eventSelected.event._def.extendedProps.event_detail
+                            .name_event
+                    }}
+                </h5>
+            </div>
+            <div *ngIf="!edition" class="p-fluid">
+                <div class="grid p-formgrid mt-1">
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <textarea
+                                [(ngModel)]="
+                                    eventSelected.event._def.extendedProps
+                                        .event_detail.description
+                                "
+                                id="description"
+                                pInputTextarea
+                                [disabled]="true"
+                            ></textarea>
+                            <label for="description"
+                                >Descripción del evento</label
+                            >
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <span class="p-float-label">
+                            <p-calendar
+                                [(ngModel)]="startTime"
+                                id="start_date"
+                                [showIcon]="true"
+                                dateFormat="dd-mm-yy"
+                                [showTime]="true"
+                                [hourFormat]="12"
+                                [disabled]="true"
+                            ></p-calendar>
+                            <label for="start_date"
+                                >Fecha y hora de inicio</label
+                            >
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <span class="p-float-label">
+                            <p-calendar
+                                id="end_date"
+                                [(ngModel)]="endTime"
+                                [showIcon]="true"
+                                dateFormat="dd-mm-yy"
+                                [showTime]="true"
+                                [hourFormat]="12"
+                                [disabled]="true"
+                            ></p-calendar>
+                            <label for="end_date">Fecha y hora de fin</label>
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <span class="p-float-label">
+                            <input
+                                id="place"
+                                type="text"
+                                pInputText
+                                class="w-full"
+                                [(ngModel)]="
+                                    eventSelected.event._def.extendedProps
+                                        .event_detail.place
+                                "
+                                [disabled]="true"
+                            />
+                            <label for="place">Lugar</label>
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <span class="p-float-label">
+                            <input
+                                id="responsible"
+                                type="text"
+                                class="w-full"
+                                pInputText
+                                [(ngModel)]="
+                                    eventSelected.event._def.extendedProps
+                                        .event_detail.responsible
+                                "
+                                [disabled]="true"
+                            />
+                            <label for="responsible">Responsable</label>
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <p-multiSelect
+                            [options]="directedAtOptions"
+                            [(ngModel)]="directedAt"
+                            optionLabel="name"
+                            class="w-full"
+                            defaultLabel="Dirigido a"
+                            [disabled]="true"
+                        ></p-multiSelect>
+                    </div>
+                </div>
+                <p-divider />
+                <div>
+                    <h4>Salones</h4>
+                </div>
+                <div class="w-full">
+                    <p-accordion [multiple]="true">
+                        <p-accordionTab
+                            *ngFor="
+                                let room of eventSelected.event._def
+                                    .extendedProps.event_detail.rooms
+                            "
+                            [header]="'Sala ' + room.room_number"
+                        >
+                            <div class="grid">
+                                <div class="col-12 col-md-6">
+                                    <p>
+                                        <strong>Moderador:</strong>
+                                        <p-chip
+                                            [label]="
+                                                room.moderator.name +
+                                                ' ' +
+                                                room.moderator.surnames
+                                            "
+                                            class="ml-3"
+                                        ></p-chip>
+                                    </p>
+                                </div>
+                                <div class="col-3">
+                                    <p>
+                                        <strong>Hora de inicio:</strong>
+                                        <br>
+                                        <i class="pi pi-clock"></i>
+                                        {{ room.start_time }}
+                                    </p>
+                                </div>
+                                <div class="col-3">
+                                    <p>
+                                        <strong>Hora de fin:</strong>
+                                        <br>
+                                        <i class="pi pi-clock"></i>
+                                        {{ room.end_time }}
+                                    </p>
+                                </div>
+
+                                <div class="col-12">
+                                    <strong>Descripción:</strong>
+                                    <textarea
+                                        [(ngModel)]="room.description"
+                                        id="description"
+                                        pInputTextarea
+                                        [disabled]="true"
+                                    ></textarea>
+
+                                    <!-- <p><strong>Fecha de registro:</strong> {{ room.created_at }}</p> -->
+                                </div>
+                            </div>
+
+                            <p-table [value]="room.topics" [responsive]="true">
+                                <ng-template pTemplate="header">
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Hora de inicio</th>
+                                        <th>Hora de fin</th>
+                                        <th>Autor(es)</th>
+                                    </tr>
+                                </ng-template>
+                                <ng-template pTemplate="body" let-topic>
+                                    <tr>
+                                        <td>{{ topic.title }}</td>
+                                        <td>{{ topic.start_time }}</td>
+                                        <td>{{ topic.end_time }}</td>
+                                        <td>
+                                            <p-chip
+                                                *ngFor="
+                                                    let author of topic.authors
+                                                "
+                                                [label]="
+                                                    author.name +
+                                                    ' ' +
+                                                    author.surnames
+                                                "
+                                                class="p-mr-2"
+                                            ></p-chip>
+                                        </td>
+                                    </tr>
+                                </ng-template>
+                            </p-table>
+                        </p-accordionTab>
+                    </p-accordion>
+                </div>
+            </div>
+
+            <form *ngIf="edition" [formGroup]="eventForm" class="p-fluid">
+                <div class="grid p-formgrid mt-1">
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <textarea
+                                rows="2"
+                                cols="30"
+                                pInputTextarea
+                                class="w-full font-bold text-color"
+                                style="text-align: center; font-size: 17.5px"
+                                formControlName="name_event"
+                            >
+                            </textarea>
+                            <label for="description">Título del evento</label>
+                        </span>
+                    </div>
+                    <div class="col-12">
+                        <span class="p-float-label">
+                            <textarea
+                                id="description"
+                                pInputTextarea
+                                formControlName="description"
+                            ></textarea>
+                            <label for="description"
+                                >Descripción del evento</label
+                            >
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <span class="p-float-label">
+                            <p-calendar
+                                id="start_date"
+                                formControlName="start_date"
+                                [showIcon]="true"
+                                dateFormat="dd-mm-yy"
+                                [showTime]="true"
+                                [hourFormat]="12"
+                            ></p-calendar>
+                            <label for="start_date"
+                                >Fecha y hora de inicio</label
+                            >
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <span class="p-float-label">
+                            <p-calendar
+                                id="end_date"
+                                formControlName="end_date"
+                                [showIcon]="true"
+                                dateFormat="dd-mm-yy"
+                                [showTime]="true"
+                                [hourFormat]="12"
+                            ></p-calendar>
+                            <label for="end_date">Fecha y hora de fin</label>
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <span class="p-float-label">
+                            <input
+                                id="place"
+                                type="text"
+                                pInputText
+                                class="w-full"
+                                formControlName="place"
+                            />
+                            <label for="place">Lugar</label>
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <span class="p-float-label">
+                            <input
+                                id="responsible"
+                                type="text"
+                                class="w-full"
+                                pInputText
+                                formControlName="responsible"
+                            />
+                            <label for="responsible">Responsable</label>
+                        </span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <p-multiSelect
+                            [options]="directedAtOptions"
+                            formControlName="directed_at"
+                            optionLabel="name"
+                            class="w-full"
+                            defaultLabel="Dirigido a"
+                        ></p-multiSelect>
+                    </div>
+                </div>
+                <p-divider />
+                <div formArrayName="rooms">
+                    <div class="col-12 d-flex">
+                        <div>
+                            <h4>Salones</h4>
+                        </div>
+                        <div class="ml-auto">
+                            <button
+                                pButton
+                                type="button"
+                                label="agregar salón"
+                                (click)="addRoom()"
+                                class="p-button-secondary"
+                            ></button>
+                        </div>
+                    </div>
+                    <div
+                        *ngFor="let room of rooms.controls; let i = index"
+                        [formGroupName]="i"
+                        class="p-mt-3"
+                    >
+                        <p-fieldset>
+                            <ng-template pTemplate="header">
+                                Salón nro {{ i + 1 }}
+                                <button
+                                    pButton
+                                    type="button"
+                                    icon="pi pi-trash"
+                                    (click)="removeRoom(i)"
+                                    class="p-button-danger p-button-text"
+                                ></button>
+                            </ng-template>
+                            <div class="grid p-formgrid">
+                                <div class="col-12 col-md-8">
+                                    <span class="p-float-label">
+                                        <p-autoComplete
+                                            formControlName="moderator"
+                                            [suggestions]="filteredModerator"
+                                            (completeMethod)="
+                                                searchModerator($event)
+                                            "
+                                            [dropdown]="true"
+                                            [forceSelection]="true"
+                                            field="name"
+                                            [dataKey]="'id'"
+                                            placeholder="Seleccionar un moderador"
+                                        >
+                                            <ng-template
+                                                let-item
+                                                pTemplate="item"
+                                            >
+                                                {{ item.name }}
+                                                {{ item.surnames }} ({{
+                                                    item.email
+                                                }})
+                                            </ng-template>
+                                        </p-autoComplete>
+                                        <label for="moderator_id_{{ i }}"
+                                            >Moderador del salón</label
+                                        >
+                                    </span>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <span class="p-float-label">
+                                        <input
+                                            id="room_number_{{ i }}"
+                                            type="text"
+                                            pInputText
+                                            class="w-full"
+                                            formControlName="room_number"
+                                        />
+                                        <label for="room_number_{{ i }}"
+                                            >Room Number</label
+                                        >
+                                    </span>
+                                </div>
+                                <div class="col-12">
+                                    <span class="p-float-label">
+                                        <textarea
+                                            id="description_{{ i }}"
+                                            pInputTextarea
+                                            formControlName="description"
+                                        ></textarea>
+                                        <label for="description_{{ i }}"
+                                            >Descripción del tema</label
+                                        >
+                                    </span>
+                                </div>
+                                <div class="p-col-12 p-md-6">
+                                    <span class="p-float-label">
+                                        <p-calendar
+                                            id="start_time_{{ i }}"
+                                            formControlName="start_time"
+                                            [timeOnly]="true"
+                                            [hourFormat]="12"
+                                        ></p-calendar>
+                                        <label for="start_time_{{ i }}"
+                                            >Hora de inicio</label
+                                        >
+                                    </span>
+                                </div>
+                                <div class="p-col-12 p-md-6">
+                                    <span class="p-float-label">
+                                        <p-calendar
+                                            id="end_time_{{ i }}"
+                                            formControlName="end_time"
+                                            [timeOnly]="true"
+                                            [hourFormat]="12"
+                                        ></p-calendar>
+                                        <label for="end_time_{{ i }}"
+                                            >Hora de fin</label
+                                        >
+                                    </span>
+                                </div>
+                            </div>
+                            <p-divider />
+                            <div formArrayName="topics">
+                                <div class="w-full d-flex">
+                                    <div>
+                                        <h4>Temas a tratar</h4>
+                                    </div>
+                                    <div class="ml-auto">
+                                        <button
+                                            pButton
+                                            type="button"
+                                            label="agregar tema"
+                                            (click)="addTopic(room)"
+                                            class="p-button-secondary"
+                                        ></button>
+                                    </div>
+                                </div>
+
+                                <div
+                                    *ngFor="
+                                        let topic of getTopics(room).controls;
+                                        let j = index
+                                    "
+                                    [formGroupName]="j"
+                                    class="mt-3"
+                                >
+                                    <p-panel [toggleable]="true">
+                                        <ng-template pTemplate="header">
+                                            Tema {{ j + 1 }}
+                                            <button
+                                                pButton
+                                                type="button"
+                                                icon="pi pi-trash"
+                                                (click)="removeTopic(room, j)"
+                                                class="p-button-danger p-button-text"
+                                            ></button>
+                                        </ng-template>
+                                        <div class="grid p-formgrid">
+                                            <div class="col-12 mt-2">
+                                                <span class="p-float-label">
+                                                    <p-autoComplete
+                                                        formControlName="title"
+                                                        [suggestions]="
+                                                            filteredTopics
+                                                        "
+                                                        (completeMethod)="
+                                                            searchTopics($event)
+                                                        "
+                                                        [dropdown]="true"
+                                                        [forceSelection]="true"
+                                                        field="title"
+                                                        [dataKey]="'title'"
+                                                        [inputStyle]="{
+                                                            width: '100%'
+                                                        }"
+                                                        [style]="{
+                                                            width: '100%'
+                                                        }"
+                                                        placeholder="Selecciona un tema"
+                                                    >
+                                                    </p-autoComplete>
+                                                    <label
+                                                        for="title_{{ i }}_{{
+                                                            j
+                                                        }}"
+                                                        >Tema a tratar</label
+                                                    >
+                                                </span>
+                                            </div>
+                                            <div class="col-12 col-md-4">
+                                                <span class="p-float-label">
+                                                    <p-calendar
+                                                        id="start_time_{{
+                                                            i
+                                                        }}_{{ j }}"
+                                                        formControlName="start_time"
+                                                        [timeOnly]="true"
+                                                        [hourFormat]="12"
+                                                    ></p-calendar>
+                                                    <label
+                                                        for="start_time_{{
+                                                            i
+                                                        }}_{{ j }}"
+                                                        >Hora de inicio</label
+                                                    >
+                                                </span>
+                                            </div>
+                                            <div class="col-12 col-md-4">
+                                                <span class="p-float-label">
+                                                    <p-calendar
+                                                        id="end_time_{{ i }}_{{
+                                                            j
+                                                        }}"
+                                                        formControlName="end_time"
+                                                        [timeOnly]="true"
+                                                        [hourFormat]="12"
+                                                    ></p-calendar>
+                                                    <label
+                                                        for="end_time_{{ i }}_{{
+                                                            j
+                                                        }}"
+                                                        >Hora de fin</label
+                                                    >
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </p-panel>
+                                </div>
+                            </div>
+                        </p-fieldset>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 <p-dialog
-    header="Detalle del Evento"
+    header="Registrar nuevo evento"
     [style]="{ width: '100rem', height: '100rem' }"
     [(visible)]="newEventDialog"
     [modal]="true"
     [closable]="true"
 >
     <form [formGroup]="eventForm" (ngSubmit)="onSubmit()" class="p-fluid">
-        <div class="p-grid p-formgrid">
-            <div class="p-col-12 p-md-6">
+        <div class="grid p-formgrid mt-1">
+            <div class="col-12">
                 <span class="p-float-label">
-                    <input
-                        id="name_event"
-                        type="text"
-                        pInputText
+                    <textarea
+                        rows="2"
+                        cols="30"
+                        pInputTextarea
+                        class="w-full font-bold text-color"
+                        style="text-align: center; font-size: 17.5px"
                         formControlName="name_event"
-                    />
-                    <label for="name_event">Event Name</label>
+                    >
+                    </textarea>
+                    <label for="description">Título del evento</label>
                 </span>
             </div>
-            <div class="p-col-12 p-md-6">
+            <div class="col-12">
                 <span class="p-float-label">
                     <textarea
                         id="description"
                         pInputTextarea
                         formControlName="description"
                     ></textarea>
-                    <label for="description">Description</label>
+                    <label for="description">Descripción del evento</label>
                 </span>
             </div>
-            <div class="p-col-12 p-md-6">
+            <div class="col-12 col-md-4">
                 <span class="p-float-label">
                     <p-calendar
                         id="start_date"
@@ -73,10 +636,10 @@
                         [showTime]="true"
                         [hourFormat]="12"
                     ></p-calendar>
-                    <label for="start_date">Start Date</label>
+                    <label for="start_date">Fecha y hora de inicio</label>
                 </span>
             </div>
-            <div class="p-col-12 p-md-6">
+            <div class="col-12 col-md-4">
                 <span class="p-float-label">
                     <p-calendar
                         id="end_date"
@@ -86,18 +649,19 @@
                         [showTime]="true"
                         [hourFormat]="12"
                     ></p-calendar>
-                    <label for="end_date">End Date</label>
+                    <label for="end_date">Fecha y hora de fin</label>
                 </span>
             </div>
-            <div class="p-col-12 p-md-6">
+            <div class="col-12 col-md-4">
                 <span class="p-float-label">
                     <input
                         id="place"
                         type="text"
                         pInputText
+                        class="w-full"
                         formControlName="place"
                     />
-                    <label for="place">Place</label>
+                    <label for="place">Lugar</label>
                 </span>
             </div>
             <!-- <div class="p-col-12 p-md-6">
@@ -110,36 +674,44 @@
                     <label for="hour">Hour</label>
                 </span>
             </div> -->
-            <div class="p-col-12 p-md-6">
-                <p-multiSelect
-                    [options]="directedAtOptions"
-                    formControlName="directed_at"
-                    optionLabel="name"
-                    defaultLabel="Select directed at"
-                ></p-multiSelect>
-            </div>
-            <div class="p-col-12 p-md-6">
+            <div class="col-12 col-md-6">
                 <span class="p-float-label">
                     <input
                         id="responsible"
                         type="text"
+                        class="w-full"
                         pInputText
                         formControlName="responsible"
                     />
-                    <label for="responsible">Responsible</label>
+                    <label for="responsible">Responsable</label>
                 </span>
             </div>
+            <div class="col-12 col-md-6">
+                <p-multiSelect
+                    [options]="directedAtOptions"
+                    formControlName="directed_at"
+                    optionLabel="name"
+                    class="w-full"
+                    defaultLabel="Dirigido a"
+                ></p-multiSelect>
+            </div>
         </div>
-
+        <p-divider />
         <div formArrayName="rooms">
-            <h3>Rooms</h3>
-            <button
-                pButton
-                type="button"
-                label="Add Room"
-                (click)="addRoom()"
-                class="p-button-secondary"
-            ></button>
+            <div class="col-12 d-flex">
+                <div>
+                    <h4>Salones</h4>
+                </div>
+                <div class="ml-auto">
+                    <button
+                        pButton
+                        type="button"
+                        label="agregar salón"
+                        (click)="addRoom()"
+                        class="p-button-secondary"
+                    ></button>
+                </div>
+            </div>
             <div
                 *ngFor="let room of rooms.controls; let i = index"
                 [formGroupName]="i"
@@ -147,7 +719,7 @@
             >
                 <p-fieldset>
                     <ng-template pTemplate="header">
-                        Room {{ i + 1 }}
+                        Salón nro {{ i + 1 }}
                         <button
                             pButton
                             type="button"
@@ -156,8 +728,8 @@
                             class="p-button-danger p-button-text"
                         ></button>
                     </ng-template>
-                    <div class="p-grid p-formgrid">
-                        <div class="p-col-12 p-md-6">
+                    <div class="grid p-formgrid">
+                        <div class="col-12 col-md-8">
                             <span class="p-float-label">
                                 <p-autoComplete
                                     formControlName="moderator_id"
@@ -167,8 +739,6 @@
                                     [forceSelection]="true"
                                     field="name"
                                     [dataKey]="'id'"
-                                    [inputStyle]="{ width: '100%' }"
-                                    [style]="{ width: '100%' }"
                                     placeholder="Seleccionar un moderador"
                                 >
                                     <ng-template let-item pTemplate="item">
@@ -178,20 +748,33 @@
                                     </ng-template>
                                 </p-autoComplete>
                                 <label for="moderator_id_{{ i }}"
-                                    >Moderator</label
+                                    >Moderador del salón</label
                                 >
                             </span>
                         </div>
-                        <div class="p-col-12 p-md-6">
+                        <div class="col-12 col-md-4">
                             <span class="p-float-label">
                                 <input
                                     id="room_number_{{ i }}"
                                     type="text"
                                     pInputText
+                                    class="w-full"
                                     formControlName="room_number"
                                 />
                                 <label for="room_number_{{ i }}"
                                     >Room Number</label
+                                >
+                            </span>
+                        </div>
+                        <div class="col-12">
+                            <span class="p-float-label">
+                                <textarea
+                                    id="description_{{ i }}"
+                                    pInputTextarea
+                                    formControlName="description"
+                                ></textarea>
+                                <label for="description_{{ i }}"
+                                    >Descripción del tema</label
                                 >
                             </span>
                         </div>
@@ -201,9 +784,10 @@
                                     id="start_time_{{ i }}"
                                     formControlName="start_time"
                                     [timeOnly]="true"
+                                    [hourFormat]="12"
                                 ></p-calendar>
                                 <label for="start_time_{{ i }}"
-                                    >Start Time</label
+                                    >Hora de inicio</label
                                 >
                             </span>
                         </div>
@@ -213,44 +797,42 @@
                                     id="end_time_{{ i }}"
                                     formControlName="end_time"
                                     [timeOnly]="true"
+                                    [hourFormat]="12"
                                 ></p-calendar>
-                                <label for="end_time_{{ i }}">End Time</label>
-                            </span>
-                        </div>
-                        <div class="p-col-12">
-                            <span class="p-float-label">
-                                <textarea
-                                    id="description_{{ i }}"
-                                    pInputTextarea
-                                    formControlName="description"
-                                ></textarea>
-                                <label for="description_{{ i }}"
-                                    >Description</label
+                                <label for="end_time_{{ i }}"
+                                    >Hora de fin</label
                                 >
                             </span>
                         </div>
                     </div>
-
+                    <p-divider />
                     <div formArrayName="topics">
-                        <h4>Topics</h4>
-                        <button
-                            pButton
-                            type="button"
-                            label="Add Topic"
-                            (click)="addTopic(room)"
-                            class="p-button-secondary"
-                        ></button>
+                        <div class="w-full d-flex">
+                            <div>
+                                <h4>Temas a tratar</h4>
+                            </div>
+                            <div class="ml-auto">
+                                <button
+                                    pButton
+                                    type="button"
+                                    label="agregar tema"
+                                    (click)="addTopic(room)"
+                                    class="p-button-secondary"
+                                ></button>
+                            </div>
+                        </div>
+
                         <div
                             *ngFor="
                                 let topic of getTopics(room).controls;
                                 let j = index
                             "
                             [formGroupName]="j"
-                            class="p-mt-3"
+                            class="mt-3"
                         >
-                            <p-fieldset>
+                            <p-panel [toggleable]="true">
                                 <ng-template pTemplate="header">
-                                    Topic {{ j + 1 }}
+                                    Tema {{ j + 1 }}
                                     <button
                                         pButton
                                         type="button"
@@ -259,8 +841,8 @@
                                         class="p-button-danger p-button-text"
                                     ></button>
                                 </ng-template>
-                                <div class="p-grid p-formgrid">
-                                    <div class="p-col-12">
+                                <div class="grid p-formgrid">
+                                    <div class="col-12 mt-2">
                                         <span class="p-float-label">
                                             <p-autoComplete
                                                 formControlName="title"
@@ -274,164 +856,52 @@
                                                 [dataKey]="'title'"
                                                 [inputStyle]="{ width: '100%' }"
                                                 [style]="{ width: '100%' }"
-                                                placeholder="Select a title"
+                                                placeholder="Selecciona un tema"
                                             >
                                             </p-autoComplete>
                                             <label for="title_{{ i }}_{{ j }}"
-                                                >Title</label
+                                                >Tema a tratar</label
                                             >
                                         </span>
                                     </div>
-                                    <div class="p-col-12 p-md-6">
+                                    <div class="col-12 col-md-4">
                                         <span class="p-float-label">
                                             <p-calendar
                                                 id="start_time_{{ i }}_{{ j }}"
                                                 formControlName="start_time"
                                                 [timeOnly]="true"
+                                                [hourFormat]="12"
                                             ></p-calendar>
                                             <label
                                                 for="start_time_{{ i }}_{{ j }}"
-                                                >Start Time</label
+                                                >Hora de inicio</label
                                             >
                                         </span>
                                     </div>
-                                    <div class="p-col-12 p-md-6">
+                                    <div class="col-12 col-md-4">
                                         <span class="p-float-label">
                                             <p-calendar
                                                 id="end_time_{{ i }}_{{ j }}"
                                                 formControlName="end_time"
                                                 [timeOnly]="true"
+                                                [hourFormat]="12"
                                             ></p-calendar>
                                             <label
                                                 for="end_time_{{ i }}_{{ j }}"
-                                                >End Time</label
+                                                >Hora de fin</label
                                             >
                                         </span>
                                     </div>
                                 </div>
-                            </p-fieldset>
+                            </p-panel>
                         </div>
                     </div>
                 </p-fieldset>
             </div>
         </div>
 
-        <div class="p-mt-4">
-            <button pButton type="submit" label="Submit"></button>
+        <div class="mt-4">
+            <button pButton type="submit" label="Registrar evento"></button>
         </div>
     </form>
-</p-dialog>
-
-<p-dialog
-    header="Detalle del evento"
-    [style]="{ width: '100rem', height: '100rem' }"
-    [(visible)]="eventDetail"
-    [modal]="true"
-    [closable]="true"
->
-    <div *ngIf="eventSelected" class="p-grid">
-        <div class="p-col-12">
-            <p-card>
-                <ng-template pTemplate="header">
-                    <h2 class="p-text-center">
-                        {{ eventSelected.event._def.extendedProps.event_detail.name_event }}
-                    </h2>
-                </ng-template>
-                <div class="p-grid">
-                    <div class="p-col-12 p-md-6">
-                        <p>
-                            <strong>Descripción:</strong>
-                            {{ eventSelected.event._def.extendedProps.event_detail.description }}
-                        </p>
-                        <p>
-                            <strong>Fecha:</strong>
-                            {{ eventSelected.event._def.extendedProps.event_detail.start_date }} -
-                            {{ eventSelected.event._def.extendedProps.event_detail.end_date }}
-                        </p>
-                        <p><strong>Hora:</strong> {{ eventSelected.event._def.extendedProps.event_detail.start_time }} - 
-                        {{  eventSelected.event._def.extendedProps.event_detail.end_time }}</p>
-                        <p><strong>Lugar:</strong> {{ eventSelected.event._def.extendedProps.event_detail.place }}</p>
-                    </div>
-                    <div class="p-col-12 p-md-6">
-                        <p>
-                            <strong>Dirigido a:</strong>
-                            {{ eventSelected.event._def.extendedProps.event_detail.directed_at }}
-                        </p>
-                        <p>
-                            <strong>Responsable:</strong>
-                            {{ eventSelected.event._def.extendedProps.event_detail.responsible }}
-                        </p>
-                        <p>
-                            <strong>Fecha de registro:</strong>
-                            {{ eventSelected.event._def.extendedProps.event_detail.created_at }}
-                        </p>
-                    </div>
-                </div>
-            </p-card>
-        </div>
-
-        <div class="p-col-12">
-            <p-accordion [multiple]="true">
-                <p-accordionTab
-                    *ngFor="let room of eventSelected.event._def.extendedProps.event_detail.rooms"
-                    [header]="'Sala ' + room.room_number"
-                >
-                    <div class="p-grid">
-                        <div class="p-col-12 p-md-6">
-                            <p>
-                                <strong>Moderador:</strong>
-                                {{
-                                    room.moderator.name +
-                                        " " +
-                                        room.moderator.surnames
-                                }}
-                            </p>
-                            <p>
-                                <strong>Hora de inicio:</strong>
-                                {{ room.start_time }}
-                            </p>
-                            <p>
-                                <strong>Hora de fin:</strong>
-                                {{ room.end_time }}
-                            </p>
-                        </div>
-                        <div class="p-col-12 p-md-6">
-                            <p>
-                                <strong>Descripción:</strong>
-                                {{ room.description }}
-                            </p>
-                            <!-- <p><strong>Fecha de registro:</strong> {{ room.created_at }}</p> -->
-                        </div>
-                    </div>
-
-                    <p-table [value]="room.topics" [responsive]="true">
-                        <ng-template pTemplate="header">
-                            <tr>
-                                <th>Título</th>
-                                <th>Hora de inicio</th>
-                                <th>Hora de fin</th>
-                                <th>Autor(es)</th>
-                            </tr>
-                        </ng-template>
-                        <ng-template pTemplate="body" let-topic>
-                            <tr>
-                                <td>{{ topic.title }}</td>
-                                <td>{{ topic.start_time }}</td>
-                                <td>{{ topic.end_time }}</td>
-                                <td>
-                                    <p-chip
-                                        *ngFor="let author of topic.authors"
-                                        [label]="
-                                            author.name + ' ' + author.surnames
-                                        "
-                                        class="p-mr-2"
-                                    ></p-chip>
-                                </td>
-                            </tr>
-                        </ng-template>
-                    </p-table>
-                </p-accordionTab>
-            </p-accordion>
-        </div>
-    </div>
 </p-dialog>

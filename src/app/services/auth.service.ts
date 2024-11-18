@@ -389,4 +389,16 @@ export class AuthService {
     return this.http.delete(`${this.API_URL}/users/${userId}`, this.header);
   }
 
+  postAddEvent(request: any) {
+    return this.http.post(`${this.API_URL}/event`, request, this.header);
+  }
+
+  putEventUpdate(request: any, eventId: string) {
+    return this.http.put(`${this.API_URL}/event/${eventId}`, request, this.header);
+  }
+
+  getEventById(eventId: string) {
+    return this.http.get(`${this.API_URL}/event/${eventId}`, this.header);
+  }
+
 }

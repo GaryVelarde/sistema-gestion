@@ -50,6 +50,7 @@ $breakpoint-lg: 992px;
 @media (min-width: $breakpoint-md) {
   .col-md-12 { @include make-col(12); }
   .col-md-9  { @include make-col(9); }
+  .col-md-8  { @include make-col(8); }
   .col-md-6  { @include make-col(6); }
   .col-md-4  { @include make-col(4); }
   .col-md-3  { @include make-col(3); }

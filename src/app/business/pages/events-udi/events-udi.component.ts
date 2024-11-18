@@ -862,7 +862,6 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         return otherList && otherList.some((otherUser: any) => otherUser.id === user.id);
     }
 
-
     formatText(text: string): string {
         return text.replace(/\n/g, '<br>');
     }
