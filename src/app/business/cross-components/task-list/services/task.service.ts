@@ -52,7 +52,7 @@ export class TaskService {
     }
 
     putAdvisoryUpdateStatusTask(eventId: string, taskId: string, request: any) {
-        return this.http.put(`${this.API_URL}/advisory/${eventId}/tasks/${taskId}/status`, request, this.header);
+        return this.http.put(`${this.API_URL}/advisory/${eventId}/tasks/${taskId}`, request, this.header);
     }
 
 }

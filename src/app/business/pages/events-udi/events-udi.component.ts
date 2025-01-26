@@ -733,7 +733,7 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
                         life: 3000,
                     });
                 })
-
+                return;
         }
         this.service.addTask(this.eventSelected.event._def.extendedProps.event_udi.id, request).pipe(takeUntil(this.destroy$))
             .subscribe(
@@ -747,11 +747,8 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
                             user: this.assignedUser.value
                             //user_name: this.assignedUser.value.fullName
                         };
-
-                        if (!this.isTaskInPending(res.id)) {
-                            this.pendingTasks = [...this.pendingTasks, newTask];
-                            this.taskForm.reset();
-                        }
+                        this.pendingTasks = [...this.pendingTasks, newTask];
+                        this.taskForm.reset();
                         this.statusTask = 'complete';
 
                     }
@@ -968,13 +965,14 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
 
     saveEdition() {
         this.chargingEdition = true;
+        console.log('this.endEdit.value', this.endEdit.value)
         const request = {
             title: this.titleEdit.value,
             description: this.descriptionEdit.value,
             managers_ids: this.extractIds(this.usersManagerEdit.value),
             users_ids: this.extractIds(this.usersParticipantsEdit.value),
-            start_date: this.dateFormatService.formatDateCalendarToBack(this.startEdit.value),
-            due_date: this.dateFormatService.formatDateCalendarToBack(this.endEdit.value),
+            start_date: this.formatDate(this.startEdit.value),
+            due_date: this.formatDate(this.endEdit.value),
             color: this.colorEdit.value.code,
             meeting_url: this.eventLinkEdit.value
         }
@@ -1006,8 +1004,50 @@ export class EventsUdiComponent implements OnInit, AfterViewInit, OnDestroy, OnC
         this.eventSelected.event._def.extendedProps.event_udi.description = this.descriptionEdit.value;
         this.eventSelected.event._def.extendedProps.event_udi.color = this.colorEdit.value.code;
         this.eventSelected.event._def.extendedProps.event_udi.meeting_url = this.eventLinkEdit.value;
+        const start = this.formatDate(this.startEdit.value);
+        const end = this.formatDate(this.endEdit.value);
+        this.eventSelected.event._def.extendedProps.event_udi.start_date = start;
+        this.eventSelected.event._def.extendedProps.event_udi.due_date = end;
+
     }
 
+    formatDate(dateString: string): string {
+        let date: Date;
+      
+        // Verificar si la fecha está en formato "dd-MM-yyyy hh:mm am/pm"
+        const customFormatRegex = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2} (am|pm)$/i;
+        if (customFormatRegex.test(dateString)) {
+          // Convertir el formato personalizado a un objeto Date
+          const [datePart, timePart] = dateString.split(' ');
+          const [day, month, year] = datePart.split('-').map(Number);
+          let [hours, minutes] = timePart.slice(0, 5).split(':').map(Number);
+          const period = timePart.slice(6).toLowerCase();
+      
+          // Ajustar las horas según el periodo am/pm
+          if (period === 'pm' && hours < 12) {
+            hours += 12;
+          } else if (period === 'am' && hours === 12) {
+            hours = 0;
+          }
+      
+          date = new Date(year, month - 1, day, hours, minutes);
+        } else {
+          // Asumir que el formato es válido para el constructor de Date
+          date = new Date(dateString);
+        }
+      
+        // Formatear la fecha usando horas locales en formato de 24 horas
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        const seconds = String(date.getSeconds()).padStart(2, '0');
+      
+        return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+      }
+      
+      
     goToCancelation() {
         const request = {
             status: 'Finalizado'

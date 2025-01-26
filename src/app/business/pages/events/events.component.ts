@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit, AfterViewInit, ElementRef, Renderer2, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, ViewChild, OnInit, AfterViewInit, ElementRef, Renderer2, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import { FullCalendarComponent } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -15,7 +15,7 @@ import {
 import { MenuItem, MessageService, PrimeNGConfig } from 'primeng/api';
 import { DateFormatService } from 'src/app/services/date-format.service';
 import { AuthService } from 'src/app/services/auth.service';
-import { DatePipe } from '@angular/common';
+import { DatePipe, formatDate } from '@angular/common';
 
 @Component({
   selector: 'app-events',
@@ -23,7 +23,7 @@ import { DatePipe } from '@angular/common';
   styleUrls: ['./events.component.scss'],
   providers: [MessageService, DatePipe]
 })
-export class EventsComponent implements OnInit, AfterViewInit {
+export class EventsComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('calendar') calendarComponent: FullCalendarComponent;
   @ViewChild('cardBody') cardBody!: ElementRef;
   resizeObserver!: ResizeObserver;
@@ -162,6 +162,10 @@ export class EventsComponent implements OnInit, AfterViewInit {
     });
   }
 
+  ngOnDestroy(): void {
+    this.clearForms();
+  }
+
   ngOnInit() {
     this.callGetTitlesEvents();
     this.callGetUdiAndTeachersList();
@@ -222,6 +226,7 @@ export class EventsComponent implements OnInit, AfterViewInit {
   }
 
   handleDateClick(arg) {
+    this.clearForms();
     const dateInfo = this.dateFormatService.formatDateWithEndTime(arg.dateStr);
     if (dateInfo.start === "00:00") {
       dateInfo.start = "07:00 AM"
@@ -231,6 +236,7 @@ export class EventsComponent implements OnInit, AfterViewInit {
     this.end.setValue(dateInfo.day + ' ' + dateInfo.end);
     this.color.setValue('#ff0000');
     this.newEventDialog = true;
+    
   }
 
   handleDetailDateClick(arg) {
@@ -242,11 +248,10 @@ export class EventsComponent implements OnInit, AfterViewInit {
   }
 
   handleEventClick(arg) {
-    console.log('eventSelected', arg.event._def.extendedProps.event_detail);
     this.eventSelected = arg;
     this.eventDetail = true;
-    this.startTime = arg.event._def.extendedProps.event_detail.start_date + ' ' + arg.event._def.extendedProps.event_detail.start_time;
-    this.endTime = arg.event._def.extendedProps.event_detail.end_date + ' ' + arg.event._def.extendedProps.event_detail.end_time;
+    this.startTime = arg.event._def.extendedProps.event_detail.start_date + ' ' + this.formatTimeTo12Hour(arg.event._def.extendedProps.event_detail.start_time);
+    this.endTime = arg.event._def.extendedProps.event_detail.end_date + ' ' + this.formatTimeTo12Hour(arg.event._def.extendedProps.event_detail.end_time);
     this.directedAt = this.parseCommaSeparatedString(arg.event._def.extendedProps.event_detail.directed_at)
   }
 
@@ -282,28 +287,32 @@ export class EventsComponent implements OnInit, AfterViewInit {
 
     formValue.directed_at = this.getCodes(formValue.directed_at);
 
-    formValue.start_time = this.formatTimeForBackend(formValue.start_date);
-    formValue.end_time = this.formatTimeForBackend(formValue.end_date);
+    const startHours = this.getHourFromDatetime(formValue.start_date);
+    const endHours = this.getHourFromDatetime(formValue.end_date);
 
-    formValue.start_date = this.formatDateToDDMMYYYY(formValue.start_date);
-    formValue.end_date = this.formatDateToDDMMYYYY(formValue.end_date);
+    formValue.start_time = startHours;
+    formValue.end_time = endHours;
+
+    console.log('formValue.start_date', formValue.start_date)
+    console.log('formValue.end_date', formValue.end_date)
+
+    formValue.start_date = this.formatToDateString(formValue.start_date);;
+    formValue.end_date = this.formatToDateString(formValue.end_date);
 
 
     formValue.rooms = formValue.rooms.map((room: any) => ({
       ...room,
       moderator_id: room.moderator.id,
-      end_time: this.formatTimeForBackend(room.end_time),
-      start_time: this.formatTimeForBackend(room.start_time),
+      end_time: this.getHourFromSpecificFormats(room.end_time),
+      start_time: this.getHourFromSpecificFormats(room.start_time),
       topics: room.topics.map((topic: any) => ({
         ...topic,
-        start_time: this.formatTimeForBackend(topic.start_time),
-        end_time: this.formatTimeForBackend(topic.end_time),
+        start_time: this.getHourFromSpecificFormats(topic.start_time),
+        end_time: this.getHourFromSpecificFormats(topic.end_time),
         title: topic.title.title ? topic.title.title : topic.title,
         authors: this.extractIdsWhitId(topic.authors.length ? topic.authors : topic.title.authors)
       }))
     }));
-
-    console.log('formValue', formValue)
 
     this.service.putEventUpdate(formValue, this.eventSelected.event._def.extendedProps.event_detail.id).
       pipe().
@@ -332,6 +341,91 @@ export class EventsComponent implements OnInit, AfterViewInit {
         })
   }
 
+  formatToDateString(dateInput: string): string {
+    let date: Date;
+  
+    if (dateInput.toString().includes('GMT')) {
+      date = new Date(dateInput);
+    } else {
+      const [datePart, timePart] = dateInput.split(' ');
+      const [day, month, year] = datePart.split('-').map(Number);
+  
+      const [time, period] = timePart.split(' ');
+      let [hours, minutes] = time.split(':').map(Number);
+      if (period === 'pm' && hours < 12) {
+        hours += 12;
+      } else if (period === 'am' && hours === 12) {
+        hours = 0;
+      }
+  
+      date = new Date(year, month - 1, day, hours, minutes);
+    }
+  
+    return formatDate(date, 'dd-MM-yyyy', 'en-US');
+  }
+
+  getHourFromDatetime(datetime: string): string {
+    console.log('datetime', datetime)
+    let time: string;
+  
+    // Verificar si el formato incluye "GMT"
+    if (datetime.toString().includes("GMT")) {
+      // Convertir a un objeto Date para extraer la hora
+      const dateObj = new Date(datetime);
+      if (isNaN(dateObj.getTime())) {
+        throw new Error("Formato de fecha inválido");
+      }
+      // Formatear la hora como hh:mm
+      const hours = dateObj.getHours().toString().padStart(2, "0");
+      const minutes = dateObj.getMinutes().toString().padStart(2, "0");
+      time = `${hours}:${minutes}`;
+    } else {
+      // Separar la fecha y la hora por el espacio para el otro formato
+      const parts = datetime.split(" ");
+      if (parts.length < 2) {
+        throw new Error("Formato de fecha inválido");
+      }
+      const fullTime = parts[1];
+      const [hour, minutes] = fullTime.split(":");
+      time = `${hour}:${minutes}`;
+    }
+  
+    return time;
+  }
+
+  getHourFromSpecificFormats(datetime: string): string {
+    let time: string;
+  
+    if (datetime.toString().includes("GMT")) {
+      // Formato con "GMT"
+      const dateObj = new Date(datetime);
+      if (isNaN(dateObj.getTime())) {
+        throw new Error("Formato de fecha inválido");
+      }
+      // Extraer la hora y minutos
+      const hours = dateObj.getHours().toString().padStart(2, "0");
+      const minutes = dateObj.getMinutes().toString().padStart(2, "0");
+      time = `${hours}:${minutes}`;
+    } else if (datetime.includes("pm") || datetime.includes("am")) {
+      // Formato con "am/pm"
+      const isPM = datetime.toLowerCase().includes("pm");
+      let [hour, minutes] = datetime.split(" ")[0].split(":").map(Number);
+  
+      if (isNaN(hour) || isNaN(minutes) || hour < 1 || hour > 12 || minutes < 0 || minutes > 59) {
+        throw new Error("Formato de hora inválido");
+      }
+  
+      // Convertir a formato de 24 horas
+      hour = isPM ? (hour === 12 ? 12 : hour + 12) : (hour === 12 ? 0 : hour);
+      time = `${hour.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+    } else {
+      throw new Error("Formato no soportado");
+    }
+  
+    return time;
+  }
+  
+  
   addEvent() {
     if (this.eventForm.valid) {
       const newEvent: EventInput = {
@@ -358,6 +452,7 @@ export class EventsComponent implements OnInit, AfterViewInit {
       (res: any) => {
         if (res.data) {
           for (let event of res.data) {
+            console.log(event.start_date + ' ' + event.start_time)
             const ev: EventInput = {
               title: event.name_event,
               start: this.convertToISOFormat(event.start_date + ' ' + event.start_time),
@@ -385,7 +480,6 @@ export class EventsComponent implements OnInit, AfterViewInit {
   }
 
   convertToISOFormat(dateString: string): string | null {
-    console.log('dateString', dateString)
     const [datePart, timePart] = dateString.split(" ");
     const [day, month, year] = datePart.split("-").map(Number);
 
@@ -460,7 +554,6 @@ export class EventsComponent implements OnInit, AfterViewInit {
       person.name.toLowerCase().includes(event.query.toLowerCase()) ||
       person.surnames.toLowerCase().includes(event.query.toLowerCase())
     );
-    console.log('this.filteredModerator', this.filteredModerator)
   }
 
   searchTopics(event: any) {
@@ -470,6 +563,7 @@ export class EventsComponent implements OnInit, AfterViewInit {
   }
 
   extractIds(arr: Array<{ author_id: string }>): { author_id: string }[] {
+    console.log('arr', arr)
     return arr.map(item => ({ author_id: item.author_id }));
   }
 
@@ -482,32 +576,32 @@ export class EventsComponent implements OnInit, AfterViewInit {
 
     formValue.directed_at = this.getCodes(formValue.directed_at);
 
-    formValue.start_time = this.formatTimeForBackend(formValue.start_date);
-    formValue.end_time = this.formatTimeForBackend(formValue.end_date);
+    formValue.start_time = this.formatDate(formValue.start_date, true);
+    formValue.end_time = this.formatDate(formValue.end_date, true);
 
     formValue.start_date = this.formatDateToDDMMYYYY(formValue.start_date);
     formValue.end_date = this.formatDateToDDMMYYYY(formValue.end_date);
-
+    console.log('formValue', formValue)
     formValue.rooms = formValue.rooms.map((room: any) => ({
       ...room,
       moderator_id: room.moderator_id.id,
-      end_time: this.formatTimeForBackend(room.end_time),
-      start_time: this.formatTimeForBackend(room.start_time),
+      end_time: this.formatDate(room.end_time, true),
+      start_time: this.formatDate(room.start_time, true),
       topics: room.topics.map((topic: any) => ({
         ...topic,
-        start_time: this.formatTimeForBackend(topic.start_time),
-        end_time: this.formatTimeForBackend(topic.end_time),
+        start_time: this.formatDate(topic.start_time, true),
+        end_time: this.formatDate(topic.end_time, true),
         title: topic.title.title,
         authors: this.extractIds(topic.title.authors)
       }))
     }));
 
-    console.log(formValue);
 
     this.service.postAddEvent(formValue).pipe().
       subscribe((res: any) => {
         if (res.status) {
           this.callGetEvents();
+          this.newEventDialog = false;
           this.messageService.add({
             key: 'tst',
             severity: 'info',
@@ -527,66 +621,38 @@ export class EventsComponent implements OnInit, AfterViewInit {
       })
   }
 
-  formatTimeForBackend(dateInput: Date | string): string | null {
-    console.log('dateInput', dateInput);
-    if (!dateInput) return null;
-
-    if (typeof dateInput === 'string') {
-        // Verifica si el formato es "HH:mm AM/PM"
-        const regex12HourFormat = /^\d{1,2}:\d{2} (AM|PM)$/;
-        if (regex12HourFormat.test(dateInput.trim())) {
-            return dateInput.trim();
-        }
-
-        // Verifica si el formato es "DD-MM-YYYY HH:mm AM/PM"
-        const regexDateWithTime = /^\d{2}-\d{2}-\d{4} \d{1,2}:\d{2} (AM|PM)$/;
-        if (regexDateWithTime.test(dateInput.trim())) {
-            // Convierte el string al objeto Date
-            const [datePart, timePart] = dateInput.split(' ');
-            const [day, month, year] = datePart.split('-').map(Number);
-            const [time, period] = timePart.split(' ');
-            const [hours, minutes] = time.split(':').map(Number);
-
-            let parsedHours = hours % 12;
-            if (period === 'PM') {
-                parsedHours += 12;
-            }
-
-            const parsedDate = new Date(year, month - 1, day, parsedHours, minutes);
-            if (isNaN(parsedDate.getTime())) {
-                console.error('Formato de fecha no válido:', dateInput);
-                return null;
-            }
-            dateInput = parsedDate;
-        } else {
-            // Intenta analizar cualquier otro formato estándar
-            const parsedDate = new Date(dateInput);
-            if (isNaN(parsedDate.getTime())) {
-                console.error('Formato de fecha no válido:', dateInput);
-                return null;
-            }
-            dateInput = parsedDate;
-        }
+  formatDate(dateString: string, onlyHour: boolean = false): string {
+    let date: Date;
+  
+    const customFormatRegex = /^\d{2}-\d{2}-\d{4} \d{2}:\d{2} (am|pm)$/i;
+    if (customFormatRegex.test(dateString)) {
+      const [datePart, timePart] = dateString.split(' ');
+      const [day, month, year] = datePart.split('-').map(Number);
+      let [hours, minutes] = timePart.slice(0, 5).split(':').map(Number);
+      const period = timePart.slice(6).toLowerCase();
+  
+      if (period === 'pm' && hours < 12) {
+        hours += 12;
+      } else if (period === 'am' && hours === 12) {
+        hours = 0;
+      }
+  
+      date = new Date(year, month - 1, day, hours, minutes);
+    } else {
+      date = new Date(dateString);
     }
-
-    if (dateInput instanceof Date) {
-        let hours = dateInput.getHours();
-        const minutes = dateInput.getMinutes();
-
-        const period = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12;
-
-        const formattedHours = String(hours).padStart(2, '0');
-        const formattedMinutes = String(minutes).padStart(2, '0');
-
-        return `${formattedHours}:${formattedMinutes} ${period}`;
-    }
-
-    return null;
-}
+  
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+  
+    return !onlyHour ? `${day}-${month}-${year} ${hours}:${minutes}:${seconds}` : `${hours}:${minutes}`;
+  }
 
   formatDateToDDMMYYYY(dateInput: string): string | null {
-    console.log('formatDateToDDMMYYYY', dateInput);
     if (!dateInput) return null;
 
     let date: Date;
@@ -648,18 +714,17 @@ export class EventsComponent implements OnInit, AfterViewInit {
   }
 
   addEventDataToForm(eventData: any) {
-    console.log('eventData', eventData)
     this.eventForm.reset();
     this.rooms.clear();
     this.eventForm.patchValue({
       id: eventData.id,
       name_event: eventData.name_event,
       description: eventData.description,
-      start_date: eventData.start_date + ' ' + eventData.start_time,
-      end_date: eventData.end_date + ' ' + eventData.end_time,
+      start_date: eventData.start_date + ' ' + this.formatTimeTo12Hour(eventData.start_time),
+      end_date: eventData.end_date + ' ' + this.formatTimeTo12Hour(eventData.end_time),
       place: eventData.place,
-      start_time: eventData.start_time,
-      end_time: eventData.end_time,
+      start_time: this.formatTimeTo12Hour(eventData.start_time),
+      end_time: this.formatTimeTo12Hour(eventData.end_time),
       directed_at: this.parseCommaSeparatedString(eventData.directed_at),
       responsible: eventData.responsible,
       created_at: eventData.created_at,
@@ -680,8 +745,8 @@ export class EventsComponent implements OnInit, AfterViewInit {
           cip: room.moderator.cip,
         }),
         room_number: room.room_number,
-        start_time: room.start_time,
-        end_time: room.end_time,
+        start_time: this.formatTimeTo12Hour(room.start_time),
+        end_time: this.formatTimeTo12Hour(room.end_time),
         description: room.description,
         created_at: room.created_at,
         topics: this.fb.array([]),
@@ -692,8 +757,8 @@ export class EventsComponent implements OnInit, AfterViewInit {
         const topicGroup = this.fb.group({
           id: topic.id,
           title: topic.title,
-          start_time: topic.start_time,
-          end_time: topic.end_time,
+          start_time: this.formatTimeTo12Hour(topic.start_time),
+          end_time: this.formatTimeTo12Hour(topic.end_time),
           authors: this.fb.array([]),
         });
 
@@ -728,37 +793,49 @@ export class EventsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  convertTo12HourFormat(time24: string): string {
-    const [hours, minutes] = time24.split(':').map(Number);
-
-    const period = hours >= 12 ? 'PM' : 'AM';
-
-    const hours12 = hours % 12 || 12;
-
-    return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
-  }
-
   callGetEventById() {
     this.service.getEventById(this.eventSelected.event._def.extendedProps.event_detail.id)
       .pipe()
       .subscribe((res: any) => {
         if (res) {
-          console.log('Antes:', this.eventSelected.event._def.extendedProps.event_detail);
-
-          // Crear una nueva referencia con las propiedades modificadas
           this.eventSelected.event._def.extendedProps = {
             ...this.eventSelected.event._def.extendedProps,
-            event_detail: res.data // Asignar la nueva información
+            event_detail: res.data
           };
           this.chargingEdition = false;
           this.edition = false;
-          this.startTime = this.eventSelected.event._def.extendedProps.event_detail.start_date + ' ' + this.eventSelected.event._def.extendedProps.event_detail.start_time;
-          this.endTime = this.eventSelected.event._def.extendedProps.event_detail.end_date + ' ' + this.eventSelected.event._def.extendedProps.event_detail.end_time;
-          console.log('Después:', this.eventSelected.event._def.extendedProps.event_detail);
+          this.startTime = this.eventSelected.event._def.extendedProps.event_detail.start_date + ' ' + this.formatTimeTo12Hour(this.eventSelected.event._def.extendedProps.event_detail.start_time);
+          this.endTime = this.eventSelected.event._def.extendedProps.event_detail.end_date + ' ' + this.formatTimeTo12Hour(this.eventSelected.event._def.extendedProps.event_detail.end_time);
         }
       }, () => {
         console.error('Error al obtener el evento');
       });
   }
 
+  formatTimeTo12Hour(time: string): string {
+    const [hours, minutes] = time.split(":").map(Number);
+  
+    if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+      throw new Error("Formato de hora inválido");
+    }
+  
+    const period = hours >= 12 ? "pm" : "am";
+    const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+
+    console.log('`${formattedHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${period}`', `${formattedHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${period}`)
+  
+    return `${formattedHours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")} ${period}`;
+  }
+  
+
+  clearForms() {
+    this.eventForm.reset();
+    this.rooms.clear();
+  }
+
+  showNewEventDialog() {
+    this.clearForms();
+    this.newEventDialog = true; 
+  }
+  
 }

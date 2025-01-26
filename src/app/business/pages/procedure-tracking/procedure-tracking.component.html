@@ -207,7 +207,7 @@
                         class="mr-3"
                         iconPos="right"
                         icon="pi pi-chevron-right"
-                        (click)="statusUpdate('Pendiente')"
+                        (click)="statusUpdate('En proceso')"
                     />
                     <p-button
                         *ngIf="procedureState === 'En proceso'"
@@ -216,7 +216,7 @@
                         class="mr-3"
                         iconPos="left"
                         icon="pi pi-chevron-left"
-                        (click)="statusUpdate('En desarrollo')"
+                        (click)="statusUpdate('Pendiente')"
                     />
                     <p-button
                         *ngIf="procedureState === 'En proceso'"
@@ -225,7 +225,7 @@
                         class="mr-3"
                         iconPos="right"
                         icon="pi pi-chevron-right"
-                        (click)="statusUpdate('Enviado a revista')"
+                        (click)="statusUpdate('Terminado')"
                     />
                 </div>
             </div>

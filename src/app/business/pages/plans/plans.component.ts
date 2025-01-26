@@ -42,6 +42,7 @@ export class PlansComponent implements OnInit {
     planSelected;
     planSelectedId = '';
     edition = false;
+    chargingEdition = false;
     actividadForm: FormGroup;
 
     constructor(
@@ -298,11 +299,11 @@ export class PlansComponent implements OnInit {
     }
 
     callPutPlansUpdate() {
-        this.loaderService.show(true);
+        this.chargingEdition = true;
         const request = this.generateRequest();
         this.service.putPlansUpdate(this.planSelected.id, [request]).pipe(
             finalize(() => {
-                this.loaderService.hide();
+                this.chargingEdition = false;
             })
         ).subscribe(
             (res: any) => {

@@ -363,8 +363,13 @@
                         </div>
                     </div>
                     <div class="card col-12 col-md-3" style="max-height: 100px">
+                        {{isFirstPresentation()}}
                         <p class="font-bold">Estado:</p>
+                        
                         <p-tag
+                            [value]="presentationState + isFirstPresentation() ? ' - 1era sustentación' : ' - 2da sustentación'"
+                        />
+                        <!-- <p-tag
                             *ngIf="
                                 presentationState === 'En proceso' &&
                                 presentationSelected.first_presentation !==
@@ -391,7 +396,7 @@
                         <p-tag
                             *ngIf="presentationState === 'Culminado'"
                             value="Culminado"
-                        />
+                        /> -->
                     </div>
                 </div>
                 <div class="grid col-12">
@@ -483,8 +488,22 @@
                         </p>
                     </div>
                     <div class="card col-12 col-md-3" style="max-height: 100px">
+                        {{isFirstPresentation()}}
                         <p class="font-bold">Estado:</p>
+                        
                         <p-tag
+                            *ngIf="
+                                isFirstPresentation()
+                            "
+                            [value]="presentationState + ' - 1era sustentación'"
+                        />
+                        <p-tag
+                        *ngIf="
+                            !isFirstPresentation()
+                        "
+                        [value]="presentationState + ' - 2da sustentación'"
+                        />
+                        <!-- <p-tag
                             *ngIf="
                                 presentationState === 'En proceso' &&
                                 presentationSelected.first_presentation !==
@@ -511,7 +530,7 @@
                         <p-tag
                             *ngIf="presentationState === 'Culminado'"
                             value="Culminado"
-                        />
+                        /> -->
                     </div>
                 </div>
                 <div class="grid col-12">

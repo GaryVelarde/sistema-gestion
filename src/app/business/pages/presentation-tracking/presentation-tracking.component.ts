@@ -320,6 +320,7 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
                 if (res.status) {
                     this.presentationSelectedUpdate();
                     this.requiereMoreInfo = false;
+                    this.presentationState = 'Pendiente';
                     this.messageService.add({
                         key: 'tst',
                         severity: 'info',
@@ -374,7 +375,7 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
     saveFiles() {
         this.loaderService.show(true);
         this.showDialogAddFiles = false;
-        this.service.postRegisterReviewFile(this.formData, this.presentationSelected.id).pipe(
+        this.service.postRegisterThesisReviewFile(this.formData, this.presentationSelected.id).pipe(
             finalize(() => {
                 this.upload.clearFile()
                 this.loaderService.hide();
@@ -473,7 +474,16 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
         this.service.putPresentationUpdateStatus(this.presentationSelected.id, rq).pipe().subscribe(
             (res: any) => {
                 if (res.status) {
-                    this.presentationState = status;
+                    
+                    const isFirstPresentation = this.isFirstPresentation();
+                    if(isFirstPresentation) {
+                        this.presentationState = status === 'No aprobado' ? 'En proceso' : 'Culminado';
+                        this.presentationSelected.first_presentation = status;
+                        this.presentationSelected.second_presentation = 'En proceso';
+                    } else {
+                        this.presentationState = status === 'No aprobado' ? 'No aprobado' : 'Culminado';
+                        this.presentationSelected.second_presentation = status;
+                    }
                 }
             }, (error) => {
                 this.messageService.add({
@@ -509,6 +519,12 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
         this.formRequestDateRepository.setValue(this.presentationSelected.form_request_date_repository);
         this.received.setValue(this.presentationSelected.received === 1 ? true : false);
         this.sentToLibrary.setValue(this.presentationSelected.sent_to_library === 1 ? true : false);
+    }
+
+    isFirstPresentation(): boolean {
+        return this.presentationSelected.first_presentation === 'Pendiente'
+            || this.presentationSelected.first_presentation !== 'No aprobado'
+            ? true : false;
     }
 
 }

@@ -238,7 +238,7 @@ export class AuthService {
   }
 
   postRegisterThesisReviewFile(request: any, id: string) {
-    return this.http.post(`${this.API_URL}/review/${id}/archive`, request, this.header);
+    return this.http.post(`${this.API_URL}/presentation/${id}/archive`, request, this.header);
   }
 
   getThesisReviewFiles(id: string) {

@@ -123,7 +123,7 @@
                             [binary]="true"
                             #checkbox
                             [disabled]="task.status || _chbDisable"
-                            (onChange)="taskDone(task.id, checkbox)"
+                            (onChange)="taskDone(task, checkbox)"
                         ></p-checkbox>
                         <label
                             class="ml-3"

@@ -95,7 +95,7 @@
                 class="card flex justify-content-center col-12"
             >
                 <h5 class="font-bold text-color" style="text-align: center">
-                    {{ eventSelected.event.title }}
+                    {{ eventSelected.event._def.extendedProps.event_udi.title }}
                 </h5>
             </div>
             <form *ngIf="edition" [formGroup]="titleForm" class="col-12">

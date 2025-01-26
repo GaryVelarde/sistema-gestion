@@ -344,7 +344,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
     goToReview() {
         this.loaderService.show();
         const rq = {
-            status: 'En Revisión'
+            status: 'En revisión'
         }
         this.service.putAdvisoryStatusUpdate(this.advisorySelected.id, rq).pipe(
             finalize(() => {
@@ -360,7 +360,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
                         detail: 'La asesoría pasó a Revisión.',
                         life: 3000,
                     });
-                    this.advisoryState = 'En Revisión';
+                    this.advisoryState = 'En revisión';
                 }
             }, (error) => {
                 this.messageService.add({
@@ -406,6 +406,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
     }
 
     goToCancelation() {
+        this.cancelattionForm.reset();
         this.showDialogCancel = true;
         this.alertForCancelation = [
             { severity: 'warn', detail: 'Recuerda que una vez cancelada la asesoría no se podrá reabrir.' },
@@ -416,7 +417,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
         this.showDialogCancel = false;
         this.loaderService.show();
         const rq = {
-            status: 'Renuncia',
+            status: 'Cancelado',
             description: this.cancelationComment.value,
         }
         this.service.putAdvisoryStatusUpdate(this.advisorySelected.id, rq).pipe(
@@ -427,7 +428,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
             (res: any) => {
                 if (res.status) {
                     this.cancelEdition();
-                    this.advisoryState = 'Renuncia';
+                    this.advisoryState = 'Cancelado';
                     this.messageService.add({
                         key: 'tst',
                         severity: 'info',

@@ -143,17 +143,17 @@ export class TaskListComponent implements OnInit, OnDestroy {
     this.countTask();
   }
 
-  taskDone(taskId: string, checkbox: any): void {
+  taskDone(task: any, checkbox: any): void {
     if (!this._chbDisable) {
       switch (this.module) {
         case eModule.advisory:
-          this.callPutAdvisoryUpdateStatusTask(taskId, checkbox);
+          this.callPutAdvisoryUpdateStatusTask(task, checkbox);
           break;
         case eModule.inscription:
-          this.callPutInscriptionUpdateStatusTask(taskId, checkbox);
+          this.callPutInscriptionUpdateStatusTask(task, checkbox);
           break;
         case eModule.eventUdi:
-          this.callPutEventUdiUpdateStatusTask(taskId, checkbox);
+          this.callPutEventUdiUpdateStatusTask(task, checkbox);
           break;
       }
     }
@@ -205,7 +205,7 @@ export class TaskListComponent implements OnInit, OnDestroy {
     this.totalTaskIncomplete = 0;
     this.totalTaskComplete = 0;
     this.tasks.forEach((task) => {
-      if (task.checked) {
+      if (task.checked || task.status) {
         this.totalTaskComplete++;
       } else {
         this.totalTaskIncomplete++;
@@ -312,15 +312,16 @@ export class TaskListComponent implements OnInit, OnDestroy {
         })
   }
 
-  callPutAdvisoryUpdateStatusTask(taskId: string, checkbox: any) {
+  callPutAdvisoryUpdateStatusTask(task: any, checkbox: any) {
     const rq = {
+      description: task.description,
       status: true,
     }
-    this.taskService.putAdvisoryUpdateStatusTask(this.idModule, taskId, rq).pipe(takeUntil(this.destroy$)).
+    this.taskService.putAdvisoryUpdateStatusTask(this.idModule, task.id, rq).pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {
           if (res.status) {
-            this.confirmTaskDone(taskId, checkbox);
+            this.confirmTaskDone(task.id, checkbox);
           }
         }, (error) => {
 

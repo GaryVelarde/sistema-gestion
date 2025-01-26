@@ -358,19 +358,20 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
   }
 
   statusUpdate(status: string) {
-    this.loaderService.show();
+    // this.loaderService.show();
     const request = {
       status: status
     }
     this.service.putProcedureStatusUpdate(request, this.procedureSelected.id).pipe(
       takeUntil(this.destroy$),
-      finalize(() => {
-        this.loaderService.hide();
-      })
+      // finalize(() => {
+      //   this.loaderService.hide();
+      // })
     ).
       subscribe((res: any) => {
         if (res.status) {
           this.procedureState = status;
+          this.procedureSelected.status = status;
         }
       }, (error) => {
         this.messageService.add({

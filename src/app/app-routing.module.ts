@@ -19,7 +19,7 @@ import { ProfileComponent } from './business/pages/profile/profile.component';
             { path: '', loadChildren: () => import('./business/auth/auth.module').then(m => m.AuthModule) },
             { path: 'notfound', component: NotfoundComponent, canActivate: [isUserAuthenticatedGuard] },
             { path: '**', redirectTo: '/notfound' },
-        ], { scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled', onSameUrlNavigation: 'reload' })
+        ], { scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled', onSameUrlNavigation: 'reload', useHash: true })
     ],
     exports: [RouterModule]
 })

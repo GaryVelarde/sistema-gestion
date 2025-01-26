@@ -38,6 +38,7 @@ export class BudgetComponent implements OnInit {
     ];
     gastosIngresados: any[] = [];
     edition = false;
+    chargingEdition = false;
     activities: any[] = [];
     tasks: any[] = [];
     statusActivity = '';
@@ -268,11 +269,11 @@ export class BudgetComponent implements OnInit {
     }
 
     saveEdition() {
-        this.loaderServide.show(true);
+        this.chargingEdition = true;
         const request = this.generateRequest(this.gastosIngresados);
         this.service.putBudgetUpdate(this.budgetSelected.id, request).pipe(
             finalize(() => {
-                this.loaderServide.hide();
+                this.chargingEdition = false;
             })
         ).
             subscribe((res: any) => {

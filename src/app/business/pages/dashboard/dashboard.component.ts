@@ -51,28 +51,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     optionsArticles: any;
 
-    years = [
-        { name: '2024', code: '2024' },
-        { name: '2023', code: '2023' },
-        { name: '2022', code: '2022' },
-        { name: '2021', code: '2021' },
-        { name: '2020', code: '2020' },
-        { name: '2019', code: '2019' },
-        { name: '2018', code: '2018' },
-        { name: '2017', code: '2017' },
-        { name: '2016', code: '2016' },
-        { name: '2015', code: '2015' },
-        { name: '2014', code: '2014' },
-        { name: '2013', code: '2013' },
-        { name: '2012', code: '2012' },
-        { name: '2011', code: '2011' },
-        { name: '2010', code: '2010' }
-    ];
-    yearSelectedByInscription: any = { name: '2024', code: '2024' };
-    yearSelectedByAdvisory: any = { name: '2024', code: '2024' };
-    yearSelectedByReview: any = { name: '2024', code: '2024' };
-    yearSelectedByPresentation: any = { name: '2024', code: '2024' };
-    yearSelectedByArticles: any = { name: '2024', code: '2024' };
+    years = this.getYearList();
+    currentYear = new Date().getFullYear().toString();
+    yearSelectedByInscription: any = { name: this.currentYear, code: this.currentYear };
+    yearSelectedByAdvisory: any = { name: this.currentYear, code: this.currentYear };
+    yearSelectedByReview: any = { name: this.currentYear, code: this.currentYear };
+    yearSelectedByPresentation: any = { name: this.currentYear, code: this.currentYear };
+    yearSelectedByArticles: any = { name: this.currentYear, code: this.currentYear };
 
     private destroy$ = new Subject<void>();
 
@@ -432,5 +417,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     goToGuide() {
         this.router.navigate(['/pages/lineas-guias']);
+    }
+
+    getYearList(): { name: string; code: string }[] {
+        const currentYear = new Date().getFullYear();
+        const startYear = currentYear - 30;
+        const yearList: { name: string; code: string }[] = [];
+
+        for (let year = startYear; year <= currentYear; year++) {
+            yearList.push({ name: year.toString(), code: year.toString() });
+        }
+
+        return yearList;
     }
 }

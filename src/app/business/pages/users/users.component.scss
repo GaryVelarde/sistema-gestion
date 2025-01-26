@@ -32,10 +32,10 @@
   }
 
   .footer {
-    position: fixed;
-    bottom: 0;
+    position: absolute;
+    // bottom: 0;
     text-align: center;
-    padding: 20px 0;
+    // padding: 20px 0;
 }
 
   .display-grid {
