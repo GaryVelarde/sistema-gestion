@@ -75,7 +75,7 @@ export class CommentsService {
     }
     
     deleteGuideComment(guideId: string, commentId: string) {
-        return this.http.delete(`${this.API_URL}/guide/${guideId}/observations/{idObservation}/${commentId}`);
+        return this.http.delete(`${this.API_URL}/guide/${guideId}/observations/${commentId}`);
     }
 
     /**

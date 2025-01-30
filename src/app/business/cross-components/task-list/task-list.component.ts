@@ -282,30 +282,30 @@ export class TaskListComponent implements OnInit, OnDestroy {
         })
   }
 
-  callPutEventUdiUpdateStatusTask(taskId: string, checkbox: any) {
+  callPutEventUdiUpdateStatusTask(task: any, checkbox: any) {
     const rq = {
       status: true,
     }
-    this.taskService.putEventUdiUpdateStatusTask(this.idModule, taskId, rq).pipe(takeUntil(this.destroy$)).
+    this.taskService.putEventUdiUpdateStatusTask(this.idModule, task.id, rq).pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {
           if (res.status) {
-            this.confirmTaskDone(taskId, checkbox);
+            this.confirmTaskDone(task.id, checkbox);
           }
         }, (error) => {
 
         })
   }
 
-  callPutInscriptionUpdateStatusTask(taskId: string, checkbox: any) {
+  callPutInscriptionUpdateStatusTask(task: any, checkbox: any) {
     const rq = {
       status: true,
     }
-    this.taskService.putInscriptionUpdateStatusTask(this.idModule, taskId, rq).pipe(takeUntil(this.destroy$)).
+    this.taskService.putInscriptionUpdateStatusTask(this.idModule, task.id, rq).pipe(takeUntil(this.destroy$)).
       subscribe(
         (res: any) => {
           if (res.status) {
-            this.confirmTaskDone(taskId, checkbox);
+            this.confirmTaskDone(task.id, checkbox);
           }
         }, (error) => {
 

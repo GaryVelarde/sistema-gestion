@@ -301,7 +301,7 @@ export class FileListComponent implements OnInit, OnDestroy {
   }
 
   callDeletePresentationArchive(archiveId: string) {
-    this.serviceFile.deleteEventUdiArchive(this.id, archiveId).pipe(
+    this.serviceFile.deletePresentationArchive(this.id, archiveId).pipe(
       takeUntil(this.destroy$)
     ).
       subscribe(

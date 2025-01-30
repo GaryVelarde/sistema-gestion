@@ -425,7 +425,6 @@ export class EventsComponent implements OnInit, AfterViewInit, OnDestroy {
     return time;
   }
   
-  
   addEvent() {
     if (this.eventForm.valid) {
       const newEvent: EventInput = {
@@ -447,16 +446,17 @@ export class EventsComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   callGetEvents() {
-    this.events = [];
+    
     this.service.getEvents().pipe().subscribe(
       (res: any) => {
         if (res.data) {
+          this.events = [];
           for (let event of res.data) {
             console.log(event.start_date + ' ' + event.start_time)
             const ev: EventInput = {
               title: event.name_event,
-              start: this.convertToISOFormat(event.start_date + ' ' + event.start_time),
-              end: this.convertToISOFormat(event.end_date + ' ' + event.end_time),
+              start: this.dateFormatService.formatDateCalendar(event.start_date + ' ' + event.start_time),
+              end: this.dateFormatService.formatDateCalendar(event.end_date + ' ' + event.end_time),
               backgroundColor: '#1e366d',
               borderColor: '#1e366d',
               color: '#1e366d',
@@ -479,24 +479,78 @@ export class EventsComponent implements OnInit, AfterViewInit, OnDestroy {
       })
   }
 
-  convertToISOFormat(dateString: string): string | null {
-    const [datePart, timePart] = dateString.split(" ");
-    const [day, month, year] = datePart.split("-").map(Number);
+  formatDateCalendar(date: string): string {
+    let dateObj: Date;
 
-    let [hour, minute] = timePart.split(/[: ]/).slice(0, 2).map(Number);
-    const period = timePart.split(" ")[1];
+    // Analizar la fecha y la hora en los formatos 'dd-mm-yyyy hh:mm:ss', 'dd-mm-yyyy hh:mm', 'dd/mm/yyyy hh:mm:ss' y 'dd/mm/yyyy hh:mm'
+    const dateTimeParts = date.split(' ');
+    if (dateTimeParts.length === 2) {
+      const datePart = dateTimeParts[0];
+      const timePart = dateTimeParts[1];
 
-    if (period === "PM" && hour !== 12) {
-      hour += 12;
-    } else if (period === "AM" && hour === 12) {
-      hour = 0;
+      let day, month, year, hours, minutes, seconds = 0;
+
+      // Procesar la parte de la fecha
+      if (datePart.includes('-')) {
+        // Formato 'dd-mm-yyyy'
+        const dateParts = datePart.split('-');
+        if (dateParts.length === 3) {
+          day = parseInt(dateParts[0], 10);
+          month = parseInt(dateParts[1], 10) - 1; // Los meses en JavaScript son 0-indexados
+          year = parseInt(dateParts[2], 10);
+        } else {
+          console.error('Invalid date format');
+          return '';
+        }
+      } else if (datePart.includes('/')) {
+        // Formato 'dd/mm/yyyy'
+        const dateParts = datePart.split('/');
+        if (dateParts.length === 3) {
+          day = parseInt(dateParts[0], 10);
+          month = parseInt(dateParts[1], 10) - 1;
+          year = parseInt(dateParts[2], 10);
+        } else {
+          console.error('Invalid date format');
+          return '';
+        }
+      } else {
+        console.error('Invalid date format');
+        return '';
+      }
+
+      // Procesar la parte de la hora
+      const timeParts = timePart.split(':');
+      if (timeParts.length >= 2) {
+        hours = parseInt(timeParts[0], 10);
+        minutes = parseInt(timeParts[1], 10);
+        if (timeParts.length === 3) {
+          // Procesar segundos si están presentes
+          seconds = parseInt(timeParts[2], 10);
+        }
+        dateObj = new Date(year, month, day, hours, minutes, seconds);
+      } else {
+        console.error('Invalid time format');
+        return '';
+      }
+    } else {
+      console.error('Invalid date format');
+      return '';
     }
 
-    const formattedDate = new Date(year, month - 1, day, hour, minute);
+    // Asegurarse de que dateObj sea un objeto Date válido
+    if (isNaN(dateObj.getTime())) {
+      console.error('Invalid date');
+      return '';
+    }
 
-    const isoFormattedDate = formattedDate.toISOString().slice(0, 19);
+    const yearStr = dateObj.getFullYear();
+    const monthStr = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+    const dayStr = ('0' + dateObj.getDate()).slice(-2);
+    const hoursStr = ('0' + dateObj.getHours()).slice(-2);
+    const minutesStr = ('0' + dateObj.getMinutes()).slice(-2);
+    const secondsStr = ('0' + dateObj.getSeconds()).slice(-2);
 
-    return isoFormattedDate;
+    return `${yearStr}-${monthStr}-${dayStr}T${hoursStr}:${minutesStr}:${secondsStr}`;
   }
 
   callGetTitlesEvents() {

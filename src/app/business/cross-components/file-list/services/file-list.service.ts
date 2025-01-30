@@ -36,11 +36,11 @@ export class FileListService {
     }
 
     deleteEventUdiArchive(eventId: string, archiveId: string) {
-        return this.http.delete(`${this.API_URL}/meeting/${eventId}/observations/${archiveId}`);
+        return this.http.delete(`${this.API_URL}/meeting/${eventId}/archive/${archiveId}`);
     }
 
     deletePresentationArchive(eventId: string, archiveId: string) {
-        return this.http.delete(`${this.API_URL}/presentation/${eventId}/observations/${archiveId}`);
+        return this.http.delete(`${this.API_URL}/presentation/${eventId}/archive/${archiveId}`);
     }
 
     deleteGuideArchive(guideId: string, archiveId: string) {

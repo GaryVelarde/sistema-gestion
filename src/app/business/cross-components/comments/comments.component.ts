@@ -449,7 +449,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
         this.callDeletePresentationComment(comment);
         break;
       case eModule.guide:
-        this.callDeletePresentationComment(comment);
+        this.callDeleteGuideComment(comment);
         break;
     }
   }
