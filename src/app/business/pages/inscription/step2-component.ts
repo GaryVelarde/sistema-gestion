@@ -8,7 +8,22 @@ import { AuthService } from 'src/app/services/auth.service';
 })
 export class Step2Component implements OnInit {
     studentsList = [];
-
+    roles: any[] = [
+        { name: 'Egresado', code: 'Egresado' },
+        { name: 'Estudiante', code: 'Estudiante' },
+    ];
+    cycles: any[] = [
+        { name: 'I', code: 'I' },
+        { name: 'II', code: 'II' },
+        { name: 'III', code: 'III' },
+        { name: 'IV', code: 'IV' },
+        { name: 'V', code: 'V' },
+        { name: 'VI', code: 'VI' },
+        { name: 'VII', code: 'VII' },
+        { name: 'VIII', code: 'VIII' },
+        { name: 'IX', code: 'IX' },
+        { name: 'X', code: 'X' },
+    ];
     filteredStudents: any[];
     filteredSecondStudents: any[];
     getStudentListProcess = '';
@@ -16,12 +31,14 @@ export class Step2Component implements OnInit {
         private router: Router,
         public presenter: InscriptionPresenter,
         private service: AuthService
-    ) {}
+    ) { }
 
     ngOnInit(): void {
         this.callGetStudentList();
         this.presenter.watchEstudent();
         this.presenter.watchEstudentTwo();
+        this.presenter.watchRole();
+        this.presenter.watchRoleTwo();
     }
 
     nextStep() {
@@ -71,4 +88,5 @@ export class Step2Component implements OnInit {
             this.getStudentListProcess = 'error';
         });
     }
+
 }

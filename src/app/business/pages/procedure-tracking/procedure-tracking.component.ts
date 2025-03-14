@@ -8,7 +8,6 @@ import { finalize, Subject, takeUntil } from 'rxjs';
 import { eModule, userType } from 'src/app/commons/enums/app,enum';
 import { FileListComponent } from '../../cross-components/file-list/file-list.component';
 import { UploadArchivesComponent } from '../../cross-components/upload-archives/upload-archives.component';
-import { DateFormatService } from 'src/app/services/date-format.service';
 import { UserSelectionComponent } from '../../cross-components/user-selection/user-selection.component';
 import { ProcedureService } from './commons/services/procedure.service';
 
@@ -24,6 +23,7 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
   @ViewChild('reviewerSelection') reviewerSelection: UserSelectionComponent;
 
   registros = [];
+  results = [];
   types = [];
 
   breadcrumbItems: MenuItem[] = [
@@ -65,9 +65,13 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
   procedureState: string;
   studentForm: FormGroup;
   editForm: FormGroup;
+  procedureForm: FormGroup;
+  procedureTypeIdSelected: string | null = null;
+  userIdSelected: string | null = null;
   private _description: FormControl = new FormControl('', [Validators.required]);
   private _student = new FormControl([], [Validators.required])
   private _procedureType = new FormControl({} as any, [Validators.required])
+  private _procedureTypeSelected = new FormControl({} as any)
 
   get student() {
     return this._student;
@@ -77,6 +81,9 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
   }
   get procedureType() {
     return this._procedureType;
+  }
+  get procedureTypeSelected() {
+    return this._procedureTypeSelected;
   }
 
   constructor(
@@ -93,11 +100,16 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
       description: this.description,
       procedureType: this.procedureType,
     });
+    this.procedureForm = this.fb.group({
+      procedureType: this.procedureTypeSelected,
+    });
   }
 
   ngOnInit() {
     this.getProcedureList();
     this.getProcedureTypesList();
+    this.watchStudent();
+    this.watchProcedureType();
   }
 
   ngOnDestroy() {
@@ -133,6 +145,7 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
     this.service.getProcedureList().pipe(takeUntil(this.destroy$)).subscribe((res: any) => {
       if (res) {
         this.registros = res.data;
+        this.results = res.data;
         this.getListProcess = 'complete';
       }
     },
@@ -428,5 +441,50 @@ export class ProcedureTrackingComponent implements OnInit, OnDestroy {
     this.procedureSelected.description = this.description.value;
     this.procedureSelected.procedure_type = this.procedureType.value.procedure_type;
     this.procedureSelected.procedure_type_id = this.procedureType.value.id;
+  }
+
+  watchStudent(): void {
+    this.student.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((data: any) => {
+        if (data[0]) {
+          this.userIdSelected = data[0].id;
+          this.results = this.getApplicantsById(this.userIdSelected, this.procedureTypeIdSelected);
+        } else {
+          this.userIdSelected = null;
+          const filtered = this.getApplicantsById(this.userIdSelected, this.procedureTypeIdSelected);
+          this.results = filtered ? filtered : this.registros;
+        }
+      })
+  }
+
+  getApplicantsById(userId: string | null, procedureTypeSelected?: string | null): any[] {
+    return this.registros.filter(procedure => {
+        const matchesUserId = userId !== null 
+            ? procedure.applicant.id === userId 
+            : true;
+
+        const matchesProcedureType = procedureTypeSelected 
+            ? procedure.procedure_type_id === procedureTypeSelected 
+            : true;
+
+        return matchesUserId && matchesProcedureType;
+    });
+}
+
+
+  watchProcedureType(): void {
+    this.procedureTypeSelected.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res: any) => {
+        if(res) {
+          this.procedureTypeIdSelected = res.id;
+          this.results = this.getApplicantsById(this.userIdSelected, this.procedureTypeIdSelected);
+        } else {
+          this.procedureTypeIdSelected = null;
+          const filtered = this.getApplicantsById(this.userIdSelected, this.procedureTypeIdSelected);
+          this.results = filtered.length ? filtered : this.registros;
+        }
+      })
   }
 }

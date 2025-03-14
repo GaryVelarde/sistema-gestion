@@ -65,7 +65,7 @@
         <ng-template #studentList>
             <div class="grid p-fluid mt-3">
                 <div *ngIf="studentsList.length" class="field col-12 md:col-6">
-                    <span class="p-float-label">
+                    <!-- <span class="p-float-label">
                         <p-autoComplete
                             id="studentOne"
                             formControlName="student"
@@ -85,7 +85,167 @@
                         <label for="studentOne"
                             >Ingrese el nombre del estudiante</label
                         >
-                    </span>
+                    </span> -->
+                    <form [formGroup]="presenter.userOneStep2">
+                        <div class="field mt-5">
+                            <span class="p-float-label">
+                                <p-dropdown
+                                    class="display-grid"
+                                    formControlName="role"
+                                    inputId="role"
+                                    [autoDisplayFirst]="false"
+                                    [options]="roles"
+                                    optionLabel="name"></p-dropdown>
+                                <label for="role">Seleccione un rol</label>
+                            </span>
+                            <small
+                                class="pl-2 text-error"
+                                *ngIf="presenter.role.dirty && presenter.role.errors">El rol es
+                                requerido.</small>
+                        </div>
+                        <div class="field mt-5">
+                            <span class="p-float-label">
+                                <input
+                                    type="text"
+                                    id="name"
+                                    class="w-full"
+                                    pInputText
+                                    formControlName="name" />
+                                <label for="name">Nombres</label>
+                            </span>
+                            <small
+                                class="pl-2 text-error"
+                                *ngIf="presenter.name.dirty && presenter.name.errors">El nombre es
+                                requerido.</small>
+                        </div>
+                        <div class="field mt-5">
+                            <span class="p-float-label">
+                                <input
+                                    type="text"
+                                    id="lastName"
+                                    class="w-full"
+                                    pInputText
+                                    formControlName="lastName" />
+                                <label for="lastName">Apellidos</label>
+                            </span>
+                            <small
+                                class="pl-2 text-error"
+                                *ngIf="presenter.lastName.dirty && presenter.lastName.errors">El
+                                apellido es requerido.</small>
+                        </div>
+            
+                        <div class="formgrid grid mt-5">
+                            <div class="field col">
+                                <span class="p-float-label">
+                                    <input
+                                        type="text"
+                                        id="code"
+                                        class="w-full"
+                                        pInputText
+                                        pKeyFilter="int"
+                                        formControlName="code" />
+                                    <label for="code">Código</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="presenter.code.dirty && presenter.code.errors">El código es
+                                    requerido.</small>
+                            </div>
+            
+                            <div class="field col">
+                                <span class="p-float-label">
+                                    <input
+                                        type="text"
+                                        id="number"
+                                        class="w-full"
+                                        pInputText
+                                        pKeyFilter="int"
+                                        formControlName="number" />
+                                    <label for="number">Celular</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="presenter.number.dirty && presenter.number.errors">El celular
+                                    es requerido.</small>
+                            </div>
+                        </div>
+                        <div class="formgrid grid mt-4">
+                            <div class="col">
+                                <span class="p-float-label">
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        class="w-full"
+                                        pInputText
+                                        formControlName="email" />
+                                    <label for="email">Correo</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="presenter.email.dirty && presenter.email.errors">El nombre es
+                                    requerido.</small>
+                            </div>
+                        </div>
+                        <div class="formgrid grid mt-5">
+                            <div class="col">
+                                <span class="p-float-label">
+                                    <input
+                                        type="text"
+                                        id="career"
+                                        class="w-full"
+                                        pInputText
+                                        formControlName="career" />
+                                    <label for="career">Carrera</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="presenter.career.dirty && presenter.career.errors">La
+                                    carrera es requerida.</small>
+                            </div>
+                        </div>
+                        <div class="formgrid grid mt-5" *ngIf="presenter.roleSelected === 'Estudiante'">
+                            <div class="col">
+                                <span class="p-float-label">
+                                    <p-dropdown
+                                        formControlName="cycle"
+                                        inputId="cycle"
+                                        class="display-grid"
+                                        [autoDisplayFirst]="false"
+                                        [options]="cycles"
+                                        optionLabel="name"></p-dropdown>
+                                    <label for="cycle">Seleccione el
+                                        ciclo</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="presenter.cycle.dirty && presenter.cycle.errors">El ciclo
+                                    es requerido.</small>
+                            </div>
+                        </div>
+
+                        <div class="formgrid grid mt-5" *ngIf="presenter.roleSelected === 'Egresado'">
+                            <div class="field col">
+                                <span class="p-float-label">
+                                    <p-calendar
+                                        inputId="egressDate"
+                                        [iconDisplay]="'input'"
+                                        formControlName="egressDate"
+                                        class="w-full"
+                                        [showIcon]="true"
+                                        dateFormat="yy-mm-dd"></p-calendar>
+                                    <label for="egressDate">Fecha de
+                                        egreso</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="
+                                        presenter.egressDate.dirty && presenter.egressDate.errors
+                                    ">La fecha de egreso es requerida.</small>
+                            </div>
+                        </div>
+                    </form>
+
+                    
                 </div>
                 <div
                     *ngIf="!presenter.studentTwoRequired"
@@ -104,7 +264,7 @@
                     *ngIf="presenter.studentTwoRequired"
                     class="col-12 md:col-5"
                 >
-                    <span class="p-float-label">
+                    <!-- <span class="p-float-label">
                         <p-autoComplete
                             id="studentTwo"
                             formControlName="studentTwo"
@@ -124,7 +284,165 @@
                         <label for="studentTwo"
                             >Ingrese el nombre del segundo estudiante</label
                         >
-                    </span>
+                    </span> -->
+                    <form [formGroup]="presenter.userTwoStep2">
+                        <div class="field mt-5">
+                            <span class="p-float-label">
+                                <p-dropdown
+                                    class="display-grid"
+                                    formControlName="roleTwo"
+                                    inputId="role"
+                                    [autoDisplayFirst]="false"
+                                    [options]="roles"
+                                    optionLabel="name"></p-dropdown>
+                                <label for="role">Seleccione un rol</label>
+                            </span>
+                            <small
+                                class="pl-2 text-error"
+                                *ngIf="presenter.roleTwo.dirty && presenter.roleTwo.errors">El rol es
+                                requerido.</small>
+                        </div>
+                        <div class="field mt-5">
+                            <span class="p-float-label">
+                                <input
+                                    type="text"
+                                    id="name"
+                                    class="w-full"
+                                    pInputText
+                                    formControlName="nameTwo" />
+                                <label for="name">Nombres</label>
+                            </span>
+                            <small
+                                class="pl-2 text-error"
+                                *ngIf="presenter.nameTwo.dirty && presenter.nameTwo.errors">El nombre es
+                                requerido.</small>
+                        </div>
+                        <div class="field mt-5">
+                            <span class="p-float-label">
+                                <input
+                                    type="text"
+                                    id="lastName"
+                                    class="w-full"
+                                    pInputText
+                                    formControlName="lastNameTwo" />
+                                <label for="lastName">Apellidos</label>
+                            </span>
+                            <small
+                                class="pl-2 text-error"
+                                *ngIf="presenter.lastNameTwo.dirty && presenter.lastNameTwo.errors">El
+                                apellido es requerido.</small>
+                        </div>
+            
+                        <div class="formgrid grid mt-5">
+                            <div class="field col">
+                                <span class="p-float-label">
+                                    <input
+                                        type="text"
+                                        id="code"
+                                        class="w-full"
+                                        pInputText
+                                        pKeyFilter="int"
+                                        formControlName="codeTwo" />
+                                    <label for="code">Código</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="presenter.codeTwo.dirty && presenter.codeTwo.errors">El código es
+                                    requerido.</small>
+                            </div>
+            
+                            <div class="field col">
+                                <span class="p-float-label">
+                                    <input
+                                        type="text"
+                                        id="number"
+                                        class="w-full"
+                                        pInputText
+                                        pKeyFilter="int"
+                                        formControlName="numberTwo" />
+                                    <label for="number">Celular</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="presenter.numberTwo.dirty && presenter.numberTwo.errors">El celular
+                                    es requerido.</small>
+                            </div>
+                        </div>
+                        <div class="formgrid grid mt-4">
+                            <div class="col">
+                                <span class="p-float-label">
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        class="w-full"
+                                        pInputText
+                                        formControlName="emailTwo" />
+                                    <label for="email">Correo</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="presenter.emailTwo.dirty && presenter.emailTwo.errors">El nombre es
+                                    requerido.</small>
+                            </div>
+                        </div>
+                        <div class="formgrid grid mt-5">
+                            <div class="col">
+                                <span class="p-float-label">
+                                    <input
+                                        type="text"
+                                        id="career"
+                                        class="w-full"
+                                        pInputText
+                                        formControlName="careerTwo" />
+                                    <label for="career">Carrera</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="presenter.careerTwo.dirty && presenter.careerTwo.errors">La
+                                    carrera es requerida.</small>
+                            </div>
+                        </div>
+                        <div class="formgrid grid mt-5" *ngIf="presenter.roleSelectedTwo === 'Estudiante'">
+                            <div class="col">
+                                <span class="p-float-label">
+                                    <p-dropdown
+                                        formControlName="cycleTwo"
+                                        inputId="cycle"
+                                        class="display-grid"
+                                        [autoDisplayFirst]="false"
+                                        [options]="cycles"
+                                        optionLabel="name"></p-dropdown>
+                                    <label for="cycle">Seleccione el
+                                        ciclo</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="presenter.cycleTwo.dirty && presenter.cycleTwo.errors">El ciclo
+                                    es requerido.</small>
+                            </div>
+                        </div>
+
+                        <div class="formgrid grid mt-5" *ngIf="presenter.roleSelectedTwo === 'Egresado'">
+                            <div class="field col">
+                                <span class="p-float-label">
+                                    <p-calendar
+                                        inputId="egressDate"
+                                        [iconDisplay]="'input'"
+                                        formControlName="egressDateTwo"
+                                        class="w-full"
+                                        [showIcon]="true"
+                                        dateFormat="yy-mm-dd"></p-calendar>
+                                    <label for="egressDate">Fecha de
+                                        egreso</label>
+                                </span>
+                                <small
+                                    class="pl-2 text-error"
+                                    *ngIf="
+                                        presenter.egressDateTwo.dirty && presenter.egressDateTwo.errors
+                                    ">La fecha de egreso es requerida.</small>
+                            </div>
+                        </div>
+                    </form>
                 </div>
                 <div
                     *ngIf="presenter.studentTwoRequired"
@@ -192,7 +510,7 @@
                 label="Siguiente"
                 icon="pi pi-angle-right"
                 iconPos="right"
-                [disabled]="!presenter.studentOneIsValid || presenter.validatonForStudentTwo()"
+                [disabled]="!this.presenter.userOneStep2.valid || presenter.validatonForStudentTwo()"
             />
         </div>
     </form>

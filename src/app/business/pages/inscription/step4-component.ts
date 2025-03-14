@@ -68,10 +68,21 @@ export class Step4Component implements OnInit, OnDestroy {
         }
       },
       (error) => {
-        this.loaderService.hide();
-        this.service.add({ key: 'tst', severity: 'error', summary: 'Error', detail: 'Se produjo un error al registrar la inscripción' });
+        console.log('err',error)
+        this.hanleError(error);
       });
   }
+
+  hanleError(error: any) {
+    let mssg = 'Se produjo un error al registrar la inscripción';
+    if(error.error && error.error.errorCode) {
+      if (error.error.errorCode === 'ERR1')
+      mssg = 'El correo del solicitante ya se encuentra registrado.';
+    }
+    this.loaderService.hide();
+    this.service.add({ key: 'tst', severity: 'error', summary: 'Error', detail: mssg });
+  }
+
 
   backStep() {
     void this.router.navigate(['pages/new-titulation-process/step3']);
