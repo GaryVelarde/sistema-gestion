@@ -441,13 +441,13 @@
                         líneas son requeridas.</small>
                 </div>
             </div>
-            <div class="formgrid grid mt-3">
+            <div *ngIf="!isNewUser" class="formgrid grid mt-3">
                 <div class="field col">
                     <p>Selecciona la opción para habilitar o deshabilitar el usuario</p>
                     <p-toggleButton
                         formControlName="status"
-                        onLabel="Habilitado" 
-                        offLabel="Deshabilitado" 
+                        onLabel="Deshabilitar" 
+                        offLabel="Habilitar" 
                         [onIcon]="chargingChangeStatus ? 'pi pi-spin pi-spinner' : 'pi pi-check'" 
                         [offIcon]="chargingChangeStatus ? 'pi pi-spin pi-spinner' : 'pi pi-times'" 
                         [onIcon]="chargingChangeStatus ? 'pi pi-spin pi-spinner' : 'pi pi-lock'" 

@@ -70,6 +70,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     titleModalDetailIserSelected: string = '';
     getUserProcess = '';
     chargingChangeStatus = false;
+    isNewUser = false;
     messageError = 'No se ha podido cargar la lista de usuarios. Por favor vuelva a intentarlo más tarde.'
     public userForm: FormGroup;
     private _role: FormControl = new FormControl('', [Validators.required]);
@@ -169,6 +170,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.destroy$.next();
         this.destroy$.complete();
+        this.isNewUser = false;
     }
 
     watchRoleSelected() {
@@ -247,6 +249,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     openNew() {
         this.userDetailSelected = null;
+        this.isNewUser = true;
         this.clearValues();
         this.submitted = false;
         this.modalNewUser = true;
@@ -267,6 +270,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     openModalUserDetail(user: any) {
         this.userDetailSelected = user;
+        this.isNewUser = false;
         this.modalNewUser = true;
         this.setUserDataDetails(user);
     }
