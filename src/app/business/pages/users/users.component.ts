@@ -76,22 +76,20 @@ export class UsersComponent implements OnInit, OnDestroy {
     private _role: FormControl = new FormControl('', [Validators.required]);
     private _name: FormControl = new FormControl('', [Validators.required]);
     private _lastName: FormControl = new FormControl('', [Validators.required]);
-    private _email: FormControl = new FormControl('', [Validators.required]);
-    private _number: FormControl = new FormControl('', [Validators.required]);
-    private _code: FormControl = new FormControl('', [Validators.required]);
-    private _egressDate: FormControl = new FormControl('', [
-        Validators.required,
-    ]);
-    private _cycle: FormControl = new FormControl('', [Validators.required]);
-    private _career: FormControl = new FormControl('', [Validators.required]);
-    private _line: FormControl = new FormControl('', [Validators.required]);
-    private _subLine: FormControl = new FormControl('', [Validators.required]);
+    private _email: FormControl = new FormControl('');
+    private _number: FormControl = new FormControl('');
+    private _code: FormControl = new FormControl('');
+    private _egressDate: FormControl = new FormControl('');
+    private _cycle: FormControl = new FormControl('');
+    private _career: FormControl = new FormControl('');
+    private _line: FormControl = new FormControl('-', [Validators.required]);
+    private _subLine: FormControl = new FormControl('-', [Validators.required]);
     private _reviewer: FormControl = new FormControl(false);
     private _adviser: FormControl = new FormControl(false);
     private _jury: FormControl = new FormControl(false);
-    private _cip: FormControl = new FormControl('', [Validators.required]);
-    private _orcid: FormControl = new FormControl('', [Validators.required]);
-    private _status: FormControl = new FormControl('', [Validators.required]);
+    private _cip: FormControl = new FormControl('');
+    private _orcid: FormControl = new FormControl('');
+    private _status: FormControl = new FormControl('');
 
     get role() {
         return this._role;
@@ -213,6 +211,8 @@ export class UsersComponent implements OnInit, OnDestroy {
         this.userForm.addControl('jury', this.jury);
         this.userForm.addControl('cip', this.cip);
         this.userForm.addControl('orcid', this.orcid);
+        this.line.setValue('-');
+        this.subLine.setValue('-');
     }
 
     addControlForEstudiante() {

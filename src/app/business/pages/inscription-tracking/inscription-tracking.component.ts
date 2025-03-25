@@ -503,6 +503,7 @@ export class InscriptionTrackingComponent implements OnInit, OnDestroy {
         this.alertForAprobation = [
             { severity: 'info', detail: 'Luego de aprobar el proyecto de tesis pasará automáticamente a la sección de Asesorías.' },
         ];
+        this.sentToSecretaryDate.reset();
         this.showDialogAprobation = true;
     }
 

@@ -74,6 +74,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     public cancelattionForm: FormGroup;
     public reviewerForm: FormGroup;
     public studentForm: FormGroup;
+    public moreInfoForm: FormGroup;
     private _cancelationComment: FormControl = new FormControl('', [Validators.required]);
     private _dateCancelationReception: FormControl = new FormControl('', [Validators.required]);
     private _taskDescription: FormControl = new FormControl('', [
@@ -81,6 +82,9 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     ]);
     private _reviewer: FormControl = new FormControl([], [Validators.required]);
     private _students: FormControl = new FormControl([], [Validators.required]);
+    private _approval_date_udi: FormControl = new FormControl(null);
+    private _reception_date_faculty: FormControl = new FormControl(null);
+    private _shipment_date_secretary: FormControl = new FormControl(null);
 
     get cancelationComment() {
         return this._cancelationComment;
@@ -96,6 +100,15 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     }
     get students() {
         return this._students;
+    }
+    get approval_date_udi() {
+        return this._approval_date_udi;
+    }
+    get reception_date_faculty() {
+        return this._reception_date_faculty;
+    }
+    get shipment_date_secretary() {
+        return this._shipment_date_secretary;
     }
 
     constructor(
@@ -120,6 +133,12 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
         });
         this.studentForm = this.fb.group({
             students: this.students,
+        });
+
+        this.moreInfoForm = this.fb.group({
+            approval_date_udi: this.approval_date_udi,
+            reception_date_faculty: this.reception_date_faculty,
+            shipment_date_secretary: this.shipment_date_secretary,
         });
     }
 
@@ -342,6 +361,9 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
         this.loaderService.show(true);
         const rq = {
             user_id: this.reviewer.value[0].id,
+            reception_date_faculty: this.reception_date_faculty.value ? this.transformDDMMYYYY(this.reception_date_faculty.value) : null,
+            approval_date_udi: this.approval_date_udi.value ? this.transformDDMMYYYY(this.approval_date_udi.value): null,
+            shipment_date_secretary: this.shipment_date_secretary.value ? this.transformDDMMYYYY(this.shipment_date_secretary.value): null,
         }
         this.service.putReviewUpdate(this.reviewSelected.id, rq).pipe(
             finalize(() => {
@@ -352,6 +374,7 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
                 if (res.status) {
                     this.reviewerSelectedUpdate();
                     this.requiereMoreInfo = false;
+                    this.moreInfoForm.reset();
                     this.messageService.add({
                         key: 'tst',
                         severity: 'info',
@@ -371,8 +394,28 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
             })
     }
 
+    transformDDMMYYYY(value: string): string {
+        if (!value) return '';
+    
+        const ddmmyyyyRegex = /^\d{2}-\d{2}-\d{4}$/;
+        if (ddmmyyyyRegex.test(value)) {
+          return value;
+        }
+    
+        const date = new Date(value);
+        const day = ('0' + date.getDate()).slice(-2);
+        const month = ('0' + (date.getMonth() + 1)).slice(-2);
+        const year = date.getFullYear();
+    
+        return `${day}-${month}-${year}`;
+      }
+
     reviewerSelectedUpdate(): void {
         this.reviewSelected.reviewer = this.reviewer.value;
+        this.reviewSelected.reception_date_faculty = this.transformDDMMYYYY(this.reception_date_faculty.value);
+        this.reviewSelected.approval_date_udi = this.transformDDMMYYYY(this.approval_date_udi.value);
+        this.reviewSelected.shipment_date_secretary = this.transformDDMMYYYY(this.shipment_date_secretary.value);
+
     }
 
     onFileChange(files: any) {
@@ -436,12 +479,16 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
     showEdition() {
         this.lastReviewerSelected = this.reviewer.value;
         this.edition = true;
+        this.reception_date_faculty.setValue(this.reviewSelected.reception_date_faculty);
+        this.approval_date_udi.setValue(this.reviewSelected.approval_date_udi);
+        this.shipment_date_secretary.setValue(this.reviewSelected.shipment_date_secretary);
     }
 
     cancelEdition() {
         this.reviewer.setValue(this.lastReviewerSelected);
         this.reviewerSelection.userFormControl.setValue(this.lastReviewerSelected);
         this.edition = false;
+        this.moreInfoForm.reset();
 
     }
 
@@ -449,10 +496,13 @@ export class ThesisReviewTrackingComponent implements OnInit, OnDestroy {
         this.chargingEdition = true;
         const rq = {
             user_id: this.reviewer.value[0].id,
+            reception_date_faculty: this.reception_date_faculty.value ? this.transformDDMMYYYY(this.reception_date_faculty.value) : null,
+            approval_date_udi: this.approval_date_udi.value ? this.transformDDMMYYYY(this.approval_date_udi.value): null,
+            shipment_date_secretary: this.shipment_date_secretary.value ? this.transformDDMMYYYY(this.shipment_date_secretary.value): null,
         }
         this.service.putReviewUpdate(this.reviewSelected.id, rq).pipe(
             finalize(() => {
-                this.chargingEdition = true;
+                this.chargingEdition = false;
             })
         ).subscribe(
             (res: any) => {

@@ -25,8 +25,8 @@ import { TokenService } from 'src/app/services/token.service';
 })
 export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
     @ViewChild('upload') upload: UploadArchivesComponent;
-    @ViewChild('fileList') fileList : FileListComponent;
-    @ViewChild('advisorySelection') advisorySelection : UserSelectionComponent;
+    @ViewChild('fileList') fileList: FileListComponent;
+    @ViewChild('advisorySelection') advisorySelection: UserSelectionComponent;
 
     private destroy$ = new Subject<void>();
     products: any[] = [];
@@ -102,14 +102,14 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
     ]);
     private _advisory: FormControl = new FormControl([], [Validators.required]);
     private _students: FormControl = new FormControl([], [Validators.required]);
-    private _advisoryReceptionDateToFacultyMI: FormControl = new FormControl('', [Validators.required]);
-    private _advisoryApprovalDateUDIMI: FormControl = new FormControl('', [Validators.required]);
-    private _paymentDateMI: FormControl = new FormControl('', [Validators.required]);
-    private _submissionDateToSecretariatMI: FormControl = new FormControl('', [Validators.required]);
-    private _reportNumberMI: FormControl = new FormControl('', [Validators.required]);
-    private _resolutionDateMI: FormControl = new FormControl('', [Validators.required]);
-    private _advisoryStartDate: FormControl = new FormControl('', [Validators.required]);
-    private _advisoryEndDate: FormControl = new FormControl('', [Validators.required]);
+    private _advisoryReceptionDateToFacultyMI: FormControl = new FormControl(null);
+    private _advisoryApprovalDateUDIMI: FormControl = new FormControl(null);
+    private _paymentDateMI: FormControl = new FormControl(null);
+    private _submissionDateToSecretariatMI: FormControl = new FormControl(null);
+    private _reportNumberMI: FormControl = new FormControl('');
+    private _resolutionDateMI: FormControl = new FormControl(null);
+    private _advisoryStartDate: FormControl = new FormControl(null);
+    private _advisoryEndDate: FormControl = new FormControl(null);
 
     get cancelationComment() {
         return this._cancelationComment;
@@ -258,7 +258,7 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
     viewDetailsInscription(data: any) {
         this.loaderService.show();
         if (data) {
-            data.approval_date_udi === '00-00-0000'
+            this.validateEmptyArray(data.reviewer)
                 ? this.requiereMoreInfo = true
                 : this.requiereMoreInfo = false;
             this.advisorySelected = data;
@@ -274,6 +274,12 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
             this.loaderService.hide();
         }, 400);
     }
+
+    validateEmptyArray(array: any[]): boolean {
+        return array.length === 0 || !array.some(item => typeof item === 'object' && item !== null);
+      }
+          
+      
 
     backList() {
         this.loaderService.show();
@@ -304,14 +310,14 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
         this.chargingEdition = true;
         const rq = {
             user_id: this.advisory.value[0].id,
-            reception_date_faculty: this.dateFormatService.transformDDMMYYYY(this.advisoryReceptionDateToFacultyMI.value),
-            payment_date: this.dateFormatService.transformDDMMYYYY(this.paymentDateMI.value),
-            approval_date_udi: this.dateFormatService.transformDDMMYYYY(this.advisoryApprovalDateUDIMI.value),
-            shipment_date_secretary: this.dateFormatService.transformDDMMYYYY(this.submissionDateToSecretariatMI.value),
+            reception_date_faculty: this.advisoryReceptionDateToFacultyMI.value ? this.dateFormatService.transformDDMMYYYY(this.advisoryReceptionDateToFacultyMI.value) : null,
+            payment_date: this.paymentDateMI.value ? this.dateFormatService.transformDDMMYYYY(this.paymentDateMI.value) : null,
+            approval_date_udi: this.advisoryApprovalDateUDIMI.value ? this.dateFormatService.transformDDMMYYYY(this.advisoryApprovalDateUDIMI.value) : null,
+            shipment_date_secretary: this.submissionDateToSecretariatMI.value ? this.dateFormatService.transformDDMMYYYY(this.submissionDateToSecretariatMI.value) : null,
             report: this.reportNumberMI.value,
-            resolution_date: this.dateFormatService.transformDDMMYYYY(this.resolutionDateMI.value),
-            start_date_advisory: this.dateFormatService.transformDDMMYYYY(this.advisoryStartDate.value),
-            end_date_advisory: this.dateFormatService.transformDDMMYYYY(this.advisoryEndDate.value),
+            resolution_date: this.resolutionDateMI.value ? this.dateFormatService.transformDDMMYYYY(this.resolutionDateMI.value) : null,
+            start_date_advisory: this.advisoryStartDate.value ? this.dateFormatService.transformDDMMYYYY(this.advisoryStartDate.value) : null,
+            end_date_advisory: this.advisoryEndDate.value ? this.dateFormatService.transformDDMMYYYY(this.advisoryEndDate.value) : null,
         }
         this.service.putAdvisoryUpdate(this.advisorySelected.id, rq).pipe(
             finalize(() => {
@@ -544,16 +550,17 @@ export class AdvisoryTrackingComponent implements OnInit, OnDestroy {
 
     saveMoreInfo() {
         this.loaderService.show();
+        console.log('this.advisoryReceptionDateToFacultyMI.value', this.advisoryReceptionDateToFacultyMI.value)
         const rq = {
             user_id: this.advisory.value[0].id,
-            reception_date_faculty: this.dateFormatService.transformDDMMYYYY(this.advisoryReceptionDateToFacultyMI.value),
-            payment_date: this.dateFormatService.transformDDMMYYYY(this.paymentDateMI.value),
-            approval_date_udi: this.dateFormatService.transformDDMMYYYY(this.advisoryApprovalDateUDIMI.value),
-            shipment_date_secretary: this.dateFormatService.transformDDMMYYYY(this.submissionDateToSecretariatMI.value),
+            reception_date_faculty: this.advisoryReceptionDateToFacultyMI.value && this.advisoryReceptionDateToFacultyMI.value !== '00-00-0000' ? this.dateFormatService.transformDDMMYYYY(this.advisoryReceptionDateToFacultyMI.value) : null,
+            payment_date: this.paymentDateMI.value && this.paymentDateMI.value !== '00-00-0000' ? this.dateFormatService.transformDDMMYYYY(this.paymentDateMI.value) : null,
+            approval_date_udi: this.advisoryApprovalDateUDIMI.value && this.advisoryApprovalDateUDIMI.value !== '00-00-0000' ? this.dateFormatService.transformDDMMYYYY(this.advisoryApprovalDateUDIMI.value) : null,
+            shipment_date_secretary: this.submissionDateToSecretariatMI.value && this.submissionDateToSecretariatMI.value !== '00-00-0000' ? this.dateFormatService.transformDDMMYYYY(this.submissionDateToSecretariatMI.value) : null,
             report: this.reportNumberMI.value,
-            resolution_date: this.dateFormatService.transformDDMMYYYY(this.resolutionDateMI.value),
-            start_date_advisory: this.dateFormatService.transformDDMMYYYY(this.advisoryStartDate.value),
-            end_date_advisory: this.dateFormatService.transformDDMMYYYY(this.advisoryEndDate.value),
+            resolution_date: this.resolutionDateMI.value && this.resolutionDateMI.value !== '00-00-0000' ? this.dateFormatService.transformDDMMYYYY(this.resolutionDateMI.value) : null,
+            start_date_advisory: this.advisoryStartDate.value && this.advisoryStartDate.value !== '00-00-0000' ? this.dateFormatService.transformDDMMYYYY(this.advisoryStartDate.value) : null,
+            end_date_advisory: this.advisoryEndDate.value && this.advisoryEndDate.value !== '00-00-0000' ? this.dateFormatService.transformDDMMYYYY(this.advisoryEndDate.value) : null,
         }
         this.service.putAdvisoryUpdate(this.advisorySelected.id, rq).pipe(
             finalize(() => {

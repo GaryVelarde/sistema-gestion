@@ -161,12 +161,12 @@
                                         pInputText
                                         pKeyFilter="int"
                                         formControlName="number" />
-                                    <label for="number">Celular</label>
+                                    <label for="number">Celular (opcional)</label>
                                 </span>
-                                <small
+                                <!-- <small
                                     class="pl-2 text-error"
                                     *ngIf="presenter.number.dirty && presenter.number.errors">El celular
-                                    es requerido.</small>
+                                    es requerido.</small> -->
                             </div>
                         </div>
                         <div class="formgrid grid mt-4">
@@ -178,12 +178,12 @@
                                         class="w-full"
                                         pInputText
                                         formControlName="email" />
-                                    <label for="email">Correo</label>
+                                    <label for="email">Correo (opcional)</label>
                                 </span>
-                                <small
+                                <!-- <small
                                     class="pl-2 text-error"
                                     *ngIf="presenter.email.dirty && presenter.email.errors">El nombre es
-                                    requerido.</small>
+                                    requerido.</small> -->
                             </div>
                         </div>
                         <div class="formgrid grid mt-5">
@@ -195,12 +195,12 @@
                                         class="w-full"
                                         pInputText
                                         formControlName="career" />
-                                    <label for="career">Carrera</label>
+                                    <label for="career">Carrera (opcional)</label>
                                 </span>
-                                <small
+                                <!-- <small
                                     class="pl-2 text-error"
                                     *ngIf="presenter.career.dirty && presenter.career.errors">La
-                                    carrera es requerida.</small>
+                                    carrera es requerida.</small> -->
                             </div>
                         </div>
                         <div class="formgrid grid mt-5" *ngIf="presenter.roleSelected === 'Estudiante'">
@@ -214,12 +214,12 @@
                                         [options]="cycles"
                                         optionLabel="name"></p-dropdown>
                                     <label for="cycle">Seleccione el
-                                        ciclo</label>
+                                        ciclo (opcional)</label>
                                 </span>
-                                <small
+                                <!-- <small
                                     class="pl-2 text-error"
                                     *ngIf="presenter.cycle.dirty && presenter.cycle.errors">El ciclo
-                                    es requerido.</small>
+                                    es requerido.</small> -->
                             </div>
                         </div>
 
@@ -234,13 +234,13 @@
                                         [showIcon]="true"
                                         dateFormat="yy-mm-dd"></p-calendar>
                                     <label for="egressDate">Fecha de
-                                        egreso</label>
+                                        egreso  (opcional)</label>
                                 </span>
-                                <small
+                                <!-- <small
                                     class="pl-2 text-error"
                                     *ngIf="
                                         presenter.egressDate.dirty && presenter.egressDate.errors
-                                    ">La fecha de egreso es requerida.</small>
+                                    ">La fecha de egreso es requerida.</small> -->
                             </div>
                         </div>
                     </form>
@@ -360,12 +360,12 @@
                                         pInputText
                                         pKeyFilter="int"
                                         formControlName="numberTwo" />
-                                    <label for="number">Celular</label>
+                                    <label for="number">Celular (opcional)</label>
                                 </span>
-                                <small
+                                <!-- <small
                                     class="pl-2 text-error"
                                     *ngIf="presenter.numberTwo.dirty && presenter.numberTwo.errors">El celular
-                                    es requerido.</small>
+                                    es requerido.</small> -->
                             </div>
                         </div>
                         <div class="formgrid grid mt-4">
@@ -377,12 +377,12 @@
                                         class="w-full"
                                         pInputText
                                         formControlName="emailTwo" />
-                                    <label for="email">Correo</label>
+                                    <label for="email">Correo (opcional)</label>
                                 </span>
-                                <small
+                                <!-- <small
                                     class="pl-2 text-error"
                                     *ngIf="presenter.emailTwo.dirty && presenter.emailTwo.errors">El nombre es
-                                    requerido.</small>
+                                    requerido.</small> -->
                             </div>
                         </div>
                         <div class="formgrid grid mt-5">
@@ -394,12 +394,12 @@
                                         class="w-full"
                                         pInputText
                                         formControlName="careerTwo" />
-                                    <label for="career">Carrera</label>
+                                    <label for="career">Carrera (opcional)</label>
                                 </span>
-                                <small
+                                <!-- <small
                                     class="pl-2 text-error"
                                     *ngIf="presenter.careerTwo.dirty && presenter.careerTwo.errors">La
-                                    carrera es requerida.</small>
+                                    carrera es requerida.</small> -->
                             </div>
                         </div>
                         <div class="formgrid grid mt-5" *ngIf="presenter.roleSelectedTwo === 'Estudiante'">
@@ -413,12 +413,12 @@
                                         [options]="cycles"
                                         optionLabel="name"></p-dropdown>
                                     <label for="cycle">Seleccione el
-                                        ciclo</label>
+                                        ciclo (opcional)</label>
                                 </span>
-                                <small
+                                <!-- <small
                                     class="pl-2 text-error"
                                     *ngIf="presenter.cycleTwo.dirty && presenter.cycleTwo.errors">El ciclo
-                                    es requerido.</small>
+                                    es requerido.</small> -->
                             </div>
                         </div>
 
@@ -433,13 +433,13 @@
                                         [showIcon]="true"
                                         dateFormat="yy-mm-dd"></p-calendar>
                                     <label for="egressDate">Fecha de
-                                        egreso</label>
+                                        egreso (opcional)</label>
                                 </span>
-                                <small
+                                <!-- <small
                                     class="pl-2 text-error"
                                     *ngIf="
                                         presenter.egressDateTwo.dirty && presenter.egressDateTwo.errors
-                                    ">La fecha de egreso es requerida.</small>
+                                    ">La fecha de egreso es requerida.</small> -->
                             </div>
                         </div>
                     </form>

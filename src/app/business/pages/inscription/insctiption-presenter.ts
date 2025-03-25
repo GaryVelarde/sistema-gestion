@@ -48,10 +48,7 @@ export class InscriptionPresenter {
     private _student: FormControl = new FormControl('', Validators.required);
     private _studentTwo: FormControl = new FormControl('', Validators.required);
     private _title: FormControl = new FormControl('', Validators.required);
-    private _approveDate: FormControl = new FormControl(
-        '',
-        Validators.required
-    );
+    private _approveDate: FormControl = new FormControl('');
     private _jobNumber: FormControl = new FormControl('', Validators.required);
     private _resolutionNumber: FormControl = new FormControl(
         '',
@@ -63,21 +60,21 @@ export class InscriptionPresenter {
     private _name: FormControl = new FormControl('', [Validators.required]);
     private _lastName: FormControl = new FormControl('', [Validators.required]);
     private _code: FormControl = new FormControl('', [Validators.required]);
-    private _number: FormControl = new FormControl('', [Validators.required]);
-    private _email: FormControl = new FormControl('', [Validators.required]);
-    private _cycle: FormControl = new FormControl('', [Validators.required]);
-    private _egressDate: FormControl = new FormControl('', [Validators.required]);
-    private _career: FormControl = new FormControl('', [Validators.required]);
+    private _number: FormControl = new FormControl('');
+    private _email: FormControl = new FormControl('');
+    private _cycle: FormControl = new FormControl('');
+    private _egressDate: FormControl = new FormControl('');
+    private _career: FormControl = new FormControl('');
 
     private _roleTwo: FormControl = new FormControl('', [Validators.required]);
     private _nameTwo: FormControl = new FormControl('', [Validators.required]);
     private _lastNameTwo: FormControl = new FormControl('', [Validators.required]);
     private _codeTwo: FormControl = new FormControl('', [Validators.required]);
-    private _numberTwo: FormControl = new FormControl('', [Validators.required]);
-    private _emailTwo: FormControl = new FormControl('', [Validators.required]);
-    private _cycleTwo: FormControl = new FormControl('', [Validators.required]);
-    private _egressDateTwo: FormControl = new FormControl('', [Validators.required]);
-    private _careerTwo: FormControl = new FormControl('', [Validators.required]);
+    private _numberTwo: FormControl = new FormControl('');
+    private _emailTwo: FormControl = new FormControl('');
+    private _cycleTwo: FormControl = new FormControl('');
+    private _egressDateTwo: FormControl = new FormControl('');
+    private _careerTwo: FormControl = new FormControl('');
 
     studentTwoRequired = false;
     studentOneIsValid = false;
@@ -327,7 +324,7 @@ export class InscriptionPresenter {
             career: this.career.value
         } as graduate;
         if (this.role.value.code === 'Egresado') {
-            userOne.discharge_date = this.formatDate(this.egressDate.value);
+            userOne.discharge_date = this.egressDate.value ? this.formatDate(this.egressDate.value) : '';
         } else {
             userOne.cycle = this.cycle.value.code;
         }
@@ -343,7 +340,7 @@ export class InscriptionPresenter {
                 career: this.careerTwo.value
             } as graduate;
             if (this.roleTwo.value.code === 'Egresado') {
-                userTwo.discharge_date = this.formatDate(this.egressDateTwo.value);
+                userTwo.discharge_date = this.egressDateTwo.value ? this.formatDate(this.egressDateTwo.value) : '';
             } else {
                 userTwo.cycle = this.cycleTwo.value.code;
             }

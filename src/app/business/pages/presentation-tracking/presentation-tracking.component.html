@@ -438,28 +438,40 @@
                         </div>
                     </div>
                     <div class="col-12 col-md-3">
-                        <p class="font-bold">Recibido:</p>
-                        <p-toggleButton
-                            formControlName="received"
-                            disabled="true"
-                            onIcon="pi pi-check"
-                            offIcon="pi pi-times"
-                            onLabel="Si"
-                            offLabel="No"
-                            pTooltip="Click para cambiar a Si o No"
-                        />
+                        <p class="font-bold">
+                            Recibido:
+                        </p>
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="dateRecivied"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
                     </div>
                     <div class="col-12 col-md-3">
-                        <p class="font-bold">Se envió a bilioteca:</p>
-                        <p-toggleButton
-                            formControlName="sentToLibrary"
-                            disabled="true"
-                            onIcon="pi pi-check"
-                            offIcon="pi pi-times"
-                            onLabel="Si"
-                            offLabel="No"
-                            pTooltip="Click para cambiar a Si o No"
-                        />
+                        <p class="font-bold">
+                            Fecha de envío a biblioteca:
+                        </p>
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="dateSentToLibrary"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -558,25 +570,17 @@
                     </div>
                     <div class="col-12 col-md-3">
                         <p class="font-bold">Recibido:</p>
-                        <p-toggleButton
-                            [(ngModel)]="presentationSelected.received"
-                            disabled="true"
-                            onIcon="pi pi-check"
-                            offIcon="pi pi-times"
-                            onLabel="Si"
-                            offLabel="No"
-                        />
+                        <p>
+                            <i class="pi pi-calendar"></i>
+                            {{ presentationSelected.received }}
+                        </p>
                     </div>
                     <div class="col-12 col-md-3">
                         <p class="font-bold">Se envió a bilioteca:</p>
-                        <p-toggleButton
-                            [(ngModel)]="presentationSelected.sent_to_library"
-                            disabled="true"
-                            onIcon="pi pi-check"
-                            offIcon="pi pi-times"
-                            onLabel="Si"
-                            offLabel="No"
-                        />
+                        <p>
+                            <i class="pi pi-calendar"></i>
+                            {{ presentationSelected.sent_to_library }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -804,6 +808,24 @@
                             </div>
                         </div>
                     </div>
+                    <div *ngIf="showDateReceived" class="col-12 col-md-3">
+                        <p class="font-bold">
+                            Recibido: (opcional)
+                        </p>
+                        <div class="grid p-fluid">
+                            <div class="field col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="dateRecivied"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-12 col-md-3">
                         <p class="font-bold">Se envío a biblioteca:</p>
                         <div class="w-full flex align-items-center">
@@ -819,6 +841,24 @@
                                 <label [for]="category.key" class="ml-2">
                                     {{ category.name }}
                                 </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="showDateSentToLibrary" class="col-12 col-md-3">
+                        <p class="font-bold">
+                            Fecha de envío a biblioteca: (opcional)
+                        </p>
+                        <div class="grid p-fluid">
+                            <div class="field col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="dateSentToLibrary"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
                             </div>
                         </div>
                     </div>

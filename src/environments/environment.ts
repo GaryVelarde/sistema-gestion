@@ -1,4 +1,4 @@
 export const environment = {
-  // apiURL: 'https://d31b-2001-1388-5780-549-60ca-8cd4-66ff-be04.ngrok-free.app/api'
-  apiURL: 'https://sisgesinv.cjtech.online/api'
+  apiURL: 'https://8de2-2001-1388-5780-4867-21a0-2e14-1d9d-c17b.ngrok-free.app/api'
+  // apiURL: 'https://sisgesinv.cjtech.online/api'
 };

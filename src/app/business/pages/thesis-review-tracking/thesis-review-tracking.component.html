@@ -267,7 +267,7 @@
                     </p>
                 </div>
                 <div class="col-12 col-md-3">
-                    <p class="font-bold">Escuala profesional:</p>
+                    <p class="font-bold">Escuela profesional:</p>
                     <p>
                         {{
                             reviewSelected.degree_processes.professional_school
@@ -287,11 +287,29 @@
                     </p>
                 </div>
             </div>
-            <div>
+            <div *ngIf="!edition">
                 <div class="grid col-12">
-                    <div class="col-12 col-md-3"></div>
-                    <div class="col-12 col-md-3"></div>
-                    <div class="col-12 col-md-3"></div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Fecha de recepción a facultad:</p>
+                        <p>
+                            <i class="pi pi-calendar"></i>
+                            {{ reviewSelected.reception_date_faculty }}
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Fecha de aprobación UDI:</p>
+                        <p>
+                            <i class="pi pi-calendar"></i>
+                            {{ reviewSelected.approval_date_udi }}
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Fecha de envió a secretaría:</p>
+                        <p>
+                            <i class="pi pi-calendar"></i>
+                            {{ reviewSelected.shipment_date_secretary }}
+                        </p>
+                    </div>
                     <div class="card col-12 col-md-3" style="max-height: 100px">
                         <p class="font-bold">Estado:</p>
                         <p-tag
@@ -309,6 +327,76 @@
                         />
                     </div>
                 </div>
+            </div>
+            <div *ngIf="edition">
+                <form [formGroup]="moreInfoForm">
+                    <div class="grid col-12 mt-2">
+                        <div class="col-12 col-md-3">
+                            <p class="font-bold">Fecha de recepción a facultad: (opcional)</p>
+                            <div class="grid p-fluid">
+                                <div class="field col-12 md:col-12">
+                                    <p-calendar
+                                        formControlName="reception_date_faculty"
+                                        placeholder="Seleccione una fecha"
+                                        [iconDisplay]="'input'"
+                                        class="full-width"
+                                        [showIcon]="true"
+                                        dateFormat="dd-mm-yy"
+                                        inputId="icondisplay"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <p class="font-bold">Fecha de aprobación UDI: (opcional)</p>
+                            <div class="grid p-fluid">
+                                <div class="field col-12 md:col-12">
+                                    <p-calendar
+                                        formControlName="approval_date_udi"
+                                        placeholder="Seleccione una fecha"
+                                        [iconDisplay]="'input'"
+                                        class="full-width"
+                                        [showIcon]="true"
+                                        dateFormat="dd-mm-yy"
+                                        inputId="icondisplay"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <p class="font-bold">Fecha de envío a secretaría: (opcional)</p>
+                            <div class="grid p-fluid">
+                                <div class="field col-12 md:col-12">
+                                    <p-calendar
+                                        formControlName="shipment_date_secretary"
+                                        placeholder="Seleccione una fecha"
+                                        [iconDisplay]="'input'"
+                                        class="full-width"
+                                        [showIcon]="true"
+                                        dateFormat="dd-mm-yy"
+                                        inputId="icondisplay"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card col-12 col-md-3" style="max-height: 100px">
+                            <p class="font-bold">Estado:</p>
+                            <p-tag
+                                *ngIf="reviewState === 'Revisión de Tesis'"
+                                value="En revisión de tesis"
+                            />
+                            <p-tag
+                                *ngIf="reviewState === 'No aprobado'"
+                                severity="danger"
+                                value="Desaprobado"
+                            />
+                            <p-tag
+                                *ngIf="reviewState === 'Aprobado'"
+                                value="Aprobado"
+                            />
+                        </div>
+                    </div>
+                </form>
             </div>
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
@@ -433,6 +521,59 @@
                     </p>
                 </div>
             </div>
+            <div class="ml-2 mr-2 separator"></div>
+            <form [formGroup]="moreInfoForm">
+                <div class="grid col-12 mt-4">
+                    <div class="col-12 col-md-4">
+                        <p class="font-bold">Fecha de recepción a facultad: (opcional)</p>
+                        <div class="grid p-fluid">
+                            <div class="field col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="reception_date_faculty"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <p class="font-bold">Fecha de aprobación UDI: (opcional)</p>
+                        <div class="grid p-fluid">
+                            <div class="field col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="approval_date_udi"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <p class="font-bold">Fecha de envío a secretaría: (opcional)</p>
+                        <div class="grid p-fluid">
+                            <div class="field col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="shipment_date_secretary"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
             <div class="ml-2 mr-2 separator"></div>
             <div class="grid col-12">
                 <div class="col-12">

@@ -79,6 +79,8 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
     messageError: string = 'Lo sentimos, hubo un problema al intentar cargar la lista de revisiones de tesis. Por favor, inténtelo de nuevo más tarde. Si el inconveniente persiste, contacte al soporte técnico.';
     messageMoreInfo = [{ severity: 'info', detail: 'Es necesario completar todos los campos faltantes para continuar con la sustentación.' }];
     requiereMoreInfo: boolean = false;
+    showDateReceived: boolean = false;
+    showDateSentToLibrary: boolean = false;
     public tasksForm: FormGroup;
     public cancelattionForm: FormGroup;
     public reviewerForm: FormGroup;
@@ -94,12 +96,14 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
     private _students: FormControl = new FormControl([], [Validators.required]);
     private _receptionDateFaculty: FormControl = new FormControl("", [Validators.required]);
     private _scheduledDate: FormControl = new FormControl("", [Validators.required]);
-    private _notificationDateGraduates: FormControl = new FormControl("", [Validators.required]);
+    private _notificationDateGraduates: FormControl = new FormControl("");
     private _juryConfirmation: FormControl = new FormControl("", [Validators.required]);
     private _place: FormControl = new FormControl("", [Validators.required]);
     private _formRequestDateRepository: FormControl = new FormControl("", [Validators.required]);
     private _received: FormControl = new FormControl(false, [Validators.required]);
     private _sentToLibrary: FormControl = new FormControl(false, [Validators.required]);
+    private _dateRecivied: FormControl = new FormControl(null);
+    private _dateSentToLibrary: FormControl = new FormControl(null);
 
     get cancelationComment() {
         return this._cancelationComment;
@@ -140,6 +144,12 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
     get sentToLibrary() {
         return this._sentToLibrary;
     }
+    get dateRecivied() {
+        return this._dateRecivied;
+    }
+    get dateSentToLibrary() {
+        return this._dateSentToLibrary;
+    }
 
     constructor(
         private messageService: MessageService,
@@ -173,6 +183,8 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
             formRequestDateRepository: this.formRequestDateRepository,
             received: this.received,
             sentToLibrary: this.sentToLibrary,
+            dateRecivied: this.dateRecivied,
+            dateSentToLibrary: this.dateSentToLibrary,
         });
         this.editForm = this.fb.group({
             receptionDateFaculty: this.receptionDateFaculty,
@@ -183,11 +195,15 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
             formRequestDateRepository: this.formRequestDateRepository,
             received: this.received,
             sentToLibrary: this.sentToLibrary,
+            dateRecivied: this.dateRecivied,
+            dateSentToLibrary: this.dateSentToLibrary,
         });
     }
 
     ngOnInit() {
         this.getPresentationList();
+        this.watchReceived();
+        this.watchSentToLibrary();
         this.config.setTranslation({
             firstDayOfWeek: 1,
             dayNames: ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"],
@@ -308,8 +324,8 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
             notification_date_graduates: this.dateFormatService.transformDDMMYYYY(this.notificationDateGraduates.value),
             jury_confirmation: this.juryConfirmation.value.code,
             form_request_date_repository: this.dateFormatService.transformDDMMYYYY(this.formRequestDateRepository.value),
-            received: this.received.value.key,
-            sent_to_library: this.sentToLibrary.value.key
+            received: this.dateRecivied.value ? this.dateFormatService.transformDDMMYYYY(this.dateRecivied.value) : null,
+            sent_to_library: this.dateSentToLibrary.value ? this.dateFormatService.transformDDMMYYYY(this.dateSentToLibrary.value) : null,
         }
         this.service.putPresentationUpdate(this.presentationSelected.id, request).pipe(
             finalize(() => {
@@ -348,8 +364,8 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
         this.presentationSelected.jury_confirmation = this.juryConfirmation.value.code;
         this.presentationSelected.place = this.place.value;
         this.presentationSelected.form_request_date_repository = this.dateFormatService.transformDDMMYYYY(this.formRequestDateRepository.value);
-        this.presentationSelected.received = this.received.value;
-        this.presentationSelected.sent_to_library = this.sentToLibrary.value;
+        this.presentationSelected.received = this.dateFormatService.transformDDMMYYYY(this.dateRecivied.value);
+        this.presentationSelected.sent_to_library = this.dateFormatService.transformDDMMYYYY(this.dateSentToLibrary.value);
     }
 
     onFileChange(files: any) {
@@ -432,8 +448,8 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
             notification_date_graduates: this.dateFormatService.transformDDMMYYYY(this.notificationDateGraduates.value),
             jury_confirmation: this.juryConfirmation.value.code,
             form_request_date_repository: this.dateFormatService.transformDDMMYYYY(this.formRequestDateRepository.value),
-            received: this.received.value,
-            sent_to_library: this.sentToLibrary.value
+            received: this.dateRecivied.value ? this.dateFormatService.transformDDMMYYYY(this.dateRecivied.value) : null,
+            sent_to_library: this.dateSentToLibrary.value ? this.dateFormatService.transformDDMMYYYY(this.dateSentToLibrary.value) : null,
         }
         this.service.putPresentationUpdate(this.presentationSelected.id, request).pipe(
             finalize(() => {
@@ -517,8 +533,10 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
         this.juryConfirmation.setValue({ code: this.presentationSelected.jury_confirmation, name: this.presentationSelected.jury_confirmation });
         this.place.setValue(this.presentationSelected.place);
         this.formRequestDateRepository.setValue(this.presentationSelected.form_request_date_repository);
-        this.received.setValue(this.presentationSelected.received === 1 ? true : false);
-        this.sentToLibrary.setValue(this.presentationSelected.sent_to_library === 1 ? true : false);
+        // this.received.setValue(this.presentationSelected.received === 1 ? true : false);
+        // this.sentToLibrary.setValue(this.presentationSelected.sent_to_library === 1 ? true : false);
+        this.dateRecivied.setValue(this.presentationSelected.received)
+        this.dateSentToLibrary.setValue(this.presentationSelected.sent_to_library)
     }
 
     isFirstPresentation(): boolean {
@@ -527,4 +545,19 @@ export class PresentationTrackingComponent implements OnInit, OnDestroy {
             ? true : false;
     }
 
+    watchReceived(): void {
+        this.received.valueChanges.pipe().subscribe(
+            (data) => {
+                this.showDateReceived = data.key
+            }
+        )
+    }
+
+    watchSentToLibrary(): void {
+        this.sentToLibrary.valueChanges.pipe().subscribe(
+            (data) => {
+                this.showDateSentToLibrary = data.key
+            }
+        )
+    }
 }
