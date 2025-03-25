@@ -311,6 +311,8 @@ export class UsersComponent implements OnInit, OnDestroy {
                     this.addControlForEgresado();
                     this.removeControlForDocente();
                     this.removeControlForEstudiante();
+                    this.egressDate.setValue(user.discharge_date);
+                    this.career.setValue(user.career);
                     break;
                 case 'Estudiante':
                 case 'Semillero':
