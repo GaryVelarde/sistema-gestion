@@ -1,0 +1,71 @@
+<p-toast />
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <h4>Registro de líneas y guías</h4>
+            <p-divider />
+            <div class="grid mt-3">
+                <form [formGroup]="articleForm" class="full-width">
+                    <div class="col-12">
+                        <p-floatLabel>
+                            <textarea
+                                formControlName="title"
+                                class="full-width"
+                                rows="3"
+                                pInputTextarea
+                            >
+                            </textarea>
+                            <label for="title">Título del documento</label>
+                        </p-floatLabel>
+                    </div>
+                    <div class="col-12">
+                        <p-floatLabel>
+                            <textarea
+                                formControlName="description"
+                                class="full-width"
+                                rows="2"
+                                pInputTextarea
+                            >
+                            </textarea>
+                            <label for="title">Descripción</label>
+                        </p-floatLabel>
+                    </div>
+                    <app-upload-archives
+                        #upload
+                        (onFileChangeEmitter)="onFileChange($event)"
+                        (clearFilesEmitter)="clearFile()"
+                    ></app-upload-archives>
+                    <div class="col-12">
+                        <p>Responsables</p>
+                        <app-user-selection
+                            #userSelection
+                            typeUserList="semilleros"
+                            maxUsersAllow="2"
+                            (userSelected)="getUserSelected($event)"
+                        >
+                        </app-user-selection>
+                    </div>
+
+                    <div class="flex gap-3 mt-3">
+                        <p-button
+                            (click)="backToList()"
+                            label="Regresar"
+                            [outlined]="true"
+                            icon="pi pi-angle-left"
+                            iconPos="left"
+                        />
+                        <p-button
+                            (click)="nextStep()"
+                            label="Registrar"
+                            icon="pi pi-angle-right"
+                            iconPos="right"
+                            [disabled]="
+                                !articleForm.valid || !studentsForm.valid
+                            "
+                        />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

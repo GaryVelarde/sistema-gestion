@@ -1,0 +1,873 @@
+<p-toast key="tst"></p-toast>
+<div *ngIf="!presentationSelected" class="grid">
+    <div class="col-12">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+        <div class="card px-6 py-6">
+            <div [ngSwitch]="getStatusList">
+                <ng-template [ngSwitchCase]="'charging'">
+                    <ng-container
+                        *ngTemplateOutlet="skeletonAdvisoryList"
+                    ></ng-container>
+                </ng-template>
+                <ng-template [ngSwitchCase]="'error'">
+                    <ng-container
+                        *ngTemplateOutlet="advisoryListError"
+                    ></ng-container>
+                </ng-template>
+                <ng-template [ngSwitchCase]="'complete'">
+                    <ng-container
+                        *ngTemplateOutlet="AdvisoryList"
+                    ></ng-container>
+                </ng-template>
+                <ng-template ngSwitchDefault>
+                    <p>Invalid state</p>
+                </ng-template>
+            </div>
+            <ng-template #AdvisoryList>
+                <div class="card">
+                    <p-table
+                        #dt
+                        [value]="registros"
+                        responsiveLayout="scroll"
+                        [rows]="10"
+                        [globalFilterFields]="[
+                            'degree_processes.thesis_project_title'
+                        ]"
+                        [paginator]="true"
+                        [rowsPerPageOptions]="[10, 20, 30]"
+                        [showCurrentPageReport]="true"
+                        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+                        selectionMode="multiple"
+                        [rowHover]="true"
+                        dataKey="id"
+                    >
+                        <ng-template pTemplate="caption">
+                            <div
+                                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+                            >
+                                <h5 class="m-0">
+                                    Seguimiento de sustentaciones de tesis
+                                </h5>
+                                <span
+                                    class="block mt-2 md:mt-0 p-input-icon-left"
+                                >
+                                    <i class="pi pi-search"></i>
+                                    <input
+                                        pInputText
+                                        type="text"
+                                        (input)="onGlobalFilter(dt, $event)"
+                                        placeholder="Buscar por título..."
+                                        class="w-full sm:w-auto"
+                                    />
+                                </span>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th
+                                    pSortableColumn="thesis_project_title"
+                                    style="width: 60%"
+                                >
+                                    Título de tesis
+                                    <p-sortIcon
+                                        field="thesis_project_title"
+                                    ></p-sortIcon>
+                                </th>
+                                <th pSortableColumn="name" style="width: 20%">
+                                    Jurados
+                                    <p-sortIcon field="status"></p-sortIcon>
+                                </th>
+                                <th style="width: 10%">Estado</th>
+                                <th style="width: 10%"></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-data>
+                            <tr>
+                                <td style="width: 14%; min-width: 10rem">
+                                    <span class="p-column-title"
+                                        >Título de tesis</span
+                                    >
+                                    {{
+                                        data.degree_processes
+                                            .thesis_project_title
+                                    }}
+                                </td>
+                                <td style="width: 14%; min-width: 8rem">
+                                    <span class="p-column-title">Revisor</span>
+                                    <div *ngIf="data.juries.length < 1">
+                                        sin asignar
+                                    </div>
+                                    <div *ngIf="data.juries[0]">
+                                        {{ getJurorNames(data.juries) }}
+                                    </div>
+                                </td>
+                                <td style="width: 14%; min-width: 10rem">
+                                    <span class="p-column-title">estado</span>
+                                    <span
+                                        [class]="
+                                            'product-badge status-' +
+                                            (data.status
+                                                ? data.status.toLowerCase()
+                                                : '')
+                                        "
+                                    >
+                                        {{ data.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="flex">
+                                        <p-button
+                                            label="Ver detalle"
+                                            [outlined]="true"
+                                            severity="contrast"
+                                            (click)="viewDetailsReview(data)"
+                                        />
+
+                                        <!-- <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" (click)="editProduct(product)"></button>
+                                <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning" (click)="deleteProduct(product)"></button> -->
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="4" class="text-center">
+                                    No se encontraron registros
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </ng-template>
+
+            <ng-template #skeletonAdvisoryList>
+                <app-skeleton-table
+                    [columnTitles]="columnTitles"
+                    [skeletonCount]="skeletonRows"
+                ></app-skeleton-table>
+            </ng-template>
+            <ng-template #advisoryListError>
+                <app-card-error
+                    [message]="messageError"
+                    (reload)="handleReload($event)"
+                ></app-card-error>
+            </ng-template>
+        </div>
+    </div>
+</div>
+<p-confirmDialog>
+    <ng-template pTemplate="message" let-message>
+        <div
+            class="flex flex-column align-items-center w-full gap-3 border-bottom-1 surface-border"
+        >
+            <i class="pi pi-exclamation-circle text-6xl text-primary-500"></i>
+            <p>{{ message.message }}</p>
+        </div>
+    </ng-template>
+</p-confirmDialog>
+<div *ngIf="presentationSelected && !requiereMoreInfo" class="grid">
+    <div class="col-12">
+        <app-breadcrumb [items]="detailBreadcrumbItems"></app-breadcrumb>
+        <div class="card">
+            <div class="grid d-flex col-12">
+                <div class="mr-auto p-2">
+                    <p-button
+                        (click)="backList()"
+                        label="Regresar"
+                        [outlined]="true"
+                        icon="pi pi-angle-left"
+                        iconPos="left"
+                    />
+                    <p-button
+                        *ngIf="
+                            !edition &&
+                            presentationState !== 'No aprobado' &&
+                            presentationState !== 'Aprobado' &&
+                            isUdi
+                        "
+                        class="ml-3"
+                        (click)="showEdition()"
+                        label="Editar"
+                        icon="pi pi-pencil"
+                        iconPos="left"
+                    />
+                    <p-button
+                        *ngIf="
+                            edition &&
+                            presentationState !== 'No aprobado' &&
+                            presentationState !== 'Aprobado'
+                        "
+                        class="ml-3"
+                        (click)="cancelEdition()"
+                        label="Cancelar edición"
+                        icon="pi pi-times"
+                        iconPos="right"
+                        [disabled]="chargingEdition"
+                    />
+                    <p-button
+                        *ngIf="
+                            edition &&
+                            presentationState !== 'No aprobado' &&
+                            presentationState !== 'Aprobado'
+                        "
+                        class="ml-3"
+                        (click)="saveEdition()"
+                        label="Guardar cambios"
+                        [icon]="
+                            chargingEdition
+                                ? 'pi pi-spin pi-spinner'
+                                : 'pi pi-save'
+                        "
+                        iconPos="left"
+                        [disabled]="chargingEdition"
+                    />
+                </div>
+                <div class="p-2">
+                    <p-button
+                        *ngIf="presentationState !== 'Culminado' && !edition"
+                        label="Desaprobado"
+                        [outlined]="true"
+                        class="mr-3"
+                        icon="pi pi-times"
+                        iconPos="left"
+                        severity="danger"
+                        (click)="goToDisapproved()"
+                    />
+                    <p-button
+                        *ngIf="presentationState !== 'Culminado' && !edition"
+                        label="Aprobado"
+                        [outlined]="true"
+                        icon="pi pi-angle-right"
+                        iconPos="right"
+                        (click)="goToApprove()"
+                    />
+                </div>
+            </div>
+            <div class="card flex justify-content-center col-12">
+                <h5
+                    class="font-bold text-color"
+                    style="font-family: revert; text-align: center"
+                >
+                    {{
+                        presentationSelected.degree_processes
+                            .thesis_project_title
+                    }}
+                </h5>
+            </div>
+            <div class="grid col-12">
+                <div class="col-12 col-md-3">
+                    <p class="font-bold">Nro de expediente:</p>
+                    <p>
+                        {{ presentationSelected.degree_processes.file }}
+                    </p>
+                </div>
+                <div class="col-12 col-md-3">
+                    <p class="font-bold">Escuala profesional:</p>
+                    <p>
+                        {{
+                            presentationSelected.degree_processes
+                                .professional_school
+                        }}
+                    </p>
+                </div>
+                <div class="col-12 col-md-3">
+                    <p class="font-bold">Primera sustentación:</p>
+                    <p-tag
+                        *ngIf="
+                            presentationSelected.first_presentation !==
+                            'No aprobado'
+                        "
+                        [value]="presentationSelected.first_presentation"
+                    />
+                    <p-tag
+                        *ngIf="
+                            presentationSelected.first_presentation ===
+                            'No aprobado'
+                        "
+                        severity="danger"
+                        value="No aprobado"
+                    />
+                </div>
+                <div
+                    *ngIf="presentationSelected.second_presentation"
+                    class="col-12 col-md-3"
+                >
+                    <p class="font-bold">Segunda sustentación</p>
+                    <p-tag
+                        *ngIf="
+                            presentationSelected.second_presentation !==
+                            'No aprobado'
+                        "
+                        [value]="presentationSelected.second_presentation"
+                    />
+                    <p-tag
+                        *ngIf="
+                            presentationSelected.second_presentation ===
+                            'No aprobado'
+                        "
+                        severity="danger"
+                        value="No aprobado"
+                    />
+                </div>
+            </div>
+            <form *ngIf="edition" [formGroup]="editForm">
+                <div class="grid col-12">
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Fecha de recepción a facultad:</p>
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="receptionDateFaculty"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Fecha programada:</p>
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="scheduledDate"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">
+                            Fecha de notificación a estudiantes:
+                        </p>
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="notificationDateGraduates"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card col-12 col-md-3" style="max-height: 100px">
+                        <p class="font-bold">Estado:</p>
+                        <p-tag
+                            *ngIf="
+                                presentationState === 'En proceso' &&
+                                presentationSelected.first_presentation !==
+                                    'No aprobado'
+                            "
+                            value="En proceso - 1era sustentación "
+                        />
+                        <p-tag
+                            *ngIf="
+                                presentationState === 'En proceso' &&
+                                presentationSelected.second_presentation
+                            "
+                            value="En proceso - 2da sustentación "
+                        />
+                        <p-tag
+                            *ngIf="presentationState === 'No aprobado'"
+                            severity="danger"
+                            value="Desaprobado"
+                        />
+                        <p-tag
+                            *ngIf="presentationState === 'Aprobado'"
+                            value="Aprobado"
+                        />
+                        <p-tag
+                            *ngIf="presentationState === 'Culminado'"
+                            value="Culminado"
+                        />
+                    </div>
+                </div>
+                <div class="grid col-12">
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Confirmación de jurados:</p>
+                        <p-dropdown
+                            styleClass="w-full"
+                            [options]="optionsConfirmationJury"
+                            formControlName="juryConfirmation"
+                            optionLabel="name"
+                            placeholder="Selecciona una opción"
+                        />
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Lugar de sustentación:</p>
+                        <input
+                            type="text"
+                            class="w-full"
+                            pInputText
+                            formControlName="place"
+                        />
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">
+                            Fecha de envío de formulario a biblioteca:
+                        </p>
+                        <div class="grid p-fluid">
+                            <div class="col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="formRequestDateRepository"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Recibido:</p>
+                        <p-toggleButton
+                            formControlName="received"
+                            disabled="true"
+                            onIcon="pi pi-check"
+                            offIcon="pi pi-times"
+                            onLabel="Si"
+                            offLabel="No"
+                            pTooltip="Click para cambiar a Si o No"
+                        />
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Se envió a bilioteca:</p>
+                        <p-toggleButton
+                            formControlName="sentToLibrary"
+                            disabled="true"
+                            onIcon="pi pi-check"
+                            offIcon="pi pi-times"
+                            onLabel="Si"
+                            offLabel="No"
+                            pTooltip="Click para cambiar a Si o No"
+                        />
+                    </div>
+                </div>
+            </form>
+            <div *ngIf="!edition">
+                <div class="grid col-12">
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Fecha de recepción a facultad:</p>
+                        <p>
+                            {{ presentationSelected.reception_date_faculty }}
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Fecha programada:</p>
+                        <p>
+                            {{ presentationSelected.scheduled_date }}
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">
+                            Fecha de notificación a estudiantes:
+                        </p>
+                        <p>
+                            {{
+                                presentationSelected.notification_date_graduates
+                            }}
+                        </p>
+                    </div>
+                    <div class="card col-12 col-md-3" style="max-height: 100px">
+                        <p class="font-bold">Estado:</p>
+                        <p-tag
+                            *ngIf="
+                                presentationState === 'En proceso' &&
+                                presentationSelected.first_presentation !==
+                                    'No aprobado'
+                            "
+                            value="En proceso - 1era sustentación "
+                        />
+                        <p-tag
+                            *ngIf="
+                                presentationState === 'En proceso' &&
+                                presentationSelected.second_presentation
+                            "
+                            value="En proceso - 2da sustentación "
+                        />
+                        <p-tag
+                            *ngIf="presentationState === 'No aprobado'"
+                            severity="danger"
+                            value="Desaprobado"
+                        />
+                        <p-tag
+                            *ngIf="presentationState === 'Aprobado'"
+                            value="Aprobado"
+                        />
+                        <p-tag
+                            *ngIf="presentationState === 'Culminado'"
+                            value="Culminado"
+                        />
+                    </div>
+                </div>
+                <div class="grid col-12">
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Confirmación de jurados:</p>
+                        <p>
+                            {{ presentationSelected.jury_confirmation }}
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Lugar de sustentación:</p>
+                        <p>
+                            {{ presentationSelected.place }}
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">
+                            Fecha de envío de formulario a biblioteca:
+                        </p>
+                        <p>
+                            {{
+                                presentationSelected.form_request_date_repository
+                            }}
+                        </p>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Recibido:</p>
+                        <p-toggleButton
+                            [(ngModel)]="presentationSelected.received"
+                            disabled="true"
+                            onIcon="pi pi-check"
+                            offIcon="pi pi-times"
+                            onLabel="Si"
+                            offLabel="No"
+                        />
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Se envió a bilioteca:</p>
+                        <p-toggleButton
+                            [(ngModel)]="presentationSelected.sent_to_library"
+                            disabled="true"
+                            onIcon="pi pi-check"
+                            offIcon="pi pi-times"
+                            onLabel="Si"
+                            offLabel="No"
+                        />
+                    </div>
+                </div>
+            </div>
+            <div class="ml-2 mr-2 separator"></div>
+            <div class="grid col-12">
+                <div class="col-6">
+                    <div>
+                        <p>Jurados de tesis</p>
+                        <app-user-selection
+                            #reviewerSelection
+                            [typeUserList]="reviewerType"
+                            maxUsersAllow="3"
+                            [usersPreSelected]="jury.value"
+                            (userSelected)="getTeacherSelected($event)"
+                            [disabled]="!edition"
+                        >
+                        </app-user-selection>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div>
+                        <p>Estudiante(s)</p>
+                        <app-user-selection
+                            #userSelection
+                            [typeUserList]="studentType"
+                            maxUsersAllow="2"
+                            (userSelected)="getStudentSelected($event)"
+                            [usersPreSelected]="students.value"
+                            [disabled]="true"
+                        >
+                        </app-user-selection>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ml-2 mr-2 separator"></div>
+            <div class="grid col-12">
+                <app-file-list
+                    #fileList
+                    class="w-full"
+                    [module]="module"
+                    [id]="presentationSelected.id"
+                    (addArchiveClicked)="showDialogAddFile()"
+                    [clear]="clearFiles"
+                >
+                </app-file-list>
+                <div class="ml-2 mr-2 separator"></div>
+                <app-comments
+                    #comments
+                    class="w-full"
+                    [module]="module"
+                    [id]="presentationSelected.id"
+                    [visible]="commentsVisible"
+                ></app-comments>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="presentationSelected && requiereMoreInfo" class="grid">
+    <div class="col-12">
+        <app-breadcrumb [items]="detailBreadcrumbItems"></app-breadcrumb>
+        <div class="card">
+            <div class="grid d-flex col-12">
+                <div class="mr-auto p-2">
+                    <p-button
+                        (click)="backList()"
+                        label="Regresar"
+                        [outlined]="true"
+                        icon="pi pi-angle-left"
+                        iconPos="left"
+                    />
+                </div>
+                <div class="p-2">
+                    <p-button
+                        class="ml-3"
+                        (click)="saveMoreInfo()"
+                        label="Guardar"
+                        icon="pi pi-save"
+                        iconPos="left"
+                        [disabled]="!jury.valid"
+                    />
+                </div>
+            </div>
+            <div class="card flex justify-content-center col-12">
+                <h5
+                    class="font-bold text-color"
+                    style="font-family: revert; text-align: center"
+                >
+                    {{
+                        presentationSelected.degree_processes
+                            .thesis_project_title
+                    }}
+                </h5>
+            </div>
+            <p-messages
+                [(value)]="messageMoreInfo"
+                [enableService]="false"
+                [closable]="false"
+            />
+            <div class="grid col-12">
+                <div class="col-12 col-md-3">
+                    <p class="font-bold">Nro de expediente:</p>
+                    <p>
+                        {{ presentationSelected.degree_processes.file }}
+                    </p>
+                </div>
+                <div class="col-12 col-md-3">
+                    <p class="font-bold">Escuela profesional:</p>
+                    <p>
+                        {{
+                            presentationSelected.degree_processes
+                                .professional_school
+                        }}
+                    </p>
+                </div>
+            </div>
+            <form [formGroup]="moreInfoForm">
+                <div class="grid col-12">
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Fecha de recepción a Facultad:</p>
+                        <div class="grid p-fluid">
+                            <div class="field col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="receptionDateFaculty"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Fecha programada:</p>
+                        <div class="grid p-fluid">
+                            <div class="field col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="scheduledDate"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">
+                            Fecha de notificación a estudiantes:
+                        </p>
+                        <div class="grid p-fluid">
+                            <div class="field col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="notificationDateGraduates"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Confirmación de jurados:</p>
+                        <p-dropdown
+                            styleClass="w-full"
+                            [options]="optionsConfirmationJury"
+                            formControlName="juryConfirmation"
+                            optionLabel="name"
+                            placeholder="Selecciona una opción"
+                        />
+                    </div>
+                </div>
+                <div class="grid col-12">
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Lugar de sustentación:</p>
+                        <input
+                            formControlName="place"
+                            type="text"
+                            pInputText
+                            placeholder="Complete la información"
+                            class="full-width"
+                        />
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">
+                            Fecha de envío de formulario a bilioteca:
+                        </p>
+                        <div class="grid p-fluid">
+                            <div class="field col-12 md:col-12">
+                                <p-calendar
+                                    formControlName="formRequestDateRepository"
+                                    placeholder="Seleccione una fecha"
+                                    [iconDisplay]="'input'"
+                                    class="full-width"
+                                    [showIcon]="true"
+                                    dateFormat="dd-mm-yy"
+                                    inputId="icondisplay"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Recibido:</p>
+                        <div class="w-full flex align-items-center">
+                            <div
+                                *ngFor="let category of categories"
+                                class="ml-3 field-checkbox"
+                            >
+                                <p-radioButton
+                                    [inputId]="category.key"
+                                    [value]="category"
+                                    formControlName="received"
+                                />
+                                <label [for]="category.key" class="ml-2">
+                                    {{ category.name }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <p class="font-bold">Se envío a biblioteca:</p>
+                        <div class="w-full flex align-items-center">
+                            <div
+                                *ngFor="let category of categories"
+                                class="ml-3 field-checkbox"
+                            >
+                                <p-radioButton
+                                    [inputId]="category.key"
+                                    [value]="category"
+                                    formControlName="sentToLibrary"
+                                />
+                                <label [for]="category.key" class="ml-2">
+                                    {{ category.name }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="ml-2 mr-2 separator"></div>
+            <div class="grid col-12">
+                <div class="col-12">
+                    <p>Por favor asigne a los jurados de tesis</p>
+                    <app-user-selection
+                        #userSelection
+                        [typeUserList]="reviewerType"
+                        maxUsersAllow="3"
+                        (userSelected)="getTeacherSelected($event)"
+                    >
+                    </app-user-selection>
+                </div>
+                <div class="col-12" style="margin-top: -30px">
+                    <p>Estudiante(s)</p>
+                    <app-user-selection
+                        #studentsView
+                        [typeUserList]="studentType"
+                        maxUsersAllow="1"
+                        [usersPreSelected]="students.value"
+                        [disabled]="true"
+                    >
+                    </app-user-selection>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<p-sidebar
+    [(visible)]="showDialogAddFiles"
+    [style]="{ width: '40%' }"
+    position="right"
+>
+    <ng-template pTemplate="header">
+        <span class="font-semibold text-xl">Agregar archivos adjuntos</span>
+    </ng-template>
+    <div class="content">
+        <div class="grid" style="height: 100%">
+            <div class="col-12">
+                <app-upload-archives
+                    #upload
+                    (onFileChangeEmitter)="onFileChange($event)"
+                    (clearFilesEmitter)="clearFile()"
+                >
+                </app-upload-archives>
+            </div>
+            <div class="footer mt-5">
+                <button
+                    pButton
+                    pRipple
+                    label="Regresar"
+                    icon="pi pi-angle-left"
+                    class="p-button-text"
+                    iconPos="left"
+                    (click)="hideAddFilesDialog()"
+                ></button>
+                <p-button
+                    label="Guardar archivos"
+                    iconPos="right"
+                    icon="pi pi-check"
+                    (click)="saveFiles()"
+                    [disabled]="!isFormDataEmpty(formData)"
+                />
+            </div>
+        </div>
+    </div>
+</p-sidebar>

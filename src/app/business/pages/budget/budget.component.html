@@ -1,0 +1,714 @@
+<p-toast key="tst"></p-toast>
+<div *ngIf="!budgetSelected" class="grid">
+    <div class="col-12">
+        <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+        <div class="card px-6 py-6">
+            <p-toolbar styleClass="mb-4">
+                <ng-template pTemplate="left">
+                    <div class="my-2">
+                        <button
+                            pButton
+                            pRipple
+                            label="nuevo presupuesto"
+                            icon="pi pi-plus"
+                            class="mr-2"
+                            (click)="goToBudgetRegister()"
+                        ></button>
+                    </div>
+                </ng-template>
+            </p-toolbar>
+            <div [ngSwitch]="statusList">
+                <ng-template [ngSwitchCase]="'charging'">
+                    <ng-container
+                        *ngTemplateOutlet="listSkeleton"
+                    ></ng-container>
+                </ng-template>
+                <ng-template [ngSwitchCase]="'error'">
+                    <ng-container *ngTemplateOutlet="listError"></ng-container>
+                </ng-template>
+                <ng-template [ngSwitchCase]="'complete'">
+                    <ng-container *ngTemplateOutlet="list"></ng-container>
+                </ng-template>
+                <ng-template ngSwitchDefault>
+                    <p>Invalid state</p>
+                </ng-template>
+            </div>
+            <ng-template #list>
+                <div class="card">
+                    <p-table
+                        #dt
+                        [value]="registros"
+                        responsiveLayout="scroll"
+                        [rows]="10"
+                        [globalFilterFields]="['title']"
+                        [paginator]="true"
+                        [rowsPerPageOptions]="[10, 20, 30]"
+                        [showCurrentPageReport]="true"
+                        currentPageReportTemplate="Mostrando del {first} al {last} de {totalRecords} registros"
+                        selectionMode="multiple"
+                        [rowHover]="true"
+                        dataKey="id"
+                    >
+                        <ng-template pTemplate="caption">
+                            <div
+                                class="flex flex-column md:flex-row md:justify-content-between md:align-items-center"
+                            >
+                                <h5 class="m-0">Lista de presupuestos</h5>
+                                <span
+                                    class="block mt-2 md:mt-0 p-input-icon-left"
+                                >
+                                    <i class="pi pi-search"></i>
+                                    <input
+                                        pInputText
+                                        type="text"
+                                        (input)="onGlobalFilter(dt, $event)"
+                                        placeholder="Buscar por título..."
+                                        class="w-full sm:w-auto"
+                                    />
+                                </span>
+                            </div>
+                        </ng-template>
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="title" style="width: 60%">
+                                    Plan del presupuesto
+                                    <p-sortIcon field="title"></p-sortIcon>
+                                </th>
+                                <th style="width: 10%"></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-data>
+                            <tr>
+                                <td style="width: 14%; min-width: 10rem">
+                                    <span class="p-column-title"
+                                        >Título de tesis</span
+                                    >
+                                    {{ data.plan }}
+                                </td>
+                                <td>
+                                    <div class="flex">
+                                        <p-button
+                                            label="Ver detalle"
+                                            [outlined]="true"
+                                            severity="contrast"
+                                            (click)="viewDetailsBudget(data)"
+                                        />
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="2" class="text-center">No se encontraron registros</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </ng-template>
+            <ng-template #listError>
+                <app-card-error
+                    [message]="messageError"
+                    (reload)="handleReload($event)"
+                ></app-card-error>
+            </ng-template>
+            <ng-template #listSkeleton>
+                <app-skeleton-table
+                    [columnTitles]="columnTitles"
+                    [skeletonCount]="skeletonRows"
+                ></app-skeleton-table>
+            </ng-template>
+            <!-- <p-carousel
+                [value]="data"
+                [numVisible]="1"
+                [numScroll]="1"
+                [circular]="false"
+                [responsiveOptions]="responsiveOptions"
+            >
+                <ng-template let-product pTemplate="item">
+                    <p-table
+                        [value]="previewData"
+                        styleClass="p-datatable-gridlines"
+                        responsiveLayout="scroll"
+                    >
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th>COD.ACT</th>
+                                <th>ACTIVIDAD FUNCIONAL</th>
+                                <th>COD. TAREA</th>
+                                <th>TAREAS</th>
+                                <th>Ene.</th>
+                                <th>Feb.</th>
+                                <th>Mar.</th>
+                                <th>Abr.</th>
+                                <th>May.</th>
+                                <th>Jun.</th>
+                                <th>Jul.</th>
+                                <th>Ago.</th>
+                                <th>Sep.</th>
+                                <th>Oct.</th>
+                                <th>Nov.</th>
+                                <th>Dic.</th>
+                                <th>AVANCES</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template
+                            pTemplate="body"
+                            let-data
+                            let-rowIndex="rowIndex"
+                        >
+                            <tr>
+                                <td
+                                    *ngIf="shouldShowRowspan(rowIndex)"
+                                    [attr.rowspan]="getRowspan(data.codAct)"
+                                >
+                                    {{ data.codAct }}
+                                </td>
+                                <td
+                                    *ngIf="shouldShowRowspan(rowIndex)"
+                                    [attr.rowspan]="getRowspan(data.codAct)"
+                                >
+                                    {{ data.actividadFuncional }}
+                                </td>
+
+                                <td>{{ data.codTarea }}</td>
+                                <td>{{ data.tarea }}</td>
+                                <td [innerHTML]="data.meses[0]"></td>
+                                <td [innerHTML]="data.meses[1]"></td>
+                                <td [innerHTML]="data.meses[2]"></td>
+                                <td [innerHTML]="data.meses[3]"></td>
+                                <td [innerHTML]="data.meses[4]"></td>
+                                <td [innerHTML]="data.meses[5]"></td>
+                                <td [innerHTML]="data.meses[6]"></td>
+                                <td [innerHTML]="data.meses[7]"></td>
+                                <td [innerHTML]="data.meses[8]"></td>
+                                <td [innerHTML]="data.meses[9]"></td>
+                                <td [innerHTML]="data.meses[10]"></td>
+                                <td [innerHTML]="data.meses[11]"></td>
+                                <td>{{ data.avances }}</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </ng-template>
+            </p-carousel> -->
+        </div>
+    </div>
+</div>
+
+<div *ngIf="budgetSelected" class="grid">
+    <div class="col-12">
+        <app-breadcrumb [items]="breadcrumbItemsDetail"></app-breadcrumb>
+        <div class="card px-6 py-6">
+            <div class="grid d-flex col-12">
+                <div class="mr-auto mb-3">
+                    <p-button
+                        (click)="backList()"
+                        label="Regresar"
+                        [outlined]="true"
+                        icon="pi pi-angle-left"
+                        iconPos="left"
+                    />
+                    <p-button
+                        *ngIf="!edition"
+                        class="ml-3"
+                        (click)="showEdition()"
+                        label="Editar"
+                        icon="pi pi-pencil"
+                        iconPos="left"
+                    />
+                    <p-button
+                        *ngIf="edition"
+                        class="ml-3"
+                        (click)="cancelEdition()"
+                        label="Cancelar edición"
+                        icon="pi pi-times"
+                        iconPos="right"
+                    />
+                    <p-button
+                        *ngIf="edition"
+                        class="ml-3"
+                        (click)="saveEdition()"
+                        label="Guardar cambios"
+                        icon="pi pi-save"
+                        iconPos="left"
+                    />
+                </div>
+                <div>
+                    <p-button
+                        icon="pi pi-download"
+                        [rounded]="true"
+                        [text]="true"
+                        label="Exportar a excel"
+                        severity="success"
+                        (click)="exportToExcel()"
+                    />
+                </div>
+            </div>
+            
+            <div class="card flex justify-content-center col-12">
+                <h5 class="font-bold text-color" style="text-align: center">
+                    {{ budgetSelected.plan }}
+                </h5>
+            </div>
+            <div *ngIf="edition">
+                <div [ngSwitch]="statusActivity">
+                    <ng-template [ngSwitchCase]="'charging'">
+                        <ng-container
+                            *ngTemplateOutlet="skeleton"
+                        ></ng-container>
+                    </ng-template>
+                    <ng-template [ngSwitchCase]="'error'">
+                        <ng-container
+                            *ngTemplateOutlet="errorActivity"
+                        ></ng-container>
+                    </ng-template>
+                    <ng-template [ngSwitchCase]="'complete'">
+                        <ng-container
+                            *ngTemplateOutlet="selectActivity"
+                        ></ng-container>
+                    </ng-template>
+                </div>
+
+                <ng-template #selectActivity>
+                    <div class="my-3">
+                        <p class="font-bold">Selecciona una actividad:</p>
+                        <div class="flex flex-wrap justify-content-start gap-2">
+                            <div *ngFor="let activity of activities">
+                                <p-chip
+                                    [label]="
+                                        activity.code_activity +
+                                        '. ' +
+                                        activity.description_activity
+                                    "
+                                    [icon]="
+                                        activity.selected
+                                            ? 'pi pi-circle-on'
+                                            : 'pi pi-circle-off'
+                                    "
+                                    class="mr-2 cursor-pointer"
+                                    (click)="activitySelection(activity)"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template #errorActivity>
+                    <p-divider />
+                    <app-label-error
+                        message="Se ha producido un error al traer la información, por favor intenta seleccionando otra actividad."
+                        class="mb-3"
+                        [buttonVisible]="false"
+                    ></app-label-error>
+                </ng-template>
+
+                <div [ngSwitch]="statusTask">
+                    <ng-template [ngSwitchCase]="'charging'">
+                        <ng-container
+                            *ngTemplateOutlet="skeleton"
+                        ></ng-container>
+                    </ng-template>
+                    <ng-template [ngSwitchCase]="'error'">
+                        <ng-container
+                            *ngTemplateOutlet="errorTask"
+                        ></ng-container>
+                    </ng-template>
+                    <ng-template [ngSwitchCase]="'complete'">
+                        <ng-container
+                            *ngTemplateOutlet="selectTask"
+                        ></ng-container>
+                    </ng-template>
+                </div>
+
+                <ng-template #selectTask>
+                    <div *ngIf="activitySelected" class="my-3">
+                        <p-divider />
+                        <p class="font-bold">Selecciona una tarea:</p>
+                        <div class="flex flex-wrap justify-content-start gap-2">
+                            <div *ngFor="let task of tasks">
+                                <p-chip
+                                    [label]="
+                                        task.code_task +
+                                        '. ' +
+                                        task.description_task
+                                    "
+                                    [icon]="
+                                        task.done
+                                            ? 'pi pi-check'
+                                            : task.selected
+                                            ? 'pi pi-circle-on'
+                                            : 'pi pi-circle-off'
+                                    "
+                                    [class]="
+                                        task.done
+                                            ? 'mr-2'
+                                            : 'mr-2 cursor-pointer'
+                                    "
+                                    (click)="
+                                        !task.done ? taskSelection(task) : null
+                                    "
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template #skeleton>
+                    <div class="my-3 w-full">
+                        <p-divider />
+                        <p-skeleton
+                            height="1.3rem"
+                            width="160px"
+                            styleClass="mb-2"
+                        />
+                        <div class="flex">
+                            <div class="mr-2" style="width: 110px">
+                                <p-skeleton height="2rem" styleClass="mb-2" />
+                            </div>
+                            <div class="mr-2" style="width: 110px">
+                                <p-skeleton height="2rem" styleClass="mb-2" />
+                            </div>
+                            <div class="mr-2" style="width: 110px">
+                                <p-skeleton height="2rem" styleClass="mb-2" />
+                            </div>
+                            <div class="mr-2" style="width: 110px">
+                                <p-skeleton height="2rem" styleClass="mb-2" />
+                            </div>
+                            <div class="mr-2" style="width: 110px">
+                                <p-skeleton height="2rem" styleClass="mb-2" />
+                            </div>
+                        </div>
+                    </div>
+                </ng-template>
+
+                <ng-template #errorTask>
+                    <p-divider />
+                    <app-label-error
+                        message="Se ha producido un error al traer la información, por favor intenta seleccionando otra actividad."
+                        class="mb-3"
+                        [buttonVisible]="false"
+                    ></app-label-error>
+                </ng-template>
+                <form *ngIf="taskSelected" [formGroup]="gastoForm">
+                    <div
+                        class="mb-4"
+                        style="
+                            border: 1px dashed #d1d5db;
+                            border-radius: 5px;
+                            padding: 15px;
+                        "
+                    >
+                        <div class="flex">
+                            <div class="mr-auto">
+                                <p for="tituloGeneral" class="font-bold">
+                                    {{
+                                        taskSelected.code_task +
+                                            ". " +
+                                            taskSelected.description_task
+                                    }}
+                                </p>
+                            </div>
+                            <button
+                                pButton
+                                type="button"
+                                icon="pi pi-times"
+                                class="p-button-danger"
+                                [rounded]="true"
+                                [text]="true"
+                                (click)="clearTaskSelection()"
+                            ></button>
+                        </div>
+
+                        <div class="p-field p-grid">
+                            <div class="col-12">
+                                <label>Gasto específico:</label>
+                                <input
+                                    pInputText
+                                    id="descripcion"
+                                    style="width: 100%"
+                                    placeholder="Gasto específico"
+                                    formControlName="gastoEspecifico"
+                                    class="p-inputtext-sm mt-3"
+                                />
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <div class="p-field p-grid">
+                                <label class="p-col-12 p-md-2">Meses:</label>
+
+                                <div
+                                    formArrayName="meses"
+                                    class="grid col-12 p-align-center p-justify-center flex"
+                                >
+                                    <div
+                                        *ngFor="
+                                            let mes of [
+                                                'Ene',
+                                                'Feb',
+                                                'Mar',
+                                                'Abr',
+                                                'May',
+                                                'Jun',
+                                                'Jul',
+                                                'Ago',
+                                                'Sep',
+                                                'Oct',
+                                                'Nov',
+                                                'Dic'
+                                            ];
+                                            let i = index
+                                        "
+                                        class="col-2"
+                                    >
+                                        <p>{{ mes }}</p>
+                                        <input
+                                            type="number"
+                                            style="
+                                                width: -webkit-fill-available;
+                                            "
+                                            [placeholder]="mes"
+                                            pInputText
+                                            [formControlName]="i"
+                                            pKeyFilter="int"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <div class="col-12">
+                                        <label>Rubro Contable:</label>
+                                        <input
+                                            pInputText
+                                            id="descripcion"
+                                            style="width: 100%"
+                                            placeholder="Rubro Contable"
+                                            formControlName="rubroContable"
+                                            class="p-inputtext-sm mt-3"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <div class="col-12">
+                                        <label>Área ejecutante del gasto específico:</label>
+                                        <input
+                                            pInputText
+                                            id="descripcion"
+                                            style="width: 100%"
+                                            placeholder="Área ejecutante del gasto específico"
+                                            formControlName="executing_area"
+                                            class="p-inputtext-sm mt-3"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <div class="col-12">
+                                        <label>Área responsable (asignación del pto):</label>
+                                        <input
+                                            pInputText
+                                            id="descripcion"
+                                            style="width: 100%"
+                                            placeholder="Área responsable (asignación del pto)"
+                                            formControlName="responsible_area"
+                                            class="p-inputtext-sm mt-3"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="p-field p-grid">
+                                    <div class="col-12">
+                                        <label>Tipo de actividad:</label>
+                                        <input
+                                            pInputText
+                                            id="descripcion"
+                                            style="width: 100%"
+                                            placeholder="Tipo de actividad"
+                                            formControlName="activity_type"
+                                            class="p-inputtext-sm mt-3"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="p-field p-grid">
+                                <div class="p-col-12 p-md-10">
+                                    <p-button
+                                        label="Agregar Gasto"
+                                        type="submit"
+                                        [disabled]="this.gastoForm.invalid"
+                                        (click)="agregarGasto()"
+                                    ></p-button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div *ngIf="edition && !floatingBoard" class="flex w-full">
+                <label style="font-size: 1.2rem" class="mr-auto"
+                    >Vista previa del plan</label
+                >
+                <p-button
+                    label="Ver en ventana flotante"
+                    [text]="true"
+                    (click)="floatingBoard = true"
+                    icon="pi pi-external-link"
+                />
+            </div>
+
+            <p-table
+                *ngIf="!floatingBoard"
+                [value]="gastosIngresados"
+                styleClass="p-datatable-gridlines"
+                responsiveLayout="scroll"
+            >
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>COD. ACT</th>
+                        <th>ACTIVIDAD FUNCIONAL</th>
+                        <th>COD. TAREA</th>
+                        <th>GASTO ESPECÍFICO</th>
+                        <th
+                            *ngFor="
+                                let mes of [
+                                    'Ene',
+                                    'Feb',
+                                    'Mar',
+                                    'Abr',
+                                    'May',
+                                    'Jun',
+                                    'Jul',
+                                    'Ago',
+                                    'Sep',
+                                    'Oct',
+                                    'Nov',
+                                    'Dic'
+                                ]
+                            "
+                        >
+                            {{ mes }}
+                        </th>
+                        <th>Total</th>
+                        <th>ÁREA EJECUTANTE DEL GASTO ESPECÍFICO</th>
+                        <th>ÁREA RESPONSABLE (ASIGNACION DEL PTO )</th>
+                        <th>TIPO DE ACTIVIDAD</th>
+                        <th>RUBRO CONTABLE</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-gasto>
+                    <tr>
+                        <td>{{ gasto.activityCode }}</td>
+                        <td>{{ gasto.actividad }}</td>
+                        <td>{{ gasto.taskCode }}</td>
+                        <td>{{ gasto.gastoEspecifico }}</td>
+                        <td *ngFor="let monto of gasto.meses">
+                            {{ monto }}
+                        </td>
+                        <td class="font-bold">
+                            {{ calcularTotal(gasto.meses) }}
+                        </td>
+                        <td>{{ gasto.executing_area }}</td>
+                        <td>{{ gasto.responsible_area }}</td>
+                        <td>{{ gasto.activity_type }}</td>
+                        <td>{{ gasto.rubroContable }}</td>
+                        <td *ngIf="edition">
+                            <p-button
+                                icon="pi pi-trash"
+                                [rounded]="true"
+                                [text]="true"
+                                severity="danger"
+                                (click)="deleteGasto(gasto)"
+                            />
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td colspan="4">TOTAL</td>
+                        <td *ngFor="let mes of totalMeses()">{{ mes }}</td>
+                        <td>{{ calcularTotalTotal() }}</td>
+                        <td colspan="4"></td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+<p-dialog
+    header="Vista previa del plan"
+    [(visible)]="floatingBoard"
+    [style]="{ width: '90rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+    [resizable]="true"
+>
+    <p-table
+        [value]="gastosIngresados"
+        styleClass="p-datatable-gridlines"
+        responsiveLayout="scroll"
+    >
+        <ng-template pTemplate="header">
+            <tr>
+                <th>COD. ACT</th>
+                <th>ACTIVIDAD FUNCIONAL</th>
+                <th>COD. TAREA</th>
+                <th>GASTO ESPECÍFICO</th>
+                <th
+                    *ngFor="
+                        let mes of [
+                            'Ene',
+                            'Feb',
+                            'Mar',
+                            'Abr',
+                            'May',
+                            'Jun',
+                            'Jul',
+                            'Ago',
+                            'Sep',
+                            'Oct',
+                            'Nov',
+                            'Dic'
+                        ]
+                    "
+                >
+                    {{ mes }}
+                </th>
+                <th>Total</th>
+                <th>ÁREA EJECUTANTE DEL GASTO ESPECÍFICO</th>
+                <th>ÁREA RESPONSABLE (ASIGNACION DEL PTO )</th>
+                <th>TIPO DE ACTIVIDAD</th>
+                <th>RUBRO CONTABLE</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-gasto>
+            <tr>
+                <td>{{ gasto.activityCode }}</td>
+                <td>{{ gasto.actividad }}</td>
+                <td>{{ gasto.taskCode }}</td>
+                <td>{{ gasto.gastoEspecifico }}</td>
+                <td *ngFor="let monto of gasto.meses">
+                    {{ monto }}
+                </td>
+                <td class="font-bold">
+                    {{ calcularTotal(gasto.meses) }}
+                </td>
+                <td>{{ gasto.executing_area }}</td>
+                <td>{{ gasto.responsible_area }}</td>
+                <td>{{ gasto.activity_type }}</td>
+                <td>{{ gasto.rubroContable }}</td>
+                <td *ngIf="edition">
+                    <p-button
+                        icon="pi pi-trash"
+                        [rounded]="true"
+                        [text]="true"
+                        severity="danger"
+                        (click)="deleteGasto(gasto)"
+                    />
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+            <tr>
+                <td colspan="4">TOTAL</td>
+                <td *ngFor="let mes of totalMeses()">{{ mes }}</td>
+                <td>{{ calcularTotalTotal() }}</td>
+                <td colspan="4"></td>
+            </tr>
+        </ng-template>
+    </p-table>
+</p-dialog>

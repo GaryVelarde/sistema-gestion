@@ -1,0 +1,492 @@
+<div *ngIf="!isUdi"  class="grid">
+    <div class="col-12">
+        <p-card styleClass="mb-4">
+            <h2>
+                Bienvenido de nuevo,
+                {{
+                    tokenService.getDR2LP2().user.name +
+                        " " +
+                        tokenService.getDR2LP2().user.surnames
+                }}
+            </h2>
+            <p>¿Qué deseas hacer hoy?</p>
+        </p-card>
+    </div>
+    <div class="col-12 md:col-6 lg:col-3">
+        <p-card styleClass="mb-4">
+            <ng-template pTemplate="header">
+                <div
+                    class="flex align-items-center justify-content-center bg-primary"
+                    style="height: 100px"
+                >
+                    <i class="pi pi-user text-5xl"></i>
+                </div>
+            </ng-template>
+            <h3>Perfil</h3>
+            <p>Actualiza tu información personal</p>
+            <ng-template pTemplate="footer">
+                <p-button
+                    [text]="true"
+                    label="Ir al perfil"
+                    icon="pi pi-user"
+                    styleClass="p-button-outlined"
+                    (click)="goToProfile()"
+                ></p-button>
+            </ng-template>
+        </p-card>
+    </div>
+    <div class="col-12 md:col-6 lg:col-3">
+        <p-card styleClass="mb-4">
+            <ng-template pTemplate="header">
+                <div
+                    class="flex align-items-center justify-content-center bg-success"
+                    style="height: 100px"
+                >
+                    <i class="pi pi-calendar text-5xl"></i>
+                </div>
+            </ng-template>
+            <h3>Calendario</h3>
+            <p>Revisa tus próximos eventos</p>
+            <ng-template pTemplate="footer">
+                <p-button
+                    [text]="true"
+                    label="Ver calendario"
+                    icon="pi pi-calendar"
+                    styleClass="p-button-outlined"
+                    (click)="goToEventsUdi()"
+                ></p-button>
+            </ng-template>
+        </p-card>
+    </div>
+    <div class="col-12 md:col-6 lg:col-3">
+        <p-card styleClass="mb-4">
+            <ng-template pTemplate="header">
+                <div
+                    class="flex align-items-center justify-content-center bg-info"
+                    style="height: 100px"
+                >
+                    <i class="pi pi-graduation-cap text-5xl"></i>
+                </div>
+            </ng-template>
+            <h3>Tesis</h3>
+            <p>Gestiona los proyectos de tesis</p>
+            <ng-template pTemplate="footer">
+                <p-button
+                    [text]="true"
+                    label="Ir a mensajes"
+                    icon="pi pi-graduation-cap"
+                    styleClass="p-button-outlined"
+                    (click)="goToTitulationProcess()"
+                ></p-button>
+            </ng-template>
+        </p-card>
+    </div>
+    <div class="col-12 md:col-6 lg:col-3">
+        <p-card styleClass="mb-4">
+            <ng-template pTemplate="header">
+                <div
+                    class="flex align-items-center justify-content-center bg-warning"
+                    style="height: 100px"
+                >
+                    <i class="pi pi-file-check text-5xl"></i>
+                </div>
+            </ng-template>
+            <h3>Líneas y guías</h3>
+            <p>Revisa tus documentos asignados</p>
+            <ng-template pTemplate="footer">
+                <p-button
+                    [text]="true"
+                    label="Configurar"
+                    icon="pi pi-file-check"
+                    styleClass="p-button-outlined"
+                    (click)="goToGuide()"
+                ></p-button>
+            </ng-template>
+        </p-card>
+    </div>
+</div>
+
+<div *ngIf="isUdi" class="grid">
+    <app-degree-process-cards
+        class="w-full"
+        style="justify-content: center; display: flex; flex-wrap: wrap"
+    ></app-degree-process-cards>
+
+    <div class="col-12 xl:col-6">
+        <div class="card">
+            <div class="flex align-items-center justify-content-between mb-2">
+                <h5>Reporte de Inscripciones</h5>
+                <div *ngIf="statusChartInscription === 'complete'">
+                    <p-dropdown
+                        [options]="years"
+                        [(ngModel)]="yearSelectedByInscription"
+                        optionLabel="name"
+                        placeholder="Selecciona un año"
+                    />
+                    <p-button
+                        icon="pi pi-search"
+                        [rounded]="true"
+                        [text]="true"
+                        (click)="fillChartInscription()"
+                    />
+                </div>
+                <div
+                    *ngIf="statusChartInscription === 'charging'"
+                    style="width: 25%"
+                >
+                    <p-skeleton height="2rem" styleClass="" />
+                </div>
+            </div>
+            <p-chart
+                *ngIf="statusChartInscription !== 'error'"
+                type="line"
+                [data]="chartDataInscription"
+                [options]="chartOptions"
+            ></p-chart>
+            <app-card-error
+                *ngIf="statusChartInscription === 'error'"
+                message="Se ha producido un error al cargar la información, por favor intentelo más tarde."
+                (reload)="fillChartInscription()"
+            >
+            </app-card-error>
+        </div>
+        <div class="card">
+            <div class="flex align-items-center justify-content-between mb-2">
+                <h5>Reporte de Revisiones de tesis</h5>
+                <div *ngIf="statusChartReview === 'complete'">
+                    <p-dropdown
+                        [options]="years"
+                        [(ngModel)]="yearSelectedByReview"
+                        optionLabel="name"
+                        placeholder="Selecciona un año"
+                    />
+                    <p-button
+                        icon="pi pi-search"
+                        [rounded]="true"
+                        [text]="true"
+                        (click)="fillChartReview()"
+                    />
+                </div>
+                <div
+                    *ngIf="statusChartReview === 'charging'"
+                    style="width: 25%"
+                >
+                    <p-skeleton height="2rem" styleClass="" />
+                </div>
+            </div>
+            <p-chart
+                *ngIf="statusChartReview !== 'error'"
+                type="line"
+                [data]="chartDataReview"
+                [options]="chartOptions"
+            ></p-chart>
+            <app-card-error
+                *ngIf="statusChartReview === 'error'"
+                message="Se ha producido un error al cargar la información, por favor intentelo más tarde."
+                (reload)="fillChartReview()"
+            >
+            </app-card-error>
+        </div>
+        <div class="card">
+            <div class="flex align-items-center justify-content-between mb-2">
+                <h5>Reporte de Articulos</h5>
+                <div *ngIf="statusChartArticles === 'complete'">
+                    <p-dropdown
+                        [options]="years"
+                        [(ngModel)]="yearSelectedByArticles"
+                        optionLabel="name"
+                        placeholder="Selecciona un año"
+                    />
+                    <p-button
+                        icon="pi pi-search"
+                        [rounded]="true"
+                        [text]="true"
+                        (click)="callGetReportByArticles()"
+                    />
+                </div>
+                <div
+                    *ngIf="statusChartArticles === 'charging'"
+                    style="width: 25%"
+                >
+                    <p-skeleton height="2rem" styleClass="" />
+                </div>
+            </div>
+            <div
+                *ngIf="statusChartReview !== 'error'"
+                class="w-full flex align-items-center justify-content-center"
+            >
+                <div style="width: 70%">
+                    <p-chart
+                        type="pie"
+                        [data]="dataArticles"
+                        [options]="optionsArticles"
+                    />
+                </div>
+            </div>
+
+            <app-card-error
+                *ngIf="statusChartReview === 'error'"
+                message="Se ha producido un error al cargar la información, por favor intentelo más tarde."
+                (reload)="callGetReportByArticles()"
+            >
+            </app-card-error>
+            <app-card-error
+                *ngIf="statusChartReview === 'error'"
+                message="Se ha producido un error al cargar la información, por favor intentelo más tarde."
+                (reload)="fillChartReview()"
+            >
+            </app-card-error>
+        </div>
+        <app-similarity-titles></app-similarity-titles>
+    </div>
+
+    <div class="col-12 xl:col-6">
+        <div class="card">
+            <div class="flex align-items-center justify-content-between mb-2">
+                <h5>Reporte de Asesorías</h5>
+                <div *ngIf="statusChartAdvisory === 'complete'">
+                    <p-dropdown
+                        [options]="years"
+                        [(ngModel)]="yearSelectedByAdvisory"
+                        optionLabel="name"
+                        placeholder="Selecciona un año"
+                    />
+                    <p-button
+                        icon="pi pi-search"
+                        [rounded]="true"
+                        [text]="true"
+                        (click)="fillChartAdvisory()"
+                    />
+                </div>
+                <div
+                    *ngIf="statusChartAdvisory === 'charging'"
+                    style="width: 25%"
+                >
+                    <p-skeleton height="2rem" styleClass="" />
+                </div>
+            </div>
+            <p-chart
+                *ngIf="statusChartAdvisory !== 'error'"
+                type="line"
+                [data]="chartDataAdvisory"
+                [options]="chartOptions"
+            ></p-chart>
+            <app-card-error
+                *ngIf="statusChartAdvisory === 'error'"
+                message="Se ha producido un error al cargar la información, por favor intentelo más tarde."
+                (reload)="fillChartAdvisory()"
+            >
+            </app-card-error>
+        </div>
+        <div class="card">
+            <div class="flex align-items-center justify-content-between mb-2">
+                <h5>Reporte de Sustentaciones</h5>
+                <div *ngIf="statusChartPresentation === 'complete'">
+                    <p-dropdown
+                        [options]="years"
+                        [(ngModel)]="yearSelectedByPresentation"
+                        optionLabel="name"
+                        placeholder="Selecciona un año"
+                    />
+                    <p-button
+                        icon="pi pi-search"
+                        [rounded]="true"
+                        [text]="true"
+                        (click)="fillChartPresentation()"
+                    />
+                </div>
+                <div
+                    *ngIf="statusChartPresentation === 'charging'"
+                    style="width: 25%"
+                >
+                    <p-skeleton height="2rem" styleClass="" />
+                </div>
+            </div>
+            <p-chart
+                *ngIf="statusChartPresentation !== 'error'"
+                type="line"
+                [data]="chartDataPresentation"
+                [options]="chartOptions"
+            ></p-chart>
+            <app-card-error
+                *ngIf="statusChartPresentation === 'error'"
+                message="Se ha producido un error al cargar la información, por favor intentelo más tarde."
+                (reload)="fillChartPresentation()"
+            >
+            </app-card-error>
+        </div>
+        <div class="card" style="max-height: 500px">
+            <div class="flex align-items-center justify-content-between mb-2">
+                <h5>Notificaciones</h5>
+                <div>
+                    <p-button
+                        icon="pi pi-refresh"
+                        [rounded]="true"
+                        [text]="true"
+                        pTooltip="Refrescar"
+                        tooltipPosition="left"
+                        (click)="refreshNotificactions()"
+                    />
+                </div>
+            </div>
+            <div [ngSwitch]="stateCallNotifications">
+                <ng-template [ngSwitchCase]="'charging'">
+                    <ng-container
+                        *ngTemplateOutlet="notificacionSkeleton"
+                    ></ng-container>
+                </ng-template>
+                <ng-template [ngSwitchCase]="'error'">
+                    <ng-container
+                        *ngTemplateOutlet="notificacionError"
+                    ></ng-container>
+                </ng-template>
+                <ng-template [ngSwitchCase]="'complete'">
+                    <ng-container
+                        *ngTemplateOutlet="notificacionList"
+                    ></ng-container>
+                </ng-template>
+                <ng-template ngSwitchDefault>
+                    <p>Invalid state</p>
+                </ng-template>
+            </div>
+
+            <ng-template #notificacionList>
+                <p-scrollPanel [style]="{ width: '100%', height: '350px' }">
+                    <span
+                        *ngIf="notificationsToday.length > 0"
+                        class="block text-600 font-medium mb-3"
+                        >Hoy</span
+                    >
+                    <ul class="p-0 mx-0 mt-0 mb-4 list-none">
+                        <li
+                            *ngFor="let notification of notificationsToday"
+                            class="flex align-items-center py-2 border-bottom-1 surface-border"
+                        >
+                            <div
+                                class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0"
+                            >
+                                <i
+                                    [class]="
+                                        notification.icon +
+                                        ' text-xl text-blue-500'
+                                    "
+                                ></i>
+                            </div>
+                            <span class="text-900 line-height-3">
+                                {{
+                                    notification.type === "comment"
+                                        ? notification.comment
+                                        : notification.type === "task"
+                                        ? notification.task
+                                        : notification.status
+                                }}
+                            </span>
+                        </li>
+                    </ul>
+
+                    <span
+                        *ngIf="notificationsYesterday.length > 0"
+                        class="block text-600 font-medium mb-3"
+                        >Ayer</span
+                    >
+                    <ul class="p-0 mx-0 mt-0 mb-4 list-none">
+                        <li
+                            *ngFor="let notification of notificationsYesterday"
+                            class="flex align-items-center py-2 border-bottom-1 surface-border"
+                        >
+                            <div
+                                class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0"
+                            >
+                                <i
+                                    [class]="
+                                        notification.icon +
+                                        ' text-xl text-blue-500'
+                                    "
+                                ></i>
+                            </div>
+                            <span class="text-900 line-height-3">
+                                {{
+                                    notification.type === "comment"
+                                        ? notification.comment
+                                        : notification.type === "task"
+                                        ? notification.task
+                                        : notification.status
+                                }}
+                            </span>
+                        </li>
+                    </ul>
+
+                    <ng-container
+                        *ngFor="let daysAgo of notificationsDaysAgo | keyvalue"
+                    >
+                        <span class="block text-600 font-medium mb-3"
+                            >Hace {{ daysAgo.key }} días</span
+                        >
+                        <ul class="p-0 mx-0 mt-0 mb-4 list-none">
+                            <li
+                                *ngFor="let notification of daysAgo.value"
+                                class="flex align-items-center py-2 border-bottom-1 surface-border"
+                            >
+                                <div
+                                    class="w-3rem h-3rem flex align-items-center justify-content-center bg-blue-100 border-circle mr-3 flex-shrink-0"
+                                >
+                                    <i
+                                        [class]="
+                                            notification.icon +
+                                            ' text-xl text-blue-500'
+                                        "
+                                    ></i>
+                                </div>
+                                <span class="text-900 line-height-3">
+                                    {{
+                                        notification.type === "comment"
+                                            ? notification.comment
+                                            : notification.type === "task"
+                                            ? notification.task
+                                            : notification.status
+                                    }}
+                                </span>
+                            </li>
+                        </ul>
+                    </ng-container>
+                </p-scrollPanel>
+            </ng-template>
+            <ng-template #notificacionError>
+                <app-label-error
+                    [message]="messageError"
+                    (reload)="refreshNotificactions()"
+                    [buttonVisible]="false"
+                >
+                </app-label-error>
+            </ng-template>
+            <ng-template #notificacionSkeleton>
+                <div *ngFor="let row of skeletonNotificationsRows" class="mb-4">
+                    <p-skeleton
+                        width="4rem"
+                        height="1.3rem"
+                        styleClass="mb-4"
+                    />
+                    <div
+                        *ngFor="let row of skeletonNotificationBodyRows"
+                        style="
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                        "
+                    >
+                        <div class="mb-1" style="width: 40px">
+                            <p-skeleton
+                                shape="circle"
+                                size="3rem"
+                                styleClass="mr-2"
+                            />
+                        </div>
+                        <div class="w-full ml-4">
+                            <p-skeleton height="1.3rem" styleClass="mb-2" />
+                        </div>
+                    </div>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>

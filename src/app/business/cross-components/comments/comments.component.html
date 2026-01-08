@@ -1,0 +1,168 @@
+<div class="col-12">
+    <h5>Comentarios</h5>
+</div>
+<div class="col-12 grid">
+    <div
+        *ngIf="visible && registerState === 'complete'"
+        class="mb-4 w-full flex align-items-center ml-3"
+    >
+        <p-avatar [label]="getInitialName()" size="large" />
+        <div class="ml-3 w-full">
+            <form [formGroup]="commentsForm" style="width: inherit">
+                <span class="p-float-label">
+                    <textarea
+                        inputId="textarea"
+                        rows="3"
+                        style="width: 100%; resize: none;"
+                        formControlName="comment"
+                        pInputTextarea
+                        (keydown.enter)="addComment($event)"
+                    ></textarea>
+                    <label for="textarea">Escribe tu comentario aquí...</label>
+                </span>
+            </form>
+        </div>
+    </div>
+    <div
+        *ngIf="registerState === 'charging'"
+        class="mb-4 w-full flex align-items-center ml-3 ng-star-inserted"
+    >
+        <div>
+            <p-skeleton size="41px" class="ml-3"></p-skeleton>
+        </div>
+        <div class="ml-3 w-full">
+            <p-skeleton height="70px" width="100%" class="ml-3"></p-skeleton>
+        </div>
+    </div>
+    <div class="col-12 content-comments">
+        <div [ngSwitch]="state">
+            <ng-template [ngSwitchCase]="'charging'">
+                <ng-container
+                    *ngTemplateOutlet="commentsSkeleton"
+                ></ng-container>
+            </ng-template>
+            <ng-template [ngSwitchCase]="'error'">
+                <ng-container *ngTemplateOutlet="commentsError"></ng-container>
+            </ng-template>
+            <ng-template [ngSwitchCase]="'complete'">
+                <ng-container *ngTemplateOutlet="commentsList"></ng-container>
+            </ng-template>
+            <ng-template ngSwitchDefault>
+                <p>Invalid state</p>
+            </ng-template>
+        </div>
+        <ng-template #commentsList>
+            <div *ngIf="comments.length < 1">
+                <span class="ml-3">Sé el primero en dejar un comentario</span>
+            </div>
+            <div *ngIf="comments.length > 0">
+                <div
+                    *ngFor="let comment of visibleComments; let i = index"
+                    class="mb-4 flex align-items-center"
+                >
+                    <p-avatar
+                        [label]="getFirstLetter(comment.user.name)"
+                        styleClass="ml-3"
+                        size="large"
+                    ></p-avatar>
+                    <div class="ml-3 w-full">
+                        <div class="flex mb-2">
+                            <span class="mr-auto block text-900">
+                                {{
+                                    comment.user.name +
+                                        " " +
+                                        comment.user.surnames
+                                }}
+                            </span>
+                            <span class="block text-700">{{
+                                comment.created_at
+                            }}</span>
+
+                            <i *ngIf="tokenService.getUserTag() === comment.user.id"
+                                class="pi pi-ellipsis-v cursor-pointer ml-3"
+                                (click)="openMenu(menu, $event)"
+                            ></i>
+
+                            <p-menu
+                                #menu
+                                [model]="commentMenuItems(comment)"
+                                [popup]="true"
+                            ></p-menu>
+                        </div>
+
+                        <span
+                            *ngIf="!comment.isEditing"
+                            class="block text-900 border-1 surface-ground surface-border p-2 border-round"
+                            style="word-break: break-all"
+                        >
+                            {{ comment.description }}
+                        </span>
+
+                        <div
+                            *ngIf="comment.isEditing"
+                            class="flex align-items-center"
+                        >
+                            <input
+                                type="text"
+                                class="w-full"
+                                pInputText
+                                [(ngModel)]="comment.description"
+                            />
+                            <i
+                                [class]="iconUpdate + ' ml-2 mt-1'"
+                                (click)="saveComment(comment)"
+                            ></i>
+                            <i
+                                class="pi pi-times ml-3 cursor-pointer mt-1"
+                                (click)="cancelEdit(comment)"
+                            ></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template #commentsSkeleton>
+            <div
+                *ngFor="let rows of skeletonLength"
+                class="mb-4 flex align-items-center"
+            >
+                <p-skeleton size="41px" class="ml-3"></p-skeleton>
+                <div class="ml-3 w-full">
+                    <div class="flex justify-content-between mb-2">
+                        <p-skeleton width="100px"></p-skeleton>
+                        <p-skeleton width="80px"></p-skeleton>
+                    </div>
+                    <p-skeleton width="100%" height="32px"></p-skeleton>
+                </div>
+            </div>
+        </ng-template>
+        <ng-template #commentsError>
+            <app-label-error [message]="messageError" (reload)="handleReload()">
+            </app-label-error>
+        </ng-template>
+    </div>
+    <ng-container *ngIf="comments.length > 5">
+        <button
+            *ngIf="!showAllComments"
+            pButton
+            [label]="
+                'Ver más (' +
+                (comments.length - 5) +
+                ' ' +
+                (comments.length - 5 > 1 ? 'comentarios' : 'comentario') +
+                ')'
+            "
+            icon="pi pi-chevron-down"
+            class="p-button-text"
+            (click)="showAll()"
+        ></button>
+        <button
+            *ngIf="showAllComments"
+            pButton
+            label="Ver menos"
+            icon="pi pi-chevron-up"
+            class="p-button-text"
+            (click)="showLess()"
+        ></button>
+    </ng-container>
+</div>

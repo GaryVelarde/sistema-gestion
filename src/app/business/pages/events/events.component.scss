@@ -1,0 +1,146 @@
+.d-flex {
+    display: flex;
+}
+
+.m-auto{
+    margin: auto;
+}
+
+
+/* Fondo de la tarjeta y sombras */
+.custom-card {
+  max-width: 350px;
+  margin: 20px auto;
+  border-radius: 15px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  padding: 20px;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Efecto hover para la tarjeta */
+.custom-card:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+/* Centrar y dar estilo al contenedor del avatar */
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+/* Personalizar el avatar */
+.custom-avatar {
+  border: 3px solid #007bff;
+}
+
+/* Estilo para la información del usuario */
+.user-info {
+  text-align: center;
+  color: #333;
+}
+
+.user-info p {
+  margin: 5px 0;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-info i {
+  margin-right: 5px;
+  color: #007bff;
+}
+
+@media (min-width: 768px) {
+  .form-section {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  input {
+    width: auto;
+    flex: 1;
+  }
+}
+
+.p-field {
+  margin-bottom: 1rem;
+}
+
+.p-grid .p-col-1 {
+  text-align: center;
+}
+
+.p-text-right {
+  text-align: right;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+.mb-2 {
+  margin-bottom: 1rem;
+}
+
+.mb-3 {
+  margin-bottom: 1.5rem;
+}
+
+.p-button-sm {
+  font-size: 0.85em;
+  padding: 0.5rem 1rem;
+}
+
+.td-check {
+  background-color: #f9fafb;
+}
+
+.display-inline-grid {
+  display: inline-grid;
+}
+
+
+
+
+:host ::ng-deep .p-card {
+  margin-bottom: 1rem;
+}
+
+:host ::ng-deep .p-accordion .p-accordion-header a {
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+:host ::ng-deep .p-accordion .p-accordion-header:not(.p-disabled).p-highlight a {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+:host ::ng-deep .p-chip {
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+@media screen and (max-width: 640px) {
+  :host ::ng-deep .p-datatable-responsive .p-datatable-tbody > tr > td {
+    text-align: left;
+    display: block;
+    width: 100%;
+    float: left;
+    clear: left;
+    border: 0 none;
+  }
+
+  :host ::ng-deep .p-datatable-responsive .p-datatable-tbody > tr > td:before {
+    content: attr(data-label);
+    float: left;
+    text-align: left;
+    font-weight: bold;
+    margin-right: 1rem;
+  }
+}

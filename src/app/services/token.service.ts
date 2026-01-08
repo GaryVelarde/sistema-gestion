@@ -1,0 +1,53 @@
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TokenService {
+
+  constructor() { }
+
+  handleToken(token: string): void {
+    localStorage.setItem('access_token', token);
+  }
+
+  getToken(): string | null {
+    return localStorage.getItem('access_token');
+  }
+
+  getDR2LP2(): any | null {
+    return JSON.parse(localStorage.getItem('dr2lp2'));
+  }
+
+  getUserTag() {
+    return this.getDR2LP2().user.id ? this.getDR2LP2().user.id : '';
+  }
+
+  userIsUDI(): boolean {
+    const user = JSON.parse(localStorage.getItem('dr2lp2'));
+    return user.user.role === 'UDI' ? true : false;
+  }
+
+  revokeToken(): void {
+    localStorage.removeItem('access_token');
+  }
+
+  revokeDR2LP2(): void {
+    localStorage.removeItem('dr2lp2');
+  }
+
+  isAuthenticated(): boolean {
+    if (this.getToken())
+      return true;
+
+    return false;
+  }
+
+  getMode() {
+    return localStorage.getItem('mode');
+  }
+
+  setMode(value: any) {
+    localStorage.setItem('mode', value);
+  }
+}

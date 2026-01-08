@@ -1,0 +1,92 @@
+<p-toast />
+<div class="grid">
+    <div class="col-12">
+        <div class="card px-6 py-6">
+            <h4>Registro de trámites</h4>
+            <p-divider />
+            <div class="grid mt-3">
+                <form [formGroup]="articleForm" class="full-width">
+                    <div class="col-12">
+                        <label class="block text-600 font-semibold mb-1 mb-3"
+                            >Tipo de trámite</label
+                        >
+                        <p-dropdown
+                            [options]="types"
+                            formControlName="procedureType"
+                            optionLabel="name"
+                            styleClass="w-full"
+                            [filter]="true"
+                            filterBy="name"
+                            [showClear]="true"
+                            placeholder="Seleccionar"
+                        >
+                            <ng-template
+                                pTemplate="selectedItem"
+                                let-selectedOption
+                            >
+                                <div class="flex align-items-center gap-2">
+                                    <div>
+                                        {{ selectedOption.procedure_type }}
+                                    </div>
+                                </div>
+                            </ng-template>
+                            <ng-template let-country pTemplate="item">
+                                <div class="flex align-items-center gap-2">
+                                    <div>{{ country.procedure_type }}</div>
+                                </div>
+                            </ng-template>
+                        </p-dropdown>
+                    </div>
+                    <div class="col-12">
+                        <p-floatLabel>
+                            <textarea
+                                formControlName="description"
+                                class="full-width"
+                                rows="2"
+                                pInputTextarea
+                            >
+                            </textarea>
+                            <label for="title">Descripción del trámite</label>
+                        </p-floatLabel>
+                    </div>
+                    <app-upload-archives
+                        #upload
+                        (onFileChangeEmitter)="onFileChange($event)"
+                        (clearFilesEmitter)="clearFile()"
+                    ></app-upload-archives>
+                    <div class="col-12">
+                        <label class="block text-600 font-semibold mb-1 mb-3"
+                            >Solicitante</label
+                        >
+                        <app-user-selection
+                            #userSelection
+                            [typeUserList]="userType"
+                            maxUsersAllow="1"
+                            (userSelected)="getUserSelected($event)"
+                        >
+                        </app-user-selection>
+                    </div>
+
+                    <div class="flex gap-3 mt-3">
+                        <p-button
+                            (click)="backToList()"
+                            label="Regresar"
+                            [outlined]="true"
+                            icon="pi pi-angle-left"
+                            iconPos="left"
+                        />
+                        <p-button
+                            (click)="nextStep()"
+                            label="Registrar"
+                            icon="pi pi-angle-right"
+                            iconPos="right"
+                            [disabled]="
+                                !articleForm.valid || !studentsForm.valid
+                            "
+                        />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

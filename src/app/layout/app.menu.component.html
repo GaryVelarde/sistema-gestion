@@ -1,11 +1,50 @@
-<ul class="layout-menu">
-    <ng-container *ngFor="let item of model; let i = index;">
-        <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true"></li>
-        <li *ngIf="item.separator" class="menu-separator"></li>
-    </ng-container>
-    <li>
-        <a href="https://www.primefaces.org/primeblocks-ng/#/">
-            <img src="assets/layout/images/{{layoutService.config().colorScheme === 'light' ? 'banner-primeblocks' : 'banner-primeblocks-dark'}}.png" alt="Prime Blocks" class="w-full mt-3"/>
-        </a>
-    </li>
-</ul>
+<style>
+   .layout-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.layout-menu {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.footer {
+    position: relative;
+    bottom: 0;
+    text-align: center;
+    flex-shrink: 0;
+}
+    /* ::ng-deep .active-route {
+        background-color: #f9fafb;
+    } */
+</style>
+<div class="layout-wrapper">
+    <ul class="layout-menu">
+        <ng-container *ngFor="let item of model; let i = index">
+            <li
+                app-menuitem
+                *ngIf="!item.separator"
+                [item]="item"
+                [index]="i"
+                [root]="true"
+            ></li>
+            <li *ngIf="item.separator" class="menu-separator"></li>
+        </ng-container>
+    </ul>
+    <!-- <div class="footer">
+        <div class="grid d-flex justify-content-center">
+            <div class="col-4">
+                <p-avatar
+                    [label]="getInitialName()"
+                    styleClass="mr-2"
+                    size="large"
+                />
+            </div>
+            <div class="col-8 align-content-center">
+                <p>{{ getUserFullName() }}</p>
+            </div>
+        </div>
+    </div> -->
+</div>

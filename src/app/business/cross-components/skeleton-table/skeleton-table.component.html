@@ -1,0 +1,21 @@
+<div class="card">
+    <p-table [value]="skeletonCount" responsiveLayout="scroll">
+        <ng-template pTemplate="header">
+            <tr>
+                <th
+                    *ngFor="let title of columnTitles"
+                    [style.width]="100 / columnTitles.length + '%'"
+                >
+                    {{ title }}
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-product>
+            <tr>
+                <td *ngFor="let rows of columnTitles">
+                    <p-skeleton></p-skeleton>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
